@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BNF GAMES — Central de Jogos</title>
+<meta name="description" content="BNF Games — O Míster e Nexus FC, dois jogos criados do zero.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #000000;
+    --bg-panel: #0a0d10;
+    --bg-panel-2: #0d1216;
+    --cyan: #12c8f0;
+    --cyan-soft: #0b3b48;
+    --cyan-dim: #6ea8b8;
+    --white: #eef7fa;
+    --grey: #6f7880;
+    --line: #171e22;
+    --notch: 14px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  ::selection{ background: var(--cyan); color: #001318; }
+  a{ color: inherit; }
+
+  :focus-visible{
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  /* ---------- ambient grid ---------- */
+  .grid-bg{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(18,200,240,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(18,200,240,0.05) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(ellipse 900px 500px at 50% 0%, black, transparent 70%);
+    mask-image: radial-gradient(ellipse 900px 500px at 50% 0%, black, transparent 70%);
+  }
+
+  .scanline{
+    position: fixed;
+    left:0; right:0; top:0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.5;
+    z-index: 1;
+    animation: sweep 7s linear infinite;
+  }
+
+  @keyframes sweep{
+    0%{ transform: translateY(-10px); opacity: 0; }
+    10%{ opacity: 0.5; }
+    90%{ opacity: 0.5; }
+    100%{ transform: translateY(100vh); opacity: 0; }
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position: relative;
+    z-index: 2;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 24px clamp(20px, 6vw, 64px) 0;
+  }
+
+  .brand-mini{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .badge{
+    width: 16px;
+    height: 26px;
+    flex-shrink: 0;
+    background: var(--cyan);
+    clip-path: polygon(45% 0, 100% 0, 55% 100%, 0 100%);
+    box-shadow: 0 0 12px rgba(18,200,240,0.5);
+  }
+
+  .brand-mini span{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    font-size: 17px;
+    text-transform: uppercase;
+  }
+
+  .status-tag{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cyan-dim);
+    border: 1px solid var(--line);
+    padding: 7px 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .dot-live{
+    width:6px; height:6px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position: relative;
+    z-index: 1;
+    padding: clamp(28px, 6vw, 52px) 20px clamp(36px, 7vw, 60px);
+    text-align:center;
+  }
+
+  .hero-logo{
+    display:flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 0.55em;
+  }
+
+  .hero-logo .bnf{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: clamp(30px, 9vw, 78px);
+    letter-spacing: 0.02em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    text-shadow: 0 0 46px rgba(18,200,240,0.35);
+  }
+
+  .hero-logo .games{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: clamp(30px, 9vw, 78px);
+    letter-spacing: 0.02em;
+    color: var(--white);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .hero-tagline{
+    margin: 6px auto 0;
+    font-family:'Share Tech Mono', monospace;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-size: clamp(8.5px, 2.6vw, 13px);
+    color: var(--grey);
+    white-space: nowrap;
+  }
+
+  .hero-tagline .sep{ color: var(--cyan); padding: 0 0.6em; }
+
+  .hero-rule{
+    max-width: 640px;
+    margin: 28px auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+    position: relative;
+  }
+
+  .hero-rule::before{
+    content:"";
+    position:absolute;
+    left:50%; top:50%;
+    width:7px; height:7px;
+    transform: translate(-50%,-50%) rotate(45deg);
+    background: var(--cyan);
+  }
+
+  /* ---------- match cards ---------- */
+  main{
+    position: relative;
+    z-index: 1;
+    padding: 40px clamp(20px, 6vw, 64px) 30px;
+  }
+
+  .cards-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 860px){
+    .cards-grid{ grid-template-columns: 1fr; }
+  }
+
+  .card-shell{
+    background: var(--line);
+    clip-path: polygon(
+      var(--notch) 0, 100% 0,
+      100% calc(100% - var(--notch)), calc(100% - var(--notch)) 100%,
+      0 100%, 0 var(--notch)
+    );
+    transition: background 0.3s ease;
+  }
+
+  .card-shell:hover{ background: var(--cyan-soft); }
+
+  .game-card{
+    position: relative;
+    margin: 1px;
+    background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+    clip-path: polygon(
+      calc(var(--notch) - 1px) 0, 100% 0,
+      100% calc(100% - var(--notch) + 1px), calc(100% - var(--notch) + 1px) 100%,
+      0 100%, 0 calc(var(--notch) - 1px)
+    );
+    padding: clamp(24px, 4vw, 34px);
+    display:flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .tag{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid var(--cyan-soft);
+    color: var(--cyan);
+    white-space: nowrap;
+  }
+
+  .stat-mini{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--grey);
+    text-align:right;
+    line-height: 1.5;
+  }
+
+  .game-title{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 3.6vw, 38px);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    line-height: 1.05;
+    margin: 0;
+  }
+
+  .game-desc{
+    color: var(--grey);
+    font-size: 14.5px;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  .feature-list{
+    list-style:none;
+    margin: 4px 0 0;
+    padding: 0;
+    display:flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .feature-list li{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11.5px;
+    color: var(--cyan-dim);
+    background: rgba(18,200,240,0.05);
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+  }
+
+  .card-bottom{
+    margin-top: auto;
+    padding-top: 14px;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .kickoff-btn{
+    position: relative;
+    display:inline-flex;
+    align-items:center;
+    gap: 9px;
+    font-family:'Share Tech Mono', monospace;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration:none;
+    color: #001318;
+    background: var(--cyan);
+    padding: 11px 18px;
+    clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+    transition: filter 0.2s ease, transform 0.2s ease;
+  }
+
+  .kickoff-btn:hover{ filter: brightness(1.15); transform: translateX(2px); }
+  .kickoff-btn svg{ width: 13px; height: 13px; }
+
+  .whistle{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--grey);
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    position: relative;
+    z-index: 1;
+    text-align:center;
+    padding: 20px 20px 40px;
+    color: var(--grey);
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+  }
+
+  footer .line{
+    width: 50px;
+    height: 1px;
+    background: var(--line);
+    margin: 0 auto 16px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+    .scanline{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg" aria-hidden="true"></div>
+<div class="scanline" aria-hidden="true"></div>
+
+<header>
+  <div class="brand-mini">
+    <span class="badge"></span>
+    <span>BNF Games</span>
+  </div>
+  <div class="status-tag"><span class="dot-live"></span> 2 jogos online</div>
+</header>
+
+<section class="hero">
+  <div class="hero-logo">
+    <span class="bnf">BNF</span>
+    <span class="games">GAMES</span>
+  </div>
+  <p class="hero-tagline">Central de jogos <span class="sep">//</span> feitos do zero</p>
+  <div class="hero-rule"></div>
+</section>
+
+<main>
+  <div class="cards-grid">
+
+    <div class="card-shell">
+      <article class="game-card">
+        <div class="card-top">
+          <span class="tag">Simulador de carreira</span>
+          <span class="stat-mini">Modo<br>treinador</span>
+        </div>
+        <h2 class="game-title">O Míster</h2>
+        <p class="game-desc">Assuma o comando de um clube do Brasileirão. Monte o elenco, negocie no mercado da bola e brigue por título, acesso ou fuja do rebaixamento em uma carreira completa de treinador.</p>
+        <ul class="feature-list">
+          <li>Elencos reais</li>
+          <li>Acesso e rebaixamento</li>
+          <li>Transferências</li>
+        </ul>
+        <div class="card-bottom">
+          <span class="whistle">Edição Brasileirão</span>
+          <a class="kickoff-btn" href="./omister.html">
+            Jogar
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <div class="card-shell">
+      <article class="game-card">
+        <div class="card-top">
+          <span class="tag">Jogo de cartas</span>
+          <span class="stat-mini">Modo<br>tático</span>
+        </div>
+        <h2 class="game-title">Nexus FC</h2>
+        <p class="game-desc">Monte sua escalação com cartas, movimente o time no tabuleiro de campo e suba na tabela de divisões em busca do título. Estratégia e futebol em cada rodada.</p>
+        <ul class="feature-list">
+          <li>Tabuleiro tático</li>
+          <li>Escada de divisões</li>
+          <li>Troféus</li>
+        </ul>
+        <div class="card-bottom">
+          <span class="whistle">Liga dos Nexos</span>
+          <a class="kickoff-btn" href="./nexus.html">
+            Jogar
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="line"></div>
+  BNF GAMES — criado por João Pedro
+</footer>
+
+<script src="./bnf-config.js"></script>
+<script src="./bnf-analytics.js" data-page="Home"></script>
+
+</body>
+</html>
