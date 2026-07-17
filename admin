@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BNF Games — Painel</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="./bnf-config.js"></script>
+<style>
+  :root{
+    --bg: #000000;
+    --bg-panel: #0a0d10;
+    --bg-panel-2: #0d1216;
+    --cyan: #12c8f0;
+    --cyan-soft: #0b3b48;
+    --cyan-dim: #6ea8b8;
+    --white: #eef7fa;
+    --grey: #6f7880;
+    --line: #171e22;
+    --red: #e0475a;
+    --notch: 12px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  ::selection{ background: var(--cyan); color: #001318; }
+  a{ color: inherit; }
+
+  :focus-visible{
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  .grid-bg{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(18,200,240,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(18,200,240,0.05) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(ellipse 900px 500px at 50% 0%, black, transparent 70%);
+    mask-image: radial-gradient(ellipse 900px 500px at 50% 0%, black, transparent 70%);
+  }
+
+  header{
+    position: relative;
+    z-index: 2;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 22px clamp(20px, 5vw, 48px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand-mini{ display:flex; align-items:center; gap:12px; }
+
+  .badge{
+    width: 14px; height: 22px; flex-shrink:0;
+    background: var(--cyan);
+    clip-path: polygon(45% 0, 100% 0, 55% 100%, 0 100%);
+    box-shadow: 0 0 12px rgba(18,200,240,0.5);
+  }
+
+  .brand-mini span{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+
+  .brand-mini small{
+    display:block;
+    font-family:'Share Tech Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: var(--grey);
+    text-transform: uppercase;
+  }
+
+  .status-tag{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cyan-dim);
+    border: 1px solid var(--line);
+    padding: 7px 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:none;
+    cursor: pointer;
+  }
+  .status-tag:hover{ border-color: var(--cyan-soft); color: var(--cyan); }
+
+  .dot-live{
+    width:6px; height:6px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    flex-shrink:0;
+  }
+
+  main{
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(24px, 5vw, 48px) clamp(20px, 5vw, 48px) 60px;
+  }
+
+  /* ---------- login ---------- */
+  .login-wrap{
+    min-height: 60vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .login-shell{
+    background: var(--line);
+    clip-path: polygon(var(--notch) 0, 100% 0, 100% calc(100% - var(--notch)), calc(100% - var(--notch)) 100%, 0 100%, 0 var(--notch));
+    width: min(360px, 100%);
+  }
+
+  .login-card{
+    margin: 1px;
+    background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+    clip-path: polygon(calc(var(--notch) - 1px) 0, 100% 0, 100% calc(100% - var(--notch) + 1px), calc(100% - var(--notch) + 1px) 100%, 0 100%, 0 calc(var(--notch) - 1px));
+    padding: 32px 28px;
+  }
+
+  .login-card h1{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 4px;
+  }
+
+  .login-card p{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11.5px;
+    color: var(--grey);
+    letter-spacing: 0.06em;
+    margin: 0 0 24px;
+  }
+
+  label{
+    display:block;
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cyan-dim);
+    margin-bottom: 6px;
+  }
+
+  input{
+    width: 100%;
+    background: #000;
+    border: 1px solid var(--line);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 11px 12px;
+    margin-bottom: 16px;
+  }
+  input:focus{ border-color: var(--cyan); outline: none; }
+
+  .btn-primary{
+    width: 100%;
+    background: var(--cyan);
+    color: #001318;
+    border: none;
+    font-family:'Share Tech Mono', monospace;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px;
+    cursor: pointer;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    transition: filter 0.2s ease;
+  }
+  .btn-primary:hover{ filter: brightness(1.15); }
+  .btn-primary:disabled{ opacity: 0.5; cursor: default; }
+
+  .login-error{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 11.5px;
+    color: var(--red);
+    margin-top: -6px;
+    margin-bottom: 14px;
+    min-height: 14px;
+  }
+
+  /* ---------- dashboard ---------- */
+  .hidden{ display:none !important; }
+
+  .section-title{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cyan-dim);
+    margin: 40px 0 14px;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height: 1px;
+    background: var(--line);
+  }
+  main > .section-title:first-child{ margin-top: 0; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 760px){ .stat-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .stat-shell{
+    background: var(--line);
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .stat-card{
+    margin: 1px;
+    background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+    clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+    padding: 18px 20px;
+  }
+
+  .stat-label{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--grey);
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom: 10px;
+  }
+
+  .stat-value{
+    font-family:'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 4vw, 34px);
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-value.accent{ color: var(--cyan); }
+
+  .panel-shell{
+    background: var(--line);
+    clip-path: polygon(var(--notch) 0, 100% 0, 100% calc(100% - var(--notch)), calc(100% - var(--notch)) 100%, 0 100%, 0 var(--notch));
+  }
+
+  .panel{
+    margin: 1px;
+    background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+    clip-path: polygon(calc(var(--notch) - 1px) 0, 100% 0, 100% calc(100% - var(--notch) + 1px), calc(100% - var(--notch) + 1px) 100%, 0 100%, 0 calc(var(--notch) - 1px));
+    padding: 22px clamp(16px, 3vw, 26px);
+  }
+
+  .row-list{ display:flex; flex-direction:column; gap: 10px; }
+
+  .bar-row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    font-family:'Share Tech Mono', monospace;
+    font-size: 12.5px;
+  }
+
+  .bar-row .label{
+    width: 130px;
+    flex-shrink:0;
+    color: var(--grey);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bar-track{
+    flex:1;
+    height: 8px;
+    background: var(--line);
+    position: relative;
+  }
+  .bar-fill{
+    position:absolute; left:0; top:0; bottom:0;
+    background: var(--cyan);
+    box-shadow: 0 0 8px rgba(18,200,240,0.5);
+  }
+
+  .bar-row .count{
+    width: 42px;
+    text-align:right;
+    color: var(--white);
+    flex-shrink:0;
+  }
+
+  .days-grid{
+    display:flex;
+    align-items:flex-end;
+    gap: 10px;
+    height: 140px;
+    padding-top: 10px;
+  }
+
+  .day-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content: flex-end;
+    gap: 8px;
+    height: 100%;
+  }
+
+  .day-bar{
+    width: 100%;
+    max-width: 34px;
+    background: linear-gradient(180deg, var(--cyan), var(--cyan-soft));
+    min-height: 2px;
+  }
+
+  .day-label{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--grey);
+    text-transform: uppercase;
+  }
+
+  .day-count{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 10.5px;
+    color: var(--cyan-dim);
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-family:'Share Tech Mono', monospace;
+    font-size: 12px;
+  }
+
+  th{
+    text-align:left;
+    color: var(--grey);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    font-size: 10.5px;
+  }
+
+  td{
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+    color: var(--white);
+    white-space: nowrap;
+  }
+  td.muted{ color: var(--grey); }
+  tr:last-child td{ border-bottom: none; }
+
+  .table-wrap{ overflow-x:auto; }
+
+  .empty-note{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--grey);
+    padding: 10px 0;
+  }
+
+  .refresh-note{
+    font-family:'Share Tech Mono', monospace;
+    font-size: 10.5px;
+    color: var(--grey);
+    text-align:right;
+    margin-top: 8px;
+  }
+
+  .config-warning{
+    max-width: 560px;
+    margin: 60px auto 0;
+    text-align:center;
+    font-family:'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--grey);
+    line-height: 1.7;
+  }
+  .config-warning b{ color: var(--cyan); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg" aria-hidden="true"></div>
+
+<header>
+  <div class="brand-mini">
+    <span class="badge"></span>
+    <div>
+      <span>BNF Games</span>
+      <small>Painel de gestão</small>
+    </div>
+  </div>
+  <button class="status-tag hidden" id="logout-btn"><span class="dot-live"></span> Sair</button>
+</header>
+
+<main>
+
+  <!-- aviso de config ausente -->
+  <div id="config-warning" class="config-warning hidden">
+    Configure o Supabase antes de usar o painel.<br><br>
+    Abra o arquivo <b>bnf-config.js</b>, cole a URL e a anon key do seu projeto Supabase,
+    e rode o <b>bnf-schema.sql</b> no SQL Editor do Supabase.
+  </div>
+
+  <!-- login -->
+  <div id="login-view" class="login-wrap hidden">
+    <div class="login-shell">
+      <div class="login-card">
+        <h1>Área restrita</h1>
+        <p>Entre com sua conta de administrador</p>
+        <form id="login-form">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" autocomplete="username" required>
+          <label for="password">Senha</label>
+          <input type="password" id="password" autocomplete="current-password" required>
+          <div class="login-error" id="login-error"></div>
+          <button type="submit" class="btn-primary" id="login-btn">Entrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- dashboard -->
+  <div id="dashboard-view" class="hidden">
+
+    <div class="stat-grid">
+      <div class="stat-shell"><div class="stat-card">
+        <div class="stat-label"><span class="dot-live"></span> Online agora</div>
+        <div class="stat-value accent" id="stat-online">—</div>
+      </div></div>
+      <div class="stat-shell"><div class="stat-card">
+        <div class="stat-label">Visualizações totais</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div></div>
+      <div class="stat-shell"><div class="stat-card">
+        <div class="stat-label">Visitantes únicos</div>
+        <div class="stat-value" id="stat-unique">—</div>
+      </div></div>
+      <div class="stat-shell"><div class="stat-card">
+        <div class="stat-label">Visualizações hoje</div>
+        <div class="stat-value" id="stat-today">—</div>
+      </div></div>
+    </div>
+
+    <div class="section-title">Visualizações por página</div>
+    <div class="panel-shell"><div class="panel">
+      <div class="row-list" id="pages-list"></div>
+    </div></div>
+
+    <div class="section-title">Últimos 7 dias</div>
+    <div class="panel-shell"><div class="panel">
+      <div class="days-grid" id="days-grid"></div>
+    </div></div>
+
+    <div class="section-title">Atividade recente</div>
+    <div class="panel-shell"><div class="panel">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Quando</th><th>Página</th><th>Origem</th></tr>
+          </thead>
+          <tbody id="recent-body"></tbody>
+        </table>
+      </div>
+      <div class="refresh-note" id="refresh-note"></div>
+    </div></div>
+
+  </div>
+
+</main>
+
+<script>
+(function(){
+  var URL_CFG = window.BNF_SUPABASE_URL;
+  var KEY_CFG = window.BNF_SUPABASE_ANON_KEY;
+
+  var configWarning = document.getElementById('config-warning');
+  var loginView = document.getElementById('login-view');
+  var dashboardView = document.getElementById('dashboard-view');
+  var logoutBtn = document.getElementById('logout-btn');
+
+  if(!URL_CFG || !KEY_CFG || URL_CFG.indexOf('COLE_AQUI') === 0){
+    configWarning.classList.remove('hidden');
+    return;
+  }
+
+  var sb = window.supabase.createClient(URL_CFG, KEY_CFG);
+  var refreshTimer = null;
+
+  var loginForm = document.getElementById('login-form');
+  var loginError = document.getElementById('login-error');
+  var loginBtn = document.getElementById('login-btn');
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    loginError.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Entrando...';
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+
+    sb.auth.signInWithPassword({ email: email, password: password }).then(function(res){
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Entrar';
+      if(res.error){
+        loginError.textContent = 'E-mail ou senha inválidos.';
+        return;
+      }
+      showDashboard();
+    });
+  });
+
+  logoutBtn.addEventListener('click', function(){
+    sb.auth.signOut().then(function(){
+      if(refreshTimer) clearInterval(refreshTimer);
+      dashboardView.classList.add('hidden');
+      logoutBtn.classList.add('hidden');
+      loginView.classList.remove('hidden');
+    });
+  });
+
+  function showDashboard(){
+    loginView.classList.add('hidden');
+    dashboardView.classList.remove('hidden');
+    logoutBtn.classList.remove('hidden');
+    loadDashboard();
+    if(refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(loadDashboard, 20000);
+  }
+
+  function fmtWhen(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function dayKey(d){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function loadDashboard(){
+    var now = new Date();
+    var sevenDaysAgo = new Date(now.getTime() - 7*24*60*60*1000);
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    Promise.all([
+      sb.from('bnf_pageviews').select('*', { count: 'exact', head: true }),
+      sb.from('bnf_pageviews').select('session_id').limit(20000),
+      sb.from('bnf_pageviews').select('page').limit(20000),
+      sb.from('bnf_pageviews').select('created_at').gte('created_at', sevenDaysAgo.toISOString()).limit(20000),
+      sb.from('bnf_pageviews').select('created_at').gte('created_at', startOfToday.toISOString()),
+      sb.from('bnf_sessions').select('session_id, last_seen'),
+      sb.from('bnf_pageviews').select('created_at, page, referrer').order('created_at', { ascending: false }).limit(30)
+    ]).then(function(results){
+      var totalRes = results[0];
+      var sessionsForUnique = results[1];
+      var pagesRes = results[2];
+      var sevenDaysRes = results[3];
+      var todayRes = results[4];
+      var onlineRes = results[5];
+      var recentRes = results[6];
+
+      document.getElementById('stat-total').textContent = (totalRes.count != null ? totalRes.count : '—');
+
+      var uniqueSet = {};
+      (sessionsForUnique.data || []).forEach(function(r){ uniqueSet[r.session_id] = true; });
+      document.getElementById('stat-unique').textContent = Object.keys(uniqueSet).length;
+
+      document.getElementById('stat-today').textContent = (todayRes.data || []).length;
+
+      var twoMinAgo = now.getTime() - 2*60*1000;
+      var onlineCount = (onlineRes.data || []).filter(function(r){
+        return new Date(r.last_seen).getTime() >= twoMinAgo;
+      }).length;
+      document.getElementById('stat-online').textContent = onlineCount;
+
+      // views por página
+      var pageCounts = {};
+      (pagesRes.data || []).forEach(function(r){
+        pageCounts[r.page] = (pageCounts[r.page] || 0) + 1;
+      });
+      var pageEntries = Object.keys(pageCounts).map(function(k){ return [k, pageCounts[k]]; });
+      pageEntries.sort(function(a,b){ return b[1]-a[1]; });
+      var maxPage = pageEntries.length ? pageEntries[0][1] : 0;
+      var pagesList = document.getElementById('pages-list');
+      pagesList.innerHTML = '';
+      if(!pageEntries.length){
+        pagesList.innerHTML = '<div class="empty-note">Ainda não há dados. Configure o rastreamento nas páginas do site.</div>';
+      }
+      pageEntries.forEach(function(entry){
+        var pct = maxPage ? Math.max(4, Math.round(entry[1]/maxPage*100)) : 0;
+        var row = document.createElement('div');
+        row.className = 'bar-row';
+        row.innerHTML =
+          '<div class="label">' + entry[0] + '</div>' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="count">' + entry[1] + '</div>';
+        pagesList.appendChild(row);
+      });
+
+      // últimos 7 dias
+      var dayCounts = {};
+      for(var i=6; i>=0; i--){
+        var d = new Date(now.getTime() - i*24*60*60*1000);
+        dayCounts[dayKey(d)] = 0;
+      }
+      (sevenDaysRes.data || []).forEach(function(r){
+        var k = dayKey(new Date(r.created_at));
+        if(dayCounts.hasOwnProperty(k)) dayCounts[k]++;
+      });
+      var dayKeys = Object.keys(dayCounts);
+      var maxDay = Math.max.apply(null, dayKeys.map(function(k){ return dayCounts[k]; }).concat([1]));
+      var daysGrid = document.getElementById('days-grid');
+      daysGrid.innerHTML = '';
+      dayKeys.forEach(function(k){
+        var parts = k.split('-');
+        var label = parts[2] + '/' + parts[1];
+        var val = dayCounts[k];
+        var h = Math.max(2, Math.round(val/maxDay*100));
+        var col = document.createElement('div');
+        col.className = 'day-col';
+        col.innerHTML =
+          '<span class="day-count">' + val + '</span>' +
+          '<div class="day-bar" style="height:' + h + '%"></div>' +
+          '<span class="day-label">' + label + '</span>';
+        daysGrid.appendChild(col);
+      });
+
+      // atividade recente
+      var recentBody = document.getElementById('recent-body');
+      recentBody.innerHTML = '';
+      var recentData = recentRes.data || [];
+      if(!recentData.length){
+        recentBody.innerHTML = '<tr><td colspan="3" class="muted">Nenhum acesso registrado ainda.</td></tr>';
+      }
+      recentData.forEach(function(r){
+        var tr = document.createElement('tr');
+        var origem = r.referrer ? r.referrer.replace(/^https?:\/\//,'').split('/')[0] : 'direto';
+        tr.innerHTML =
+          '<td>' + fmtWhen(r.created_at) + '</td>' +
+          '<td>' + r.page + '</td>' +
+          '<td class="muted">' + origem + '</td>';
+        recentBody.appendChild(tr);
+      });
+
+      document.getElementById('refresh-note').textContent = 'Atualizado às ' + now.toLocaleTimeString('pt-BR');
+    }).catch(function(err){
+      console.error('Erro ao carregar painel:', err);
+    });
+  }
+
+  // checa se já está logado
+  sb.auth.getSession().then(function(res){
+    if(res.data && res.data.session){
+      showDashboard();
+    } else {
+      loginView.classList.remove('hidden');
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
