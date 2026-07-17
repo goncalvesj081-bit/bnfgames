@@ -1,0 +1,2777 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#efeee9">
+<title>O MÍSTER — Simulador de Carreira de Treinador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#efeee9; --panel:#ffffff; --panel2:#ffffff; --line:#dcdad2;
+  --txt:#0b0b0b; --mut:#6f6f6a;
+  --acc:#0b0b0b; --acc2:#0b0b0b; --ink:#ffffff; --edge:#0b0b0b;
+  --rit:#3a3a3a; --fin:#1e1e1e; --pas:#111111; --dri:#4a4a4a;
+  --def:#2c2c2c; --fis:#3f3f3f; --sm:#1a1a1a; --wf:#565656;
+  --ok:#0b0b0b; --bad:#9a9a9a;
+  /* acentos de cor (usados só em momentos festivos e sinais de leitura) */
+  --gold:#e8b23a; --win:#1f9d57;
+  --font-disp:'Archivo Black','Arial Black',sans-serif;
+  --font-body:'Inter','Segoe UI',Roboto,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+html{background:var(--bg)}
+body{
+  background:var(--bg); color:var(--txt);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  background-image:
+    linear-gradient(rgba(11,11,11,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(11,11,11,.045) 1px,transparent 1px);
+  background-size:28px 28px;
+  background-attachment:fixed;
+  min-height:100dvh;
+}
+.disp{font-weight:400;text-transform:uppercase;letter-spacing:.01em;font-family:var(--font-disp);line-height:.95}
+.mono{font-family:ui-monospace,'Cascadia Mono','Courier New',monospace}
+.screen{display:none;max-width:520px;margin:0 auto;padding:18px 16px 110px;min-height:100dvh}
+.screen.on{display:block}
+.eyebrow{color:var(--acc2);font-size:11px;letter-spacing:.34em;text-transform:uppercase;font-weight:700}
+h1.logo{font-family:var(--font-disp);font-weight:400;text-transform:uppercase;font-size:60px;line-height:.86;letter-spacing:.01em;margin:6px 0 2px}
+h1.logo span{color:var(--acc2)}
+.sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 20px 44px -28px rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.06) inset}
+.lbl{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.24em;font-weight:700;margin-bottom:8px}
+input[type=text],select{
+  width:100%;background:rgba(8,16,38,.6);border:1px solid var(--line);border-radius:12px;
+  color:var(--txt);padding:12px;font-size:16px;outline:none
+}
+input:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,123,255,.22)}
+.grid{display:grid;gap:8px}
+.opt{
+  background:rgba(8,16,38,.6);border:1px solid var(--line);border-radius:12px;color:var(--txt);
+  padding:10px 4px;text-align:center;font-weight:600;font-size:13px;cursor:pointer;user-select:none;transition:border-color .12s,background .12s,box-shadow .12s
+}
+.opt small{display:block;font-weight:400;font-size:9px;color:var(--mut);margin-top:2px}
+.opt.sel{background:linear-gradient(180deg,var(--acc2),var(--acc));border-color:transparent;color:#fff;box-shadow:0 8px 20px -8px rgba(47,123,255,.7)}
+.opt.sel small{color:rgba(255,255,255,.82)}
+.tag{display:inline-block;font-size:9px;background:var(--acc);color:#fff;border-radius:5px;padding:1px 5px;font-weight:700;vertical-align:middle}
+.cta{
+  position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,transparent,rgba(6,11,26,.9) 45%);max-width:520px;margin:0 auto;z-index:20
+}
+.btn{
+  display:block;width:100%;border:none;border-radius:14px;padding:15px;font-size:16px;cursor:pointer;
+  font-family:var(--font-disp);font-weight:400;text-transform:uppercase;letter-spacing:.03em;
+  background:linear-gradient(180deg,var(--acc2),var(--acc));color:#fff;
+  box-shadow:0 14px 30px -10px rgba(47,123,255,.6),0 1px 0 rgba(255,255,255,.25) inset;
+  transition:transform .08s ease,box-shadow .15s ease,filter .12s
+}
+.btn:hover{filter:brightness(1.07);box-shadow:0 16px 36px -10px rgba(47,123,255,.75),0 1px 0 rgba(255,255,255,.3) inset}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);box-shadow:none}
+.btn.ghost:hover{border-color:var(--acc);filter:none}
+.btn.mini{padding:11px;font-size:14px;border-radius:11px}
+.btn:disabled{opacity:.4;pointer-events:none}
+.row{display:flex;gap:8px}.row>*{flex:1}
+/* ---- DRAFT ---- */
+.draft-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dots{display:flex;gap:5px}
+.dot{width:9px;height:9px;border-radius:99px;background:rgba(120,160,255,.14);border:1px solid var(--line)}
+.dot.done{background:var(--acc);border-color:var(--acc)}
+.dot.cur{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,123,255,.3)}
+.attr-chip{display:inline-block;padding:5px 14px;border-radius:99px;font-family:var(--font-disp);font-weight:400;font-size:17px;letter-spacing:.03em;color:#fff;box-shadow:0 6px 16px -8px rgba(0,0,0,.8)}
+.slot{
+  background:rgba(8,16,38,.7);border:1px solid var(--line);border-radius:16px;height:150px;overflow:hidden;
+  position:relative;margin:14px 0;display:flex;align-items:center;justify-content:center;flex-direction:column
+}
+.slot .name{font-family:var(--font-disp);font-size:30px;font-weight:400;text-transform:uppercase;letter-spacing:.01em;text-align:center;padding:0 10px}
+.slot .val{font-family:var(--font-disp);font-size:48px;font-weight:400;margin-top:4px;color:var(--acc2)}
+.slot.spin .name{filter:blur(1.5px);opacity:.85}
+.slot::before,.slot::after{content:'';position:absolute;left:0;right:0;height:34px;pointer-events:none;z-index:2}
+.slot::before{top:0;background:linear-gradient(180deg,rgba(8,16,38,.9),transparent)}
+.slot::after{bottom:0;background:linear-gradient(0deg,rgba(8,16,38,.9),transparent)}
+.stolen{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.st{background:rgba(8,16,38,.6);border:1px solid var(--line);border-radius:12px;text-align:center;padding:7px 2px}
+.st .k{font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.12em}
+.st .v{font-family:var(--font-disp);font-size:24px;font-weight:400}
+.st .f{font-size:8px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+/* ---- HUB ---- */
+.hub-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.ovr-big{font-family:var(--font-disp);font-size:56px;font-weight:400;color:var(--acc2);line-height:.9;text-shadow:0 0 26px rgba(47,123,255,.45)}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.stat-row .st .v{color:var(--txt)}
+.season-log{max-height:230px;overflow:auto;font-size:12px}
+.season-log .li{display:flex;justify-content:space-between;padding:7px 4px;border-bottom:1px solid var(--line);gap:6px}
+.season-log .li b{color:var(--acc)}
+/* ---- MODAL ---- */
+ .ovl{position:fixed;inset:0;background:rgba(4,8,20,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
+ .ovl.open{display:flex;animation:ovlIn .28s ease}
+ @keyframes ovlIn{from{opacity:0}to{opacity:1}}
+ .mcard{background:var(--panel2);border:1px solid var(--line);border-radius:22px;max-width:440px;width:100%;padding:22px;text-align:center;max-height:92dvh;overflow:auto;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 30px 70px -30px rgba(0,0,0,.9)}
+ .ovl.open .mcard{animation:cardIn .34s cubic-bezier(.2,.8,.25,1)}
+ @keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+ @media (prefers-reduced-motion:reduce){.ovl.open,.ovl.open .mcard{animation:none}}
+.mcard .ico{font-size:46px;margin-bottom:6px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.mcard h3{font-family:var(--font-disp);font-size:26px;font-weight:400;text-transform:uppercase;letter-spacing:.01em;margin-bottom:8px}
+.mcard p{color:var(--mut);font-size:14px;line-height:1.55;margin-bottom:16px}
+.mcard .btns{display:flex;flex-direction:column;gap:8px}
+.score{font-family:var(--font-disp);font-size:44px;font-weight:400;margin:6px 0}
+/* ---- FIM ---- */
+.rank-hero{text-align:center;padding:22px 10px 14px}
+.rank-hero .r{font-family:var(--font-disp);font-size:42px;font-weight:400;color:var(--acc2);text-transform:uppercase;letter-spacing:.01em;line-height:1;text-shadow:0 0 30px rgba(47,123,255,.4)}
+.rank-hero .q{color:var(--mut);font-size:13px;margin-top:8px;font-style:italic}
+.meta-line{display:flex;justify-content:center;gap:14px;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-top:12px;flex-wrap:wrap}
+.tot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.honra{display:flex;justify-content:space-between;padding:7px 4px;border-bottom:1px solid var(--line);font-size:13px}
+.honra b{color:var(--acc)}
+.legbar{margin-bottom:12px}
+.legbar .t{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em}
+.legbar .bar{height:8px;background:rgba(8,16,38,.6);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.legbar .fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:99px}
+/* share */
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{flex:1;padding:9px;border-radius:11px;border:1px solid var(--line);background:rgba(8,16,38,.6);color:var(--mut);font-weight:700;font-size:12px;text-transform:uppercase;cursor:pointer}
+.tab.sel{border-color:var(--acc);color:var(--acc2)}
+#cardPrev{width:100%;border-radius:12px;border:1px solid var(--line)}
+/* full career */
+.fc-sec{margin-bottom:16px;text-align:left}
+.fc-sec h4{font-size:12px;color:var(--acc);text-transform:uppercase;letter-spacing:.18em;margin-bottom:8px}
+table.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl th{color:var(--mut);font-weight:800;text-align:left;padding:4px 3px;border-bottom:1px solid var(--line);font-size:10px;text-transform:uppercase}
+.tbl td{padding:5px 3px;border-bottom:1px solid var(--line)}
+.hist{margin-top:14px}
+.hist .li{display:flex;justify-content:space-between;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:13px}
+svg text{font-family:'Space Grotesk','Segoe UI',sans-serif}
+.small{font-size:11px;color:var(--mut)}
+.center{text-align:center}
+@media (prefers-reduced-motion:reduce){.slot.spin .name{filter:none}}
+</style>
+<style>
+.filo{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pill{display:inline-block;font-size:10px;padding:3px 9px;border-radius:99px;background:rgba(47,123,255,.15);border:1px solid var(--line);color:var(--acc2);font-weight:600}
+.board{display:flex;gap:8px;align-items:center;background:rgba(8,16,38,.55);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:8px}
+.board .exp{flex:1}
+.moodbar{height:8px;border-radius:99px;background:rgba(8,16,38,.7);border:1px solid var(--line);overflow:hidden;margin-top:4px}
+.moodbar .f{height:100%;border-radius:99px}
+</style>
+
+<style>
+/* ---- PARTIDA AO VIVO ---- */
+.mv{max-width:460px;text-align:left;padding:0;overflow:hidden}
+.mv-comp{background:linear-gradient(90deg,var(--acc),var(--acc2));border-bottom:1px solid transparent;padding:12px 14px;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#fff;font-weight:700;text-align:center}
+.mv-board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;padding:18px 14px 10px;background:rgba(8,16,38,.5)}
+ .mv-side{text-align:center;min-width:0}
+ .mv-nm{font-family:var(--font-disp);font-weight:400;font-size:20px;text-transform:uppercase;line-height:1.05;white-space:nowrap}
+ .mv-gg{display:flex;align-items:center;gap:6px;font-family:var(--font-disp);font-size:clamp(36px,11vw,50px);font-weight:400}
+.mv-gg i{font-size:16px;color:var(--mut);font-style:normal}
+.mv-gg span{min-width:38px;text-align:center}
+.mv-clock{display:flex;align-items:center;gap:8px;padding:0 14px 10px;background:rgba(8,16,38,.5)}
+.mv-clock #mvMin{font-family:ui-monospace,monospace;font-weight:700;color:var(--acc2);min-width:38px}
+.mv-track{flex:1;height:6px;background:rgba(4,8,20,.8);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.mv-fill{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .12s linear}
+.mv-feed{padding:6px 14px;min-height:150px;max-height:190px;overflow:auto;font-size:13px;background:rgba(4,8,20,.4)}
+.mv-feed .f{padding:6px 2px;border-bottom:1px dashed var(--line);display:flex;gap:8px;animation:slidein .25s ease}
+.mv-feed .f b{color:var(--acc2);font-family:ui-monospace,monospace;min-width:30px}
+.mv-feed .f.goal{color:var(--txt);font-weight:700}
+.mv-feed .f.goal b{color:var(--ok)}
+.mv-feed .f.dec{color:var(--sm)}
+@keyframes slidein{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.mv-act{padding:10px 14px 14px;display:flex;flex-direction:column;gap:8px;background:rgba(8,16,38,.5);border-top:1px solid var(--line)}
+.mv-act .q{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.12em;font-weight:600;text-align:center;margin-bottom:2px}
+/* ---- COMEMORAÇÃO ---- */
+.cel{position:relative;max-width:440px;padding:0;overflow:hidden;min-height:360px;background:linear-gradient(180deg,#0e2050,#060b1a)}
+#celCanvas{position:absolute;inset:0;width:100%;height:100%}
+.cel-in{position:relative;z-index:2;padding:34px 20px;text-align:center}
+.cel-tro{font-size:74px;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+.cel-big{font-family:var(--font-disp);font-size:42px;font-weight:400;text-transform:uppercase;letter-spacing:.01em;color:var(--acc2);margin:6px 0 4px;line-height:1;text-shadow:0 0 30px rgba(47,123,255,.5)}
+.cel-sub{font-size:17px;font-weight:700;color:var(--txt);margin-bottom:18px}
+@keyframes pop{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0)}}
+@media (prefers-reduced-motion:reduce){.cel-tro{animation:none}}
+</style>
+
+<style>
+  .draft-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 12px}
+  .dopt{background:rgba(8,16,38,.6);border:1px solid var(--line);border-radius:14px;padding:12px 5px;text-align:center;cursor:pointer;min-width:0;transition:transform .08s,border-color .12s,box-shadow .12s}
+.dopt:active{transform:translateY(1px)}
+.dopt.sel{border-color:var(--acc);background:rgba(47,123,255,.16);box-shadow:0 8px 20px -10px rgba(47,123,255,.6)}
+.dopt-nm{font-weight:600;font-size:11.5px;line-height:1.15;min-height:30px;display:flex;align-items:center;justify-content:center}
+  .dopt-val{font-family:var(--font-disp);font-size:34px;font-weight:400;margin-top:2px;color:var(--acc2);min-height:38px;display:flex;align-items:center;justify-content:center}
+  .dopt-val.stars{font-size:16px;letter-spacing:2px;line-height:1.25;overflow-wrap:anywhere;color:var(--gold)}
+.draft-hint{font-size:12px;color:var(--mut);text-align:center;margin-bottom:8px}
+.langbar{position:fixed;top:10px;right:10px;z-index:200;display:flex;gap:3px;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;padding:3px}
+.langbar button{border:0;background:transparent;color:var(--mut);font-weight:800;font-size:11px;letter-spacing:.4px;padding:5px 9px;border-radius:999px;cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+.langbar button:hover{color:var(--txt)}
+.langbar button.on{background:var(--acc);color:var(--ink)}
+</style>
+
+<style>
+/* ==========================================================================
+   SKIN 2.0 — EDITORIAL BRUTALISTA, PRETO & BRANCO
+   Redesenho completo: sem vidro/blur, cantos vivos, molduras pretas,
+   sombras "carimbo" (offset sólido), tipografia Archivo Black + Inter.
+   ========================================================================== */
+body{letter-spacing:-.01em}
+.screen{max-width:540px;padding:64px 18px 122px}
+.disp{letter-spacing:0}
+
+/* ----- Cabeçalho / logo ----- */
+.eyebrow{color:var(--txt);font-weight:800;letter-spacing:.42em;display:inline-block;
+  border:2px solid var(--edge);padding:5px 10px;border-radius:0;background:var(--edge);color:#fff}
+h1.logo{font-size:clamp(46px,13.5vw,74px);line-height:.92;margin:12px 0 14px;letter-spacing:-.02em;overflow-wrap:break-word}
+h1.logo span{background:var(--edge);color:#fff;padding:0 .1em;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+.sub{color:var(--mut);font-size:13.5px;line-height:1.5;max-width:42ch;margin-bottom:22px;
+  border-left:3px solid var(--edge);padding-left:12px}
+
+/* ----- Cartões / superfícies ----- */
+.card{background:var(--panel);border:2px solid var(--edge);border-radius:6px;padding:16px;
+  margin-bottom:14px;backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:5px 5px 0 var(--edge)}
+.lbl{color:var(--txt);font-weight:800;letter-spacing:.2em}
+
+/* ----- Inputs / selects ----- */
+input[type=text],select{background:#fff;border:2px solid var(--edge);border-radius:4px;
+  color:var(--txt);font-family:var(--font-body);font-weight:600}
+input::placeholder{color:#a7a49c}
+input:focus,select:focus{border-color:var(--edge);box-shadow:4px 4px 0 var(--edge)}
+
+/* ----- Opções (grade) ----- */
+.opt{background:#fff;border:2px solid var(--edge);border-radius:4px;color:var(--txt);
+  font-weight:700;transition:transform .07s,box-shadow .1s,background .1s,color .1s}
+.opt small{color:var(--mut)}
+.opt:hover{box-shadow:3px 3px 0 var(--edge)}
+.opt.sel{background:var(--edge);border-color:var(--edge);color:#fff;box-shadow:3px 3px 0 var(--edge)}
+.opt.sel small{color:rgba(255,255,255,.75)}
+
+.tag{background:var(--edge);color:#fff;border-radius:3px;font-weight:800;letter-spacing:.04em}
+.pill{background:#fff;border:2px solid var(--edge);color:var(--txt);border-radius:999px;font-weight:700}
+
+/* ----- Botões ----- */
+.cta{background:linear-gradient(180deg,transparent,var(--bg) 55%);max-width:540px}
+.btn{border:2px solid var(--edge);border-radius:4px;background:var(--edge);color:#fff;
+  font-family:var(--font-disp);letter-spacing:0;box-shadow:5px 5px 0 rgba(11,11,11,.28);
+  transition:transform .07s,box-shadow .12s,background .12s,color .12s}
+.btn:hover{filter:none;background:#fff;color:var(--edge);box-shadow:5px 5px 0 var(--edge)}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--edge)}
+.btn.ghost{background:#fff;border:2px solid var(--edge);color:var(--edge);box-shadow:3px 3px 0 var(--edge)}
+.btn.ghost:hover{background:var(--edge);color:#fff}
+.btn.mini{border-radius:4px}
+
+/* ----- Draft ----- */
+.dot{background:#fff;border:2px solid var(--edge);border-radius:0}
+.dot.done{background:var(--edge)}
+.dot.cur{box-shadow:0 0 0 3px rgba(11,11,11,.18)}
+.attr-chip{color:#fff;border:2px solid var(--edge);border-radius:4px;box-shadow:3px 3px 0 var(--edge)}
+.slot{background:#fff;border:2px solid var(--edge);border-radius:6px;box-shadow:5px 5px 0 var(--edge)}
+.slot .val{color:var(--txt);text-shadow:none}
+.slot::before{background:linear-gradient(180deg,#fff,transparent)}
+.slot::after{background:linear-gradient(0deg,#fff,transparent)}
+.st{background:#fff;border:2px solid var(--edge);border-radius:4px}
+.st .v{color:var(--txt)}
+.draft-opts .dopt{background:#fff;border:2px solid var(--edge);border-radius:5px}
+.dopt:hover{box-shadow:3px 3px 0 var(--edge)}
+.dopt.sel{border-color:var(--edge);background:var(--edge);box-shadow:3px 3px 0 var(--edge)}
+.dopt.sel .dopt-nm,.dopt.sel .dopt-val{color:#fff}
+.dopt-val{color:var(--txt);text-shadow:none}
+
+/* ----- Hub ----- */
+.ovr-big{color:var(--txt);text-shadow:none}
+.season-log .li b{color:var(--txt);font-weight:800}
+.board{background:#fff;border:2px solid var(--edge);border-radius:5px}
+.moodbar{background:#e7e5dd;border:2px solid var(--edge);border-radius:0;height:10px}
+.moodbar .f{border-radius:0}
+
+/* ----- Modais ----- */
+.ovl{background:rgba(11,11,11,.55);backdrop-filter:none;-webkit-backdrop-filter:none}
+.mcard{background:var(--panel2);border:3px solid var(--edge);border-radius:8px;
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:8px 8px 0 var(--edge)}
+.mcard .ico{filter:none}
+  .mcard p{color:var(--mut)}
+  .score{color:var(--txt)}
+
+/* ----- Fim de carreira ----- */
+.rank-hero .r{color:var(--txt);text-shadow:none}
+.legbar .bar{background:#e7e5dd;border:2px solid var(--edge);border-radius:0;height:10px}
+.legbar .fill{background:linear-gradient(90deg,var(--edge),var(--gold));border-radius:0}
+.tab{background:#fff;border:2px solid var(--edge);border-radius:4px;color:var(--mut);font-weight:800}
+.tab.sel{border-color:var(--edge);color:var(--edge);background:#fff;box-shadow:3px 3px 0 var(--edge)}
+.fc-sec h4{color:var(--txt);border-bottom:2px solid var(--edge);padding-bottom:5px}
+.hist .li{background:#fff;border:2px solid var(--edge);border-radius:5px}
+#cardPrev{border:2px solid var(--edge);border-radius:6px}
+
+/* ----- Partida ao vivo ----- */
+.mv-comp{background:var(--edge);color:#fff;letter-spacing:.24em}
+.mv-board,.mv-clock,.mv-act{background:#faf9f6}
+.mv-act{border-top:2px solid var(--edge)}
+.mv-nm{color:var(--txt)}
+.mv-clock #mvMin{color:var(--txt)}
+.mv-track{background:#e7e5dd;border:2px solid var(--edge);border-radius:0}
+.mv-fill{background:var(--edge)}
+.mv-feed{background:#fff}
+.mv-feed .f b{color:var(--txt)}
+.mv-feed .f.goal{color:var(--win);font-weight:800}
+.mv-feed .f.goal b{color:var(--win)}
+.mv-feed .f.dec{color:var(--mut)}
+.mv-fill{background:linear-gradient(90deg,var(--edge),var(--win))}
+
+/* ----- Comemoração (bloco invertido preto com brilho dourado) ----- */
+.cel{background:radial-gradient(120% 90% at 50% 0%,#20242e 0%,#0b0b0b 60%);border:3px solid var(--gold);
+  box-shadow:0 0 0 6px rgba(232,178,58,.15),8px 8px 0 var(--edge)}
+.cel-big{color:var(--gold);text-shadow:0 2px 22px rgba(232,178,58,.4)}
+.cel-sub{color:#f3f0e6}
+.cel-tro{filter:none;text-shadow:0 4px 18px rgba(232,178,58,.5)}
+
+/* ----- Barra de idioma ----- */
+.langbar{background:#fff;border:2px solid var(--edge);border-radius:999px;box-shadow:3px 3px 0 var(--edge)}
+.langbar button{color:var(--mut);font-weight:800}
+.langbar button.on{background:var(--edge);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ATALHO DE IDIOMA (sempre visível) -->
+<div class="langbar" id="langbar">
+  <button data-lang="pt" onclick="setLang('pt')">PT</button>
+  <button data-lang="es" onclick="setLang('es')">ES</button>
+  <button data-lang="en" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- SETUP -->
+<div class="screen on" id="scr-setup">
+  <div class="eyebrow" data-i18n="eyebrow_sim">Simulador de carreira</div>
+  <h1 class="logo disp">O <span>MÍSTER</span></h1>
+  <div class="sub" data-i18n="sub_setup">Roube o DNA de técnicos lendários, assuma clubes do zero e construa uma dinastia. Você será O Míster?</div>
+
+  <div id="resumeBox"></div>
+
+  <div class="card">
+    <div class="lbl" data-i18n="lbl_nome">Nome do treinador</div>
+    <input type="text" id="inNome" maxlength="18" placeholder="Seu nome no banco">
+  </div>
+  <div class="card">
+    <div class="lbl" data-i18n="lbl_pais">País de origem</div>
+    <select id="inPais"></select>
+  </div>
+  <div class="card">
+    <div class="lbl" data-i18n="lbl_filo">Filosofia de jogo</div>
+    <div class="filo" id="filoGrid"></div>
+  </div>
+  <div class="card">
+    <div class="lbl" data-i18n="lbl_dif">Dificuldade</div>
+    <div class="grid" style="grid-template-columns:1fr 1fr" id="difGrid">
+      <div class="opt sel" data-d="am"><span data-i18n="dif_am">AMADOR</span><small data-i18n="dif_am_sub">atributos visíveis no draft</small></div>
+      <div class="opt" data-d="pro"><span data-i18n="dif_pro">PROFISSIONAL</span><small data-i18n="dif_pro_sub">atributos ocultos — risco total</small></div>
+    </div>
+  </div>
+  <div class="hist" id="histBox"></div>
+  <div class="cta"><button class="btn" onclick="startDraft()" data-i18n="btn_montar">Montar comissão</button></div>
+</div>
+
+<!-- DRAFT -->
+<div class="screen" id="scr-draft">
+  <div class="draft-head">
+    <div>
+      <div class="eyebrow" data-i18n="eyebrow_draft">Draft de mentores</div>
+      <div class="disp" style="font-size:20px" id="drAula">Aula <span id="drRound">1</span>/8</div>
+    </div>
+    <div class="dots" id="drDots"></div>
+  </div>
+  <div class="center" style="margin-top:10px"><span class="attr-chip" id="drChip">TÁTICA</span></div>
+  <div class="slot" id="slot"><div class="name" id="slotName">?</div><div class="val" id="slotVal">&nbsp;</div></div>
+  <div class="draft-hint" id="draftHint"></div>
+  <div class="draft-opts" id="draftOpts"></div>
+  <button class="btn ghost mini" id="btnReroll" onclick="rerollSpin()" disabled></button>
+  <div class="stolen" id="stolenGrid"></div>
+</div>
+
+<!-- CLUBE INICIAL -->
+<div class="screen" id="scr-club">
+  <div class="eyebrow" data-i18n="eyebrow_primeiro">Primeiro emprego</div>
+  <h1 class="logo disp" style="font-size:24px"><span data-i18n="club_pre">Você foi </span><span data-i18n="club_span">contratado</span></h1>
+  <div class="sub" data-i18n="sub_club">Ajuste a filosofia se quiser — a reputação e o clube que te contrata mudam junto.</div>
+  <div class="card center">
+    <div class="lbl" data-i18n="lbl_rep">Reputação inicial</div>
+    <div class="ovr-big" id="clOvr">70</div>
+    <div class="small" id="clPosLbl"></div>
+  </div>
+  <div class="card center">
+    <div class="lbl" data-i18n="lbl_club_contratou">Clube que te contratou</div>
+    <div class="disp" style="font-size:22px" id="clClube"></div>
+    <div class="small" id="clLiga"></div>
+    <div class="small" id="clExp" style="margin-top:6px"></div>
+  </div>
+  <div class="card">
+    <div class="lbl" data-i18n="lbl_trocar_filo">Trocar filosofia</div>
+    <div class="filo" id="filoGrid2"></div>
+  </div>
+  <div class="cta"><button class="btn" onclick="beginCareer()" data-i18n="btn_assumir">Assumir o comando</button></div>
+</div>
+
+<!-- HUB -->
+<div class="screen" id="scr-hub">
+  <div class="hub-top">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="eyebrow" id="hbTemp">Temporada 2026</div>
+        <button id="btnEndCareer" onclick="confirmEndCareer()" title="" style="border:1px solid var(--line);background:transparent;color:var(--mut);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:999px;cursor:pointer">⨯ <span data-i18n="end_now">Encerrar</span></button>
+      </div>
+      <div class="disp" style="font-size:22px" id="hbNome"></div>
+      <div class="small" id="hbClube"></div>
+    </div>
+    <div class="center"><div class="ovr-big" id="hbOvr">70</div><div class="small" id="hbIdade">38 anos</div></div>
+  </div>
+  <div class="card">
+    <div class="lbl" data-i18n="lbl_carreira_banco">Carreira no banco</div>
+    <div class="stat-row">
+      <div class="st"><div class="k" data-i18n="st_jogos">JOGOS</div><div class="v" id="hbJ">0</div></div>
+      <div class="st"><div class="k" data-i18n="st_vitorias">VITÓRIAS</div><div class="v" id="hbV">0</div></div>
+      <div class="st"><div class="k" data-i18n="st_aprov">APROV.</div><div class="v" id="hbAp">0%</div></div>
+      <div class="st"><div class="k" data-i18n="st_titulos">TÍTULOS</div><div class="v" id="hbT">0</div></div>
+    </div>
+    <div class="board">
+      <div class="exp">
+        <div class="small"><span data-i18n="board_conf">Confiança da diretoria</span> <b id="boardPct" style="color:var(--txt);float:right">70%</b></div>
+        <div class="moodbar"><div class="f" id="boardBar" style="width:70%;background:var(--ok)"></div></div>
+      </div>
+      <div class="pill" id="expPill">Meta: meio de tabela</div>
+    </div>
+    <div class="small" id="hbStatus" style="margin-top:10px;font-style:italic;line-height:1.45"></div>
+    <button class="btn mini ghost" style="margin-top:10px" onclick="openSquad()" data-i18n="btn_ver_elenco">👥 Ver elenco</button>
+  </div>
+  <div class="card">
+    <div class="lbl" data-i18n="lbl_hist_temp">Histórico de temporadas</div>
+    <div class="season-log" id="seasonLog"><div class="small center" style="padding:14px" data-i18n="dinastia">Sua dinastia começa agora.</div></div>
+  </div>
+  <div class="cta"><button class="btn" id="btnAdv" onclick="advanceSeason()" data-i18n="btn_avancar">Avançar temporada →</button></div>
+</div>
+
+<!-- FIM -->
+<div class="screen" id="scr-over">
+  <div class="rank-hero">
+    <div class="eyebrow" id="ovEyebrow" data-i18n="eyebrow_fim">Fim de carreira</div>
+    <div class="r" id="ovRank">TÉCNICO RESPEITADO</div>
+    <div class="q" id="ovQuote"></div>
+    <div class="meta-line" id="ovMeta"></div>
+  </div>
+  <div class="card"><div class="lbl" data-i18n="tot_title">Totais</div><div class="tot-grid" id="ovTot"></div></div>
+  <div class="card"><div class="lbl" data-i18n="honras_title">Honrarias</div><div id="ovHonras"></div></div>
+  <div class="card"><div class="lbl" data-i18n="legado_title">Recordes &amp; Legado</div><div id="ovLegado"></div></div>
+  <div class="row" style="margin-bottom:8px">
+    <button class="btn mini" onclick="openCard()" data-i18n="btn_card">🃏 Card da Carreira</button>
+    <button class="btn mini ghost" onclick="openFull()" data-i18n="btn_full">📊 Carreira completa</button>
+  </div>
+  <button class="btn ghost mini" onclick="backHome()" data-i18n="btn_voltar">Voltar ao início</button>
+  <div style="height:20px"></div>
+</div>
+
+<div class="ovl" id="ovlEv"><div class="mcard"><div class="ico" id="evIco">⚽</div><h3 id="evTit"></h3><p id="evTxt"></p><div class="btns" id="evBtns"></div></div></div>
+
+<div class="ovl" id="ovlCard"><div class="mcard">
+  <h3 data-i18n="card_tit">Card da Carreira</h3>
+  <div class="tabs">
+    <div class="tab sel" id="tabStory" onclick="renderCard('story')" data-i18n="card_story">Story 9:16</div>
+    <div class="tab" id="tabSq" onclick="renderCard('sq')" data-i18n="card_sq">Quadrado 1:1</div>
+  </div>
+  <canvas id="cardPrev"></canvas>
+  <div class="btns" style="margin-top:10px">
+    <button class="btn mini" onclick="saveCard()" data-i18n="card_salvar">💾 Salvar imagem</button>
+    <div class="row">
+      <button class="btn mini ghost" onclick="shareCard()" data-i18n="card_compartilhar">Compartilhar</button>
+      <button class="btn mini ghost" onclick="shareWpp()">WhatsApp</button>
+      <button class="btn mini ghost" onclick="shareX()">X</button>
+    </div>
+    <button class="btn mini ghost" onclick="closeModal('ovlCard')" data-i18n="card_fechar">Fechar</button>
+  </div>
+</div></div>
+
+<div class="ovl" id="ovlFull"><div class="mcard" style="max-width:480px"><h3 data-i18n="full_tit">Carreira Completa</h3><div id="fullBody"></div><button class="btn mini ghost" onclick="closeModal('ovlFull')" data-i18n="card_fechar">Fechar</button></div></div>
+
+<div class="ovl" id="ovlSquad"><div class="mcard" style="max-width:460px">
+  <h3 id="sqTitulo" data-i18n="sq_tit_modal">Elenco</h3>
+  <div class="small" id="sqSub" style="margin-bottom:10px"></div>
+  <div id="sqBody" style="text-align:left;max-height:60dvh;overflow:auto"></div>
+  <button class="btn mini ghost" style="margin-top:10px" onclick="closeModal('ovlSquad')" data-i18n="card_fechar">Fechar</button>
+</div></div>
+
+
+<!-- PARTIDA AO VIVO -->
+<div class="ovl" id="ovlMatch"><div class="mcard mv">
+  <div class="mv-comp" id="mvComp"></div>
+  <div class="mv-board">
+    <div class="mv-side"><div class="mv-nm" id="mvHome"></div></div>
+    <div class="mv-gg"><span id="mvGh">0</span><i>x</i><span id="mvGa">0</span></div>
+    <div class="mv-side"><div class="mv-nm" id="mvAway"></div></div>
+  </div>
+  <div class="mv-clock"><span id="mvMin">0'</span><div class="mv-track"><div class="mv-fill" id="mvFill"></div></div></div>
+  <div class="mv-feed" id="mvFeed"></div>
+  <div class="mv-act" id="mvAct"></div>
+</div></div>
+
+<!-- COMEMORAÇÃO -->
+<div class="ovl" id="ovlCel"><div class="mcard cel">
+  <canvas id="celCanvas"></canvas>
+  <div class="cel-in">
+    <div class="cel-tro">🏆</div>
+    <div class="cel-big" id="celBig"></div>
+    <div class="cel-sub" id="celSub"></div>
+    <button class="btn mini" onclick="closeCelebration()" data-i18n="cel_continuar">Continuar</button>
+  </div>
+</div></div>
+
+<script>
+/* ============ O MÍSTER — EDIÇÃO BRASILEIRÃO ============ */
+/* Composição real 2026 (Séries A/B/C/D). Fonte: CBF/Wikipédia/ge. */
+/* ============ IDIOMAS (i18n) — PT / ES / EN ============ */
+let LANG=(function(){try{return localStorage.getItem('mister_lang')||'pt';}catch(e){return 'pt';}})();
+
+const I18N={
+ pt:{
+  eyebrow_sim:'Simulador de carreira',
+  sub_setup:'Roube o DNA de técnicos lendários, assuma clubes do zero e construa uma dinastia. Você será O Míster?',
+  lbl_nome:'Nome do treinador', ph_nome:'Seu nome no banco',
+  lbl_pais:'País de origem (define sua liga inicial)', lbl_idioma:'Idioma',
+  lbl_filo:'Filosofia de jogo', lbl_dif:'Dificuldade',
+  dif_am:'AMADOR', dif_am_sub:'atributos visíveis no draft',
+  dif_pro:'PROFISSIONAL', dif_pro_sub:'atributos ocultos — risco total',
+  hist_title:'Suas carreiras', btn_montar:'Montar comissão',
+ resume_title:'Carreira em andamento', resume_continue:'Continuar carreira', resume_discard:'Descartar e começar do zero',
+ resume_info:(clube,ano,n)=>'Carreira #'+n+' · '+clube+' · '+ano, resume_confirm:'Descartar a carreira em andamento? Esta ação não pode ser desfeita.',
+  eyebrow_draft:'Draft de mentores', draft_aula:(r)=>'Aula '+r+'/8',
+  btn_reroll:(n)=>'🎲 Sortear outros mentores — restam '+n,
+  slot_ini:'?', slot_escolha:'Escolha seu mentor',
+  hint_pro:'Modo Profissional: valores ocultos — confie no faro',
+  hint_normal:(a)=>'Toque no mentor de quem você quer herdar '+a,
+  eyebrow_primeiro:'Primeiro emprego', club_pre:'Você foi ', club_span:'contratado',
+  sub_club:'Ajuste a filosofia se quiser — a reputação e o clube que te contrata mudam junto.',
+  lbl_rep:'Reputação inicial', lbl_club_contratou:'Clube que te contratou',
+  lbl_trocar_filo:'Trocar filosofia', btn_assumir:'Assumir o comando',
+  hb_temp:(y)=>'Temporada '+y, hb_nome:(n)=>'Téc. '+n, hb_idade:(a)=>a+' anos',
+  lbl_carreira_banco:'Carreira no banco',
+  st_jogos:'JOGOS', st_vitorias:'VITÓRIAS', st_aprov:'APROV.', st_titulos:'TÍTULOS',
+  board_conf:'Confiança da diretoria', lbl_hist_temp:'Histórico de temporadas',
+  btn_ver_elenco:'👥 Ver elenco', dinastia:'Sua dinastia começa agora.',
+  btn_avancar:'Avançar temporada →',
+  eyebrow_fim:'Fim de carreira', tot_title:'Totais', honras_title:'Honrarias',
+  honras_none:'Nenhuma honraria individual.', legado_title:'Recordes & Legado',
+  btn_card:'🃏 Card da Carreira', btn_full:'📊 Carreira completa', btn_voltar:'Voltar ao início',
+  cel_continuar:'Continuar', mv_final:'Final · ',
+  hb_clube:(nm,liga,pais,ovr)=>nm+' — '+liga+(pais?' · '+pais:'')+' · Elenco '+ovr+' OVR',
+  metaline:(f,c,t2,n)=>['Filosofia: '+f,'Clubes: '+c,'Temporadas: '+t2,'Carreira #'+n],
+  bs:['🔥 A torcida entoa o nome de <b style="color:var(--acc)">{n}</b> nas arquibancadas. Você é ídolo absoluto por aqui.',
+      '💚 A diretoria confia no seu projeto e banca suas decisões sem hesitar.',
+      '🤝 O ambiente é estável, mas a cobrança por resultados sobe a cada rodada.',
+      '📰 A imprensa questiona seus métodos e a paciência da diretoria é curta.',
+      '⚠️ Sua cabeça está a prêmio — o próximo tropeço pode ser o último no comando.'],
+  exp:{A:'Meta: não cair / brigar em cima',B:'Meta: buscar o acesso à Série A',C:'Meta: subir para a Série B',D:'Meta: sair da várzea nacional'},
+  exp_intl:'Meta: crescer na liga e brigar por vaga continental',
+  pill_intl_eur:'Meta: título nacional + Champions League',
+  pill_intl_sam:'Meta: título nacional + Libertadores',
+  filo:{POS:'Jogo de posição',PRE:'Pressão alta',RET:'Contra-ataque',EQU:'Equilíbrio',JOV:'Base & garotos',RAC:'Raça e entrega'},
+  attr:{TAT:'TÁTICA',ATA:'ATAQUE',DEF:'DEFESA',MER:'OLHO DE MERCADO',JOV:'BASE / GAROTOS',MOT:'MOTIVAÇÃO',GES:'GESTÃO DE VESTIÁRIO',ADA:'JOGO DE CINTURA'},
+  div:{A:'Brasileirão Série A',B:'Brasileirão Série B',C:'Brasileirão Série C',D:'Brasileirão Série D'},
+  ranks_n:['O MÍSTER','LENDA DO FUTEBOL','MESTRE DA ELITE','TÉCNICO CONSOLIDADO','ESPECIALISTA EM ACESSO','TÉCNICO RODADO','TÉCNICO DE CARREIRA'],
+  ranks_q:['Não há debate: você é o maior treinador que o futebol já viu. Uma era leva o seu nome.',
+    'Do interior aos gigantes, seu nome virou sinônimo de título. O mundo inteiro te reverencia.',
+    'Campeão nas maiores prateleiras do futebol. Um vencedor de verdade.',
+    'Respeitado na elite, arquiteto de campanhas que a torcida não esquece.',
+    'Você faz time subir. Onde chega, coloca clube na divisão de cima.',
+    'Uma carreira honesta rodando o mundo. Deixou sua marca em cada vestiário.',
+    'Uma jornada digna. Mas O Míster... é outro patamar.'],
+  tot:{jogos:'JOGOS',vit:'VITÓRIAS',aprov:'APROV.',ucl:'CHAMPIONS',lib:'LIBERTADORES',serieA:'TÍT. LIGA NAC.',copa:'COPAS',intl:'TÍT. NAC. (EXT.)'},
+  leg:{jogos:'Jogos',vit:'Vitórias',tit:'Títulos',ucl:'Champions',lib:'Libertadores'},
+  // eventos
+  mkt_reforco:(c)=>'💰 Contratar reforço (R$ '+c+' mi)', mkt_teto:'⛔ Elenco já no teto da divisão',
+  mkt_sem:(c)=>'💰 Sem verba p/ reforço (R$ '+c+' mi)',
+  mkt_promover:'🌱 Promover joia da base', mkt_vender:'🏷️ Vender e encher o caixa',
+  mkt_r_ok:'Reforço contratado — elenco mais forte.', mkt_r_teto:'O elenco já é o mais forte da divisão — sobe de nível subindo de divisão.',
+  mkt_r_sem:'Verba insuficiente para um reforço de peso.', mkt_r_base:'Garoto da base promovido — torcida aprova.',
+  mkt_r_venda:(g)=>'Venda fechada: +R$ '+g+' mi no caixa.',
+  mkt_tit:'Janela de transferências',
+  mkt_txt:(cl,liga,orc)=>'Elenco do <b>'+cl+'</b> · '+liga+'<br>Verba disponível: <b>R$ '+orc+' mi</b>. Como você monta o time para a temporada?',
+  dir_acesso:(n)=>'conquistar o <b>acesso</b> (terminar no G-'+n+')',
+  dir_top:(n)=>'terminar entre os <b>'+n+' primeiros</b>',
+  dir_min:(n)=>'terminar ao menos em <b>'+n+'º</b> e não decepcionar',
+  dir_naocair:'<b>não ser rebaixado</b> de jeito nenhum',
+  dir_tit:'Cobrança da diretoria',
+  dir_txt:(meta)=>'O presidente foi à imprensa e traçou a meta da temporada: <b>'+meta+'</b>.<br><br>Bater a meta rende prestígio e verba. Falhar depois de comprar a briga pode custar o emprego.',
+  dir_b1:'Assumir a meta publicamente', dir_b2:'Pedir calma e tempo',
+  rev_tit:'Rachão no vestiário', rev_txt:'Os líderes do elenco reclamaram dos seus métodos à diretoria. O clima ameaça a temporada.',
+  rev_b1:'Bater o martelo', rev_b2:'Conversar e ceder',
+  est_alvos:['seu camisa 10','o artilheiro do time','a joia da base','o capitão'],
+  est_tit:(a)=>'Assédio a '+a, est_txt:(a)=>'Um clube grande da elite quer '+a+'. Vender enche o caixa; segurar mantém a força do elenco.',
+  est_b1:'Vender e faturar', est_b2:'Segurar o craque',
+  prop_tit:'Proposta na mesa',
+  prop_txt:(intl,quente)=>'Clubes maiores bateram à porta'+(intl?' — inclusive de fora do país':'')+(quente?', e no seu clube a cadeira está quente':'')+'. Onde continua o projeto?',
+  prop_ficar:(c)=>'Ficar no '+c,
+  fin_flavor:{champions:'A final da Champions League é o palco mais cobiçado do futebol mundial.',liberta:'A final da Libertadores é o jogo da vida de qualquer treinador sul-americano.',copa:'Uma final de Copa do Brasil n  o se joga toda temporada.'},
+  fin_tit:(c)=>'Final: '+c, fin_fav:(r)=>' <span class="small">(favorito: '+r+')</span>',
+  fin_txt:(meu,riv,fav,flavor)=>'<b>'+meu+'</b> x <b>'+riv+'</b>'+fav+'. '+flavor+' Como você quer viver essa decisão?',
+  fin_assistir:'Assistir ao vivo ▶', fin_pular:'Pular pro resultado ⏭',
+  fin_campeao:(c)=>'É CAMPEÃO da '+c+'!', fin_vice:'A taça escapou nos detalhes.',
+  fin_comemorar:'🏆 Comemorar', fin_continuar:'Continuar',
+  mv_postura:'Postura inicial', mv_pressao:'⚔️ Pressão total', mv_equil:'⚖️ Equilíbrio', mv_cautela:'🛡️ Cautela',
+  mv_say_pressao:'manda o time pressionar alto', mv_say_equil:'começa equilibrado', mv_say_cautela:'pede cautela na saída',
+  mv_int_vence:'Intervalo · você vence', mv_segurar:'🔒 Segurar o resultado', mv_matar:'🗡️ Matar o jogo',
+  mv_say_segurar:'recua pra segurar o placar', mv_say_matar:'vai pra matar o jogo',
+  mv_int_perde:'Intervalo · você perde', mv_ircima:'🔥 Ir pra cima', mv_reorg:'🧩 Reorganizar',
+  mv_say_ircima:'joga tudo pro ataque', mv_say_reorg:'reorganiza e busca o contra-ataque',
+  mv_int_empate:'Intervalo · empate', mv_buscar:'⚡ Buscar a vitória', mv_manter:'⚖️ Manter o plano',
+  mv_say_buscar:'sobe as linhas pra vencer', mv_say_manter:'mantém o plano de jogo',
+  mv_reta:"70' · reta final", mv_sacar:'🏃 Sacar volante, entrar atacante', mv_marcacao:'🧱 Reforçar a marcação', mv_mantertime:'↔️ Manter o time',
+  mv_say_sacar:'troca o volante por um atacante', mv_say_marcacao:'reforça a marcação', mv_say_mantertime:'mantém a equipe em campo',
+  mv_desespero:"82' · tudo ou nada", mv_zag:'🎲 Zagueiro no ataque', mv_insistir:'😤 Insistir organizado',
+  mv_say_zag:'joga o zagueiro na área — é tudo ou nada!', mv_say_insistir:'insiste com organização',
+  mv_tecnico:'🎯 Técnico ', mv_intervalo:'— Intervalo —',
+  mv_events:['🟨 Cartão amarelo','🧤 Defensão do goleiro','↗️ Chutou pra fora','🚩 Impedimento','↪️ Escanteio perigoso'],
+  mv_penaltis:'— Pênaltis! —', mv_disp_pen:'Disputa de pênaltis',
+  mv_fim:(ico,meu,pl,riv)=>ico+' Fim de jogo: '+meu+' '+pl+' '+riv,
+  mv_levantar:'🏆 Levantar a taça', mv_pen_txt:(a,b)=>' ('+a+'-'+b+' nos pênaltis)',
+  mc_j:(v)=>v+' jogos no banco', mc_j_txt:(v)=>'<b>'+v+' partidas</b> comandadas na carreira.'+(v>=700?' Longevidade de lenda.':''),
+  mc_t:(v)=>v+' títulos na carreira', mc_t_txt:(v)=>'Você chegou a <b>'+v+' taças</b> como treinador.',
+  mc_ac:(v)=>v+' acessos conquistados', mc_ac_txt:(v)=>'Você já colocou <b>'+v+' clubes</b> na divisão de cima.',
+  mc_continuar:'Continuar',
+  retire_tit:'Fim de ciclo?', retire_txt:(a)=>'Você já tem <b>'+a+' anos</b> e uma baita estrada no banco. O corpo cobra e o desgaste começa a pesar no dia a dia. Quer seguir treinando ou pendurar a prancheta com a cabeça erguida?',
+  retire_seguir:'Seguir no comando', retire_encerrar:'Encerrar a carreira',
+ end_now:'Encerrar', end_now_tit:'Encerrar carreira agora?', end_now_txt:'Você vai pendurar a prancheta de vez e ver o balanço final da sua trajetória. Não dá pra voltar atrás. Tem certeza?', end_now_yes:'Sim, encerrar carreira', end_now_no:'Continuar treinando',
+  fire_tit:'Você foi demitido', fire_txt:(c)=>'A diretoria do '+c+' perdeu a paciência. Mas currículo não some — sempre aparece outro projeto.',
+  fire_buscar:'Buscar novo clube', fire_encerrar:'Encerrar a carreira',
+  recomeco:(c,d)=>'Recomeço no '+c+' ('+d+')',
+  sq_titulo:(c,liga)=>c+' — '+liga, sq_sub:(ovr,n)=>'Força do elenco: '+ovr+' OVR · '+n+' atletas no plantel',
+  sq_pos:{GOL:'Goleiros',ZAG:'Zagueiros',LAT:'Laterais',VOL:'Volantes',MEI:'Meias',ATA:'Atacantes'}, sq_craque:'CRAQUE',
+  full_perfil:'Perfil tático final', full_ges:(g,a)=>'Gestão de vestiário '+'★'.repeat(g)+' · Jogo de cintura '+'★'.repeat(a),
+  full_vitrine:'Vitrine de troféus', full_semtrof:'Sem troféus.',
+  full_conf:'Confiança da diretoria por temporada', full_conf_lbl:'Confiança (0-100)',
+  full_vit:'Vitórias por temporada', full_vit_lbl:'Vitórias',
+  full_temp:'Temporada a temporada', full_th:['Ano','Clube','Div','Pos','V','Tít'],
+  full_finais:'Finais disputadas', full_semfinais:'Sem finais registradas.',
+  full_cadeia:'Cadeia de clubes', full_insuf:(l)=>l+': dados insuficientes.', full_max:'máx',
+  full_best:'Melhor trabalho', full_best_none:'Carreira ainda sem uma passagem de destaque.',
+  fb_liga:(n)=>n+(n>1?' títulos nacionais':' título nacional'), fb_intl:(n)=>n+(n>1?' títulos continentais':' título continental'),
+  fb_copa:(n)=>n+(n>1?' copas nacionais':' copa nacional'), fb_acesso:(n)=>n+(n>1?' acessos à elite':' acesso à elite'),
+  fb_aprov:(p)=>p+'% de aproveitamento', fb_temps:(n)=>n+(n>1?' temporadas':' temporada'), fb_conf:(b)=>'confiança de pico '+b,
+  fb_period:(a,b)=>a===b?(''+a):(a+'–'+b),
+  trof:{ucl:'Champions League',lib:'Libertadores',A:'Brasileirão Série A',B:'Brasileirão Série B',C:'Brasileirão Série C',D:'Brasileirão Série D',copa:'Copa do Brasil',intl:'Títulos nac. (ext.)',ac:'Acessos'},
+  season_camp:(l)=>'🏆 Campeão '+l, season_pos:(p,l)=>p+'º na '+l,
+  season_conf:(d)=>' · <span style="color:'+(d>0?'var(--ok)':'var(--bad)')+'">'+(d>0?'▲+':'▼')+d+' confiança</span>',
+ season_pres:()=>'<span style="color:var(--bad)">pressão da torcida</span>',
+ pres_tag:(l)=>'Pressão '+({1:'moderada',2:'alta',3:'máxima'}[l]),
+  season_meta_ok:' · 🎯 meta batida', season_meta_fail:' · ⚠️ meta falhada',
+  season_acesso:(d)=>'⬆️ ACESSO à '+d, season_rebaix:(d)=>'⬇️ REBAIXADO à '+d,
+  cel_acesso:(d)=>'ACESSO À '+d.toUpperCase(), cel_acesso_sub:(c)=>c+' subiu de divisão!',
+  cel_final:(c)=>'CAMPEÃO DA '+c.toUpperCase(),
+  cel_camp_nac:(p)=>'CAMPEÃO '+p.toUpperCase(), cel_camp_br:'CAMPEÃO BRASILEIRO', cel_camp_div:(d)=>'Campeão da '+d,
+  hon_camp_ucl:'Campeão da Champions League', hon_camp_lib:'Campeão da Libertadores', hon_camp_copa:'Campeão da Copa do Brasil',
+  hon_camp_nac:(l)=>'Campeão: '+l, hon_camp_div:(d)=>'Campeão da '+d, hon_melhor:(l)=>'Melhor técnico · '+l,
+  hon_meta:'Meta da diretoria batida', hon_acesso:'Acesso conquistado',
+  wl_camp:(c,comp)=>'🏆 '+comp+' — '+c+' campeão', wl_vice:(comp,r)=>comp+' — vice (campeão: '+r+')',
+  card_head:(n)=>'O MÍSTER · #'+n, card_tec:(n)=>'TÉC. '+n, card_sub:(reg,filo)=>reg+' · '+filo,
+  card_stats:{jogos:'JOGOS',vit:'VITÓRIAS',aprov:'APROV.',ucl:'UCL',lib:'LIBERTA',serieA:'LIGA',copa:'MUNDIAL'},
+  card_temps:(t2,c)=>t2+' temporadas · '+c+' clubes', card_foot:'o míster · mundial',
+  card_salvar:'💾 Salvar imagem', card_compartilhar:'Compartilhar', card_fechar:'Fechar',
+  card_story:'Story 9:16', card_sq:'Quadrado 1:1', card_tit:'Card da Carreira', full_tit:'Carreira Completa', sq_tit_modal:'Elenco',
+  share_txt:(rank,tit,ac,v,j)=>'Minha carreira em O Míster: '+rank+' — '+tit+' títulos, '+ac+' acessos, '+v+' vitórias em '+j+' jogos. Consegue treinar melhor?',
+  hist_item:(n,nome,rank)=>'<span>Carreira #'+n+' — '+nome+'</span><b style="color:var(--acc)">'+rank+'</b>',
+ view_hint:'Toque para ver os dados desta carreira', view_eyebrow:(n)=>'Carreira #'+n+' · arquivo',
+  cdb:'🏆CdB', liberta_s:'🌎Liberta', ucl_s:'⭐UCL'
+ }
+};
+I18N.es={
+  eyebrow_sim:'Simulador de carrera',
+  sub_setup:'Roba el ADN de técnicos legendarios, toma clubes desde cero y construye una dinastía. ¿Serás El Míster?',
+  lbl_nome:'Nombre del entrenador', ph_nome:'Tu nombre en el banquillo',
+  lbl_pais:'País de origen (define tu liga inicial)', lbl_idioma:'Idioma',
+  lbl_filo:'Filosofía de juego', lbl_dif:'Dificultad',
+  dif_am:'AMATEUR', dif_am_sub:'atributos visibles en el draft',
+  dif_pro:'PROFESIONAL', dif_pro_sub:'atributos ocultos — riesgo total',
+  hist_title:'Tus carreras', btn_montar:'Formar cuerpo técnico',
+ resume_title:'Carrera en curso', resume_continue:'Continuar carrera', resume_discard:'Descartar y empezar de cero',
+ resume_info:(clube,ano,n)=>'Carrera #'+n+' · '+clube+' · '+ano, resume_confirm:'¿Descartar la carrera en curso? Esta acción no se puede deshacer.',
+  eyebrow_draft:'Draft de mentores', draft_aula:(r)=>'Clase '+r+'/8',
+  btn_reroll:(n)=>'🎲 Sortear otros mentores — quedan '+n,
+  slot_ini:'?', slot_escolha:'Elige tu mentor',
+  hint_pro:'Modo Profesional: valores ocultos — confía en tu olfato',
+  hint_normal:(a)=>'Toca al mentor de quien quieres heredar '+a,
+  eyebrow_primeiro:'Primer empleo', club_pre:'Has sido ', club_span:'contratado',
+  sub_club:'Ajusta la filosofía si quieres — la reputación y el club que te contrata cambian con ella.',
+  lbl_rep:'Reputación inicial', lbl_club_contratou:'Club que te contrató',
+  lbl_trocar_filo:'Cambiar filosofía', btn_assumir:'Tomar el mando',
+  hb_temp:(y)=>'Temporada '+y, hb_nome:(n)=>'DT '+n, hb_idade:(a)=>a+' años',
+  lbl_carreira_banco:'Carrera en el banquillo',
+  st_jogos:'PARTIDOS', st_vitorias:'VICTORIAS', st_aprov:'RENDIM.', st_titulos:'TÍTULOS',
+  board_conf:'Confianza de la directiva', lbl_hist_temp:'Historial de temporadas',
+  btn_ver_elenco:'👥 Ver plantilla', dinastia:'Tu dinastía empieza ahora.',
+  btn_avancar:'Avanzar temporada →',
+  eyebrow_fim:'Fin de carrera', tot_title:'Totales', honras_title:'Distinciones',
+  honras_none:'Ninguna distinción individual.', legado_title:'Récords y Legado',
+  btn_card:'🃏 Tarjeta de Carrera', btn_full:'📊 Carrera completa', btn_voltar:'Volver al inicio',
+  cel_continuar:'Continuar', mv_final:'Final · ',
+  hb_clube:(nm,liga,pais,ovr)=>nm+' — '+liga+(pais?' · '+pais:'')+' · Plantilla '+ovr+' OVR',
+  metaline:(f,c,t2,n)=>['Filosofía: '+f,'Clubes: '+c,'Temporadas: '+t2,'Carrera #'+n],
+  bs:['🔥 La afición corea el nombre de <b style="color:var(--acc)">{n}</b> en las gradas. Eres ídolo absoluto aquí.',
+      '💚 La directiva confía en tu proyecto y respalda tus decisiones sin dudar.',
+      '🤝 El ambiente es estable, pero la exigencia por resultados sube cada jornada.',
+      '📰 La prensa cuestiona tus métodos y la paciencia de la directiva es corta.',
+      '⚠️ Tu puesto está en juego — el próximo tropiezo puede ser el último al mando.'],
+  exp:{A:'Meta: no descender / pelear arriba',B:'Meta: buscar el ascenso a Primera',C:'Meta: ascender de categoría',D:'Meta: salir del fondo'},
+  exp_intl:'Meta: crecer en la liga y pelear plaza continental',
+  pill_intl_eur:'Meta: título nacional + Champions League',
+  pill_intl_sam:'Meta: título nacional + Libertadores',
+  filo:{POS:'Juego de posición',PRE:'Presión alta',RET:'Contraataque',EQU:'Equilibrio',JOV:'Cantera y jóvenes',RAC:'Garra y entrega'},
+  attr:{TAT:'TÁCTICA',ATA:'ATAQUE',DEF:'DEFENSA',MER:'OJO DE MERCADO',JOV:'CANTERA / JÓVENES',MOT:'MOTIVACIÓN',GES:'GESTIÓN DE VESTUARIO',ADA:'CINTURA TÁCTICA'},
+  div:{A:'Brasileirão Serie A',B:'Brasileirão Serie B',C:'Brasileirão Serie C',D:'Brasileirão Serie D'},
+  ranks_n:['EL MÍSTER','LEYENDA DEL FÚTBOL','MAESTRO DE LA ELITE','TÉCNICO CONSOLIDADO','ESPECIALISTA EN ASCENSOS','TÉCNICO CURTIDO','TÉCNICO DE CARRERA'],
+  ranks_q:['No hay debate: eres el mejor entrenador que el fútbol ha visto. Una era lleva tu nombre.',
+    'Del interior a los gigantes, tu nombre es sinónimo de título. El mundo entero te reverencia.',
+    'Campeón en las mayores vitrinas del fútbol. Un ganador de verdad.',
+    'Respetado en la elite, arquitecto de campañas que la afición no olvida.',
+    'Haces subir a los equipos. Donde llegas, colocas al club en la categoría de arriba.',
+    'Una carrera honesta recorriendo el mundo. Dejaste tu marca en cada vestuario.',
+    'Una trayectoria digna. Pero El Míster... es otro nivel.'],
+  tot:{jogos:'PARTIDOS',vit:'VICTORIAS',aprov:'RENDIM.',ucl:'CHAMPIONS',lib:'LIBERTADORES',serieA:'TÍT. LIGA NAC.',copa:'COPAS',intl:'TÍT. NAC. (EXT.)'},
+  leg:{jogos:'Partidos',vit:'Victorias',tit:'Títulos',ucl:'Champions',lib:'Libertadores'},
+  mkt_reforco:(c)=>'💰 Fichar refuerzo ('+c+' mi)', mkt_teto:'⛔ Plantilla ya en el tope de la categoría',
+  mkt_sem:(c)=>'💰 Sin fondos para refuerzo ('+c+' mi)',
+  mkt_promover:'🌱 Subir joya de la cantera', mkt_vender:'🏷️ Vender y llenar la caja',
+  mkt_r_ok:'Refuerzo fichado — plantilla más fuerte.', mkt_r_teto:'La plantilla ya es la más fuerte de la categoría — sube de nivel ascendiendo.',
+  mkt_r_sem:'Fondos insuficientes para un refuerzo de peso.', mkt_r_base:'Chico de la cantera promovido — la afición aprueba.',
+  mkt_r_venda:(g)=>'Venta cerrada: +'+g+' mi en caja.',
+  mkt_tit:'Ventana de fichajes',
+  mkt_txt:(cl,liga,orc)=>'Plantilla del <b>'+cl+'</b> · '+liga+'<br>Presupuesto disponible: <b>'+orc+' mi</b>. ¿Cómo armas el equipo para la temporada?',
+  dir_acesso:(n)=>'lograr el <b>ascenso</b> (terminar en el G-'+n+')',
+  dir_top:(n)=>'terminar entre los <b>'+n+' primeros</b>',
+  dir_min:(n)=>'terminar al menos en <b>'+n+'º</b> y no decepcionar',
+  dir_naocair:'<b>no descender</b> bajo ningún concepto',
+  dir_tit:'Exigencia de la directiva',
+  dir_txt:(meta)=>'El presidente habló con la prensa y fijó la meta de la temporada: <b>'+meta+'</b>.<br><br>Cumplir da prestigio y presupuesto. Fallar tras asumir el reto puede costarte el puesto.',
+  dir_b1:'Asumir la meta públicamente', dir_b2:'Pedir calma y tiempo',
+  rev_tit:'Motín en el vestuario', rev_txt:'Los líderes del plantel se quejaron de tus métodos a la directiva. El clima amenaza la temporada.',
+  rev_b1:'Imponer autoridad', rev_b2:'Dialogar y ceder',
+  est_alvos:['tu número 10','el goleador del equipo','la joya de la cantera','el capitán'],
+  est_tit:(a)=>'Asedio a '+a, est_txt:(a)=>'Un grande de la elite quiere a '+a+'. Vender llena la caja; retener mantiene la fuerza del plantel.',
+  est_b1:'Vender y facturar', est_b2:'Retener al crack',
+  prop_tit:'Oferta sobre la mesa',
+  prop_txt:(intl,quente)=>'Clubes más grandes llamaron a la puerta'+(intl?' — incluso del extranjero':'')+(quente?', y en tu club el puesto está caliente':'')+'. ¿Dónde sigue el proyecto?',
+  prop_ficar:(c)=>'Quedarse en '+c,
+  fin_flavor:{champions:'La final de la Champions League es el escenario más codiciado del fútbol mundial.',liberta:'La final de la Libertadores es el partido de la vida de cualquier técnico sudamericano.',copa:'Una final de Copa no se juega todas las temporadas.'},
+  fin_tit:(c)=>'Final: '+c, fin_fav:(r)=>' <span class="small">(favorito: '+r+')</span>',
+  fin_txt:(meu,riv,fav,flavor)=>'<b>'+meu+'</b> x <b>'+riv+'</b>'+fav+'. '+flavor+' ¿Cómo quieres vivir esta final?',
+  fin_assistir:'Ver en vivo ▶', fin_pular:'Ir al resultado ⏭',
+  fin_campeao:(c)=>'¡CAMPEÓN de la '+c+'!', fin_vice:'La copa se escapó en los detalles.',
+  fin_comemorar:'🏆 Celebrar', fin_continuar:'Continuar',
+  mv_postura:'Postura inicial', mv_pressao:'⚔️ Presión total', mv_equil:'⚖️ Equilibrio', mv_cautela:'🛡️ Cautela',
+  mv_say_pressao:'ordena presionar alto', mv_say_equil:'empieza equilibrado', mv_say_cautela:'pide cautela en la salida',
+  mv_int_vence:'Descanso · vas ganando', mv_segurar:'🔒 Mantener el resultado', mv_matar:'🗡️ Sentenciar el partido',
+  mv_say_segurar:'se repliega para aguantar', mv_say_matar:'va a sentenciar el partido',
+  mv_int_perde:'Descanso · vas perdiendo', mv_ircima:'🔥 Ir al ataque', mv_reorg:'🧩 Reorganizar',
+  mv_say_ircima:'lo apuesta todo al ataque', mv_say_reorg:'reorganiza y busca el contragolpe',
+  mv_int_empate:'Descanso · empate', mv_buscar:'⚡ Buscar la victoria', mv_manter:'⚖️ Mantener el plan',
+  mv_say_buscar:'sube las líneas para ganar', mv_say_manter:'mantiene el plan de juego',
+  mv_reta:"70' · recta final", mv_sacar:'🏃 Quitar pivote, meter delantero', mv_marcacao:'🧱 Reforzar la marca', mv_mantertime:'↔️ Mantener el equipo',
+  mv_say_sacar:'cambia el pivote por un delantero', mv_say_marcacao:'refuerza la marca', mv_say_mantertime:'mantiene el equipo en el campo',
+  mv_desespero:"82' · todo o nada", mv_zag:'🎲 Central al ataque', mv_insistir:'😤 Insistir con orden',
+  mv_say_zag:'sube al central al área — ¡es todo o nada!', mv_say_insistir:'insiste con organización',
+  mv_tecnico:'🎯 El técnico ', mv_intervalo:'— Descanso —',
+  mv_events:['🟨 Tarjeta amarilla','🧤 Paradón del portero','↗   Disparo fuera','🚩 Fuera de juego','↪️ Córner peligroso'],
+  mv_penaltis:'— ¡Penales! —', mv_disp_pen:'Tanda de penales',
+  mv_fim:(ico,meu,pl,riv)=>ico+' Final del partido: '+meu+' '+pl+' '+riv,
+  mv_levantar:'🏆 Levantar la copa', mv_pen_txt:(a,b)=>' ('+a+'-'+b+' en penales)',
+  mc_j:(v)=>v+' partidos dirigidos', mc_j_txt:(v)=>'<b>'+v+' partidos</b> dirigidos en tu carrera.'+(v>=700?' Longevidad de leyenda.':''),
+  mc_t:(v)=>v+' títulos en la carrera', mc_t_txt:(v)=>'Llegaste a <b>'+v+' copas</b> como entrenador.',
+  mc_ac:(v)=>v+' ascensos logrados', mc_ac_txt:(v)=>'Ya colocaste <b>'+v+' clubes</b> en la categoría de arriba.',
+  mc_continuar:'Continuar',
+  retire_tit:'¿Fin de ciclo?', retire_txt:(a)=>'Ya tienes <b>'+a+' años</b> y un largo camino en el banquillo. El cuerpo pasa factura y el desgaste empieza a pesar. ¿Quieres seguir dirigiendo o colgar la pizarra con la cabeza alta?',
+  retire_seguir:'Seguir al mando', retire_encerrar:'Terminar la carrera',
+ end_now:'Terminar', end_now_tit:'¿Terminar la carrera ahora?', end_now_txt:'Vas a colgar la pizarra para siempre y ver el balance final de tu trayectoria. No hay vuelta atrás. ¿Estás seguro?', end_now_yes:'Sí, terminar carrera', end_now_no:'Seguir dirigiendo',
+  fire_tit:'Has sido despedido', fire_txt:(c)=>'La directiva del '+c+' perdió la paciencia. Pero el currículum no desaparece — siempre aparece otro proyecto.',
+  fire_buscar:'Buscar nuevo club', fire_encerrar:'Terminar la carrera',
+  recomeco:(c,d)=>'Reinicio en '+c+' ('+d+')',
+  sq_titulo:(c,liga)=>c+' — '+liga, sq_sub:(ovr,n)=>'Fuerza de la plantilla: '+ovr+' OVR · '+n+' jugadores',
+  sq_pos:{GOL:'Porteros',ZAG:'Centrales',LAT:'Laterales',VOL:'Pivotes',MEI:'Mediocampistas',ATA:'Delanteros'}, sq_craque:'CRACK',
+  full_perfil:'Perfil táctico final', full_ges:(g,a)=>'Gestión de vestuario '+'★'.repeat(g)+' · Cintura táctica '+'★'.repeat(a),
+  full_vitrine:'Vitrina de trofeos', full_semtrof:'Sin trofeos.',
+  full_conf:'Confianza de la directiva por temporada', full_conf_lbl:'Confianza (0-100)',
+  full_vit:'Victorias por temporada', full_vit_lbl:'Victorias',
+  full_temp:'Temporada a temporada', full_th:['Año','Club','Div','Pos','V','Tít'],
+  full_finais:'Finales disputadas', full_semfinais:'Sin finales registradas.',
+  full_cadeia:'Cadena de clubes', full_insuf:(l)=>l+': datos insuficientes.', full_max:'máx',
+  full_best:'Mejor trabajo', full_best_none:'Carrera aún sin un paso destacado.',
+  fb_liga:(n)=>n+(n>1?' títulos nacionales':' título nacional'), fb_intl:(n)=>n+(n>1?' títulos continentales':' título continental'),
+  fb_copa:(n)=>n+(n>1?' copas nacionales':' copa nacional'), fb_acesso:(n)=>n+(n>1?' ascensos a la élite':' ascenso a la élite'),
+  fb_aprov:(p)=>p+'% de rendimiento', fb_temps:(n)=>n+(n>1?' temporadas':' temporada'), fb_conf:(b)=>'confianza pico '+b,
+  fb_period:(a,b)=>a===b?(''+a):(a+'–'+b),
+  trof:{ucl:'Champions League',lib:'Libertadores',A:'Brasileirão Serie A',B:'Brasileirão Serie B',C:'Brasileirão Serie C',D:'Brasileirão Serie D',copa:'Copa de Brasil',intl:'Tít. nac. (ext.)',ac:'Ascensos'},
+  season_camp:(l)=>'🏆 Campeón '+l, season_pos:(p,l)=>p+'º en '+l,
+  season_conf:(d)=>' · <span style="color:'+(d>0?'var(--ok)':'var(--bad)')+'">'+(d>0?'▲+':'▼')+d+' confianza</span>',
+ season_pres:()=>'<span style="color:var(--bad)">presión de la afición</span>',
+ pres_tag:(l)=>'Presión '+({1:'moderada',2:'alta',3:'máxima'}[l]),
+  season_meta_ok:' · 🎯 meta cumplida', season_meta_fail:' · ⚠️ meta fallada',
+  season_acesso:(d)=>'⬆️ ASCENSO a '+d, season_rebaix:(d)=>'⬇️ DESCENSO a '+d,
+  cel_acesso:(d)=>'ASCENSO A '+d.toUpperCase(), cel_acesso_sub:(c)=>'¡'+c+' subió de categoría!',
+  cel_final:(c)=>'CAMPEÓN DE LA '+c.toUpperCase(),
+  cel_camp_nac:(p)=>'CAMPEÓN '+p.toUpperCase(), cel_camp_br:'CAMPEÓN DE BRASIL', cel_camp_div:(d)=>'Campeón de '+d,
+  hon_camp_ucl:'Campeón de la Champions League', hon_camp_lib:'Campeón de la Libertadores', hon_camp_copa:'Campeón de la Copa de Brasil',
+  hon_camp_nac:(l)=>'Campeón: '+l, hon_camp_div:(d)=>'Campeón de '+d, hon_melhor:(l)=>'Mejor técnico · '+l,
+  hon_meta:'Meta de la directiva cumplida', hon_acesso:'Ascenso logrado',
+  wl_camp:(c,comp)=>'🏆 '+comp+' — '+c+' campeón', wl_vice:(comp,r)=>comp+' — subcampeón (campeón: '+r+')',
+  card_head:(n)=>'EL MÍSTER · #'+n, card_tec:(n)=>'DT '+n, card_sub:(reg,filo)=>reg+' · '+filo,
+  card_stats:{jogos:'PARTIDOS',vit:'VICTORIAS',aprov:'RENDIM.',ucl:'UCL',lib:'LIBERTA',serieA:'LIGA',copa:'MUNDIAL'},
+  card_temps:(t2,c)=>t2+' temporadas · '+c+' clubes', card_foot:'el míster · mundial',
+  card_salvar:'💾 Guardar imagen', card_compartilhar:'Compartir', card_fechar:'Cerrar',
+  card_story:'Story 9:16', card_sq:'Cuadrado 1:1', card_tit:'Tarjeta de Carrera', full_tit:'Carrera Completa', sq_tit_modal:'Plantilla',
+  share_txt:(rank,tit,ac,v,j)=>'Mi carrera en El Míster: '+rank+' — '+tit+' títulos, '+ac+' ascensos, '+v+' victorias en '+j+' partidos. ¿Puedes dirigir mejor?',
+  hist_item:(n,nome,rank)=>'<span>Carrera #'+n+' — '+nome+'</span><b style="color:var(--acc)">'+rank+'</b>',
+ view_hint:'Toca para ver los datos de esta carrera', view_eyebrow:(n)=>'Carrera #'+n+' · archivo',
+  cdb:'🏆Copa', liberta_s:'🌎Liberta', ucl_s:'⭐UCL'
+};
+I18N.en={
+  eyebrow_sim:'Career simulator',
+  sub_setup:'Steal the DNA of legendary managers, take over clubs from scratch and build a dynasty. Will you be The Gaffer?',
+  lbl_nome:'Manager name', ph_nome:'Your name on the touchline',
+  lbl_pais:'Country of origin (sets your starting league)', lbl_idioma:'Language',
+  lbl_filo:'Playing philosophy', lbl_dif:'Difficulty',
+  dif_am:'AMATEUR', dif_am_sub:'attributes visible in the draft',
+  dif_pro:'PROFESSIONAL', dif_pro_sub:'hidden attributes — full risk',
+  hist_title:'Your careers', btn_montar:'Build your staff',
+ resume_title:'Career in progress', resume_continue:'Continue career', resume_discard:'Discard and start over',
+ resume_info:(clube,ano,n)=>'Career #'+n+' · '+clube+' · '+ano, resume_confirm:'Discard the career in progress? This cannot be undone.',
+  eyebrow_draft:'Mentor draft', draft_aula:(r)=>'Lesson '+r+'/8',
+  btn_reroll:(n)=>'🎲 Draw other mentors — '+n+' left',
+  slot_ini:'?', slot_escolha:'Choose your mentor',
+  hint_pro:'Professional mode: values hidden — trust your instinct',
+  hint_normal:(a)=>'Tap the mentor you want to inherit '+a+' from',
+  eyebrow_primeiro:'First job', club_pre:'You were ', club_span:'hired',
+  sub_club:'Adjust the philosophy if you want — your reputation and the club that hires you change with it.',
+  lbl_rep:'Starting reputation', lbl_club_contratou:'Club that hired you',
+  lbl_trocar_filo:'Change philosophy', btn_assumir:'Take charge',
+  hb_temp:(y)=>'Season '+y, hb_nome:(n)=>'Mgr '+n, hb_idade:(a)=>a+' yrs',
+  lbl_carreira_banco:'Dugout career',
+  st_jogos:'GAMES', st_vitorias:'WINS', st_aprov:'WIN %', st_titulos:'TROPHIES',
+  board_conf:'Board confidence', lbl_hist_temp:'Season history',
+  btn_ver_elenco:'👥 View squad', dinastia:'Your dynasty starts now.',
+  btn_avancar:'Advance season →',
+  eyebrow_fim:'End of career', tot_title:'Totals', honras_title:'Honours',
+  honras_none:'No individual honours.', legado_title:'Records & Legacy',
+  btn_card:'🃏 Career Card', btn_full:'📊 Full career', btn_voltar:'Back to start',
+  cel_continuar:'Continue', mv_final:'Final · ',
+  hb_clube:(nm,liga,pais,ovr)=>nm+' — '+liga+(pais?' · '+pais:'')+' · Squad '+ovr+' OVR',
+  metaline:(f,c,t2,n)=>['Philosophy: '+f,'Clubs: '+c,'Seasons: '+t2,'Career #'+n],
+  bs:['🔥 The fans chant the name of <b style="color:var(--acc)">{n}</b> on the terraces. You are an absolute idol here.',
+      '💚 The board trusts your project and backs your decisions without hesitation.',
+      '🤝 The mood is stable, but pressure for results rises every matchday.',
+      '📰 The press questions your methods and the board&apos;s patience is running thin.',
+      '⚠️ Your job is on the line — the next slip could be your last in charge.'],
+  exp:{A:'Goal: avoid relegation / fight at the top',B:'Goal: earn promotion to the top flight',C:'Goal: get promoted',D:'Goal: climb out of the bottom tier'},
+  exp_intl:'Goal: grow in the league and fight for a continental spot',
+  pill_intl_eur:'Goal: national title + Champions League',
+  pill_intl_sam:'Goal: national title + Libertadores',
+  filo:{POS:'Positional play',PRE:'High press',RET:'Counter-attack',EQU:'Balance',JOV:'Youth & academy',RAC:'Grit & commitment'},
+  attr:{TAT:'TACTICS',ATA:'ATTACK',DEF:'DEFENCE',MER:'MARKET EYE',JOV:'ACADEMY / YOUTH',MOT:'MOTIVATION',GES:'DRESSING ROOM',ADA:'ADAPTABILITY'},
+  div:{A:'Brasileirão Série A',B:'Brasileirão Série B',C:'Brasileirão Série C',D:'Brasileirão Série D'},
+  ranks_n:['THE GAFFER','FOOTBALL LEGEND','MASTER OF THE ELITE','ESTABLISHED MANAGER','PROMOTION SPECIALIST','SEASONED MANAGER','CAREER MANAGER'],
+  ranks_q:['No debate: you are the greatest manager football has ever seen. An era bears your name.',
+    'From the lower leagues to the giants, your name means trophies. The whole world reveres you.',
+    'Champion on football&apos;s biggest stages. A true winner.',
+    'Respected among the elite, architect of campaigns the fans never forget.',
+    'You get teams promoted. Wherever you go, you take the club up a division.',
+    'An honest career touring the world. You left your mark in every dressing room.',
+    'A worthy journey. But The Gaffer... is another level.'],
+  tot:{jogos:'GAMES',vit:'WINS',aprov:'WIN %',ucl:'CHAMPIONS',lib:'LIBERTADORES',serieA:'LEAGUE TITLES',copa:'CUPS',intl:'NAT. TITLES (ABROAD)'},
+  leg:{jogos:'Games',vit:'Wins',tit:'Trophies',ucl:'Champions',lib:'Libertadores'},
+  mkt_reforco:(c)=>'💰 Sign a reinforcement ('+c+'M)', mkt_teto:'⛔ Squad already at the division ceiling',
+  mkt_sem:(c)=>'💰 No funds for a signing ('+c+'M)',
+  mkt_promover:'🌱 Promote an academy gem', mkt_vender:'🏷️ Sell and fill the coffers',
+  mkt_r_ok:'Reinforcement signed — stronger squad.', mkt_r_teto:'The squad is already the strongest in the division — level up by getting promoted.',
+  mkt_r_sem:'Not enough funds for a major signing.', mkt_r_base:'Academy kid promoted — the fans approve.',
+  mkt_r_venda:(g)=>'Sale closed: +'+g+'M in the bank.',
+  mkt_tit:'Transfer window',
+  mkt_txt:(cl,liga,orc)=>'<b>'+cl+'</b> squad · '+liga+'<br>Available budget: <b>'+orc+'M</b>. How do you build the team for the season?',
+  dir_acesso:(n)=>'earn <b>promotion</b> (finish in the top '+n+')',
+  dir_top:(n)=>'finish in the <b>top '+n+'</b>',
+  dir_min:(n)=>'finish at least <b>'+n+'th</b> and not disappoint',
+  dir_naocair:'<b>avoid relegation</b> at all costs',
+  dir_tit:'Board demands',
+  dir_txt:(meta)=>'The chairman went to the press and set the season target: <b>'+meta+'</b>.<br><br>Hitting it brings prestige and budget. Failing after accepting the challenge could cost you the job.',
+  dir_b1:'Accept the target publicly', dir_b2:'Ask for calm and time',
+  rev_tit:'Dressing room revolt', rev_txt:'The squad leaders complained about your methods to the board. The mood threatens the season.',
+  rev_b1:'Lay down the law', rev_b2:'Talk it out and give ground',
+  est_alvos:['your number 10','the team&apos;s top scorer','the academy gem','the captain'],
+  est_tit:(a)=>'Interest in '+a, est_txt:(a)=>'A big elite club wants '+a+'. Selling fills the coffers; keeping preserves the squad&apos;s strength.',
+  est_b1:'Sell and cash in', est_b2:'Keep the star',
+  prop_tit:'Offer on the table',
+  prop_txt:(intl,quente)=>'Bigger clubs came knocking'+(intl?' — even from abroad':'')+(quente?', and your seat at the club is hot':'')+'. Where does the project continue?',
+  prop_ficar:(c)=>'Stay at '+c,
+  fin_flavor:{champions:'The Champions League final is the most coveted stage in world football.',liberta:'The Libertadores final is the game of a lifetime for any South American manager.',copa:'A cup final does not come around every season.'},
+  fin_tit:(c)=>'Final: '+c, fin_fav:(r)=>' <span class="small">(favourite: '+r+')</span>',
+  fin_txt:(meu,riv,fav,flavor)=>'<b>'+meu+'</b> x <b>'+riv+'</b>'+fav+'. '+flavor+' How do you want to live this final?',
+  fin_assistir:'Watch live ▶', fin_pular:'Skip to result ⏭',
+  fin_campeao:(c)=>'CHAMPIONS of the '+c+'!', fin_vice:'The trophy slipped away in the details.',
+  fin_comemorar:'🏆 Celebrate', fin_continuar:'Continue',
+  mv_postura:'Starting approach', mv_pressao:'⚔️ Full press', mv_equil:'⚖    Balanced', mv_cautela:'🛡️ Cautious',
+  mv_say_pressao:'orders a high press', mv_say_equil:'starts balanced', mv_say_cautela:'asks for caution at the back',
+  mv_int_vence:'Half-time · you lead', mv_segurar:'🔒 Hold the result', mv_matar:'🗡️ Kill the game off',
+  mv_say_segurar:'drops back to hold the lead', mv_say_matar:'goes to kill the game off',
+  mv_int_perde:'Half-time · you trail', mv_ircima:'🔥 Go for it', mv_reorg:'🧩 Reorganise',
+  mv_say_ircima:'throws everything forward', mv_say_reorg:'reorganises and looks for the counter',
+  mv_int_empate:'Half-time · draw', mv_buscar:'⚡ Chase the win', mv_manter:'⚖️ Keep the plan',
+  mv_say_buscar:'pushes the lines up to win', mv_say_manter:'keeps the game plan',
+  mv_reta:"70' · final stretch", mv_sacar:'🏃 Off with a midfielder, on a striker', mv_marcacao:'🧱 Tighten the marking', mv_mantertime:'↔️ Keep the team',
+  mv_say_sacar:'swaps a midfielder for a striker', mv_say_marcacao:'tightens the marking', mv_say_mantertime:'keeps the team on the pitch',
+  mv_desespero:"82' · all or nothing", mv_zag:'🎲 Centre-back up front', mv_insistir:'😤 Keep it organised',
+  mv_say_zag:'sends the centre-back into the box — all or nothing!', mv_say_insistir:'keeps pushing with organisation',
+  mv_tecnico:'🎯 The manager ', mv_intervalo:'— Half-time —',
+  mv_events:['🟨 Yellow card','🧤 Great goalkeeper save','↗️ Shot wide','🚩 Offside','↪️ Dangerous corner'],
+  mv_penaltis:'— Penalties! —', mv_disp_pen:'Penalty shootout',
+  mv_fim:(ico,meu,pl,riv)=>ico+' Full time: '+meu+' '+pl+' '+riv,
+  mv_levantar:'🏆 Lift the trophy', mv_pen_txt:(a,b)=>' ('+a+'-'+b+' on penalties)',
+  mc_j:(v)=>v+' games in the dugout', mc_j_txt:(v)=>'<b>'+v+' matches</b> managed in your career.'+(v>=700?' Legendary longevity.':''),
+  mc_t:(v)=>v+' career trophies', mc_t_txt:(v)=>'You reached <b>'+v+' trophies</b> as a manager.',
+  mc_ac:(v)=>v+' promotions earned', mc_ac_txt:(v)=>'You have taken <b>'+v+' clubs</b> up a division.',
+  mc_continuar:'Continue',
+  retire_tit:'End of an era?', retire_txt:(a)=>'You are already <b>'+a+' years old</b> with a long road in the dugout. The body demands its due and the wear starts to weigh. Keep managing or hang up the clipboard with your head held high?',
+  retire_seguir:'Stay in charge', retire_encerrar:'End the career',
+ end_now:'End', end_now_tit:'End career now?', end_now_txt:'You will hang up the clipboard for good and see the final summary of your journey. There is no going back. Are you sure?', end_now_yes:'Yes, end career', end_now_no:'Keep managing',
+  fire_tit:'You were sacked', fire_txt:(c)=>'The board of '+c+' lost patience. But a CV does not vanish — another project always comes along.',
+  fire_buscar:'Find a new club', fire_encerrar:'End the career',
+  recomeco:(c,d)=>'Fresh start at '+c+' ('+d+')',
+  sq_titulo:(c,liga)=>c+' — '+liga, sq_sub:(ovr,n)=>'Squad strength: '+ovr+' OVR · '+n+' players in the squad',
+  sq_pos:{GOL:'Goalkeepers',ZAG:'Centre-backs',LAT:'Full-backs',VOL:'Defensive mids',MEI:'Midfielders',ATA:'Forwards'}, sq_craque:'STAR',
+  full_perfil:'Final tactical profile', full_ges:(g,a)=>'Dressing room '+'★'.repeat(g)+' · Adaptability '+'★'.repeat(a),
+  full_vitrine:'Trophy cabinet', full_semtrof:'No trophies.',
+  full_conf:'Board confidence per season', full_conf_lbl:'Confidence (0-100)',
+  full_vit:'Wins per season', full_vit_lbl:'Wins',
+  full_temp:'Season by season', full_th:['Year','Club','Div','Pos','W','Tr'],
+  full_finais:'Finals played', full_semfinais:'No finals recorded.',
+  full_cadeia:'Chain of clubs', full_insuf:(l)=>l+': not enough data.', full_max:'max',
+  full_best:'Best spell', full_best_none:'No standout spell yet in this career.',
+  fb_liga:(n)=>n+(n>1?' league titles':' league title'), fb_intl:(n)=>n+(n>1?' continental titles':' continental title'),
+  fb_copa:(n)=>n+(n>1?' domestic cups':' domestic cup'), fb_acesso:(n)=>n+(n>1?' promotions to the top flight':' promotion to the top flight'),
+  fb_aprov:(p)=>p+'% win rate', fb_temps:(n)=>n+(n>1?' seasons':' season'), fb_conf:(b)=>'peak confidence '+b,
+  fb_period:(a,b)=>a===b?(''+a):(a+'–'+b),
+  trof:{ucl:'Champions League',lib:'Libertadores',A:'Brasileirão Série A',B:'Brasileirão Série B',C:'Brasileirão Série C',D:'Brasileirão Série D',copa:'Copa do Brasil',intl:'Nat. titles (abroad)',ac:'Promotions'},
+  season_camp:(l)=>'🏆 Champions of '+l, season_pos:(p,l)=>p+'th in '+l,
+  season_conf:(d)=>' · <span style="color:'+(d>0?'var(--ok)':'var(--bad)')+'">'+(d>0?'▲+':'▼')+d+' confidence</span>',
+ season_pres:()=>'<span style="color:var(--bad)">fan pressure</span>',
+ pres_tag:(l)=>'Pressure '+({1:'moderate',2:'high',3:'max'}[l]),
+  season_meta_ok:' · 🎯 target hit', season_meta_fail:' · ⚠️ target missed',
+  season_acesso:(d)=>'⬆️ PROMOTED to '+d, season_rebaix:(d)=>'⬇️ RELEGATED to '+d,
+  cel_acesso:(d)=>'PROMOTED TO '+d.toUpperCase(), cel_acesso_sub:(c)=>c+' moved up a division!',
+  cel_final:(c)=>c.toUpperCase()+' CHAMPIONS',
+  cel_camp_nac:(p)=>p.toUpperCase()+' CHAMPIONS', cel_camp_br:'BRAZILIAN CHAMPIONS', cel_camp_div:(d)=>d+' Champions',
+  hon_camp_ucl:'Champions League winner', hon_camp_lib:'Libertadores winner', hon_camp_copa:'Copa do Brasil winner',
+  hon_camp_nac:(l)=>'Champions: '+l, hon_camp_div:(d)=>d+' champions', hon_melhor:(l)=>'Manager of the year · '+l,
+  hon_meta:'Board target hit', hon_acesso:'Promotion earned',
+  wl_camp:(c,comp)=>'🏆 '+comp+' — '+c+' champions', wl_vice:(comp,r)=>comp+' — runners-up (winner: '+r+')',
+  card_head:(n)=>'THE GAFFER · #'+n, card_tec:(n)=>'MGR '+n, card_sub:(reg,filo)=>reg+' · '+filo,
+  card_stats:{jogos:'GAMES',vit:'WINS',aprov:'WIN %',ucl:'UCL',lib:'LIBERTA',serieA:'LEAGUE',copa:'WORLD CUP'},
+  card_temps:(t2,c)=>t2+' seasons · '+c+' clubs', card_foot:'the gaffer · worldwide',
+  card_salvar:'💾 Save image', card_compartilhar:'Share', card_fechar:'Close',
+  card_story:'Story 9:16', card_sq:'Square 1:1', card_tit:'Career Card', full_tit:'Full Career', sq_tit_modal:'Squad',
+  share_txt:(rank,tit,ac,v,j)=>'My career in The Gaffer: '+rank+' — '+tit+' trophies, '+ac+' promotions, '+v+' wins in '+j+' games. Can you manage better?',
+  hist_item:(n,nome,rank)=>'<span>Career #'+n+' — '+nome+'</span><b style="color:var(--acc)">'+rank+'</b>',
+ view_hint:'Tap to view this career\u2019s data', view_eyebrow:(n)=>'Career #'+n+' · archive',
+  cdb:'🏆Cup', liberta_s:'🌎Liberta', ucl_s:'⭐UCL'
+};
+/* ES e EN preenchidos (mesmas chaves e assinaturas de função) */
+function t(k,...a){
+  const d=I18N[LANG]||I18N.pt;
+  let v=(d[k]!==undefined)?d[k]:I18N.pt[k];
+  if(v===undefined)v=k;
+  return (typeof v==='function')?v(...a):v;
+}
+function tt(k){const d=I18N[LANG]||I18N.pt;return (d[k]!==undefined?d[k]:I18N.pt[k]);}
+  function filoName(f){return tt('filo')[f];}
+function attrName(k){return tt('attr')[k];}
+ function setLang(l){LANG=l;try{localStorage.setItem('mister_lang',l);}catch(e){}
+   document.querySelectorAll('#langbar button').forEach(b=>b.classList.toggle('on',b.getAttribute('data-lang')===l));
+   applyStaticI18n();}
+
+const REGIOES=[
+  ['Brasil','🇧🇷'],['Argentina','🇦🇷'],['Uruguai','🇺🇾'],['Paraguai','🇵🇾'],['Chile','🇨🇱'],
+ ['Colômbia','🇨🇴'],['Equador','🇪🇨'],['Peru','🇵🇪'],['Bolívia','🇧🇴'],['Venezuela','🇻🇪'],
+ ['Inglaterra','🇬🇧'],['Espanha','🇪🇸'],['Alemanha','🇩🇪'],['Itália','🇮🇹'],['França','🇫🇷'],
+ ['Portugal','🇵🇹'],['Holanda','🇳🇱'],['Bélgica','🇧🇪'],['Turquia','🇹🇷'],['Chéquia','🇨🇿'],
+ ['Noruega','🇳🇴'],['Grécia','🇬🇷'],['Dinamarca','🇩🇰'],['Chipre','🇨🇾'],['Azerbaijão','🇦🇿'],['Cazaquistão','🇰🇿']
+];
+const FILO={
+ POS:{n:'Jogo de posição',w:{TAT:.28,ATA:.22,MER:.14,JOV:.12,MOT:.12,DEF:.12}},
+ PRE:{n:'Pressão alta',w:{ATA:.26,MOT:.24,TAT:.20,DEF:.12,JOV:.10,MER:.08}},
+ RET:{n:'Contra-ataque',w:{DEF:.30,TAT:.24,MER:.16,MOT:.12,ATA:.10,JOV:.08}},
+ EQU:{n:'Equilíbrio',w:{TAT:.22,DEF:.18,ATA:.18,MOT:.16,MER:.14,JOV:.12}},
+ JOV:{n:'Base &amp; garotos',w:{JOV:.30,MOT:.20,TAT:.18,MER:.14,ATA:.10,DEF:.08}},
+ RAC:{n:'Raça e entrega',w:{MOT:.28,DEF:.22,TAT:.16,ATA:.16,MER:.10,JOV:.08}}
+};
+const ATTRS=[
+ {k:'TAT',n:'TÁTICA',c:'var(--pas)'},{k:'ATA',n:'ATAQUE',c:'var(--fin)'},
+ {k:'DEF',n:'DEFESA',c:'var(--def)'},{k:'MER',n:'OLHO DE MERCADO',c:'var(--dri)'},
+ {k:'JOV',n:'BASE / GAROTOS',c:'var(--rit)'},{k:'MOT',n:'MOTIVAÇÃO',c:'var(--fis)'},
+ {k:'GES',n:'GESTÃO DE VESTIÁRIO',c:'var(--sm)',star:1},{k:'ADA',n:'JOGO DE CINTURA',c:'var(--wf)',star:1}
+];
+/* mentores: os maiores treinadores da história do futebol mundial — [nome, TAT,ATA,DEF,MER,JOV,MOT, GES,ADA] */
+const LENDAS=[
+ ['Pep Guardiola',99,96,82,88,84,88,5,4],['José Mourinho',94,80,95,86,74,92,4,5],
+ ['Alex Ferguson',90,88,86,90,92,96,5,5],['Johan Cruyff',96,97,74,84,94,86,5,4],
+ ['Arrigo Sacchi',95,90,92,76,80,88,4,3],['Carlo Ancelotti',90,88,86,86,78,90,5,5],
+ ['Jürgen Klopp',88,92,82,84,84,96,5,4],['Marcelo Bielsa',96,94,72,70,90,92,3,2],
+ ['Rinus Michels',95,94,80,78,88,90,4,4],['Franz Beckenbauer',86,86,88,80,78,88,5,5],
+ ['Valeriy Lobanovskyi',94,88,88,76,86,90,4,3],['Helenio Herrera',88,74,96,82,72,90,4,4],
+ ['Bob Paisley',86,86,88,88,80,88,5,4],['Ernst Happel',90,86,88,78,80,86,4,4],
+ ['Giovanni Trapattoni',88,78,92,82,76,88,4,4],['Fabio Capello',90,82,92,84,76,90,4,4],
+ ['Marcello Lippi',90,84,90,82,76,90,5,4],['Vicente del Bosque',90,86,86,82,80,88,5,5],
+ ['Diego Simeone',90,78,94,82,78,96,4,4],['Zinedine Zidane',84,88,82,82,74,92,5,5],
+ ['Antonio Conte',92,84,92,80,76,92,3,3],['Louis van Gaal',92,86,84,84,92,84,3,3],
+ ['Ottmar Hitzfeld',88,84,86,82,80,86,5,4],['César Luis Menotti',86,90,74,76,84,84,4,3],
+ ['Carlos Bilardo',88,76,92,78,74,88,3,4],['Telê Santana',94,96,78,80,86,90,5,4],
+ ['Tite',92,84,88,82,80,90,5,5],['Felipão',84,80,88,82,72,96,5,4],
+ ['Abel Ferreira',88,84,90,82,84,88,4,5],['Zagallo',88,84,86,82,80,92,5,5]
+];
+/* técnico lendário secreto: 99 em tudo. Aparece ~1 vez a cada 100 técnicos exibidos no draft */
+const GORDIOLA=['Gordiola',99,99,99,99,99,99,5,5];
+/* clubes: [nome, divisão('A'/'B'/'C'/'D'), força] — 2026 real */
+const CLUBES=[
+ // ---- SÉRIE A (20)
+ ['Flamengo','A',92],['Palmeiras','A',91],['Botafogo','A',85],['Cruzeiro','A',84],
+ ['Atlético-MG','A',84],['São Paulo','A',84],['Corinthians','A',83],['Grêmio','A',82],
+ ['Internacional','A',82],['Fluminense','A',82],['Bahia','A',80],['Vasco','A',80],
+ ['Santos','A',79],['Bragantino','A',78],['Athletico-PR','A',76],['Vitória','A',74],
+ ['Mirassol','A',73],['Coritiba','A',73],['Chapecoense','A',70],['Remo','A',70],
+ // ---- SÉRIE B (20)
+ ['Fortaleza','B',76],['Ceará','B',74],['Juventude','B',72],['Sport','B',72],
+ ['Goiás','B',72],['Cuiabá','B',71],['América-MG','B',70],['Atlético-GO','B',70],
+ ['Criciúma','B',69],['Avaí','B',68],['Vila Nova','B',67],['Novorizontino','B',67],
+ ['Ponte Preta','B',66],['Botafogo-SP','B',66],['Náutico','B',66],['CRB','B',66],
+ ['Operário','B',64],['Londrina','B',63],['Athletic','B',62],['São Bernardo','B',62],
+ // ---- SÉRIE C (20)
+ ['Paysandu','C',64],['Guarani','C',62],['Santa Cruz','C',62],['Figueirense','C',60],
+ ['Ituano','C',60],['Amazonas','C',58],['Brusque','C',58],['Caxias','C',58],
+ ['Ferroviária','C',58],['Volta Redonda','C',58],['Ypiranga','C',57],['Botafogo-PB','C',56],
+ ['Confiança','C',56],['Inter de Limeira','C',56],['Maringá','C',56],['Anápolis','C',54],
+ ['Floresta','C',54],['Maranhão','C',53],['Itabaiana','C',53],['Barra-SC','C',52],
+ // ---- SÉRIE D (24 amostra real)
+ ['América-RN','D',52],['Portuguesa-RJ','D',52],['Nova Iguaçu','D',50],['ASA','D',50],
+ ['Uberlândia','D',50],['Aparecidense','D',50],['Pouso Alegre','D',49],['Sousa','D',48],
+ ['Sergipe','D',48],['Juazeirense','D',48],['Cianorte','D',48],['Araguaína','D',48],
+ ['Tuna Luso','D',47],['Águia de Marabá','D',47],['Altos','D',47],['Moto Club','D',47],
+ ['Costa Rica-MS','D',47],['Rio Branco-ES','D',46],['Democrata-GV','D',45],['Porto Velho','D',45],
+ ['Manauara','D',44],['São Raimundo-RR','D',44],['Trem','D',43],['Humaitá','D',43]
+];
+ const DIVS=['D','C','B','A'];
+  const DIVNOME={A:'Brasileirão Série A',B:'Brasileirão Série B',C:'Brasileirão Série C',D:'Brasileirão Série D'};
+ const DIVIDX=d=>DIVS.indexOf(d);
+ const clubesDaDiv=d=>CLUBES.filter(c=>c[1]===d);
+
+/* ============ CONMEBOL / LIBERTADORES ============ */
+/* nomes dos países */
+const PAIS_NOME={BRA:'Brasil',ARG:'Argentina',URU:'Uruguai',PAR:'Paraguai',CHI:'Chile',COL:'Colômbia',EQU:'Equador',PER:'Peru',BOL:'Bolívia',VEN:'Venezuela',
+ ENG:'Inglaterra',ESP:'Espanha',GER:'Alemanha',ITA:'Itália',FRA:'França',POR:'Portugal',NED:'Holanda',BEL:'Bélgica',TUR:'Turquia',CZE:'Chéquia',NOR:'Noruega',GRE:'Grécia',DEN:'Dinamarca',CYP:'Chipre',AZE:'Azerbaijão',KAZ:'Cazaquistão'};
+/* mapa reverso nome->código de país (a nacionalidade escolhida define a liga inicial) */
+const NAME_PAIS={};Object.entries(PAIS_NOME).forEach(([c,n])=>NAME_PAIS[n]=c);
+function regCode(reg){return NAME_PAIS[(reg&&reg[0])||'Brasil']||'BRA';}
+/* nomes de países por idioma (PT usa PAIS_NOME) */
+const PAIS_I18N={
+ es:{BRA:'Brasil',ARG:'Argentina',URU:'Uruguay',PAR:'Paraguay',CHI:'Chile',COL:'Colombia',EQU:'Ecuador',PER:'Perú',BOL:'Bolivia',VEN:'Venezuela',
+  ENG:'Inglaterra',ESP:'España',GER:'Alemania',ITA:'Italia',FRA:'Francia',POR:'Portugal',NED:'Países Bajos',BEL:'Bélgica',TUR:'Turquía',CZE:'Chequia',NOR:'Noruega',GRE:'Grecia',DEN:'Dinamarca',CYP:'Chipre',AZE:'Azerbaiyán',KAZ:'Kazajistán'},
+ en:{BRA:'Brazil',ARG:'Argentina',URU:'Uruguay',PAR:'Paraguay',CHI:'Chile',COL:'Colombia',EQU:'Ecuador',PER:'Peru',BOL:'Bolivia',VEN:'Venezuela',
+  ENG:'England',ESP:'Spain',GER:'Germany',ITA:'Italy',FRA:'France',POR:'Portugal',NED:'Netherlands',BEL:'Belgium',TUR:'Turkey',CZE:'Czechia',NOR:'Norway',GRE:'Greece',DEN:'Denmark',CYP:'Cyprus',AZE:'Azerbaijan',KAZ:'Kazakhstan'}
+};
+function paisNome(code){const m=PAIS_I18N[LANG];return (m&&m[code])||PAIS_NOME[code]||code;}
+function regName(reg){return paisNome(regCode(reg));}
+/* ligas nacionais sul-americanas: pais -> { liga, clubes:[[nome,força],...] }
+   inclui todos os participantes da Libertadores 2026 + principais clubes de cada país */
+const LIGAS={
+ ARG:{liga:'Liga Profesional (ARG)',clubes:[['River Plate',87],['Boca Juniors',86],['Racing',82],['Estudiantes',80],['Vélez Sarsfield',79],['Talleres',78],['Independiente',77],['Lanús',76],['San Lorenzo',75],['Rosario Central',75],['Argentinos Juniors',74],['Defensa y Justicia',73],['Independiente Rivadavia',72],["Newell's Old Boys",72],['Godoy Cruz',71],['Platense',70],['Gimnasia LP',70],['Banfield',69]]},
+ URU:{liga:'Primera División (URU)',clubes:[['Nacional',78],['Peñarol',78],['Defensor Sporting',70],['Liverpool-URU',70],['Montevideo City',66],['Cerro Largo',64],['Danubio',65],['Boston River',63],['Racing-URU',62],['River Plate-URU',62],['Wanderers',61],['Plaza Colonia',60]]},
+ PAR:{liga:'Primera División (PAR)',clubes:[['Cerro Porteño',78],['Libertad',77],['Olimpia',77],['Guaraní',72],['Nacional-PAR',68],['Sportivo Ameliano',64],['Sportivo Luqueño',65],['General Caballero',63],['Sportivo Trinidense',63],['Tacuary',62],['2 de Mayo',61],['Recoleta',60]]},
+ CHI:{liga:'Primera División (CHI)',clubes:[['Colo-Colo',78],['Universidad Católica',76],['Universidad de Chile',76],['Coquimbo Unido',72],['Huachipato',70],['Palestino',70],['Cobresal',69],['Unión Española',68],["O'Higgins",68],['Audax Italiano',67],['Everton-CHI',66],['Ñublense',66],['Unión La Calera',65],['Deportes Iquique',62],['La Serena',62],['Deportes Limache',60]]},
+ COL:{liga:'Liga BetPlay (COL)',clubes:[['Atlético Nacional',79],['Millonarios',76],['Independiente Medellín',75],['Junior Barranquilla',75],['Deportes Tolima',74],['Santa Fe',74],['América de Cali',74],['Deportivo Cali',72],['Once Caldas',71],['Atlético Bucaramanga',71],['Deportivo Pereira',70],['Águilas Doradas',69],['La Equidad',65],['Envigado',65],['Alianza FC',64],['Fortaleza CEIF',63],['Boyacá Chicó',62],['Llaneros',60]]},
+ EQU:{liga:'LigaPro (EQU)',clubes:[['Independiente del Valle',79],['LDU Quito',78],['Barcelona SC',77],['Emelec',72],['Aucas',68],['Deportivo Cuenca',68],['Universidad Católica-EQU',66],['Orense',65],['Delfín',65],['El Nacional',64],['Libertad-EQU',64],['Macará',63],['Técnico Universitario',63],['Mushuc Runa',62]]},
+ PER:{liga:'Liga 1 (PER)',clubes:[['Alianza Lima',74],['Universitario',74],['Sporting Cristal',73],['Melgar',70],['Cusco',70],['Cienciano',66],['Sport Huancayo',65],['Deportivo Garcilaso',64],['Atlético Grau',63],['ADT',63],['Sport Boys',62],['UTC',61],['Los Chankas',60],['Comerciantes Unidos',59]]},
+ BOL:{liga:'División Profesional (BOL)',clubes:[['Bolívar',74],['The Strongest',72],['Always Ready',70],['Oriente Petrolero',65],['Blooming',64],['Nacional Potosí',64],['Aurora',63],['Club San José',62],['Independiente Petrolero',62],['Real Tomayapo',61],['Guabirá',60],['GV San José',60]]},
+ VEN:{liga:'Liga FUTVE (VEN)',clubes:[['Deportivo Táchira',70],['Deportivo La Guaira',70],['Caracas FC',70],['Monagas',67],['Carabobo',68],['Metropolitanos',66],['Universidad Central',66],['Academia Puerto Cabello',65],['Estudiantes de Mérida',64],['Zamora',64],['Rayo Zuliano',63],['Angostura',60]]},
+ /* ===== UEFA / EUROPA ===== */
+ ENG:{liga:'Premier League (ENG)',clubes:[['Liverpool',90],['Manchester City',90],['Arsenal',89],['Chelsea',85],['Newcastle',83],['Tottenham',82],['Manchester United',82],['Aston Villa',81],['Nottingham Forest',78],['Brighton',78],['Bournemouth',76],['West Ham',76],['Crystal Palace',75],['Brentford',75],['Fulham',75],['Everton',74],['Wolves',73],['Leeds',72],['Burnley',70],['Sunderland',70]]},
+ ESP:{liga:'LaLiga (ESP)',clubes:[['Real Madrid',91],['Barcelona',90],['Atlético de Madrid',86],['Athletic Club',81],['Villarreal',80],['Real Betis',79],['Real Sociedad',79],['Sevilla',77],['Valencia',76],['Girona',76],['Celta Vigo',74],['Osasuna',73],['Rayo Vallecano',73],['Mallorca',72],['Getafe',72],['Espanyol',71],['Alavés',70],['Levante',68],['Elche',68],['Oviedo',66]]},
+ GER:{liga:'Bundesliga (GER)',clubes:[['Bayern München',90],['Bayer Leverkusen',85],['Borussia Dortmund',84],['RB Leipzig',83],['Eintracht Frankfurt',81],['VfB Stuttgart',80],['Freiburg',77],['Wolfsburg',76],["Borussia M'gladbach",75],['Werder Bremen',74],['Hoffenheim',74],['Mainz',74],['Augsburg',72],['Union Berlin',72],['Köln',71],['St. Pauli',70],['Hamburger SV',70],['Heidenheim',68]]},
+ ITA:{liga:'Serie A (ITA)',clubes:[['Inter',88],['Napoli',87],['Milan',84],['Juventus',84],['Atalanta',84],['Roma',82],['Lazio',80],['Fiorentina',79],['Bologna',79],['Como',75],['Torino',74],['Udinese',73],['Genoa',72],['Cagliari',71],['Parma',71],['Sassuolo',70],['Verona',69],['Lecce',69],['Cremonese',68],['Pisa',67]]},
+ FRA:{liga:'Ligue 1 (FRA)',clubes:[['Paris Saint-Germain',90],['Marseille',82],['Monaco',82],['Lille',80],['Lyon',79],['Nice',78],['Lens',77],['Rennes',76],['Strasbourg',75],['Brest',74],['Toulouse',73],['Nantes',71],['Auxerre',70],['Angers',68],['Le Havre',68],['Paris FC',68],['Lorient',67],['Metz',66]]},
+ POR:{liga:'Primeira Liga (POR)',clubes:[['Sporting CP',82],['Benfica',82],['Porto',81],['Braga',78],['Vitória SC',73],['Famalic  o',68],['Moreirense',68],['Gil Vicente',67],['Santa Clara',66],['Arouca',65],['Casa Pia',65],['Estoril',65],['Rio Ave',65],['Nacional-POR',64],['Estrela',63],['AVS',62]]},
+ NED:{liga:'Eredivisie (NED)',clubes:[['PSV',81],['Ajax',80],['Feyenoord',80],['AZ Alkmaar',76],['Twente',74],['Utrecht',73],['Go Ahead Eagles',68],['Heerenveen',67],['NEC',67],['Sparta Rotterdam',66],['Fortuna Sittard',65],['Groningen',65],['Zwolle',64],['Heracles',63]]},
+ BEL:{liga:'Pro League (BEL)',clubes:[['Club Brugge',79],['Union Saint-Gilloise',78],['Anderlecht',76],['Genk',76],['Antwerp',74],['Gent',73],['Standard Liège',71],['Charleroi',69],['Cercle Brugge',68],['Mechelen',67],['OH Leuven',65],['Westerlo',64]]},
+ TUR:{liga:'Süper Lig (TUR)',clubes:[['Galatasaray',82],['Fenerbahçe',81],['Beşiktaş',78],['Trabzonspor',76],['Başakşehir',73],['Samsunspor',70],['Eyüpspor',68],['Konyaspor',67],['Antalyaspor',67],['Kasımpaşa',66],['Rizespor',65],['Gaziantep',65]]},
+ CZE:{liga:'Chance Liga (CZE)',clubes:[['Slavia Praha',76],['Sparta Praha',76],['Viktoria Plzeň',74],['Baník Ostrava',68],['Sigma Olomouc',67],['Slovan Liberec',66],['Jablonec',65],['Hradec Králové',63],['Bohemians',63],['Teplice',61]]},
+ NOR:{liga:'Eliteserien (NOR)',clubes:[['Bodø/Glimt',76],['Molde',72],['Brann',70],['Rosenborg',70],['Viking',68],['Lillestrøm',66],['Fredrikstad',65],['Tromsø',64],['Sarpsborg',63],['Strømsgodset',62],['HamKam',61],['Kristiansund',61]]},
+ GRE:{liga:'Super League (GRE)',clubes:[['Olympiacos',78],['PAOK',76],['AEK Athens',74],['Panathinaikos',74],['Aris',68],['Panserraikos',62],['OFI',62],['Volos',61],['Atromitos',61],['Levadiakos',60]]},
+ DEN:{liga:'Superliga (DEN)',clubes:[['Copenhagen',76],['Midtjylland',75],['Brøndby',71],['Nordsjælland',70],['Aarhus',68],['Silkeborg',66],['Randers',65],['Viborg',64],['Sønderjyske',62],['Vejle',61]]},
+ CYP:{liga:'First Division (CYP)',clubes:[['Pafos',70],['APOEL',69],['Omonia',69],['AEK Larnaca',68],['Aris Limassol',67],['Apollon',66],['Anorthosis',65],['AEL Limassol',64],['Ethnikos',60],['Nea Salamis',59]]},
+ AZE:{liga:'Premyer Liqası (AZE)',clubes:[['Qarabağ',72],['Neftçi',66],['Zira',63],['Sabah',63],['Sumqayıt',61],['Araz',60],['Kəpəz',58],['Turan',58],['Səbail',57],['Şamaxı',56]]},
+ KAZ:{liga:'Premier League (KAZ)',clubes:[['Kairat Almaty',68],['Astana',68],['Tobol',65],['Ordabasy',62],['Aktobe',62],['Elimai',60],['Turan-KAZ',58],['Zhenis',57],['Kyzylzhar',57],['Okzhetpes',56]]}
+};
+/* clubes internacionais treináveis: [nome, 'A'(topo), força, pais, liga] */
+const LIB_INT=[];
+Object.entries(LIGAS).forEach(([pais,o])=>{o.clubes.forEach(([n,f])=>LIB_INT.push([n,'A',f,pais,o.liga]));});
+/* os 32 classificados para a fase de grupos da Libertadores 2026 */
+const LIBERTA_NAMES=[
+ 'Flamengo','Palmeiras','Fluminense','Corinthians','Cruzeiro','Mirassol',
+ 'Estudiantes','Independiente Rivadavia','Boca Juniors','Platense','Lanús','Rosario Central',
+ 'Nacional','Peñarol','Cusco','Universitario','Sporting Cristal',
+ 'Independiente Medellín','Deportes Tolima','Santa Fe','Junior Barranquilla',
+ 'Bolívar','Always Ready','Deportivo La Guaira','Universidad Central',
+ 'Coquimbo Unido','Universidad Católica','Barcelona SC','LDU Quito','Independiente del Valle',
+ 'Cerro Porteño','Libertad'
+];
+/* os 36 clubes da fase de liga da Champions League 2025-26 */
+const CHAMPIONS_NAMES=[
+ 'Liverpool','Arsenal','Manchester City','Chelsea','Newcastle','Tottenham',
+ 'Barcelona','Real Madrid','Atlético de Madrid','Athletic Club','Villarreal',
+ 'Bayern München','Bayer Leverkusen','Eintracht Frankfurt','Borussia Dortmund',
+ 'Napoli','Inter','Atalanta','Juventus',
+ 'Paris Saint-Germain','Marseille','Monaco',
+ 'PSV','Ajax','Benfica','Sporting CP',
+ 'Club Brugge','Union Saint-Gilloise','Galatasaray','Slavia Praha',
+ 'Bodø/Glimt','Olympiacos','Copenhagen','Pafos','Qarabağ','Kairat Almaty'
+];
+function clubByName(n){return CLUBES.find(c=>c[0]===n)||LIB_INT.find(c=>c[0]===n);}
+/* pools resolvidos (objetos-clube) */
+const LIBERTA=LIBERTA_NAMES.map(n=>{const c=clubByName(n);return c?c.slice():null;}).filter(Boolean);
+const CHAMPIONS=CHAMPIONS_NAMES.map(n=>{const c=clubByName(n);return c?c.slice():null;}).filter(Boolean);
+/* continentes: define qual copa continental cada país disputa */
+const PAISES_SAM=['ARG','URU','PAR','CHI','COL','EQU','PER','BOL','VEN'];
+const PAISES_EUR=['ENG','ESP','GER','ITA','FRA','POR','NED','BEL','TUR','CZE','NOR','GRE','DEN','CYP','AZE','KAZ'];
+function continente(club){
+  if(!club)return null;
+  const p=club[3];
+  if(!p||p==='BRA')return 'SAM'; // Brasil disputa a Libertadores
+  if(PAISES_EUR.indexOf(p)>=0)return 'EUR';
+  return 'SAM';
+}
+/* helpers de nacionalidade / liga */
+function isIntl(club){return !!(club&&club[3]&&club[3]!=='BRA');}
+function divLabel(club){return isIntl(club)?club[4]:DIVNOME[club[1]];}
+function curLeague(){
+  if(isIntl(G.club))return G.pool||(G.pool=LIB_INT.filter(c=>c[3]===G.club[3]));
+  return clubesDaDiv(G.club[1]);
+}
+
+/* ---- ELENCO FICTÍCIO ---- */
+const P_NOME=['Gabriel','Lucas','Matheus','Rafael','Bruno','Diego','Thiago','Vinícius','Felipe','Rodrigo',
+ 'André','Carlos','Wesley','Everton','Kaique','Danilo','Igor','Renan','Yuri','Alan','Emerson','Douglas',
+ 'Wallace','Jean','Marcos','Alisson','Jefferson','Wendell','Robson','Adriano','Leandro','Fábio','Ricardo',
+ 'Anderson','Cauã','Erik','Vítor','Nathan','Samuel','Davi','Ederson','Juninho','Betinho','Marquinhos'];
+const P_SOBRE=['Silva','Souza','Santos','Oliveira','Pereira','Costa','Almeida','Ribeiro','Carvalho','Gomes',
+ 'Martins','Araújo','Melo','Barbosa','Rocha','Dias','Nunes','Teixeira','Correia','Cardoso','Freitas','Moura',
+ 'Cavalcante','Duarte','Vieira','Lopes','Machado','Farias','Batista','Pinto'];
+function genNomeJogador(){
+  if(Math.random()<0.22)return pick(P_NOME)+(Math.random()<0.5?'inho':'ão');
+  return pick(P_NOME)+' '+pick(P_SOBRE);
+}
+const POSICOES=[['GOL',3],['ZAG',4],['LAT',4],['VOL',4],['MEI',4],['ATA',4]];
+function genSquad(force){
+  const arr=[];
+  POSICOES.forEach(([pos,n])=>{
+    for(let i=0;i<n;i++)arr.push({nome:genNomeJogador(),pos,ovr:clamp(Math.round(force+R(-11,7)),38,96)});
+  });
+  arr.sort((a,b)=>b.ovr-a.ovr);
+  arr[0].ovr=clamp(arr[0].ovr+R(3,8),38,99); // craque do elenco
+  arr.sort((a,b)=>b.ovr-a.ovr);
+  return arr;
+}
+function syncSquad(){G.squad=genSquad(G.club[2]);}
+
+const RANKS=[
+ [999,'O MÍSTER','Não há debate: você é o maior treinador que o futebol brasileiro já viu. Uma era leva o seu nome.'],
+ [999,'LENDA DO BRASILEIRÃO','Do interior à Série A, seu nome virou sinônimo de título. O país inteiro te reverencia.'],
+ [999,'MESTRE DA ELITE','Campeão na maior prateleira do futebol nacional. Um vencedor de verdade.'],
+ [999,'TÉCNICO CONSOLIDADO','Respeitado na Série A, arquiteto de campanhas que a torcida não esquece.'],
+ [999,'ESPECIALISTA EM ACESSO','Você faz time subir. Onde chega, coloca clube na divisão de cima.'],
+ [999,'TÉCNICO RODADO','Uma carreira honesta rodando o Brasil. Deixou sua marca em cada vestiário.'],
+ [0,'TÉCNICO DE CARREIRA','Uma jornada digna nas quatro divisões. Mas O Míster... é outro patamar.']
+];
+ const TETOS={jogos:1000,vit:600,titulos:20,acessos:6,copas:4,liberta:3,champions:3};
+
+/* UTIL */
+const $=id=>document.getElementById(id);
+const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null}}
+
+/* ===== SAVE EM ANDAMENTO (retomar de onde parou) ===== */
+const SAVE_KEY='mister_br_save';
+function saveProgress(){
+  try{
+    if(!G||G.over)return;                       // não salva carreira encerrada
+    const log=$('seasonLog')?$('seasonLog').innerHTML:'';
+    localStorage.setItem(SAVE_KEY,JSON.stringify({v:2,ts:Date.now(),lang:LANG,log:log,G:G}));
+  }catch(e){}
+}
+function loadProgress(){try{return JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch(e){return null;}}
+function clearProgress(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+function resumeCareer(){
+  const s=loadProgress();if(!s||!s.G)return;
+  G=s.G;
+  if(s.lang&&s.lang!==LANG)setLang(s.lang);
+  if(!G.squad&&G.mode!=='nt')syncSquad();       // reconstrói elenco se faltar (saves antigos)
+  updateHub();
+  if($('seasonLog')&&s.log!=null)$('seasonLog').innerHTML=s.log;
+  show('scr-hub');
+}
+function renderResume(){
+  const box=$('resumeBox');if(!box)return;
+  const s=loadProgress();
+  if(!s||!s.G){box.innerHTML='';return;}
+  const g=s.G,nome=g.nome||'MÍSTER';
+  const clube=(g.mode==='nt'&&g.nt)?('🎽 '+g.nt.nome):(g.club?g.club[0]:'');
+  box.innerHTML='<div class="card" style="border:2px solid var(--acc)">'
+    +'<div class="lbl" style="color:var(--acc)">'+t('resume_title')+'</div>'
+    +'<div class="disp" style="font-size:20px">'+nome+'</div>'
+    +'<div class="small" style="margin:2px 0 10px">'+t('resume_info',clube,g.year,g.careerN)+'</div>'
+    +'<button class="btn" onclick="resumeCareer()">'+t('resume_continue')+'</button>'
+    +'<button class="btn ghost mini" style="margin-top:8px" onclick="discardProgress()">'+t('resume_discard')+'</button>'
+    +'</div>';
+}
+function discardProgress(){
+  if(!confirm(t('resume_confirm')))return;
+  clearProgress();renderResume();
+}
+/* autosave ao sair/minimizar a página */
+window.addEventListener('beforeunload',saveProgress);
+window.addEventListener('pagehide',saveProgress);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveProgress();});
+
+let G=null;
+let cfg={nome:'',reg:REGIOES[0],filo:'EQU',dif:'am'};
+let draft={i:0,rr:2,cur:null,spinning:false,vals:{},from:{}};
+
+/* aplica todas as traduções estáticas (elementos com data-i18n) + selects dinâmicos */
+function applyStaticI18n(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('#langbar button').forEach(b=>b.classList.toggle('on',b.getAttribute('data-lang')===LANG));
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const v=tt(el.getAttribute('data-i18n'));
+    if(typeof v==='string')el.innerHTML=v;
+  });
+  const ph=I18N[LANG]&&I18N[LANG].ph_nome;$('inNome')&&$('inNome').setAttribute('placeholder',ph||I18N.pt.ph_nome);
+  // recria o dropdown de país com nomes traduzidos, preservando a seleção
+  const psel=$('inPais');
+  if(psel&&psel.options.length){const cur=psel.value;psel.innerHTML='';
+    REGIOES.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p[1]+' '+regName(p);psel.appendChild(o);});
+    psel.value=cur;}
+  // reconstrói grades de filosofia (nomes traduzidos)
+  buildFilo('filoGrid',cfg.filo,f=>cfg.filo=f);
+  if($('filoGrid2').children.length)buildFilo('filoGrid2',cfg.filo,f=>{cfg.filo=f;refreshClubScreen(true);});
+  updateDraftTexts();
+  renderHist();
+  renderResume();
+  if(G)updateHub();
+}
+function updateDraftTexts(){
+  const n=(draft&&draft.i!=null)?draft.i+1:1;
+  if($('drAula'))$('drAula').innerHTML=t('draft_aula','<span id="drRound">'+n+'</span>');
+  const rr=(draft&&draft.rr!=null)?draft.rr:2;
+  if($('btnReroll'))$('btnReroll').textContent=t('btn_reroll',rr);
+}
+function initSetup(){
+  const sel=$('inPais');sel.innerHTML='';
+  REGIOES.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p[1]+' '+regName(p);sel.appendChild(o);});
+  buildFilo('filoGrid',cfg.filo,f=>cfg.filo=f);
+  $('difGrid').querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+    cfg.dif=o.dataset.d;$('difGrid').querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');
+  });
+  applyStaticI18n();
+  renderResume();
+}
+function buildFilo(id,sel,cb){
+  const g=$(id);g.innerHTML='';
+  Object.keys(FILO).forEach(k=>{
+    const d=document.createElement('div');d.className='opt'+(k===sel?' sel':'');
+    d.innerHTML=k+'<small>'+filoName(k)+'</small>';
+    d.onclick=()=>{[...g.children].forEach(c=>c.classList.remove('sel'));d.classList.add('sel');cb(k);};
+    g.appendChild(d);
+  });
+}
+function renderHist(){
+  const h=store('mister_br_hist')||[];const box=$('histBox');box.innerHTML='';
+  if(!h.length)return;
+  box.innerHTML='<div class="lbl">'+t('hist_title')+'</div>';
+  h.slice().reverse().forEach(c=>{const d=document.createElement('div');d.className='li';
+    const rk=(c.rankIdx!=null)?rankName(c.rankIdx):c.rank;
+    d.innerHTML=t('hist_item',c.n,c.nome,rk);
+    if(c.snap){d.classList.add('clickable');d.style.cursor='pointer';d.title=t('view_hint');
+      const bEl=d.querySelector('b');if(bEl)bEl.insertAdjacentHTML('beforeend','<span style="color:var(--mut);margin-left:8px;font-weight:700">›</span>');
+      d.onclick=()=>viewCareer(c.n);}
+    box.appendChild(d);});
+}
+/* abre uma carreira antiga (somente leitura) restaurando o snapshot salvo */
+function viewCareer(n){
+  const h=store('mister_br_hist')||[];
+  const c=h.find(x=>x.n===n&&x.snap);
+  if(!c||!c.snap)return;
+  saveProgress();                       // preserva o save em andamento antes de trocar G
+  let snap=null;try{snap=JSON.parse(JSON.stringify(c.snap));}catch(e){return;}
+  snap._viewing=true;                   // marca como visualização (não sobrescreve o save)
+  G=snap;
+  renderOver();show('scr-over');
+}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
+function closeModal(id){$(id).classList.remove('open');}
+function openModal(id){$(id).classList.add('open');}
+
+/* ============ DRAFT — 3 MENTORES POR RODADA ============ */
+let spinTimer=null;
+function startDraft(){
+  cfg.nome=($('inNome').value.trim()||'MÍSTER').toUpperCase();
+  cfg.reg=REGIOES[+$('inPais').value];
+  draft={i:0,rr:2,opts:null,spinning:false,vals:{},from:{}};
+  const dots=$('drDots');dots.innerHTML='';
+  for(let i=0;i<8;i++){const d=document.createElement('div');d.className='dot';dots.appendChild(d);}
+  $('stolenGrid').innerHTML='';updateDraftTexts();
+  show('scr-draft');spinRound();
+}
+function attrVal(l,k){return l[{TAT:1,ATA:2,DEF:3,MER:4,JOV:5,MOT:6,GES:7,ADA:8}[k]];}
+function pick3(){
+  const pool=LENDAS.slice(),out=[];
+  for(let i=0;i<3;i++){const idx=Math.floor(Math.random()*pool.length);out.push(pool.splice(idx,1)[0]);}
+  // 1 técnico a cada 100 exibidos é o Gordiola (99 em tudo); no máximo um por rodada
+  for(let i=0;i<out.length;i++){
+    if(Math.random()<0.01){out[i]=GORDIOLA;break;}
+  }
+  return out;
+}
+function spinRound(){
+  const a=ATTRS[draft.i];updateDraftTexts();
+  [...$('drDots').children].forEach((d,i)=>{d.className='dot'+(i<draft.i?' done':i===draft.i?' cur':'')});
+  const chip=$('drChip');chip.innerHTML=attrName(a.k);chip.style.background=a.c;
+  $('draftOpts').innerHTML='';$('draftHint').textContent='';
+  $('btnReroll').disabled=true;
+  $('slot').classList.add('spin');$('slotName').textContent='';$('slotVal').textContent='\u00a0';
+  draft.spinning=true;let t=0;clearInterval(spinTimer);
+  spinTimer=setInterval(()=>{$('slotName').textContent=pick(LENDAS)[0];t+=60;if(t>=900){clearInterval(spinTimer);landRound();}},60);
+}
+function landRound(){
+  const a=ATTRS[draft.i];
+  draft.opts=pick3().map(l=>({lenda:l,val:attrVal(l,a.k)}));
+  $('slot').classList.remove('spin');
+  $('slotName').textContent=t('slot_escolha');$('slotVal').textContent='';
+  $('draftHint').textContent=cfg.dif==='pro'?t('hint_pro'):t('hint_normal',attrName(a.k));
+  const box=$('draftOpts');box.innerHTML='';
+  draft.opts.forEach((o,idx)=>{
+    const card=document.createElement('div');card.className='dopt';
+    const isGord=o.lenda[0]==='Gordiola';
+    if(isGord){card.classList.add('gord');card.style.border='2px solid var(--acc)';card.style.boxShadow='0 0 14px rgba(212,175,55,.5)';}
+    const val=cfg.dif==='pro'?'?':(a.star?'★'.repeat(o.val):o.val);
+    card.innerHTML='<div class="dopt-nm">'+(isGord?'⭐ ':'')+o.lenda[0]+'</div><div class="dopt-val'+(a.star?' stars':'')+'" style="color:'+(isGord?'var(--acc)':a.c)+'">'+val+'</div>';
+    card.onclick=()=>chooseOpt(idx);
+    box.appendChild(card);
+  });
+  draft.spinning=false;$('btnReroll').disabled=draft.rr<=0;
+}
+function rerollSpin(){if(draft.rr<=0||draft.spinning)return;draft.rr--;updateDraftTexts();spinRound();}
+function chooseOpt(idx){
+  if(draft.spinning||!draft.opts)return;
+  const a=ATTRS[draft.i],o=draft.opts[idx];
+  draft.vals[a.k]=o.val;draft.from[a.k]=o.lenda[0];
+  const st=document.createElement('div');st.className='st';
+  st.innerHTML='<div class="k" style="color:'+a.c+'">'+a.k+'</div><div class="v">'+(a.star?o.val+'★':o.val)+'</div><div class="f">'+o.lenda[0]+'</div>';
+  $('stolenGrid').appendChild(st);
+  $('draftOpts').innerHTML='';draft.opts=null;
+  draft.i++;
+  if(draft.i>=8)setTimeout(finishDraft,500);else setTimeout(spinRound,350);
+}
+function calcOVR(filo,vals){
+  const w=FILO[filo].w;let s=0;for(const k in w)s+=vals[k]*(w[k]||0);
+  const soma=Object.keys(w).reduce((a,k)=>a+w[k],0)||1;
+  s=s/soma;
+  s+=((vals.GES||3)+(vals.ADA||3)-6)*0.8;
+  return clamp(Math.round(s)-10,42,95);
+}
+function drawStartClub(exclude){
+  const code=regCode(cfg.reg);
+  // Brasil mantém as 4 divisões: começa na várzea (Série D/C)
+  if(code==='BRA'){
+    const div=Math.random()<0.78?'D':'C';
+    const pool=clubesDaDiv(div).filter(c=>!exclude||c[0]!==exclude);
+    return pick(pool).slice();
+  }
+  // Internacional: a nacionalidade define a liga. Começa entre os clubes mais fracos dela.
+  let pool=LIB_INT.filter(c=>c[3]===code);
+  if(!pool.length){const div=Math.random()<0.78?'D':'C';return pick(clubesDaDiv(div)).slice();}
+  pool=pool.slice().sort((a,b)=>a[2]-b[2]); // do mais fraco ao mais forte
+  const bottom=pool.slice(0,Math.max(4,Math.ceil(pool.length*0.5)));
+  const cand=bottom.filter(c=>!exclude||c[0]!==exclude);
+  return pick(cand.length?cand:bottom).slice();
+}
+function expectByDiv(div){
+  return tt('exp')[div];
+}
+function expectByClub(club){
+  if(isIntl(club))return t('exp_intl');
+  return expectByDiv(club[1]);
+}
+function finishDraft(){
+  cfg.attrs=draft.vals;cfg.from=draft.from;
+  refreshClubScreen(true);
+  buildFilo('filoGrid2',cfg.filo,f=>{cfg.filo=f;refreshClubScreen(true);});
+  show('scr-club');
+}
+function refreshClubScreen(redraw){
+  const ovr=calcOVR(cfg.filo,cfg.attrs);cfg.ovr=ovr;
+  if(redraw)cfg.club=drawStartClub(cfg.club?cfg.club[0]:null);
+  $('clOvr').textContent=ovr;
+  $('clPosLbl').textContent=filoName(cfg.filo).replace('&amp;','&');
+  $('clClube').textContent=cfg.club[0];
+  $('clLiga').textContent=divLabel(cfg.club)+' · '+regName(cfg.reg);
+  $('clExp').textContent=expectByClub(cfg.club);
+}
+
+/* ============ CARREIRA ============ */
+function beginCareer(){
+  const hist=store('mister_br_hist')||[];
+  G={
+    nome:cfg.nome,reg:cfg.reg,filo:cfg.filo,dif:cfg.dif,
+    attrs:{...cfg.attrs},from:{...cfg.from},ovr:cfg.ovr,base:cfg.ovr,
+    club:cfg.club.slice(),age:R(38,44),year:(new Date()).getFullYear(),
+    j:0,v:0,e:0,d:0,gp:0,gc:0,
+    board:70,verba:6,seasons:[],clubes:[cfg.club[0]],
+    honras:{},tit:{A:0,B:0,C:0,D:0,copa:0,liberta:0,champions:0,intl:0,intlBy:{}},acessos:0,rebaix:0,metas:0,
+    tension:false,milestones:{},careerN:hist.length+1,worldLog:[],pool:null
+  };
+  // limpa o histórico de temporadas exibido (carreira anterior)
+  $('seasonLog').innerHTML='<div class="small center" style="padding:14px">'+t('dinastia')+'</div>';
+  syncSquad();
+  updateHub();show('scr-hub');
+}
+ function titTot(){return G.tit.A+G.tit.B+G.tit.C+G.tit.D+G.tit.copa+(G.tit.liberta||0)+(G.tit.champions||0)+(G.tit.intl||0)+(G.ntCups?(G.ntCups.world+G.ntCups.euro+G.ntCups.copa):0);}
+function aprov(){return G.j?Math.round((G.v*3+G.e)/(G.j*3)*100):0;}
+function forcaCap(div){return{D:58,C:66,B:78,A:94}[div];}
+function updateHub(){
+  $('hbTemp').textContent=t('hb_temp',G.year);
+  $('hbNome').textContent=t('hb_nome',G.nome);
+  if(G.mode==='nt'&&G.nt)$('hbClube').textContent=t('nt_hub_clube',G.nt.nome,G.nt.conf,G.nt.forca);
+  else $('hbClube').textContent=t('hb_clube',G.club[0],divLabel(G.club),isIntl(G.club)?paisNome(G.club[3]):'',G.club[2]);
+  $('hbOvr').textContent=G.ovr;
+  $('hbIdade').textContent=t('hb_idade',G.age);
+  $('hbJ').textContent=G.j;$('hbV').textContent=G.v;$('hbAp').textContent=aprov()+'%';
+  $('hbT').textContent=titTot();
+  const bar=$('boardBar');bar.style.width=G.board+'%';
+  bar.style.background=G.board>=60?'var(--ok)':G.board>=35?'var(--acc)':'var(--bad)';
+  $('boardPct').textContent=G.board+'%';
+  $('hbStatus').innerHTML=boardStatus();
+  if(G.mode==='nt'&&G.nt)$('expPill').textContent=t('nt_hub_meta',ntCompName(tournamentOf(G.year,G.nt.conf)));
+  else $('expPill').textContent=(isIntl(G.club)?(continente(G.club)==='EUR'?t('pill_intl_eur'):t('pill_intl_sam')):expectByDiv(G.club[1]))+pressTag();
+  saveProgress();   // autosave a cada retorno ao hub
+}
+/* nível de pressão da torcida/diretoria conforme o tamanho do clube */
+function pressTag(){
+  if(G.mode==='nt')return '';
+  const st=clubStature();if(st<1)return '';
+  return ' · '+t('pres_tag',st)+' '+'●'.repeat(st)+'○'.repeat(3-st);
+}
+/* narrativa dinâmica: reage ao trabalho do treinador citando torcida/imprensa/diretoria */
+function boardStatus(){
+  const b=G.board,bs=tt('bs');
+  const i=b>=85?0:b>=68?1:b>=45?2:b>=25?3:4;
+  return bs[i].replace('{n}',G.nome);
+}
+function addHonra(n,pts){G.honras[n]=(G.honras[n]||0)+1;G.honras._pts=(G.honras._pts||0)+(pts||4);}
+function logSeason(html){const log=$('seasonLog');if(log.querySelector('.small'))log.innerHTML='';
+  const d=document.createElement('div');d.className='li';d.innerHTML=html;log.prepend(d);}
+/* --- pressão por tamanho do clube: gigantes exigem títulos p/ manter a confiança --- */
+function clubStature(){
+  if(isIntl&&isIntl(G.club)&&G.club[2]>=82)return 3;
+  const o=G.club[2],dv=G.club[1];
+  if(dv==='A'&&o>=86)return 3;   // gigante (exige títulos)
+  if(dv==='A'&&o>=79)return 2;   // grande (exige protagonismo)
+  if((dv==='A'||dv==='B')&&o>=71)return 1; // tradicional
+  return 0;                       // sem pressão de elite
+}
+/* --- força / posição --- */
+function coachEff(){return (G.ovr-70)*0.30;}
+function effStrength(club){return club[2]+coachEff()+(Math.random()*15-7.5);}
+function leaguePosition(){
+  const liga=curLeague();
+  const rivals=liga.filter(c=>c[0]!==G.club[0]);
+  const meu=effStrength(G.club);
+  let acima=0;
+  rivals.forEach(c=>{ if(c[2]+(Math.random()*18-9)>meu) acima++; });
+  return clamp(acima+1+R(-1,1),1,liga.length);
+}
+/* meta esperada da diretoria: ranking do clube por força na divisão */
+function metaEsperada(){
+  const liga=curLeague(),total=liga.length;
+  const maisFortes=liga.filter(c=>c[2]>G.club[2]).length;
+  return clamp(maisFortes+1+1,1,total); // posição esperada + 1 de folga
+}
+/* ============ FLUXO: pré-temporada -> temporada ============ */
+let preQueue=[],seasonTmp=null,evQueue=[];
+function advanceSeason(){
+  $('btnAdv').disabled=true;
+  if(G.mode==='nt'){advanceNT();return;} // temporada internacional pela seleção
+  preQueue=[];
+  if(Math.random()<0.62)preQueue.push({t:'mercado'});
+  runPre();
+}
+function runPre(){
+  NEXT=runPre;
+  if(!preQueue.length){computeSeason();return;}
+  const ev=preQueue.shift();
+  ({mercado:evMercado}[ev.t])(ev);
+}
+function computeSeason(){
+  const div=G.club[1];
+  G._boardStart=G.board; // confiança no início do ciclo, p/ medir o impacto das decisões
+  const jogos=div==='A'?38:div==='B'?38:div==='C'?R(20,26):R(12,20);
+  const pos=leaguePosition();
+  const frac=1-(pos-1)/(curLeague().length-1);
+  let v=Math.round(jogos*(0.24+frac*0.42));
+  let e=Math.round(jogos*0.26);
+  let dd=jogos-v-e; if(dd<0){e+=dd;dd=0;}
+  const gp=Math.round(v*2.0+e+dd*0.6+R(0,6));
+  const gc=Math.round(dd*1.9+e+v*0.5+R(0,6));
+  seasonTmp={div,jogos,v,e,d:dd,gp,gc,pos,titFlags:[],acesso:false,rebaix:false,campeao:false,demanda:null,club:G.club.slice()};
+  const nAcesso=div==='D'?6:4, nRebaix=4, total=curLeague().length;
+  if(!isIntl(G.club)&&div!=='A'&&pos<=nAcesso)seasonTmp.acesso=true;
+  if(pos===1)seasonTmp.campeao=true;
+  if(!isIntl(G.club)&&div!=='D'&&pos>total-nRebaix)seasonTmp.rebaix=true;
+  const meta={A:14,B:6,C:4,D:8}[div];
+  seasonTmp.boardDelta=pos<meta?R(8,16):pos<=meta+3?R(-2,5):-R(10,22);
+  // eventos de temporada
+  evQueue=[];
+  if(Math.random()<0.13)evQueue.push({t:'revolta'});
+  if(Math.random()<0.13)evQueue.push({t:'estrela'});
+  if(Math.random()<0.26)evQueue.push({t:'diretoria'});
+  if(G.ovr>=72&&G.board>38&&Math.random()<0.5)evQueue.push({t:'proposta'});
+  buildComps(); // final da Copa do Brasil por último
+  if(canCoachNT())evQueue.push({t:'selecao'}); // convite da seleção (currículo de elite)
+  runEvents();
+}
+
+/* ============ FLUXO DE EVENTOS ============ */
+function buildComps(){
+  const div=G.club[1],intl=isIntl(G.club),pos=seasonTmp.pos,total=curLeague().length;
+  const fca=G.club[2]; // força REAL do elenco (gate estável, sem aleatoriedade)
+  // Copa do Brasil: só para clubes brasileiros. Clubes pequenos quase nunca chegam à final.
+  if(!intl){
+    const base={A:0.10,B:0.05,C:0.015,D:0.004}[div];
+    const copaP=clamp(base+(fca-60)/400,0,0.24);
+    if(Math.random()<copaP)evQueue.push({t:'final',comp:'Copa do Brasil',tipo:'copa'});
+  }
+  // copa continental: exige CAMPANHA de elite (terminar no topo) + ELENCO forte de verdade.
+  // sem isso, um clube fraco (ex.: recém-chegado à Série A) jamais chega a uma final continental.
+  const cont=continente(G.club);
+  if(cont==='EUR'){
+    // Champions League: terminar no G-4 da liga E ter um elenco de nível europeu (80+)
+    const topo=pos<=Math.max(4,Math.ceil(total*0.20));
+    if(topo&&fca>=80){
+      const chP=clamp((fca-80)/45+0.05,0.03,0.22);
+      if(Math.random()<chP)evQueue.push({t:'final',comp:'Champions League',tipo:'champions'});
+    }
+  }else{
+    // Libertadores: vaga vem de campanha forte (Série A no G-6 / sul-americano no G-4) + elenco 76+
+    const berthBR=(!intl&&div==='A'&&pos<=6);
+    const berthSAM=(intl&&pos<=4);
+    if((berthBR||berthSAM)&&fca>=76){
+      const libP=clamp((fca-76)/45+0.05,0.03,0.24);
+      if(Math.random()<libP)evQueue.push({t:'final',comp:'Libertadores',tipo:'liberta'});
+    }
+  }
+}
+let NEXT=null;
+function runEvents(){
+  NEXT=runEvents;
+  if(!evQueue.length){resolveSeason();return;}
+  const ev=evQueue.shift();
+  ({revolta:evRevolta,estrela:evEstrela,diretoria:evDiretoria,proposta:evProposta,final:evFinal,selecao:evSelecao}[ev.t])(ev);
+}
+function evShow(ico,tit,txt,btns){
+  $('evIco').textContent=ico;$('evTit').textContent=tit;$('evTxt').innerHTML=txt;
+  const bx=$('evBtns');bx.innerHTML='';
+  btns.forEach(b=>{const el=document.createElement('button');el.className='btn mini'+(b.ghost?' ghost':'');el.textContent=b.l;
+    el.onclick=()=>{closeModal('ovlEv');b.f&&b.f();if(!b.hold)setTimeout(()=>NEXT&&NEXT(),600);};bx.appendChild(el);});
+  openModal('ovlEv');
+}
+/* --- MERCADO DA BOLA (pré-temporada) --- */
+function evMercado(){
+  const div=G.club[1],cap=forcaCap(div),orc=Math.round(G.verba);
+  const custo={D:6,C:12,B:24,A:50}[div];
+  const noTeto=G.club[2]>=cap;
+  const semVerba=orc<custo;
+  const podeReforco=!semVerba&&!noTeto;
+  let reforcoLabel;
+  if(podeReforco)reforcoLabel=t('mkt_reforco',custo);
+  else if(noTeto)reforcoLabel=t('mkt_teto');
+  else reforcoLabel=t('mkt_sem',custo);
+  const btns=[];
+  btns.push({l:reforcoLabel,
+    f:()=>{if(podeReforco){G.verba-=custo;G.club[2]=clamp(G.club[2]+R(2,4),42,cap);G._merc=t('mkt_r_ok');}
+      else if(noTeto){G._merc=t('mkt_r_teto');}
+      else{G._merc=t('mkt_r_sem');}syncSquad();}});
+  btns.push({l:t('mkt_promover'),
+    f:()=>{const g=(G.attrs.JOV>=82)?2:1;G.club[2]=clamp(G.club[2]+g,42,cap);G.board=clamp(G.board+3,0,100);G.verba+=2;G._merc=t('mkt_r_base');syncSquad();}});
+  btns.push({l:t('mkt_vender'),ghost:1,
+    f:()=>{const ganho=R(6,18);G.verba+=ganho;G.club[2]=clamp(G.club[2]-1,42,cap);G.board=clamp(G.board+2,0,100);G._merc=t('mkt_r_venda',ganho);syncSquad();}});
+  evShow('🔁',t('mkt_tit'),t('mkt_txt',G.club[0],divLabel(G.club),orc),btns);
+}
+/* --- COBRANÇA COM META E CONSEQUÊNCIA --- */
+function evDiretoria(){
+  const div=G.club[1],total=curLeague().length;
+  const alvoN=metaEsperada();
+  const nAc=div==='D'?6:4;
+  let metaTxt;
+  if(div!=='A'&&alvoN<=nAc)metaTxt=t('dir_acesso',nAc);
+  else if(alvoN<=6)metaTxt=t('dir_top',alvoN);
+  else metaTxt=t('dir_min',alvoN);
+  const risco = seasonTmp.pos>total-6 && div!=='D';
+  if(risco)metaTxt=t('dir_naocair');
+  seasonTmp.demanda={alvoN:risco?(total-4):alvoN,risco};
+  evShow('🏛️',t('dir_tit'),t('dir_txt',metaTxt),[
+    {l:t('dir_b1'),f:()=>{seasonTmp.demanda.assumida=true;}},
+    {l:t('dir_b2'),ghost:1,f:()=>{seasonTmp.demanda.assumida=false;}}
+  ]);
+}
+function evRevolta(){
+  evShow('🔥',t('rev_tit'),t('rev_txt'),[
+    {l:t('rev_b1'),f:()=>{if((G.attrs.GES||3)>=4||Math.random()<0.5)G.board=clamp(G.board+5,0,100);else{seasonTmp.v=Math.round(seasonTmp.v*0.85);G.board=clamp(G.board-10,0,100);}}},
+    {l:t('rev_b2'),ghost:1,f:()=>{G.board=clamp(G.board-2,0,100);}}
+  ]);
+}
+function evEstrela(){
+  const alvo=pick(tt('est_alvos'));
+  evShow('💸',t('est_tit',alvo),t('est_txt',alvo),[
+    {l:t('est_b1'),f:()=>{G.board=clamp(G.board+6,0,100);G.verba+=R(8,22);if(Math.random()<0.5)seasonTmp.v=Math.round(seasonTmp.v*0.9);}},
+    {l:t('est_b2'),ghost:1,f:()=>{if((G.attrs.MER||70)<75)G.board=clamp(G.board-6,0,100);}}
+  ]);
+}
+  function offerLabel(c){return c[0]+' ('+(isIntl(c)?paisNome(c[3]):DIVNOME[c[1]])+')';}
+function inLiberta(name){return LIBERTA_NAMES.indexOf(name)>=0;}
+function inChampions(name){return CHAMPIONS_NAMES.indexOf(name)>=0;}
+function copaTag(name){return inChampions(name)?' · Champions':(inLiberta(name)?' · Libertadores':'');}
+/* clube gigante = disputa Champions/Libertadores. Só assedia treinador com currículo de elite. */
+function isGiant(name){return inChampions(name)||inLiberta(name);}
+/* currículo de elite: ganhou algo grande de verdade (não basta acesso).
+   1 título continental, OU 2+ títulos nacionais de 1ª divisão (Série A + títulos nac. no exterior). */
+function eliteCV(){
+  const t=G.tit;
+  if((t.champions||0)>=1||(t.liberta||0)>=1)return true;
+  return (t.A+(t.intl||0))>=2;
+}
+/* prestígio do treinador: pontuação de currículo (títulos, acessos, reputação) */
+function prestigio(){
+  const t=G.tit;
+  let p=(t.champions||0)*10+(t.liberta||0)*8+t.A*6+(t.intl||0)*5+t.copa*4+t.B*3+t.C*1.5+t.D*0.8+G.acessos*1.5;
+  return p;
+}
+/* teto de força: o clube mais forte que pode te oferecer emprego.
+   sem currículo, o teto é baixo — clubes de elite só chegam depois de conquistas. */
+function tetoForca(){
+  let teto=52+(clamp(G.ovr,50,92)-60)*0.9+prestigio()*1.7;
+  // dirigir bem um clube grande também abre portas (mas não o suficiente p/ gigantes)
+  teto=Math.max(teto,G.club[2]+4);
+  return clamp(teto,52,99);
+}
+function evProposta(){
+  const cur=G.club;
+  const teto=tetoForca();
+  const btns=[];const used={};
+  const add=(c,intl)=>{ if(!c||used[c[0]]||c[0]===cur[0])return; used[c[0]]=1;
+    btns.push({l:(intl?'🌎 ':'')+offerLabel(c)+copaTag(c[0]),f:()=>doMove(c)}); };
+
+  const elite=eliteCV();
+  // gigantes de Champions/Libertadores só entram na lista se você tem currículo de elite
+  const okClub=c=>c[2]<=teto&&(elite||!isGiant(c[0]));
+
+  if(isIntl(cur)){
+    const cont=continente(cur);
+    const paisesCont=(cont==='EUR')?PAISES_EUR:PAISES_SAM;
+    // 1) PRIORIDADE: clubes maiores do MESMO país/liga onde você trabalha
+    const dom=LIB_INT.filter(c=>c[3]===cur[3]&&c[0]!==cur[0]&&c[2]>=cur[2]+1&&okClub(c)).sort((a,b)=>b[2]-a[2]);
+    if(dom.length)add(pick(dom.slice(0,Math.min(6,dom.length))).slice());
+    // 2) clubes de OUTROS países do mesmo continente (europeu p/ europeu, sul-am p/ sul-am)
+    if(G.ovr>=74){
+      const viz=LIB_INT.filter(c=>c[3]!==cur[3]&&paisesCont.indexOf(c[3])>=0&&c[2]>=Math.max(64,cur[2]-6)&&okClub(c)).sort((a,b)=>b[2]-a[2]);
+      if(viz.length)add(pick(viz.slice(0,10)).slice(),true);
+    }
+    // 3) gigantes continentais (Champions/Libertadores) — EXIGE currículo de elite
+    if(elite&&G.ovr>=80){
+      const giants=LIB_INT.filter(c=>c[0]!==cur[0]&&isGiant(c[0])&&c[2]<=teto).sort((a,b)=>b[2]-a[2]);
+      if(giants.length)add(pick(giants.slice(0,10)).slice(),true);
+    }
+    // 4) chance de "voltar pro Brasil" (Série A) — opção, não regra; gigantes só com currículo de elite
+    if(btns.length<3&&Math.random()<0.4){
+      const br=CLUBES.filter(c=>c[1]==='A'&&c[2]>=cur[2]-4&&okClub(c));
+      if(br.length)add(pick(br).slice(),true);
+    }
+  }else{
+    // BRASIL: subir de divisão / clubes maiores da Série A
+    let cands;
+    if(cur[1]==='A')cands=CLUBES.filter(c=>c[0]!==cur[0]&&c[1]==='A'&&c[2]>cur[2]+3&&c[2]<=teto);
+    else cands=CLUBES.filter(c=>c[0]!==cur[0]&&DIVIDX(c[1])>DIVIDX(cur[1])&&DIVIDX(c[1])<=DIVIDX(cur[1])+1&&c[2]<=teto);
+    if(cands.length){add(pick(cands).slice()); if(cands.length>1&&Math.random()<0.5)add(pick(cands).slice());}
+    // aventura internacional a partir do Brasil (Série A + reputação); gigantes só com currículo de elite
+    if(cur[1]==='A'&&G.ovr>=76&&prestigio()>=6){
+      const viz=LIB_INT.filter(c=>c[2]>=Math.max(70,cur[2]-4)&&okClub(c)).sort((a,b)=>b[2]-a[2]);
+      if(viz.length)add(pick(viz.slice(0,12)).slice(),true);
+    }
+  }
+
+  if(!btns.length){NEXT&&NEXT();return;}
+  while(btns.length>3)btns.pop();
+  btns.push({l:t('prop_ficar',cur[0]),ghost:1,f:()=>{if(G.tension)G.board=clamp(G.board-5,0,100);}});
+  const temIntl=btns.some(b=>b.l.indexOf('🌎')===0);
+  evShow('📞',t('prop_tit'),t('prop_txt',temIntl,G.board<40),btns);
+}
+function doMove(c){G.club=c.slice();G.pool=null;G.clubes.push(c[0]);G.tension=false;G.board=70;G.verba=Math.max(G.verba,{D:4,C:8,B:16,A:40}[c[1]]);syncSquad();}
+
+/* ============ FINAL — ESCOLHA ASSISTIR / PULAR ============ */
+function finalRival(tipo){
+  let pool;
+  if(tipo==='champions'){
+    // finalista da Champions é elite absoluta: os 8 mais fortes da Europa
+    pool=CHAMPIONS.filter(c=>c[0]!==G.club[0]).sort((a,b)=>b[2]-a[2]).slice(0,8);
+  }else if(tipo==='liberta'){
+    // finalista continental é elite: sorteia entre os 8 mais fortes da Libertadores
+    pool=LIBERTA.filter(c=>c[0]!==G.club[0]).sort((a,b)=>b[2]-a[2]).slice(0,8);
+  }else{
+    // Copa do Brasil: adversário mais forte, mas competitivo (dentro do alcance do finalista)
+    const meu=G.club[2];
+    pool=CLUBES.filter(c=>c[0]!==G.club[0]&&c[2]>=meu-2&&c[2]<=meu+14);
+    if(pool.length<6)pool=CLUBES.filter(c=>c[0]!==G.club[0]&&DIVIDX(c[1])>=DIVIDX(G.club[1]))
+      .sort((a,b)=>Math.abs(a[2]-meu)-Math.abs(b[2]-meu)).slice(0,16);
+    pool=pool.sort((a,b)=>b[2]-a[2]).slice(0,16);
+  }
+  if(!pool.length)pool=CLUBES.filter(c=>c[0]!==G.club[0]);
+  return pick(pool).slice();
+}
+function evFinal(ev){
+  // corrige a competição caso o treinador tenha trocado de clube após o agendamento da final:
+  // clube europeu SEMPRE joga Champions; sul-americano/brasileiro joga Libertadores (Copa do Brasil só p/ BR)
+  const cont=continente(G.club);
+  if(cont==='EUR'){
+    if(ev.tipo!=='champions'){ev.tipo='champions';ev.comp='Champions League';}
+  }else{
+    if(ev.tipo==='champions'){ev.tipo='liberta';ev.comp='Libertadores';}
+    else if(ev.tipo==='copa'&&isIntl(G.club)){ev.tipo='liberta';ev.comp='Libertadores';}
+  }
+  const rival=finalRival(ev.tipo);ev.rival=rival[0];ev.meu=G.club[0];
+  // quem chega a uma final está em grande fase — bônus leve de força (finais são equilibradas)
+  const boost=(ev.tipo==='champions'||ev.tipo==='liberta')?R(2,5):R(1,3);
+  ev.rivalForca=rival[2]+boost;
+  const zebra=G.club[2]<ev.rivalForca-8;
+  const flavor=tt('fin_flavor')[ev.tipo];
+  evShow('🏆',t('fin_tit',ev.comp),t('fin_txt',ev.meu,ev.rival,zebra?t('fin_fav',ev.rival):'',flavor),[
+    {l:t('fin_assistir'),hold:true,f:()=>startMatch(ev)},
+    {l:t('fin_pular'),ghost:1,hold:true,f:()=>playInstant(ev)}
+  ]);
+}
+
+/* ============ FORÇAS DA PARTIDA (com força do adversário) ============ */
+function matchChances(rivalForca,myForce){
+  const meu=(myForce!=null?myForce:G.club[2])+coachEff();
+  const gap=meu-rivalForca; // negativo = zebra
+  // taxas de gol por minuto: calibradas p/ ~1.1-1.4 gols esperados por time (placares realistas)
+  return{
+    my:clamp(0.0125+gap/1050,0.004,0.021),
+    ri:clamp(0.014-gap/1050,0.008,0.029), // diferença de elenco pesa: zebra sofre mais
+    gap
+  };
+}
+// probabilidade só usada p/ desempate em pênaltis: perto de um cara-ou-coroa
+function winProbFromGap(gap){return clamp(0.5+gap/120,0.32,0.68);}
+
+/* ============ PARTIDA AO VIVO ============ */
+let M=null;const TICK=120;
+/* ícone do resultado: 🥈 só em finais; ✕ em grupos/eliminatórias */
+function isFinalEv(ev){return !!(ev&&((ev.phase&&ev.phase.n==='final')||ev.tipo));}
+function lossIco(ev){return isFinalEv(ev)?'🥈':'✕';}
+/* encolhe o nome do time para caber em uma única linha */
+function fitName(el){
+  if(!el)return;el.style.fontSize='';
+  let fs=20;el.style.fontSize=fs+'px';
+  requestAnimationFrame(()=>{
+    let guard=0;
+    while(el.scrollWidth>el.clientWidth&&fs>10&&guard++<40){fs-=1;el.style.fontSize=fs+'px';}
+  });
+}
+function startMatch(ev){
+  const mc=matchChances(ev.rivalForca,ev.myForca);
+  M={ev,meu:ev.meu,rival:ev.rival,min:0,gh:0,ga:0,atk:1,def:1,baseMy:mc.my,baseRi:mc.ri,gap:mc.gap,ended:false,stops:{}};
+  $('mvComp').textContent=ev.compLabel||(t('mv_final')+ev.comp);
+  $('mvHome').textContent=M.meu;$('mvAway').textContent=M.rival;
+  fitName($('mvHome'));fitName($('mvAway'));
+  $('mvGh').textContent='0';$('mvGa').textContent='0';
+  $('mvMin').textContent="0'";$('mvFill').style.width='0%';
+  $('mvFeed').innerHTML='';$('mvAct').innerHTML='';
+  openModal('ovlMatch');
+  if(window.__HEADLESS){headlessMatch();return;}
+  askDecision('postura');
+}
+function feed(cls,min,txt){
+  const el=document.createElement('div');el.className='f'+(cls?' '+cls:'');
+  el.innerHTML=(min!=null?'<b>'+min+"'</b>":'<b>·</b>')+'<span>'+txt+'</span>';
+  const f=$('mvFeed');f.appendChild(el);f.scrollTop=f.scrollHeight;
+}
+function setScore(){$('mvGh').textContent=M.gh;$('mvGa').textContent=M.ga;}
+function clampTac(){M.atk=clamp(M.atk,0.7,1.5);M.def=clamp(M.def,0.7,1.5);}
+const DECISIONS={
+  postura:()=>({q:t('mv_postura'),opts:[
+    {l:t('mv_pressao'),fx:()=>{M.atk*=1.35;M.def*=1.28;},say:t('mv_say_pressao')},
+    {l:t('mv_equil'),fx:()=>{},say:t('mv_say_equil')},
+    {l:t('mv_cautela'),fx:()=>{M.atk*=0.78;M.def*=0.74;},say:t('mv_say_cautela')}
+  ]}),
+  intervalo:()=>{
+    if(M.gh>M.ga)return{q:t('mv_int_vence'),opts:[
+      {l:t('mv_segurar'),fx:()=>{M.atk*=0.7;M.def*=0.68;},say:t('mv_say_segurar')},
+      {l:t('mv_matar'),fx:()=>{M.atk*=1.25;M.def*=1.15;},say:t('mv_say_matar')}]};
+    if(M.gh<M.ga)return{q:t('mv_int_perde'),opts:[
+      {l:t('mv_ircima'),fx:()=>{M.atk*=1.4;M.def*=1.35;},say:t('mv_say_ircima')},
+      {l:t('mv_reorg'),fx:()=>{M.atk*=1.08;M.def*=0.82;},say:t('mv_say_reorg')}]};
+    return{q:t('mv_int_empate'),opts:[
+      {l:t('mv_buscar'),fx:()=>{M.atk*=1.25;M.def*=1.2;},say:t('mv_say_buscar')},
+      {l:t('mv_manter'),fx:()=>{},say:t('mv_say_manter')}]};
+  },
+  reta:()=>({q:t('mv_reta'),opts:[
+    {l:t('mv_sacar'),fx:()=>{M.atk*=1.22;M.def*=1.18;},say:t('mv_say_sacar')},
+    {l:t('mv_marcacao'),fx:()=>{M.atk*=0.82;M.def*=0.78;},say:t('mv_say_marcacao')},
+    {l:t('mv_mantertime'),fx:()=>{},say:t('mv_say_mantertime')}]}),
+  desespero:()=>({q:t('mv_desespero'),opts:[
+    {l:t('mv_zag'),fx:()=>{M.atk*=1.6;M.def*=1.5;},say:t('mv_say_zag')},
+    {l:t('mv_insistir'),fx:()=>{M.atk*=1.15;M.def*=1.05;},say:t('mv_say_insistir')}]})
+};
+function askDecision(key){
+  const d=DECISIONS[key]();
+  const act=$('mvAct');act.innerHTML='<div class="q">'+d.q+'</div>';
+  d.opts.forEach(o=>{
+    const b=document.createElement('button');b.className='btn mini'+(o.ghost?' ghost':'');b.textContent=o.l;
+    b.onclick=()=>{o.fx();clampTac();feed('dec',M.min||null,t('mv_tecnico')+o.say);act.innerHTML='';runTick();};
+    act.appendChild(b);
+  });
+}
+function runTick(){
+  if(M.ended)return;
+  M._t=setInterval(()=>{
+    M.min++;
+    $('mvMin').textContent=M.min+"'";
+    $('mvFill').style.width=Math.min(M.min/90*100,100)+'%';
+    if(M.min===45&&!M.stops.i){M.stops.i=1;clearInterval(M._t);feed(null,45,t('mv_intervalo'));askDecision('intervalo');return;}
+    if(M.min===70&&!M.stops.r){M.stops.r=1;clearInterval(M._t);askDecision('reta');return;}
+    if(M.min===82&&!M.stops.d&&(M.ga-M.gh)===1){M.stops.d=1;clearInterval(M._t);askDecision('desespero');return;}
+    if(Math.random()<M.baseMy*M.atk){M.gh++;setScore();feed('goal',M.min,'⚽ '+M.meu+' — '+nomeJog());}
+    if(Math.random()<M.baseRi*M.def){M.ga++;setScore();feed('goal',M.min,'⚽ '+M.rival);}
+    else if(Math.random()<0.05)feed(null,M.min,pick(tt('mv_events'))+' · '+(Math.random()<0.5?M.meu:M.rival));
+    if(M.min>=90){clearInterval(M._t);endMatch();}
+  },TICK);
+}
+function endMatch(){M.ended=true;if(M.gh===M.ga){if(M.ev&&M.ev.allowDraw){showMatchResult(null,null);return;}penShootout();return;}showMatchResult(M.gh>M.ga,null);}
+function penShootout(){
+  feed(null,null,t('mv_penaltis'));
+  let pm=0,pr=0,round=0;
+  const act=$('mvAct');act.innerHTML='<div class="q">'+t('mv_disp_pen')+'</div>';
+  const wp=winProbFromGap(M.gap);
+  const kick=()=>{
+    round++;
+    let meP=Math.random()<0.72+(wp-0.5)*0.22, riP=Math.random()<0.72-(wp-0.5)*0.22;
+    // morte súbita longa: após muitas rodadas empatadas, força um desempate limpo
+    if(round>=10&&(pm+(meP?1:0))===(pr+(riP?1:0))){ if(Math.random()<wp){meP=true;riP=false;}else{meP=false;riP=true;} }
+    if(meP)pm++; if(riP)pr++;
+    feed(null,null,'🥅 '+M.meu+': '+(meP?'✅':'❌')+'  ·  '+M.rival+': '+(riP?'✅':'❌')+'  ('+pm+'-'+pr+')');
+    // decidido só quando há vantagem depois de cobranças iguais (best of 5 -> morte súbita)
+    const decided=(round>=5&&pm!==pr);
+    if(decided){const win=pm>pr;showMatchResult(win,[win?pm:pr,win?pr:pm]);}
+    else setTimeout(kick,520);
+  };
+  setTimeout(kick,500);
+}
+function showMatchResult(win,pen){
+  const placar=M.gh+' x '+M.ga+(pen?t('mv_pen_txt',pen[0],pen[1]):'');
+  if(win===null)feed(null,null,t('nt_mv_draw',M.meu,placar,M.rival));
+  else feed(null,null,t('mv_fim',win?'🏆':lossIco(M.ev),M.meu,placar,M.rival));
+  const act=$('mvAct');act.innerHTML='';
+  const b=document.createElement('button');b.className='btn mini';
+  b.textContent=(M.ev&&M.ev.matchBtn)?M.ev.matchBtn(win):(win?t('mv_levantar'):t('fin_continuar'));
+  b.onclick=()=>{closeModal('ovlMatch');finishMatch(M.ev,win);};
+  act.appendChild(b);
+}
+function finishMatch(ev,win){if(ev&&ev.finish){ev.finish(ev,win);return;}finishFinal(ev,win);}
+function headlessMatch(){
+  while(M.min<90){M.min++;if(Math.random()<M.baseMy*M.atk)M.gh++;if(Math.random()<M.baseRi*M.def)M.ga++;}
+  let win;
+  if(M.gh===M.ga)win=(M.ev&&M.ev.allowDraw)?null:(Math.random()<winProbFromGap(M.gap));else win=M.gh>M.ga;
+  closeModal('ovlMatch');finishMatch(M.ev,win);
+}
+/* ============ PULAR (resultado instantâneo, com força do rival) ============ */
+function playInstant(ev){
+  const mc=matchChances(ev.rivalForca,ev.myForca);
+  // simula 90 minutos com as mesmas taxas do jogo ao vivo -> placar realista
+  let gM=0,gR=0;
+  for(let m=0;m<90;m++){ if(Math.random()<mc.my)gM++; if(Math.random()<mc.ri)gR++; }
+  let pen=null,win;
+  if(gM===gR){
+    if(ev.allowDraw){win=null;} // fase de grupos: empate é resultado válido
+    else{ // mata-mata -> pênaltis
+      win=Math.random()<winProbFromGap(mc.gap);
+      const a=R(3,5);let b=R(2,5);if(a===b)b+=(win?-1:1);pen=[win?Math.max(a,b):Math.min(a,b),win?Math.min(a,b):Math.max(a,b)];
+    }
+  }else win=gM>gR; // vencedor definido pelo placar
+  const placar=gM+' x '+gR+(pen?t('mv_pen_txt',pen[0],pen[1]):'');
+  const tit=ev.resultTit?ev.resultTit(ev):t('fin_tit',ev.comp);
+  const body=ev.resultTxt?ev.resultTxt(win,placar,ev):('<div class="score">'+ev.meu+' '+placar+' '+ev.rival+'</div>'+(win?t('fin_campeao',ev.comp):t('fin_vice')));
+  const btnL=ev.resultBtn?ev.resultBtn(win):(win?t('fin_comemorar'):t('fin_continuar'));
+  const ico=win===true?'🏆':win===null?'⚖️':lossIco(ev);
+  evShow(ico,tit,body,[{l:btnL,hold:true,f:()=>finishMatch(ev,win)}]);
+}
+/* ============ RESULTADO DA FINAL (comum) ============ */
+function finishFinal(ev,win){
+  if(win){
+  if(ev.tipo==='champions'){
+  G.tit.champions=(G.tit.champions||0)+1;seasonTmp.t_champions='🏆 '+ev.comp;seasonTmp.titFlags.push('Champions League');
+  addHonra(t('hon_camp_ucl'),28);G.board=clamp(G.board+20,0,100);G.verba+=40;
+  }else if(ev.tipo==='liberta'){
+  G.tit.liberta=(G.tit.liberta||0)+1;seasonTmp.t_liberta='🏆 '+ev.comp;seasonTmp.titFlags.push('Libertadores');
+  addHonra(t('hon_camp_lib'),24);G.board=clamp(G.board+18,0,100);G.verba+=30;
+  }else{
+      G.tit.copa++;seasonTmp.t_copa='🏆 '+ev.comp;seasonTmp.titFlags.push('Copa do Brasil');
+      addHonra(t('hon_camp_copa'),14);G.board=clamp(G.board+14,0,100);G.verba+=18;
+    }
+  }
+  else G.board=clamp(G.board-4,0,100);
+  G.worldLog.push({y:G.year,win:win,txt:win?t('wl_camp',G.club[0],ev.comp):t('wl_vice',ev.comp,ev.rival)});
+  if(win)celebrate(t('cel_final',ev.comp),G.club[0]+' — '+G.year,()=>NEXT&&NEXT());
+  else{if(NEXT)setTimeout(NEXT,600);}
+}
+/* ============ COMEMORAÇÃO (confete + taça) ============ */
+let celDone=null,celRAF=null;
+function celebrate(big,sub,onDone){
+  celDone=onDone;
+  if(window.__HEADLESS){const f=celDone;celDone=null;f&&f();return;}
+  $('celBig').textContent=big;$('celSub').textContent=sub;
+  openModal('ovlCel');startConfetti();
+}
+function closeCelebration(){stopConfetti();closeModal('ovlCel');const f=celDone;celDone=null;if(f)setTimeout(f,450);}
+function startConfetti(){
+  const cv=$('celCanvas'),rect=cv.getBoundingClientRect();
+  cv.width=rect.width||440;cv.height=rect.height||360;
+  const x=cv.getContext('2d'),cols=['#e8b23a','#1f9d57','#d23b3b','#3fb4ff','#ffffff','#f2c94c'];
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const N=reduce?40:120;
+  const ps=Array.from({length:N},()=>({x:Math.random()*cv.width,y:Math.random()*-cv.height,
+    r:3+Math.random()*5,c:pick(cols),vy:1.5+Math.random()*3,vx:Math.random()*2-1,a:Math.random()*6.28,va:Math.random()*.3-.15}));
+  const draw=()=>{
+    x.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.a+=p.va;if(p.y>cv.height+10){p.y=-10;p.x=Math.random()*cv.width;}
+      x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);x.restore();});
+    celRAF=requestAnimationFrame(draw);
+  };
+  if(reduce)draw();else celRAF=requestAnimationFrame(draw);
+}
+function stopConfetti(){if(celRAF)cancelAnimationFrame(celRAF);celRAF=null;}
+/* ============ MARCOS ============ */
+let marcoQueue=[];
+function collectMarcos(){
+  const marks=[
+    ...[100,300,500,700,1000].map(v=>({k:'j'+v,c:G.j>=v,ico:'🎖️',tit:t('mc_j',v),txt:t('mc_j_txt',v)})),
+    ...[3,5,10].map(v=>({k:'t'+v,c:titTot()>=v,ico:'🏆',tit:t('mc_t',v),txt:t('mc_t_txt',v)})),
+    ...[3,5].map(v=>({k:'ac'+v,c:G.acessos>=v,ico:'⬆️',tit:t('mc_ac',v),txt:t('mc_ac_txt',v)}))
+  ];
+  marks.forEach(m=>{if(m.c&&!G.milestones[m.k]){G.milestones[m.k]=1;marcoQueue.push(m);}});
+}
+function runMarcos(){
+  NEXT=runMarcos;
+  if(!marcoQueue.length){endTurn();return;}
+  const m=marcoQueue.shift();
+  evShow(m.ico,m.tit,m.txt,[{l:t('mc_continuar')}]);
+}
+function nomeJog(){return pick(['Kaio','Léo','Vitinho','Rael','Juninho','Marcelinho','Dudu','Rômulo','Peixoto','Wesley','Gabriel','Nenê']);}
+
+/* ============ FECHAMENTO DE TEMPORADA + ACESSO/REBAIXAMENTO ============ */
+function resolveSeason(){
+  const s=seasonTmp,div=s.div;
+  // clube que REALMENTE disputou a temporada (pode ter havido transferência no fim do ciclo)
+  const played=(s.club&&s.club.length)?s.club:G.club;
+  const moved=G.club[0]!==played[0];          // trocou de clube antes de fechar a temporada?
+  const playedIntl=isIntl(played);
+  const clubNome=played[0];
+  // estatísticas de carreira sempre contam
+  G.j+=s.jogos;G.v+=s.v;G.e+=s.e;G.d+=s.d;G.gp+=s.gp;G.gc+=s.gc;
+  if(!moved)G.board=clamp(G.board+s.boardDelta,0,100);
+  let celTitle=null,celSub=null;
+  const ligaNome=divLabel(played);
+  if(s.campeao){
+    if(playedIntl){
+      G.tit.intl=(G.tit.intl||0)+1;s.titFlags.push(t('cel_camp_nac',ligaNome));
+      G.tit.intlBy=G.tit.intlBy||{};G.tit.intlBy[ligaNome]=(G.tit.intlBy[ligaNome]||0)+1;
+      addHonra(t('hon_camp_nac',ligaNome),18);
+      celTitle=t('cel_camp_nac',paisNome(played[3]));
+    }else{
+      G.tit[div]++;s.titFlags.push(t('hon_camp_div',DIVNOME[div]));
+      addHonra(t('hon_camp_div',DIVNOME[div]),div==='A'?30:div==='B'?14:div==='C'?10:7);
+      celTitle=(div==='A'?t('cel_camp_br'):t('cel_camp_div',DIVNOME[div]));
+    }
+    if(!moved)G.board=clamp(G.board+10,0,100);
+    celSub=clubNome+' — '+G.year;
+  }
+  const meta={A:14,B:6,C:4,D:8}[div];
+  if(s.pos<meta||s.campeao)addHonra(t('hon_melhor',ligaNome),4);
+  // avaliação da meta cobrada pela diretoria (só afeta a confiança se você continuou no clube)
+  let demTxt='';
+  if(s.demanda&&!moved){
+    const bateu=s.campeao||s.acesso||s.pos<=s.demanda.alvoN||(s.demanda.risco&&!s.rebaix);
+    if(s.demanda.assumida){
+      if(bateu){G.board=clamp(G.board+12,0,100);G.metas++;addHonra(t('hon_meta'),4);demTxt=t('season_meta_ok');}
+      else{G.board=clamp(G.board-16,0,100);G.tension=true;demTxt=t('season_meta_fail');}
+    }else{ if(bateu)G.board=clamp(G.board+4,0,100); else G.board=clamp(G.board-6,0,100); }
+  }
+  // verba da temporada (não se aplica se você trocou de clube — o novo já veio com verba própria)
+  if(!moved)G.verba=clamp(G.verba+{D:3,C:6,B:14,A:34}[div]+Math.round(G.board/12),0,400);
+  let movedTxt='';
+  if(s.acesso){G.acessos++;addHonra(t('hon_acesso'),6);
+    const novo=DIVS[clamp(DIVIDX(div)+1,0,3)];
+    // só promove o clube se você AINDA estiver nele; se saiu, o acesso fica no currículo mas não altera o novo clube
+    if(!moved){G.club[1]=novo;G.club[2]=clamp(G.club[2]+R(3,6),44,95);G.board=clamp(G.board+8,0,100);syncSquad();}
+    movedTxt=t('season_acesso',DIVNOME[novo]);
+    if(!celTitle){celTitle=t('cel_acesso',DIVNOME[novo]);celSub=t('cel_acesso_sub',clubNome);}}
+  else if(s.rebaix){G.rebaix++;const novo=DIVS[clamp(DIVIDX(div)-1,0,3)];
+    if(!moved){G.club[1]=novo;G.club[2]=clamp(G.club[2]-R(2,5),42,95);G.board=clamp(G.board-14,0,100);syncSquad();}
+    movedTxt=t('season_rebaix',DIVNOME[novo]);}
+  // === PRESSÃO POR TAMANHO DO CLUBE: em gigantes, só títulos seguram a confiança ===
+  let presTxt='';
+  if(!moved){
+    const st=clubStature();
+    const wonSilver=s.campeao||s.t_copa||s.t_liberta||s.t_champions;
+    if(st>=1&&!wonSilver){
+      const flopou=s.pos>=meta; // não brigou pelo topo
+      let pen=0;
+      if(st===3)pen=flopou?14:8;        // gigante: temporada sem taça pesa muito
+      else if(st===2)pen=flopou?8:3;    // grande: cobrança forte
+      else if(st===1)pen=flopou?4:0;    // tradicional: só pune campanha ruim
+      if(pen>0){G.board=clamp(G.board-pen,0,100);presTxt=' · '+t('season_pres');}
+    }
+  }
+  let d=0;
+  if(s.campeao)d+=1; else if(s.acesso)d+=1; else if(s.pos<meta)d+=1;
+  if(s.rebaix)d-=2; if(!moved&&s.pos>curLeague().length-3&&!s.rebaix)d-=1;
+  // desgaste gradual da idade: a partir dos 65 a reputação/energia cai mais rápido
+  if(G.age>=70)d-=2; else if(G.age>=65)d-=1;
+  G.ovr=clamp(G.ovr+d,45,90);
+  const posTxt=s.campeao?t('season_camp',ligaNome):t('season_pos',s.pos,ligaNome);
+  G.seasons.push({y:G.year,age:G.age,club:clubNome,div:playedIntl?played[3]:div,pos:s.pos,campeao:s.campeao,acesso:s.acesso,rebaix:s.rebaix,
+    j:s.jogos,v:s.v,e:s.e,d:s.d,tit:s.titFlags.slice(),board:G.board});
+  // variação de confiança da temporada: mostra o peso das decisões do treinador
+  const dBoard=G.board-(G._boardStart!=null?G._boardStart:G.board);
+  const confTxt=(!moved&&dBoard!==0)?t('season_conf',dBoard):'';
+  logSeason('<span>'+G.year+' · '+clubNome+'</span><b>'+posTxt+(movedTxt?' · '+movedTxt:'')+demTxt+(s.t_copa?' · '+t('cdb'):'')+(s.t_liberta?' · '+t('liberta_s'):'')+(s.t_champions?' · '+t('ucl_s'):'')+presTxt+confTxt+'</b>');
+  marcoQueue=[];collectMarcos();
+  G.year++;G.age++;updateHub();
+  // comemoração de título/acesso e então segue pros marcos + fim do turno
+  if(celTitle)celebrate(celTitle,celSub,runMarcos);
+  else runMarcos();
+}
+function endTurn(){
+  if(G.mode==='nt'){endTurnNT();return;}
+  if(G.board<=12){fireEvent();return;}
+  if(G.age>=75){endCareer('aposentadoria');return;}      // limite máximo
+  if(G.age===65){askRetire();return;}                     // pergunta apenas aos 65
+  $('btnAdv').disabled=false;
+}
+function endTurnNT(){
+  if(G.board<=10){ntSacked();return;}                     // baixa confiança -> demissão da seleção
+  if(G.age>=75){endCareer('aposentadoria');return;}
+  if(G.age===65){askRetire();return;}
+  $('btnAdv').disabled=false;
+}
+function askRetire(){
+  NEXT=null;
+  evShow('⏳',t('retire_tit'),t('retire_txt',G.age),[
+    {l:t('retire_seguir'),hold:true,f:()=>{$('btnAdv').disabled=false;}},
+    {l:t('retire_encerrar'),ghost:1,hold:true,f:()=>endCareer('aposentadoria')}
+  ]);
+}
+function fireEvent(){
+  evShow('📉',t('fire_tit'),t('fire_txt',G.club[0]),[
+    {l:t('fire_buscar'),f:()=>{
+      const div=Math.random()<0.6?G.club[1]:DIVS[clamp(DIVIDX(G.club[1])-1,0,3)];
+      const pool=clubesDaDiv(div).filter(c=>c[0]!==G.club[0]);G.club=pick(pool).slice();G.pool=null;G.clubes.push(G.club[0]);G.board=62;syncSquad();
+      logSeason('<span>—</span><b>'+t('recomeco',G.club[0],DIVNOME[G.club[1]])+'</b>');updateHub();$('btnAdv').disabled=false;
+    }},
+    {l:t('fire_encerrar'),ghost:1,f:()=>endCareer('demissao')}
+  ]);
+}
+/* ============ FIM ============ */
+function careerScore(){
+  const h=G.honras,hn=Object.keys(h).filter(k=>k!=='_pts').reduce((s,k)=>s+h[k],0);
+  const NC=G.ntCups||{world:0,euro:0,copa:0};
+  // títulos mandam; longevidade (jogos/vitórias) só desempata
+  return Math.round(G.tit.A*70+G.tit.B*26+G.tit.C*16+G.tit.D*10+G.tit.copa*40+(G.tit.liberta||0)*90+(G.tit.champions||0)*120+(G.tit.intl||0)*34+NC.world*150+NC.euro*95+NC.copa*90+G.acessos*14+hn*4+G.v*0.3+aprov()*0.8-G.rebaix*6);
+}
+function rankFor(sc){
+  // ranking guiado por títulos: sem prata de elite não se chega ao topo
+  const T=G.tit,NC=G.ntCups||{world:0,euro:0,copa:0};
+  const majors=(T.champions||0)+(T.liberta||0)+NC.world+NC.euro+NC.copa; // troféus de elite
+  const topLeagues=T.A+(T.intl||0);                                      // títulos de 1ª divisão
+  const bigTitles=majors+topLeagues+T.copa;                             // conquistas relevantes
+  if(majors>=5 && topLeagues>=6 && sc>=2600) return 0; // O MÍSTER: era dominante
+  if(majors>=3 && topLeagues>=4 && sc>=1900) return 1; // LENDA DO BRASILEIRÃO
+  if(majors>=2 && bigTitles>=5 && sc>=1350) return 2;  // MESTRE DA ELITE
+  if(bigTitles>=3 && sc>=800)                return 3; // TÉCNICO CONSOLIDADO
+  if((G.acessos>=2||bigTitles>=1) && sc>=450)return 4; // ESPECIALISTA EM ACESSO
+  if(sc>=250 || G.j>=200)                    return 5; // TÉCNICO RODADO
+  return 6;                                            // TÉCNICO DE CARREIRA
+}
+function rankName(idx){return tt('ranks_n')[idx];}
+function rankQuote(idx){return tt('ranks_q')[idx];}
+function confirmEndCareer(){
+  if(!G||G.over)return;
+  NEXT=null;
+  evShow('🏁',t('end_now_tit'),t('end_now_txt'),[
+    {l:t('end_now_no'),hold:true,f:()=>{}},
+    {l:t('end_now_yes'),ghost:1,hold:true,f:()=>endCareer('aposentadoria')}
+  ]);
+}
+function endCareer(motivo){
+  const sc=careerScore();const idx=rankFor(sc);
+  G.rankIdx=idx;G.rank=rankName(idx);G.quote=rankQuote(idx);G.score=sc;G.motivo=motivo;
+  G.over=true;
+  const hist=store('mister_br_hist')||[];
+  let snap=null;try{snap=JSON.parse(JSON.stringify(G));}catch(e){}
+  hist.push({n:G.careerN,nome:G.nome,rankIdx:idx,rank:G.rank,tit:titTot(),j:G.j,snap});
+  // mantém no máximo os 30 snapshots mais recentes para não estourar o localStorage
+  const withSnap=hist.filter(c=>c.snap);
+  if(withSnap.length>30){const cut=withSnap.length-30;let n=0;for(const c of hist){if(c.snap&&n<cut){delete c.snap;n++;}}}
+  store('mister_br_hist',hist);
+  clearProgress();          // carreira concluída: remove o save em andamento
+  renderOver();show('scr-over');
+}
+function renderOver(){
+  const idx=(G.rankIdx!=null)?G.rankIdx:0;
+  $('ovEyebrow').textContent=G._viewing?t('view_eyebrow',G.careerN):t('eyebrow_fim');
+  $('ovRank').textContent=rankName(idx);$('ovQuote').textContent='"'+rankQuote(idx)+'"';
+  $('ovMeta').innerHTML=t('metaline',filoName(G.filo),G.clubes.length,G.seasons.length,G.careerN).map(m=>'<span>'+m+'</span>').join('');
+  const T=tt('tot');
+  const tot=[[T.jogos,G.j],[T.vit,G.v],[T.aprov,aprov()+'%'],[T.ucl,G.tit.champions||0],[T.lib,G.tit.liberta||0],[T.serieA,G.tit.A],[T.copa,G.tit.copa],[T.intl,G.tit.intl||0]];
+  $('ovTot').innerHTML=tot.map(r=>'<div class="st"><div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div></div>').join('');
+  const hs=Object.entries(G.honras).filter(([k])=>k!=='_pts');
+  $('ovHonras').innerHTML=hs.length?hs.map(([k,v])=>'<div class="honra"><span>'+k+'</span><b>×'+v+'</b></div>').join(''):'<div class="small">'+t('honras_none')+'</div>';
+  const L=tt('leg');
+  const bars=[[L.jogos,G.j,TETOS.jogos],[L.vit,G.v,TETOS.vit],[L.tit,titTot(),TETOS.titulos],[L.ucl,G.tit.champions||0,TETOS.champions],[L.lib,G.tit.liberta||0,TETOS.liberta]];
+  $('ovLegado').innerHTML=bars.map(b=>'<div class="legbar"><div class="t"><span>'+b[0]+'</span><span class="mono">'+b[1]+'/'+b[2]+'</span></div><div class="bar"><div class="fill" style="width:'+clamp(b[1]/b[2]*100,2,100)+'%"></div></div></div>').join('');
+}
+function backHome(){renderHist();renderResume();show('scr-setup');}
+/* ============ CARD (CANVAS) ============ */
+/* ============ ELENCO ============ */
+function openSquad(){
+  const nt=(G.mode==='nt'&&G.nt);
+  let squad,titulo,sub;
+  if(nt){
+    if(!G.ntSquad)G.ntSquad=genSquad(G.nt.forca);
+    squad=G.ntSquad;
+    titulo=t('nt_sq_titulo',G.nt.nome,G.nt.conf);
+    sub=t('sq_sub',G.nt.forca,squad.length);
+  }else{
+    if(!G.squad)syncSquad();
+    squad=G.squad;
+    titulo=t('sq_titulo',G.club[0],divLabel(G.club));
+    sub=t('sq_sub',G.club[2],squad.length);
+  }
+  $('sqTitulo').textContent=titulo;
+  $('sqSub').textContent=sub;
+  const porPos={};POSICOES.forEach(([pos])=>porPos[pos]=[]);
+  squad.forEach(p=>porPos[p.pos].push(p));
+  const posNome=tt('sq_pos');
+  $('sqBody').innerHTML=POSICOES.map(([pos])=>
+    '<div class="fc-sec"><h4>'+posNome[pos]+'</h4>'+
+    porPos[pos].map(p=>'<div class="honra"><span>'+p.nome+(p.ovr===squad[0].ovr?' <span class="tag">'+t('sq_craque')+'</span>':'')+'</span><b>'+p.ovr+'</b></div>').join('')+
+    '</div>').join('');
+  openModal('ovlSquad');
+}
+let cardMode='story';
+function openCard(){openModal('ovlCard');renderCard('story');}
+function renderCard(mode){
+  cardMode=mode;$('tabStory').classList.toggle('sel',mode==='story');$('tabSq').classList.toggle('sel',mode==='sq');
+  drawCard(mode);
+  // as fontes reais (Archivo Black / Inter) precisam estar carregadas no canvas
+  if(document.fonts&&document.fonts.load&&!renderCard._fr){
+    Promise.all([
+      document.fonts.load('72px "Archivo Black"'),
+      document.fonts.load('700 40px "Inter"'),
+      document.fonts.load('800 40px "Inter"'),
+      document.fonts.load('600 40px "Inter"')
+    ]).then(()=>{renderCard._fr=true;if(cardMode===mode)drawCard(mode);}).catch(()=>{});
+  }
+}
+/* troféu desenhado no canvas (o emoji 🏆 renderiza instável/monocromático em alguns aparelhos) */
+function drawTrophyIcon(x,cx,cy,h,fill){
+  x.save();
+  x.fillStyle=fill;x.strokeStyle=fill;x.lineJoin='round';x.lineCap='round';
+  const w=h*0.60,top=cy-h*0.5,bowlBot=top+h*0.46;
+  // bojo da taça
+  x.beginPath();x.moveTo(cx-w/2,top);x.lineTo(cx+w/2,top);x.lineTo(cx+w*0.30,bowlBot);x.lineTo(cx-w*0.30,bowlBot);x.closePath();x.fill();
+  // alças
+  x.lineWidth=Math.max(2,h*0.07);const hy=top+h*0.10,hr=h*0.16;
+  x.beginPath();x.arc(cx-w/2,hy,hr,Math.PI*0.5,Math.PI*1.5,false);x.stroke();
+  x.beginPath();x.arc(cx+w/2,hy,hr,Math.PI*1.5,Math.PI*2.5,false);x.stroke();
+  // haste
+  x.fillRect(cx-w*0.07,bowlBot,w*0.14,h*0.16);
+  // base (dois degraus)
+  const by=bowlBot+h*0.16;
+  x.fillRect(cx-w*0.20,by,w*0.40,h*0.07);
+  x.fillRect(cx-w*0.30,by+h*0.07,w*0.60,h*0.07);
+  x.restore();
+}
+function drawCard(mode){
+  const story=mode==='story',W=1080,Hc=story?1920:1080,cx=W/2;
+  const cv=$('cardPrev');cv.width=W;cv.height=Hc;
+  const x=cv.getContext('2d');
+  const GOLD='#e8b23a',GOLD2='#f4cf7a',WHITE='#f4f2ec',MUT='#8b8f98',DARK='#0b0c11';
+  const DISP='"Archivo Black","Arial Black",sans-serif',BODY='"Inter",Arial,sans-serif';
+  const rr=(px,py,w,h,r)=>{x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();};
+  const track=(s)=>{if('letterSpacing' in x)x.letterSpacing=s+'px';};
+
+  // fundo + vinheta + brilho dourado no topo
+  const gr=x.createLinearGradient(0,0,0,Hc);gr.addColorStop(0,'#1b1f28');gr.addColorStop(.5,'#0d0f15');gr.addColorStop(1,'#050609');
+  x.fillStyle=gr;x.fillRect(0,0,W,Hc);
+  const glow=x.createRadialGradient(cx,story?360:220,0,cx,story?360:220,story?900:640);
+  glow.addColorStop(0,'rgba(232,178,58,.20)');glow.addColorStop(1,'rgba(232,178,58,0)');
+  x.fillStyle=glow;x.fillRect(0,0,W,Hc);
+
+  // moldura + marcas de canto
+  const M=story?58:52,fr=M+18,fw=W-2*fr,fh=Hc-2*fr;
+  x.lineWidth=2;x.strokeStyle='rgba(232,178,58,.30)';rr(fr,fr,fw,fh,26);x.stroke();
+  x.lineWidth=6;x.strokeStyle=GOLD;const L=story?54:46;
+  [[fr,fr,1,1],[fr+fw,fr,-1,1],[fr,fr+fh,1,-1],[fr+fw,fr+fh,-1,-1]].forEach(c=>{
+    x.beginPath();x.moveTo(c[0],c[1]+c[3]*L);x.lineTo(c[0],c[1]);x.lineTo(c[0]+c[2]*L,c[1]);x.stroke();});
+
+  const idx=(G.rankIdx!=null)?G.rankIdx:0,rk=(rankName(idx)||'').toUpperCase(),CS=tt('card_stats');
+  const P=story
+    ?{mono:250,monoS:132,eye:398,name:502,sub:566,rankTop:632,rankH:120,div:816,heroNum:1002,heroLab:1064,troTop:1150,troH:320,troGl:1252,troNum:1372,troLab:1428,temp:1600,foot:Hc-84}
+    :{mono:150,monoS:96, eye:250,name:330,sub:384,rankTop:424,rankH:92, div:560,heroNum:684,heroLab:732,troTop:780,troH:184,troGl:840,troNum:912,troLab:952,temp:1000,foot:Hc-40};
+  x.textAlign='center';x.textBaseline='alphabetic';
+
+  // monograma (quadrado dourado com a inicial)
+  const mono=((G.nome||'M').trim().charAt(0)||'M').toUpperCase(),ms=P.monoS;
+  const mg=x.createLinearGradient(0,P.mono-ms/2,0,P.mono+ms/2);mg.addColorStop(0,GOLD2);mg.addColorStop(1,GOLD);
+  rr(cx-ms/2,P.mono-ms/2,ms,ms,ms*0.26);x.fillStyle=mg;x.fill();
+  x.fillStyle=DARK;x.font=(ms*0.6)+'px '+DISP;x.textBaseline='middle';x.fillText(mono,cx,P.mono+ms*0.05);x.textBaseline='alphabetic';
+
+  // eyebrow tracked
+  x.fillStyle=GOLD;x.font='800 '+(story?34:28)+'px '+BODY;track(story?7:6);
+  x.fillText((t('card_head',G.careerN)||'').toUpperCase(),cx,P.eye);track(0);
+
+  // nome
+  const nm=t('card_tec',G.nome);let ns=story?104:92;x.font=ns+'px '+DISP;
+  while(x.measureText(nm).width>W-2*(M+30)&&ns>44){ns-=4;x.font=ns+'px '+DISP;}
+  x.fillStyle=WHITE;x.shadowColor='rgba(0,0,0,.5)';x.shadowBlur=18;x.shadowOffsetY=4;
+  x.fillText(nm,cx,P.name);x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0;
+
+  // subtítulo
+  x.fillStyle=MUT;x.font='600 '+(story?40:36)+'px '+BODY;
+  x.fillText(t('card_sub',regName(G.reg),filoName(G.filo).replace('&amp;','&')),cx,P.sub);
+
+  // faixa de ranking em "foil" dourado
+  let rs=story?66:56;x.font=rs+'px '+DISP;
+  while(x.measureText(rk).width>W-2*(M+70)&&rs>30){rs-=3;x.font=rs+'px '+DISP;}
+  const rw=Math.min(W-2*M,x.measureText(rk).width+(story?110:88)),rx=cx-rw/2;
+  const fg=x.createLinearGradient(rx,0,rx+rw,0);fg.addColorStop(0,GOLD);fg.addColorStop(.5,GOLD2);fg.addColorStop(1,GOLD);
+  rr(rx,P.rankTop,rw,P.rankH,P.rankH/2);x.fillStyle=fg;x.fill();
+  x.fillStyle=DARK;track(story?3:2);x.textBaseline='middle';x.fillText(rk,cx,P.rankTop+P.rankH/2+2);x.textBaseline='alphabetic';track(0);
+
+  // divisória com losango central
+  x.lineWidth=2;const dg=x.createLinearGradient(M+40,0,W-M-40,0);
+  dg.addColorStop(0,'rgba(232,178,58,0)');dg.addColorStop(.5,'rgba(232,178,58,.5)');dg.addColorStop(1,'rgba(232,178,58,0)');
+  x.strokeStyle=dg;x.beginPath();x.moveTo(M+50,P.div);x.lineTo(W-M-50,P.div);x.stroke();
+  x.fillStyle=GOLD;x.save();x.translate(cx,P.div);x.rotate(Math.PI/4);x.fillRect(-7,-7,14,14);x.restore();
+
+  // estatísticas herói (3 colunas com separadores)
+  const hero=[[CS.jogos,G.j],[CS.vit,G.v],[CS.aprov,aprov()+'%']];
+  const inW=W-2*(M+40),col=inW/3,x0=M+40;
+  hero.forEach((s,i)=>{const px=x0+col*i+col/2;
+    x.fillStyle=WHITE;x.font=(story?96:86)+'px '+DISP;x.fillText(''+s[1],px,P.heroNum);
+    x.fillStyle=MUT;x.font='700 '+(story?30:26)+'px '+BODY;track(2);x.fillText((''+s[0]).toUpperCase(),px,P.heroLab);track(0);});
+  x.lineWidth=1.5;x.strokeStyle='rgba(255,255,255,.10)';
+  [1,2].forEach(i=>{const sx=x0+col*i;x.beginPath();x.moveTo(sx,P.heroNum-(story?66:60));x.lineTo(sx,P.heroLab+6);x.stroke();});
+
+  // painel de troféus (com ícone)
+  const tro=[[CS.ucl,G.tit.champions||0],[CS.lib,G.tit.liberta||0],[CS.serieA,G.tit.A],[CS.copa,(G.ntCups&&G.ntCups.world)||0]];
+  const tn=tro.length,tpx=M+30,tpw=W-2*(M+30),tcol=tpw/tn;
+  rr(tpx,P.troTop,tpw,P.troH,24);x.fillStyle='rgba(232,178,58,.08)';x.fill();
+  x.lineWidth=1.5;x.strokeStyle='rgba(232,178,58,.35)';x.stroke();
+  tro.forEach((s,i)=>{const px=tpx+tcol*i+tcol/2;
+    const _fs=story?52:40;drawTrophyIcon(x,px,P.troGl-_fs*0.35,_fs*0.92,GOLD2);
+    x.fillStyle=GOLD2;x.font=(story?80:64)+'px '+DISP;x.fillText(''+s[1],px,P.troNum);
+    x.fillStyle='rgba(232,178,58,.8)';x.font='700 '+(story?26:22)+'px '+BODY;track(1);x.fillText((''+s[0]).toUpperCase(),px,P.troLab);track(0);});
+  x.lineWidth=1.5;x.strokeStyle='rgba(232,178,58,.22)';
+  for(let i=1;i<tn;i++){const sx=tpx+tcol*i;x.beginPath();x.moveTo(sx,P.troTop+26);x.lineTo(sx,P.troTop+P.troH-26);x.stroke();}
+
+  // rodapé: temporadas/clubes + assinatura
+  x.fillStyle=MUT;x.font='600 '+(story?36:30)+'px '+BODY;x.fillText(t('card_temps',G.seasons.length,G.clubes.length),cx,P.temp);
+  x.fillStyle='rgba(232,178,58,.7)';x.font='800 '+(story?26:22)+'px '+BODY;track(story?5:4);
+  x.fillText((t('card_foot')||'').toUpperCase(),cx,P.foot);track(0);
+}
+function saveCard(){const a=document.createElement('a');a.download='mister_'+G.nome.toLowerCase().replace(/\s+/g,'_')+'.png';a.href=$('cardPrev').toDataURL('image/png');a.click();}
+function shareText(){const idx=(G.rankIdx!=null)?G.rankIdx:0;return t('share_txt',rankName(idx),titTot(),G.acessos,G.v,G.j);}
+async function shareCard(){try{const blob=await new Promise(r=>$('cardPrev').toBlob(r));const f=new File([blob],'carreira.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],text:shareText()});else await navigator.share({text:shareText()});}catch(e){}}
+function shareWpp(){window.open('https://wa.me/?text='+encodeURIComponent(shareText()),'_blank');}
+function shareX(){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText()),'_blank');}
+/* ============ CARREIRA COMPLETA ============ */
+/* melhor trabalho: agrupa temporadas consecutivas no mesmo clube/seleção e pontua a passagem */
+function bestSpell(){
+  const S=G.seasons;if(!S||!S.length)return null;
+  const spells=[];let cur=null;
+  S.forEach(s=>{
+    if(!cur||cur.club!==s.club){cur={club:s.club,isNT:/^🎽/.test(s.club),y0:s.y,y1:s.y,seasons:0,liga:0,intl:0,copa:0,acesso:0,rebaix:0,v:0,j:0,board:0};spells.push(cur);}
+    cur.y1=s.y;cur.seasons++;cur.v+=s.v||0;cur.j+=s.j||0;cur.board=Math.max(cur.board,s.board||0);
+    if(s.campeao&&!cur.isNT)cur.liga++;
+    if(s.acesso)cur.acesso++;
+    if(s.rebaix)cur.rebaix++;
+    (s.tit||[]).forEach(tit=>{
+      if(cur.isNT)cur.intl++;
+      else if(/Champions|Libertadores/.test(tit))cur.intl++;
+      else if(/Copa/i.test(tit))cur.copa++;
+    });
+  });
+  spells.forEach(sp=>{
+    sp.aprov=sp.j?Math.round(sp.v/sp.j*100):0;
+    sp.score=sp.intl*100+sp.liga*45+sp.copa*30+sp.acesso*20-sp.rebaix*30+sp.aprov*0.4+sp.seasons*2;
+  });
+  spells.sort((a,b)=>b.score-a.score);
+  return spells[0];
+}
+function bestSpellHTML(){
+  const bs=bestSpell();
+  if(!bs||(bs.intl+bs.liga+bs.copa+bs.acesso===0&&bs.aprov<55))return '<div class="small">'+t('full_best_none')+'</div>';
+  const R=[];
+  if(bs.intl)R.push(t('fb_intl',bs.intl));
+  if(bs.liga)R.push(t('fb_liga',bs.liga));
+  if(bs.copa)R.push(t('fb_copa',bs.copa));
+  if(bs.acesso)R.push(t('fb_acesso',bs.acesso));
+  if(bs.aprov>=55)R.push(t('fb_aprov',bs.aprov));
+  R.push(t('fb_temps',bs.seasons));
+  return '<div class="honra"><span style="font-size:15px"><b>'+bs.club+'</b></span><span class="mono">'+t('fb_period',bs.y0,bs.y1)+'</span></div>'+
+    '<div class="small" style="margin-top:4px;line-height:1.5">'+R.join(' · ')+'.</div>';
+}
+function openFull(){
+  const b=$('fullBody'),at=G.attrs;
+  const keys=['TAT','ATA','DEF','MER','JOV','MOT'],C=110,Rr=86;
+  const pt=(i,f)=>{const ang=-Math.PI/2+i*Math.PI/3;return (C+Math.cos(ang)*Rr*f).toFixed(1)+','+(C+Math.sin(ang)*Rr*f).toFixed(1);};
+  const poly=keys.map((k,i)=>pt(i,at[k]/100)).join(' ');
+  const grid=[0.33,0.66,1].map(f=>'<polygon points="'+keys.map((k,i)=>pt(i,f)).join(' ')+'" fill="none" stroke="rgba(11,11,11,.18)"/>').join('');
+  const labels=keys.map((k,i)=>{const ang=-Math.PI/2+i*Math.PI/3;const lx=C+Math.cos(ang)*(Rr+16),ly=C+Math.sin(ang)*(Rr+16)+4;return '<text x="'+lx+'" y="'+ly+'" fill="#6f6f6a" font-size="10" text-anchor="middle" font-weight="700">'+k+' '+at[k]+'</text>';}).join('');
+  const radar='<svg viewBox="0 0 220 220" style="max-width:230px;display:block;margin:0 auto">'+grid+'<polygon points="'+poly+'" fill="rgba(63,180,255,.22)" stroke="#3fb4ff" stroke-width="2"/>'+labels+'</svg>';
+  const line=(vals,color,label)=>{if(vals.length<2)return '<div class="small">'+t('full_insuf',label)+'</div>';
+    const mx=Math.max(...vals),mn=Math.min(...vals);
+    const pts=vals.map((v,i)=>((i/(vals.length-1))*280+10).toFixed(1)+','+((70-((v-mn)/Math.max(mx-mn,0.01))*60)+5).toFixed(1)).join(' ');
+    return '<div class="small" style="margin-bottom:2px">'+label+' <span class="mono" style="float:right">'+t('full_max')+' '+mx+'</span></div><svg viewBox="0 0 300 85" style="width:100%"><polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linejoin="round"/></svg>';};
+  const TR=tt('trof'),NC=G.ntCups||{world:0,euro:0,copa:0};
+  // títulos nac. no exterior: uma linha por liga (ex.: Ligue 1, LaLiga); fallback genérico p/ saves antigos
+  const intlBy=G.tit.intlBy||{};
+  const intlKeys=Object.keys(intlBy).sort((a,b)=>intlBy[b]-intlBy[a]);
+  const intlRows=intlKeys.length?intlKeys.map(l=>['🌐 '+l,intlBy[l]]):(G.tit.intl?[['🌐 '+TR.intl,G.tit.intl]]:[]);
+  const trof=[
+    ['🌟 '+t('nt_comp_world'),NC.world],
+    ['🏅 '+t('nt_comp_copa'),NC.copa],
+    ['🏅 '+t('nt_comp_euro'),NC.euro],
+    ['⭐ '+TR.ucl,G.tit.champions||0],
+    ['🌎 '+TR.lib,G.tit.liberta||0],
+    ['🏆 '+TR.A,G.tit.A],
+    ...intlRows,
+    ['🏆 '+TR.copa,G.tit.copa],
+    ['🥈 '+TR.B,G.tit.B],
+    ['🥉 '+TR.C,G.tit.C],
+    ['🎖️ '+TR.D,G.tit.D],
+    ['⬆️ '+TR.ac,G.acessos]
+  ].filter(t=>t[1]>0);
+  const rows=G.seasons.map(s=>'<tr><td>'+s.y+'</td><td>'+s.club+'</td><td>'+s.div+'</td><td>'+(s.campeao?'🏆':s.pos+'º')+(s.acesso?' ⬆️':s.rebaix?' ⬇️':'')+'</td><td>'+s.v+'</td><td>'+(s.tit.length?'🏆'+s.tit.length:'—')+'</td></tr>').join('');
+  const world=G.worldLog.slice(-14).map(w=>'<div class="honra"><span>'+w.y+'</span><span style="color:'+(w.win?'#1f9d57':'#d23b3b')+';font-weight:'+(w.win?'800':'600')+';'+(w.win?'':'opacity:.8')+'">'+w.txt+'</span></div>').join('')||'<div class="small">'+t('full_semfinais')+'</div>';
+  const TH=tt('full_th');
+  b.innerHTML=
+    '<div class="fc-sec"><h4>'+t('full_best')+'</h4>'+bestSpellHTML()+'</div>'+
+    '<div class="fc-sec"><h4>'+t('full_perfil')+'</h4>'+radar+'<div class="small center">'+t('full_ges',at.GES,at.ADA)+'</div></div>'+
+    '<div class="fc-sec"><h4>'+t('full_vitrine')+'</h4>'+(trof.length?trof.map(t=>'<div class="honra"><span>'+t[0]+'</span><b>×'+t[1]+'</b></div>').join(''):'<div class="small">'+t('full_semtrof')+'</div>')+'</div>'+
+    '<div class="fc-sec"><h4>'+t('full_conf')+'</h4>'+line(G.seasons.map(s=>s.board),'#3fb4ff',t('full_conf_lbl'))+'</div>'+
+    '<div class="fc-sec"><h4>'+t('full_vit')+'</h4>'+line(G.seasons.map(s=>s.v),'#1f9d57',t('full_vit_lbl'))+'</div>'+
+    '<div class="fc-sec"><h4>'+t('full_temp')+'</h4><table class="tbl"><tr><th>'+TH[0]+'</th><th>'+TH[1]+'</th><th>'+TH[2]+'</th><th>'+TH[3]+'</th><th>'+TH[4]+'</th><th>'+TH[5]+'</th></tr>'+rows+'</table></div>'+
+    '<div class="fc-sec"><h4>'+t('full_finais')+'</h4>'+world+'</div>'+
+    '<div class="fc-sec"><h4>'+t('full_cadeia')+'</h4><div class="small">'+G.clubes.join(' → ')+'</div></div>';
+  openModal('ovlFull');
+}
+initSetup();
+
+/* =========================================================================
+   ====================  SELEÇÕES NACIONAIS (v1)  ==========================
+   Currículo de elite (10+ títulos, com 1 Libertadores/Champions) abre a
+   porta da seleção do país escolhido no início. Em anos de Copa do Mundo /
+   Eurocopa / Copa América o treinador joga os jogos com suas decisões,
+   de forma realista (seleções fracas podem nem se classificar).
+   ========================================================================= */
+/* força FIFA-like de cada seleção (0-99) */
+const SELECOES={
+ BRA:92,ARG:93,URU:84,COL:83,EQU:80,PAR:76,CHI:76,PER:74,VEN:72,BOL:67,
+ FRA:92,ESP:92,ENG:91,POR:89,GER:88,ITA:87,NED:87,BEL:85,DEN:80,NOR:78,TUR:78,CZE:76,GRE:74,CYP:60,AZE:58,KAZ:58
+};
+function confOf(code){return PAISES_EUR.indexOf(code)>=0?'UEFA':'CONMEBOL';}
+function ntForca(code){return SELECOES[code]||65;}
+function confTeams(conf){return Object.keys(SELECOES).filter(c=>confOf(c)===conf);}
+/* calendário: Copa do Mundo em anos %4==2 (2026,2030…); Euro/Copa América em %4==0 (2028,2032…) */
+function tournamentOf(year,conf){
+  if(year%4===2)return 'world';
+  if(year%4===0)return (conf==='UEFA'?'euro':'copa');
+  return 'quali';
+}
+/* próxima Copa do Mundo estritamente após 'year' (anos %4==2). Ex.: 2050->2054, 2051->2054 */
+function nextWorldCupYear(year){let y=year+1;while(y%4!==2)y++;return y;}
+function ntCompName(tp){return t('nt_comp_'+tp);}
+
+/* ---- elegibilidade e convite ---- */
+function canCoachNT(){
+  if(G.mode==='nt')return false;
+  if(G._ntBlockUntil&&G.year<=G._ntBlockUntil)return false; // recusou: espera passar a próxima Copa do Mundo
+  if(titTot()<10)return false;
+  if(((G.tit.liberta||0)+(G.tit.champions||0))<1)return false;
+  const code=regCode(G.reg);
+  if(!SELECOES[code])return false;
+  return Math.random()<0.55;
+}
+function evSelecao(){
+  const code=regCode(G.reg),nm=paisNome(code);
+  evShow('🎽',t('nt_prop_tit'),t('nt_prop_txt',nm),[
+    {l:t('nt_prop_yes',nm),f:()=>takeNT(code)},
+    {l:t('nt_prop_no'),ghost:1,f:()=>{G._ntBlockUntil=nextWorldCupYear(G.year);}}
+  ]);
+}
+function takeNT(code){
+  G.mode='nt';
+  G.nt={code,nome:paisNome(code),forca:ntForca(code),conf:confOf(code)};
+  G.ntSquad=genSquad(G.nt.forca);
+  G.prevClub=G.club.slice();
+  G.ntCups=G.ntCups||{world:0,euro:0,copa:0};
+  G.clubes.push('🎽 '+G.nt.nome);
+  G.board=74;G.tension=false;
+  logSeason('<span>'+G.year+'</span><b>'+t('nt_assumiu',G.nt.nome)+'</b>');
+  updateHub();
+}
+
+/* ---- temporada internacional ---- */
+let ntSeason=null,ntTour=null;
+function advanceNT(){
+  NEXT=null; // toda a temporada de seleção é conduzida por botões diretos
+  const conf=G.nt.conf,tp=tournamentOf(G.year,conf);
+  ntSeason={conf,tp,titFlags:[],champion:false,result:null,played:0,win:0,draw:0,loss:0};
+  if(tp==='quali'){ntQualiYear();return;}
+  if(!ntQualifies(tp)){ntFailQualify(tp);return;}
+  ntStartTournament(tp);
+}
+function ntQualifies(tp){
+  const f=G.nt.forca+coachEff();
+  let base;
+  if(tp==='copa')base=0.99;                      // Copa América: 10 seleções, quase todas entram
+  else if(tp==='euro')base=clamp((f-58)/36,0.12,0.97); // fortes quase certos, fracos em risco
+  else base=clamp((f-50)/45,0.20,0.97);          // Copa do Mundo: classificação mais dura
+  return Math.random()<base;
+}
+function ntFailQualify(tp){
+  ntSeason.result='naoclass';
+  G.board=clamp(G.board-14,0,100);
+  G.worldLog.push({y:G.year,win:false,txt:t('nt_wl_naoclass',ntCompName(tp))});
+  evShow('❌',t('nt_naoclass_tit'),t('nt_naoclass_txt',ntCompName(tp)),
+    [{l:t('fin_continuar'),hold:true,f:()=>ntResolve()}]);
+}
+function ntQualiYear(){
+  const f=G.nt.forca+coachEff(),games=8;let w=0,d=0,l=0;
+  for(let i=0;i<games;i++){const r=Math.random()*100,edge=(f-72);
+    if(r<46+edge*0.6)w++;else if(r<72+edge*0.3)d++;else l++;}
+  ntSeason.win=w;ntSeason.draw=d;ntSeason.loss=l;ntSeason.played=games;ntSeason.result='quali';
+  G.board=clamp(G.board+clamp(w*2-l*2,-10,10),0,100);
+  evShow('🗓️',t('nt_quali_tit'),t('nt_quali_txt',w,d,l),
+    [{l:t('fin_continuar'),hold:true,f:()=>ntResolve(true)}]);
+}
+
+/* ---- torneio (grupos + mata-mata) ---- */
+function ntBracketPlan(tp){
+  if(tp==='copa')return [{s:'group'},{s:'ko',n:'qf'},{s:'ko',n:'sf'},{s:'ko',n:'final'}];
+  return [{s:'group'},{s:'ko',n:'r16'},{s:'ko',n:'qf'},{s:'ko',n:'sf'},{s:'ko',n:'final'}];
+}
+function ntOpponentPool(tp){
+  if(tp==='world'){ // mundo: mistura das duas confederações
+    return Object.keys(SELECOES).filter(c=>c!==G.nt.code);
+  }
+  return confTeams(G.nt.conf).filter(c=>c!==G.nt.code);
+}
+function ntStartTournament(tp){
+  ntTour={tp,rounds:ntBracketPlan(tp),idx:0,pool:ntOpponentPool(tp),groupPts:0,groupGames:0,used:[],last:null};
+  evShow('🏆',t('nt_open_tit',ntCompName(tp)),t('nt_open_txt',ntCompName(tp),G.nt.nome),
+    [{l:t('nt_open_go'),hold:true,f:()=>ntNextMatch()}]);
+}
+function ntPickOpp(){
+  const pool=ntTour.pool;
+  // evita repetir adversários já enfrentados no torneio; se esgotar, evita ao menos o último
+  let cand=pool.filter(c=>ntTour.used.indexOf(c)<0);
+  if(!cand.length)cand=pool.filter(c=>c!==ntTour.last);
+  if(!cand.length)cand=pool;
+  const opp=cand[R(0,cand.length-1)];
+  ntTour.used.push(opp);ntTour.last=opp;
+  return opp;
+}
+function ntNextMatch(){
+  const ph=ntTour.rounds[ntTour.idx];
+  if(!ph){ntTournamentDone(true,'final');return;}
+  if(ph.s==='group'){
+    if(ntTour.groupGames>=3){
+      const pts=ntTour.groupPts;
+      const adv=pts>=5||(pts>=4&&Math.random()<0.9)||(pts>=3&&Math.random()<0.45);
+      if(!adv){ntTournamentDone(false,'group');return;}
+      ntTour.idx++;ntTour.groupGames=0;ntTour.groupPts=0;ntNextMatch();return;
+    }
+    ntPlayMatch(ph,'group');
+  }else ntPlayMatch(ph,'ko');
+}
+function ntPlayMatch(ph,kind){
+  const oppCode=ntPickOpp(),opp=paisNome(oppCode),oppF=ntForca(oppCode)+R(-2,3);
+  const stageLabel=(kind==='group')?t('nt_group_g',ntTour.groupGames+1):t('nt_stage_'+ph.n);
+  const ev={
+    comp:ntCompName(ntTour.tp),compLabel:ntCompName(ntTour.tp)+' · '+stageLabel,
+    meu:G.nt.nome,rival:opp,rivalForca:oppF,myForca:G.nt.forca,
+    nt:true,kind,phase:ph,allowDraw:(kind==='group'),finish:ntMatchDone,
+    matchBtn:(win)=>(ph.n==='final'&&win===true)?t('mv_levantar'):t('fin_continuar'),
+    resultTit:(e)=>e.compLabel,
+    resultTxt:(win,placar)=>'<div class="score">'+ev.meu+' '+placar+' '+ev.rival+'</div>'+ntResultLine(win,ph,kind),
+    resultBtn:(win)=>(ph.n==='final'&&win===true)?t('fin_comemorar'):t('fin_continuar')
+  };
+  evShow('⚽',ev.compLabel,t('nt_match_txt',ev.meu,ev.rival),
+    [{l:t('fin_assistir'),hold:true,f:()=>startMatch(ev)},
+     {l:t('fin_pular'),ghost:1,hold:true,f:()=>playInstant(ev)}]);
+}
+function ntResultLine(win,ph,kind){
+  if(kind==='group')return t('nt_res_group',win===true?t('nt_won'):win===null?t('nt_drew'):t('nt_lost'));
+  if(ph.n==='final')return win===true?t('fin_campeao',ntCompName(ntTour.tp)):t('nt_res_finalloss');
+  return win===true?t('nt_res_advance'):t('nt_res_out');
+}
+function ntMatchDone(ev,win){
+  ntSeason.played++;
+  if(win===true)ntSeason.win++;else if(win===null)ntSeason.draw++;else ntSeason.loss++;
+  if(ev.kind==='group'){
+    ntTour.groupPts+=(win===true?3:win===null?1:0);ntTour.groupGames++;
+    setTimeout(()=>ntNextMatch(),350);return;
+  }
+  if(win===true){
+    if(ev.phase.n==='final'){ntTournamentDone(true,'final');return;}
+    ntTour.idx++;setTimeout(()=>ntNextMatch(),350);return;
+  }
+  ntTournamentDone(false,ev.phase.n);
+}
+function ntTournamentDone(champion,stage){
+  const tp=ntTour.tp,comp=ntCompName(tp);
+  if(champion){
+    ntSeason.champion=true;ntSeason.result='champ';
+    G.ntCups[tp]=(G.ntCups[tp]||0)+1;ntSeason.titFlags.push(comp);
+    addHonra(t('nt_hon_'+tp),tp==='world'?42:24);
+    G.board=clamp(G.board+22,0,100);
+    G.worldLog.push({y:G.year,win:true,txt:t('nt_wl_champ',G.nt.nome,comp)});
+    celebrate(tp==='world'?t('nt_cel_world'):t('nt_cel_conf',comp),G.nt.nome+' — '+G.year,()=>ntResolve());
+  }else{
+    ntSeason.result=stage;
+    G.board=clamp(G.board+(stage==='final'?6:stage==='sf'?1:stage==='qf'?-3:-13),0,100);
+    G.worldLog.push({y:G.year,win:false,txt:t('nt_wl_out',comp,t('nt_stage_'+stage))});
+    evShow(stage==='group'?'💥':'🥲',t('nt_out_tit'),t('nt_out_txt',comp,t('nt_stage_'+stage)),
+      [{l:t('fin_continuar'),hold:true,f:()=>ntResolve()}]);
+  }
+}
+
+/* ---- resolução da temporada de seleção + continuar/demissão ---- */
+function ntResolve(offYear){
+  G.seasons.push({y:G.year,age:G.age,club:'🎽 '+G.nt.nome,div:G.nt.code,pos:ntSeason.champion?1:'-',
+    campeao:ntSeason.champion,acesso:false,rebaix:false,
+    j:ntSeason.played,v:ntSeason.win,e:ntSeason.draw,d:ntSeason.loss,tit:ntSeason.titFlags.slice(),board:G.board});
+  G.j+=ntSeason.played;G.v+=ntSeason.win;G.e+=ntSeason.draw;G.d+=ntSeason.loss;
+  if(!offYear){
+    const res=ntSeason.champion?t('nt_log_champ',ntCompName(ntSeason.tp))
+      :ntSeason.result==='naoclass'?t('nt_log_naoclass',ntCompName(ntSeason.tp))
+      :t('nt_log_out',ntCompName(ntSeason.tp),t('nt_stage_'+ntSeason.result));
+    logSeason('<span>'+G.year+' · '+G.nt.nome+'</span><b>'+res+'</b>');
+  }else{
+    logSeason('<span>'+G.year+' · '+G.nt.nome+'</span><b>'+t('nt_log_quali',ntSeason.win,ntSeason.draw,ntSeason.loss)+'</b>');
+  }
+  marcoQueue=[];collectMarcos();
+  G.year++;G.age++;updateHub();
+  const disaster=ntSeason.tp==='world'&&(ntSeason.result==='naoclass'||ntSeason.result==='group');
+  if(disaster){NEXT=null;setTimeout(ntSacked,450);return;}
+  if(ntSeason.tp!=='quali'){NEXT=null;setTimeout(ntAskContinue,300);return;}
+  runMarcos(); // ano de eliminatórias: segue direto (marcos + fim do turno)
+}
+function ntAskContinue(){
+  NEXT=null;
+  evShow('🎽',t('nt_cont_tit'),t('nt_cont_txt',G.nt.nome),[
+    {l:t('nt_cont_stay'),hold:true,f:()=>runMarcos()},
+    {l:t('nt_cont_leave'),ghost:1,hold:true,f:()=>ntToClubs(true)}
+  ]);
+}
+function ntSacked(){
+  NEXT=null;
+  evShow('📉',t('nt_sack_tit'),t('nt_sack_txt',G.nt.nome),
+    [{l:t('nt_sack_ok'),hold:true,f:()=>ntToClubs(false)}]);
+}
+function ntToClubs(voluntary){
+  G.mode='club';
+  if(!G.club||G.club.length<3)G.club=(G.prevClub&&G.prevClub.slice())||['Retorno','A',80,'BRA'];
+  const teto=Math.max(tetoForca(),82);
+  const code=regCode(G.reg);
+  let pool=[...CLUBES,...LIB_INT].filter(c=>c[2]<=teto&&c[2]>=74);
+  const dom=pool.filter(c=>c[3]===code||(code==='BRA'&&!isIntl(c)));
+  if(dom.length&&Math.random()<0.6)pool=dom;
+  const club=(pool.length?pick(pool):CLUBES[0]).slice();
+  G.club=club;G.pool=null;G.clubes.push(club[0]);
+  G.board=voluntary?68:60;G.tension=false;G.verba=Math.max(G.verba,40);
+  G._ntDeclinedYear=G.year;
+  const nm=G.nt?G.nt.nome:'';G.nt=null;G.ntSquad=null;
+  logSeason('<span>'+G.year+'</span><b>'+t('nt_backclub',nm,club[0])+'</b>');
+  syncSquad();updateHub();
+  runMarcos();
+}
+
+/* ---- i18n da seleção (mescla nos dicionários existentes) ---- */
+Object.assign(I18N.pt,{
+  nt_comp_world:'Copa do Mundo',nt_comp_euro:'Eurocopa',nt_comp_copa:'Copa América',
+  nt_prop_tit:'A seleção chamou',
+  nt_prop_txt:(nm)=>'Seu currículo é de elite. A <b>federação da '+nm+'</b> quer você no comando da seleção nacional. Assumir significa <b>deixar o clube</b> ao fim desta temporada.',
+  nt_prop_yes:(nm)=>'Assumir a seleção da '+nm,
+  nt_prop_no:'Recusar e seguir no clube',
+  nt_assumiu:(nm)=>'🎽 Assumiu a seleção da '+nm,
+  nt_hub_clube:(nm,conf,f)=>'🎽 Seleção da '+nm+' — '+conf+' · Elenco '+f+' OVR',
+  nt_hub_meta:(comp)=>'Foco: '+comp,
+  nt_sq_titulo:(nm,conf)=>'Seleção da '+nm+' — '+conf,
+  nt_naoclass_tit:'Fora do torneio',
+  nt_naoclass_txt:(comp)=>'A campanha de classificação fracassou e a seleção <b>não se classificou</b> para a '+comp+'. A pressão aumenta.',
+  nt_wl_naoclass:(comp)=>'Não se classificou · '+comp,
+  nt_quali_tit:'Data FIFA · Eliminatórias',
+  nt_quali_txt:(w,d,l)=>'Ano sem grande torneio: eliminatórias e amistosos. Campanha: <b>'+w+'V '+d+'E '+l+'D</b>.',
+  nt_log_quali:(w,d,l)=>'Eliminatórias/amistosos · '+w+'V '+d+'E '+l+'D',
+  nt_open_tit:(comp)=>comp+' começou!',
+  nt_open_txt:(comp,nm)=>'A '+nm+' está na '+comp+'. Cada decisão sua pesa nos jogos. Boa sorte, Míster.',
+  nt_open_go:'Entrar em campo ▶',
+  nt_group_g:(n)=>'Grupo · Jogo '+n,
+  nt_stage_group:'Fase de grupos',nt_stage_r16:'Oitavas',nt_stage_qf:'Quartas',nt_stage_sf:'Semifinal',nt_stage_final:'FINAL',
+  nt_match_txt:(meu,riv)=>'<b>'+meu+'</b> x <b>'+riv+'</b>. Como você quer viver este jogo?',
+  nt_mv_draw:(meu,placar,riv)=>'🤝 Empate: '+meu+' '+placar+' '+riv,
+  nt_res_group:(r)=>'Resultado do grupo: '+r+'.',
+  nt_won:'vitória',nt_drew:'empate',nt_lost:'derrota',
+  nt_res_advance:'Classificado para a próxima fase!',
+  nt_res_out:'Eliminado do torneio.',
+  nt_res_finalloss:'O vice amargo de uma final.',
+  nt_cel_world:'CAMPEÃO DO MUNDO!',
+  nt_cel_conf:(comp)=>'CAMPEÃO DA '+comp.toUpperCase()+'!',
+  nt_wl_champ:(nm,comp)=>nm+' campeão · '+comp,
+  nt_wl_out:(comp,st)=>comp+' · eliminado ('+st+')',
+  nt_out_tit:'Fim de linha no torneio',
+  nt_out_txt:(comp,st)=>'A campanha na '+comp+' terminou na fase: <b>'+st+'</b>.',
+  nt_hon_world:'Campeão da Copa do Mundo',nt_hon_euro:'Campeão da Eurocopa',nt_hon_copa:'Campeão da Copa América',
+  nt_cont_tit:'Fim do ciclo',
+  nt_cont_txt:(nm)=>'O ciclo com a seleção da '+nm+' se encerrou. O que você decide?',
+  nt_cont_stay:'Seguir na seleção',
+  nt_cont_leave:'Voltar a treinar clubes',
+  nt_sack_tit:'Demitido da seleção',
+  nt_sack_txt:(nm)=>'O fracasso na Copa do Mundo custou seu cargo. A federação da '+nm+' anunciou sua saída.',
+  nt_sack_ok:'Buscar um clube',
+  nt_backclub:(nm,club)=>'Deixou a seleção'+(nm?' da '+nm:'')+' e assinou com o '+club,
+  nt_log_champ:(comp)=>'🏆 Campeão · '+comp,
+  nt_log_naoclass:(comp)=>'Não se classificou · '+comp,
+  nt_log_out:(comp,st)=>comp+' · eliminado ('+st+')'
+});
+Object.assign(I18N.es,{
+  nt_comp_world:'Copa del Mundo',nt_comp_euro:'Eurocopa',nt_comp_copa:'Copa América',
+  nt_prop_tit:'La selección llamó',
+  nt_prop_txt:(nm)=>'Tu currículum es de élite. La <b>federación de '+nm+'</b> te quiere al mando de la selección. Aceptar significa <b>dejar el club</b> al final de esta temporada.',
+  nt_prop_yes:(nm)=>'Dirigir a '+nm,
+  nt_prop_no:'Rechazar y seguir en el club',
+  nt_assumiu:(nm)=>'🎽 Asumió la selección de '+nm,
+  nt_hub_clube:(nm,conf,f)=>'🎽 Selección de '+nm+' — '+conf+' · Plantel '+f+' OVR',
+  nt_hub_meta:(comp)=>'Foco: '+comp,
+  nt_sq_titulo:(nm,conf)=>'Selección de '+nm+' — '+conf,
+  nt_naoclass_tit:'Fuera del torneo',
+  nt_naoclass_txt:(comp)=>'La clasificación fracasó y la selección <b>no clasificó</b> a la '+comp+'. La presión sube.',
+  nt_wl_naoclass:(comp)=>'No clasificó · '+comp,
+  nt_quali_tit:'Fecha FIFA · Eliminatorias',
+  nt_quali_txt:(w,d,l)=>'Año sin gran torneo: eliminatorias y amistosos. Campaña: <b>'+w+'G '+d+'E '+l+'P</b>.',
+  nt_log_quali:(w,d,l)=>'Eliminatorias/amistosos · '+w+'G '+d+'E '+l+'P',
+  nt_open_tit:(comp)=>'¡Empezó la '+comp+'!',
+  nt_open_txt:(comp,nm)=>nm+' está en la '+comp+'. Cada decisión tuya pesa en los partidos. Suerte, Míster.',
+  nt_open_go:'Saltar al campo ▶',
+  nt_group_g:(n)=>'Grupo · Partido '+n,
+  nt_stage_group:'Fase de grupos',nt_stage_r16:'Octavos',nt_stage_qf:'Cuartos',nt_stage_sf:'Semifinal',nt_stage_final:'FINAL',
+  nt_match_txt:(meu,riv)=>'<b>'+meu+'</b> x <b>'+riv+'</b>. ¿Cómo quieres vivir este partido?',
+  nt_mv_draw:(meu,placar,riv)=>'🤝 Empate: '+meu+' '+placar+' '+riv,
+  nt_res_group:(r)=>'Resultado del grupo: '+r+'.',
+  nt_won:'victoria',nt_drew:'empate',nt_lost:'derrota',
+  nt_res_advance:'¡Clasificado a la siguiente fase!',
+  nt_res_out:'Eliminado del torneo.',
+  nt_res_finalloss:'El amargo subcampeonato de una final.',
+  nt_cel_world:'¡CAMPEÓN DEL MUNDO!',
+  nt_cel_conf:(comp)=>'¡CAMPEÓN DE LA '+comp.toUpperCase()+'!',
+  nt_wl_champ:(nm,comp)=>nm+' campeón · '+comp,
+  nt_wl_out:(comp,st)=>comp+'    eliminado ('+st+')',
+  nt_out_tit:'Fin del camino en el torneo',
+  nt_out_txt:(comp,st)=>'La campaña en la '+comp+' terminó en la fase: <b>'+st+'</b>.',
+  nt_hon_world:'Campeón del Mundo',nt_hon_euro:'Campeón de la Eurocopa',nt_hon_copa:'Campeón de la Copa América',
+  nt_cont_tit:'Fin del ciclo',
+  nt_cont_txt:(nm)=>'El ciclo con la selección de '+nm+' terminó. ¿Qué decides?',
+  nt_cont_stay:'Seguir en la selección',
+  nt_cont_leave:'Volver a dirigir clubes',
+  nt_sack_tit:'Destituido de la selección',
+  nt_sack_txt:(nm)=>'El fracaso en el Mundial te costó el cargo. La federación de '+nm+' anunció tu salida.',
+  nt_sack_ok:'Buscar un club',
+  nt_backclub:(nm,club)=>'Dejó la selección'+(nm?' de '+nm:'')+' y firmó con '+club,
+  nt_log_champ:(comp)=>'🏆 Campeón · '+comp,
+  nt_log_naoclass:(comp)=>'No clasificó · '+comp,
+  nt_log_out:(comp,st)=>comp+' · eliminado ('+st+')'
+});
+Object.assign(I18N.en,{
+  nt_comp_world:'World Cup',nt_comp_euro:'Euros',nt_comp_copa:'Copa América',
+  nt_prop_tit:'The national team called',
+  nt_prop_txt:(nm)=>'Your CV is elite. The <b>'+nm+' federation</b> wants you in charge of the national team. Accepting means <b>leaving your club</b> at the end of this season.',
+  nt_prop_yes:(nm)=>'Take charge of '+nm,
+  nt_prop_no:'Decline and stay at the club',
+  nt_assumiu:(nm)=>'🎽 Took charge of '+nm,
+  nt_hub_clube:(nm,conf,f)=>'🎽 '+nm+' NT — '+conf+' · Squad '+f+' OVR',
+  nt_hub_meta:(comp)=>'Focus: '+comp,
+  nt_sq_titulo:(nm,conf)=>nm+' national team — '+conf,
+  nt_naoclass_tit:'Out of the tournament',
+  nt_naoclass_txt:(comp)=>'The qualifying campaign failed and the team <b>did not qualify</b> for the '+comp+'. Pressure rises.',
+  nt_wl_naoclass:(comp)=>'Failed to qualify · '+comp,
+  nt_quali_tit:'FIFA break · Qualifiers',
+  nt_quali_txt:(w,d,l)=>'No major tournament this year: qualifiers and friendlies. Record: <b>'+w+'W '+d+'D '+l+'L</b>.',
+  nt_log_quali:(w,d,l)=>'Qualifiers/friendlies · '+w+'W '+d+'D '+l+'L',
+  nt_open_tit:(comp)=>'The '+comp+' has begun!',
+  nt_open_txt:(comp,nm)=>nm+' are at the '+comp+'. Every decision you make shapes the matches. Good luck, Gaffer.',
+  nt_open_go:'Take the field ▶',
+  nt_group_g:(n)=>'Group · Match '+n,
+  nt_stage_group:'Group stage',nt_stage_r16:'Round of 16',nt_stage_qf:'Quarter-final',nt_stage_sf:'Semi-final',nt_stage_final:'FINAL',
+  nt_match_txt:(meu,riv)=>'<b>'+meu+'</b> vs <b>'+riv+'</b>. How do you want to live this match?',
+  nt_mv_draw:(meu,placar,riv)=>'🤝 Draw: '+meu+' '+placar+' '+riv,
+  nt_res_group:(r)=>'Group result: '+r+'.',
+  nt_won:'win',nt_drew:'draw',nt_lost:'loss',
+  nt_res_advance:'Through to the next round!',
+  nt_res_out:'Knocked out of the tournament.',
+  nt_res_finalloss:'The bitter runner-up of a final.',
+  nt_cel_world:'WORLD CHAMPIONS!',
+  nt_cel_conf:(comp)=>comp.toUpperCase()+' CHAMPIONS!',
+  nt_wl_champ:(nm,comp)=>nm+' champions · '+comp,
+  nt_wl_out:(comp,st)=>comp+' · knocked out ('+st+')',
+  nt_out_tit:'End of the road',
+  nt_out_txt:(comp,st)=>'Your '+comp+' run ended at: <b>'+st+'</b>.',
+  nt_hon_world:'World Cup winner',nt_hon_euro:'Euros winner',nt_hon_copa:'Copa América winner',
+  nt_cont_tit:'End of the cycle',
+  nt_cont_txt:(nm)=>'Your cycle with '+nm+' has ended. What do you decide?',
+  nt_cont_stay:'Stay with the national team',
+  nt_cont_leave:'Go back to club management',
+  nt_sack_tit:'Sacked by the federation',
+  nt_sack_txt:(nm)=>'The World Cup failure cost you the job. The '+nm+' federation announced your exit.',
+  nt_sack_ok:'Find a club',
+  nt_backclub:(nm,club)=>'Left the '+(nm?nm+' ':'')+'national team and signed with '+club,
+  nt_log_champ:(comp)=>'🏆 Champions · '+comp,
+  nt_log_naoclass:(comp)=>'Failed to qualify · '+comp,
+  nt_log_out:(comp,st)=>comp+' · knocked out ('+st+')'
+});
+
+</script>
+<script src="./bnf-config.js"></script>
+<script src="./bnf-analytics.js" data-page="O Míster"></script>
+</body>
+</html>
