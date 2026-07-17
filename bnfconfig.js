@@ -1,0 +1,2 @@
+window.BNF_SUPABASE_URL = "https://exxqzvkskkafqvmgofuy.supabase.co";
+window.BNF_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4eHF6dmtza2thZnF2bWdvZnV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MjU3NDIsImV4cCI6MjA5OTMwMTc0Mn0.gFrN1Zh6jlJA7UWg5YZyQPlQkVu40heMvrs4Ya7Mm88";
