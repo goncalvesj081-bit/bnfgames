@@ -415,6 +415,8 @@ function criarMundo() {
     /* posicao "da temporada passada" pela forca, base do valor de mercado */
     equipesDa(cat).slice().sort((a, b) => b.base - a.base).forEach((e, i) => { e.ult = i + 1; });
   }
+  /* pilotos livres em cada categoria */
+  for (let cat = 0; cat < NCAT; cat++) for (let k = 0; k < 4; k++) { const pl = novoPiloto(cat, usados); pl.cat = cat; S.pilotos.push(pl); }
   S.equipes.forEach(eq => {
     const rec = receitaEquipe(eq, eq.ult).total;
     eq.p.divida = Math.round(rec * (0.05 + Math.pow(Math.random(), 1.9) * 1.05) / 1e4) * 1e4;
@@ -986,6 +988,179 @@ function novosMarcos() {
 }
 
 /* =========================================================
+   CICLO DE REGULAMENTO (F1)
+   ========================================================= */
+function novoReg() { return { tec: 1 + ri(4, 5), motor: 1 + ri(6, 8), avisoTec: 0, avisoMotor: 0 }; }
+function avisosRegulamento() {
+  const r = S.reg, t = S.temporada;
+  if (r.tec - t === 2 && r.avisoTec !== r.tec) {
+    r.avisoTec = r.tec;
+    noticia('A F1 confirmou novo regulamento tecnico para a temporada ' + r.tec + '. Quem tiver tunel, fabrica e simulador sai na frente; pacote de agora perde valor.', 'a');
+  }
+  if (r.motor - t === 2 && r.avisoMotor !== r.motor) {
+    r.avisoMotor = r.motor;
+    noticia('Novo regulamento de motor da F1 na temporada ' + r.motor + '. As montadoras vao as compras.', 'a');
+  }
+}
+/* aplicado na virada para a temporada da mudanca */
+function aplicarRegulamento() {
+  const r = S.reg, t = S.temporada;
+  if (t === r.tec) {
+    equipesDa(0).forEach(eq => {
+      const p = eq.p, infra = (p.tunel + p.fabrica + p.simulador) / 3;
+      const novo = clamp(Math.round(p.carro * 0.4 + infra * 0.4 + ri(55, 90) * 0.2), 30, 96);
+      if (!ehMeu(eq.id)) eq.base = Math.round(eq.base * 0.5 + novo * 0.5);
+      p.carro = Math.min(novo, tetoCarro(eq));
+    });
+    noticia('Novo regulamento tecnico na F1: o carro de todas as equipes foi recalculado pela infraestrutura.', 'a');
+    r.tec = t + ri(4, 5);
+  }
+  if (t === r.motor) {
+    equipesDa(0).forEach(eq => { eq.p.confiab = clamp(eq.p.confiab - ri(4, 10), 30, 98); });
+    noticia('Novo regulamento de motor na F1: confiabilidade em queda no grid inteiro ate os motores amadurecerem.', 'r');
+    r.motor = t + ri(6, 8);
+  }
+}
+
+/* =========================================================
+   PILOTOS: MERCADO, CARREIRA E ACADEMIA
+   ========================================================= */
+function catDoPiloto(pl) { return pl.eq !== null ? S.equipes[pl.eq].cat : pl.cat; }
+function livres(cat) { return S.pilotos.filter(pl => pl.eq === null && !pl.aposentado && pl.acad === undefined && pl.cat === cat); }
+/* luvas para o piloto e multa para a equipe que perde o piloto */
+function custoContratacao(pl, eq) {
+  const luvas = eq.cat === 0 ? salarioPiloto(pl, 0) * 0.5 : ECO[eq.cat].pagante * 0.3 + ECO[eq.cat].equipe * 0.04;
+  let multa = 0;
+  if (pl.eq !== null) {
+    const atual = S.equipes[pl.eq];
+    multa = atual.cat === 0 ? salarioPiloto(pl, 0) * 1.5 : ECO[atual.cat].pagante * 1.5 + ECO[atual.cat].equipe * 0.1;
+  }
+  return { luvas: Math.round(luvas), multa: Math.round(multa), total: Math.round(luvas + multa) };
+}
+function candidatos(eq) {
+  return S.pilotos.filter(pl => {
+    if (pl.aposentado || pl.acad !== undefined) return false;
+    if (pl.eq !== null && ehMeu(pl.eq)) return false;
+    const c = catDoPiloto(pl);
+    return c === eq.cat || c === eq.cat + 1;
+  }).sort((a, b) => b.nivel - a.nivel);
+}
+function substituto(cat, usados) {
+  const l = livres(cat).sort((a, b) => b.nivel - a.nivel);
+  if (l.length) return l[0];
+  const pl = novoPiloto(cat, usados || nomesUsados());
+  pl.cat = cat;
+  S.pilotos.push(pl);
+  return pl;
+}
+function nomesUsados() { const u = {}; S.pilotos.forEach(p => { u[p.nome] = 1; }); return u; }
+function colocar(pl, eq, idx) {
+  const sai = eq.p.pil[idx];
+  if (sai !== undefined && sai !== pl.id) { const s = S.pilotos[sai]; s.eq = null; s.cat = eq.cat; }
+  pl.eq = eq.id; pl.cat = eq.cat; delete pl.acad;
+  eq.p.pil[idx] = pl.id;
+}
+function contratarPiloto(idEq, idPl, idSai) {
+  const eq = S.equipes[idEq], pl = S.pilotos[idPl];
+  if (!ehMeu(idEq)) return 'Essa equipe nao e sua';
+  if (S.fase !== 'pre') return 'Contratacao so na pre-temporada';
+  const idx = eq.p.pil.indexOf(idSai);
+  if (idx < 0) return 'Escolha quem sai';
+  if (candidatos(eq).indexOf(pl) < 0) return 'Esse piloto nao esta disponivel para a ' + eq.nome;
+  const c = custoContratacao(pl, eq);
+  const err = pagar(eq, c.total);
+  if (err) return err;
+  if (pl.eq !== null) {
+    const antiga = S.equipes[pl.eq], i2 = antiga.p.pil.indexOf(pl.id);
+    pl.eq = null;
+    colocar(substituto(antiga.cat), antiga, i2);
+    noticia(antiga.nome + ' recebeu ' + moeda(c.multa) + ' de multa pela saida de ' + pl.nome + '.', '');
+  }
+  const saiu = S.pilotos[idSai];
+  colocar(pl, eq, idx);
+  noticia(eq.nome + ' contratou ' + pl.nome + ' (nivel ' + pl.nivel + ') no lugar de ' + saiu.nome + '.', 'v');
+  invalidarTabelas();
+  salvar();
+  return null;
+}
+/* academia: o fundo guarda os pilotos revelados por cada equipe */
+function prospectos() { return S.pilotos.filter(pl => pl.acad !== undefined && !pl.aposentado); }
+function valorProspecto(pl) { return Math.round(Math.max(50e3, Math.pow(Math.max(0, pl.nivel - 50), 2) * 4e3 * (0.7 + pl.pot)) / 1e4) * 1e4; }
+function promoverProspecto(idPl, idEq, idSai) {
+  const pl = S.pilotos[idPl], eq = S.equipes[idEq];
+  if (pl.acad === undefined) return 'Esse piloto nao e da academia';
+  if (!ehMeu(idEq)) return 'Essa equipe nao e sua';
+  if (S.fase !== 'pre') return 'Promocao so na pre-temporada';
+  const idx = eq.p.pil.indexOf(idSai);
+  if (idx < 0) return 'Escolha quem sai';
+  colocar(pl, eq, idx);
+  noticia(pl.nome + ', da academia do fundo, ganhou vaga de titular na ' + eq.nome + '.', 'v');
+  invalidarTabelas(); salvar();
+  return null;
+}
+function venderProspecto(idPl) {
+  const pl = S.pilotos[idPl];
+  if (pl.acad === undefined) return 'Esse piloto nao e da academia';
+  const v = valorProspecto(pl), dono = S.equipes[pl.acad];
+  const f1 = pl.nivel >= CATS[0].piloto[0];
+  if (dono && ehMeu(dono.id)) dono.p.caixa += v; else S.f.caixa += v;
+  delete pl.acad;
+  pl.eq = null; pl.cat = f1 ? 0 : pl.nivel >= CATS[1].piloto[0] ? 1 : 2;
+  if (f1 && S.f.marcos) S.f.marcos.revelacao++;
+  noticia(pl.nome + ' saiu da academia ' + (f1 ? 'para a F1' : 'para a ' + DIVS[pl.cat]) + ' por ' + moeda(v) + '.', 'v');
+  salvar();
+  return null;
+}
+/* carreira de todos os pilotos, uma vez por temporada */
+function evoluirPilotos() {
+  const usados = nomesUsados();
+  S.pilotos.forEach(pl => {
+    if (pl.aposentado) return;
+    pl.idade++;
+    const d = pl.idade <= 20 ? ri(0, 3) + Math.round(pl.pot * 3) : pl.idade <= 23 ? ri(0, 2) + Math.round(pl.pot * 2) :
+      pl.idade <= 29 ? ri(-1, 2) : pl.idade <= 33 ? ri(-2, 1) : ri(-4, 0);
+    pl.nivel = clamp(pl.nivel + d, 20, 99);
+  });
+  /* aposentadoria e vagas */
+  S.pilotos.forEach(pl => {
+    if (pl.aposentado || pl.acad !== undefined) return;
+    if (pl.idade >= 39 || (pl.idade >= 35 && Math.random() < 0.3)) {
+      pl.aposentado = true;
+      if (pl.eq !== null) {
+        const eq = S.equipes[pl.eq], idx = eq.p.pil.indexOf(pl.id);
+        if (ehMeu(eq.id)) noticia(pl.nome + ' se aposentou. A ' + eq.nome + ' promoveu um substituto.', '');
+        pl.eq = null;
+        colocar(substituto(eq.cat, usados), eq, idx);
+      }
+    }
+  });
+  /* danca das cadeiras: equipes sem dono trocam o pior piloto por um livre melhor */
+  S.equipes.forEach(eq => {
+    if (ehMeu(eq.id) || Math.random() > 0.35) return;
+    const idx = eq.p.pil[0] !== undefined && S.pilotos[eq.p.pil[0]].nivel <= S.pilotos[eq.p.pil[1]].nivel ? 0 : 1;
+    const pior = S.pilotos[eq.p.pil[idx]];
+    const sobe = livres(eq.cat + 1 < NCAT ? eq.cat + 1 : eq.cat).concat(livres(eq.cat)).sort((a, b) => b.nivel - a.nivel)[0];
+    if (sobe && sobe.nivel > pior.nivel + 2) colocar(sobe, eq, idx);
+  });
+  /* mantem uma reserva de pilotos livres em cada categoria */
+  for (let cat = 0; cat < NCAT; cat++) {
+    while (livres(cat).length < 4) { const pl = novoPiloto(cat, usados); pl.cat = cat; S.pilotos.push(pl); }
+  }
+  /* academias das equipes do fundo revelam pilotos */
+  meus().forEach(eq => {
+    if (prospectos().length >= 4) return;
+    if (Math.random() > eq.p.academia / 100 * 0.7) return;
+    const pl = novoPiloto(3, usados, true);
+    pl.nivel = clamp(Math.round(40 + eq.p.academia / 4 + ri(-4, 6)), 30, 75);
+    pl.pot = Math.round(clamp(0.3 + eq.p.academia / 150 + Math.random() * 0.3, 0, 1) * 100) / 100;
+    pl.acad = eq.id; pl.cat = 3;
+    S.pilotos.push(pl);
+    noticia('A academia da ' + eq.nome + ' revelou ' + pl.nome + ', ' + pl.idade + ' anos, nivel ' + pl.nivel + '.', 'v');
+  });
+  invalidarTabelas();
+}
+
+/* =========================================================
    FUNDO
    ========================================================= */
 function novoFundo(nome, idEquipe) {
@@ -994,7 +1169,7 @@ function novoFundo(nome, idEquipe) {
   S.donos = []; S.noticias = []; S.relatorio = null; S.dd = {}; S.recusas = {};
   gerarCalendarios();
   invalidarTabelas();
-  S.ciclo = novoCiclo(); S.propostas = [];
+  S.ciclo = novoCiclo(); S.propostas = []; S.reg = novoReg();
   S.f.marcos = novosMarcos();
   const err = comprarEquipe(idEquipe, 'justa', true);
   criarRivais();
@@ -1306,6 +1481,7 @@ function encerrarTemporada() {
   /* 5. mercado e concorrencia */
   evoluirCiclo();
   turnoRivais();
+  evoluirPilotos();
   /* 6. fundo */
   const juros = Math.round(S.f.divida * JUROS);
   if (juros > 0) {
@@ -1337,6 +1513,8 @@ function encerrarTemporada() {
   S.temporada++;
   S.passo = 0;
   S.recusas = {};
+  aplicarRegulamento();
+  avisosRegulamento();
   gerarCalendarios();
   S.relatorio = rel;
   S.fase = 'relatorio';
@@ -1394,6 +1572,7 @@ function carregar() {
     if (!S.dd) S.dd = {};
     if (!S.recusas) S.recusas = {};
     if (!S.ciclo) S.ciclo = novoCiclo();
+    if (!S.reg) S.reg = { tec: S.temporada + ri(2, 5), motor: S.temporada + ri(4, 8) };
     if (!S.propostas) S.propostas = [];
     if (!S.f.marcos) S.f.marcos = novosMarcos();
     S.equipes.forEach(e => { if (e.dono === undefined) e.dono = null; });
@@ -1417,7 +1596,7 @@ const UI = {
   equipe: null, abaEquipe: 'painel',
   catCamp: null, visaoCamp: 'construtores',
   abaRel: 'fundo', relFiltro: 'todas', relDet: {},
-  alavFiltro: 'todas', abaMercado: 'equipes', mercLivre: false, mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
+  alavFiltro: 'todas', abaMercado: 'equipes', mercLivre: false, trocaSai: null, mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
   criaCat: 2, criaOrd: 'preco', nome: '', foco: null, escolha: null
 };
 let SCROLL = {}, ULTIMA = '';
@@ -1601,6 +1780,7 @@ function telaFundo() {
       '<div class="gap"></div><div class="bt2">' +
       '<button class="btn gh" data-a="emprestimo" ' + (lim < 1e5 ? 'disabled' : '') + '>Tomar credito</button>' +
       '<button class="btn sec2" data-a="quitarfundo" ' + (S.f.divida <= 0 || S.f.caixa <= 0 ? 'disabled' : '') + '>Abater divida</button></div>');
+  h += painelRegulamento();
   const nts = S.noticias.slice(0, 8);
   h += sec('radar', 'ultimas noticias') +
     painel('', '', nts.length ? nts.map(n => '<div class="nt"><i class="' + n.tipo + '"></i><span><em>T' + n.temp + '</em>' + esc(n.t) + '</span></div>').join('') : vazio('Sem noticias'), true);
@@ -1683,15 +1863,51 @@ function painelEquipe(eq) {
   return h;
 }
 function pilotosEquipe(eq) {
-  return sec('titulares', '2 carros') + painel('', '', eq.p.pil.map(id => {
+  const pre = S.fase === 'pre';
+  let h = sec('titulares', pre ? 'toque para trocar' : '2 carros') + painel('', '', eq.p.pil.map(id => {
     const pl = S.pilotos[id];
     const pos = tabelaPilotos(eq.cat).indexOf(pl) + 1;
     const custo = salarioPiloto(pl, eq.cat), traz = aportePagante(pl, eq.cat);
-    return '<div class="item"><span class="p"><b>' + esc(pl.nome) + '</b><span>' + esc(pl.pais) + ' &middot; ' + pl.idade + ' anos &middot; ' +
+    return '<div class="item" ' + (pre ? 'data-a="trocapil:' + id + '"' : '') + ' style="' + (UI.trocaSai === id ? 'background:var(--ac2)' : '') + '">' +
+      '<span class="p"><b>' + esc(pl.nome) + '</b><span>' + esc(pl.pais) + ' &middot; ' + pl.idade + ' anos &middot; ' +
       pl.st.v + ' V &middot; ' + pl.st.pod + ' P &middot; ' + pl.st.ab + ' AB<br>' +
-      (custo ? 'salario ' + moeda(custo) + ' por ano' : traz ? 'traz ' + moeda(traz) + ' em patrocinio pessoal' : '') + '</span></span>' +
-      '<span class="d">' + pl.nivel + '<span>' + (pl.st.c ? pos + 'o no campeonato' : 'nivel') + '</span></span></div>';
+      (custo ? 'salario ' + moeda(custo) + ' por ano (fora do teto)' : traz ? 'traz ' + moeda(traz) + ' em patrocinio pessoal' : '') + '</span></span>' +
+      '<span class="d">' + pl.nivel + '<span>' + (pre ? (UI.trocaSai === id ? tag('saindo', 'a') : tag('trocar', 'n')) : pl.st.c ? pos + 'o no campeonato' : 'nivel') + '</span></span></div>';
   }).join(''), true);
+  if (pre && eq.p.pil.indexOf(UI.trocaSai) >= 0) {
+    const sai = S.pilotos[UI.trocaSai];
+    const cands = candidatos(eq).slice(0, 16);
+    h += sec('mercado de pilotos', 'no lugar de ' + sai.nome.split(' ')[0]) +
+      painel('', '', cands.length ? cands.map(pl => {
+        const c = custoContratacao(pl, eq), de = pl.eq === null ? 'livre' : S.equipes[pl.eq].nome;
+        const extra = eq.cat === 0 ? 'salario ' + moeda(salarioPiloto(pl, 0)) : aportePagante(pl, eq.cat) ? 'traz ' + moeda(aportePagante(pl, eq.cat)) : '';
+        return '<div class="item" data-a="contratar:' + pl.id + '"><span class="p"><b>' + esc(pl.nome) + '</b><span>' + pl.idade + ' anos &middot; ' + esc(de) + ' (' + esc(DIVS[catDoPiloto(pl)]) + ')' + (extra ? ' &middot; ' + extra : '') + '</span></span>' +
+          '<span class="d">' + pl.nivel + (pl.nivel > sai.nivel ? ' <span class="ok" style="display:inline">+' + (pl.nivel - sai.nivel) + '</span>' : '') + '<span>' + moeda(c.total) + '</span></span></div>';
+      }).join('') : vazio('Ninguem disponivel'), true) +
+      '<p class="msg" style="margin-top:9px">Livres pedem so luvas. Quem tem equipe custa tambem a multa de rescisao. Pilotos da categoria de baixo sobem com prazer.</p>';
+  }
+  const pr = prospectos();
+  h += sec('academia do fundo', pr.length + ' de 4 vagas');
+  h += pr.length ? painel('', '', pr.map(pl => {
+    const dono = S.equipes[pl.acad];
+    return '<div class="item"><span class="p"><b>' + esc(pl.nome) + '</b><span>' + pl.idade + ' anos &middot; potencial ' + Math.round(pl.pot * 100) + ' &middot; revelado pela ' + esc(dono ? dono.nome : 'academia') + '<br>' +
+      (pre ? '<span style="display:flex;gap:6px;margin-top:6px"><button class="btn sm" style="width:auto" data-a="promover:' + pl.id + '">Promover</button>' +
+        '<button class="btn sm sec2" style="width:auto" data-a="vendeprosp:' + pl.id + '">Vender ' + moeda(valorProspecto(pl)) + '</button></span>' : 'promover e vender so na pre-temporada') + '</span></span>' +
+      '<span class="d">' + pl.nivel + '<span>nivel</span></span></div>';
+  }).join(''), true) : painel('', '', '<p class="msg">Nenhum piloto revelado ainda. A cada temporada, a academia de cada equipe do fundo tem chance de revelar um garoto. Academia ' + eq.p.academia + ' nesta equipe.</p>');
+  return h;
+}
+function mercadoPilotos() {
+  const lista = S.pilotos.filter(pl => pl.eq === null && !pl.aposentado && pl.acad === undefined && acessoCat(pl.cat)).sort((a, b) => b.nivel - a.nivel).slice(0, 40);
+  return painel('PILOTOS LIVRES', lista.length + ' NO MERCADO', '<p class="msg">Para contratar, abra a equipe em <b>Equipes &gt; Pilotos</b> e toque no titular que vai sair. Ali aparecem tambem os pilotos de outras equipes, com a multa de rescisao.</p>') +
+    '<div class="gap"></div>' + painel('', '', tabela(['Piloto', 'Idade', 'Nivel'], lista.map(pl =>
+      '<tr><td><span class="nm">' + esc(pl.nome) + '</span><span class="sub">' + esc(pl.pais) + ' - nivel de ' + esc(DIVS[pl.cat]) + '</span></td><td>' + pl.idade + '</td><td>' + pl.nivel + '</td></tr>')), true);
+}
+function painelRegulamento() {
+  const r = S.reg;
+  return sec('regulamento da f1') + painel('', '',
+    ln('Novo regulamento tecnico', 'temporada ' + r.tec, r.tec - S.temporada <= 2 ? 'gd' : '', r.tec - S.temporada <= 2 ? 'carro recalculado pela infraestrutura: pacote agora perde valor' : 'mudanca a cada 4 ou 5 temporadas') +
+    ln('Novo regulamento de motor', 'temporada ' + r.motor, janelaMotor() ? 'gd' : '', janelaMotor() ? 'montadoras procurando equipe: hora de receber proposta' : 'muda a cada 6 a 8 temporadas'));
 }
 function financasEquipe(eq) {
   const pos = eq.st.c ? posDaEquipe(eq) : meioGrid(eq.cat);
@@ -1823,8 +2039,9 @@ function filtrarMercado() {
 }
 function telaMercado() {
   if (UI.alvo !== null) return fichaMercado(UI.alvo);
-  let h = '<div class="wrap">' + seg(UI.abaMercado, [['equipes', 'Equipes a venda'], ['fundos', 'Fundos']], 'abamerc');
+  let h = '<div class="wrap">' + seg(UI.abaMercado, [['equipes', 'Equipes a venda'], ['pilotos', 'Pilotos'], ['fundos', 'Fundos']], 'abamerc');
   if (UI.abaMercado === 'fundos') return h + mercadoFundos() + '</div>';
+  if (UI.abaMercado === 'pilotos') return h + mercadoPilotos() + '</div>';
   const lista = filtrarMercado();
   h += painelCiclo();
   h += sec('filtros', lista.length + ' resultado' + (lista.length === 1 ? '' : 's')) +
@@ -2282,7 +2499,36 @@ document.addEventListener('click', e => {
     case 'reldet': UI.relDet[p1] = !UI.relDet[p1]; render(); break;
     case 'fecharrel': UI.relDet = {}; fecharRelatorio(); TELA = 'fundo'; render(); break;
     case 'verequipe': UI.equipe = Number(p1); TELA = 'equipes'; render(); break;
-    case 'abaequipe': UI.abaEquipe = p1; render(); break;
+    case 'abaequipe': UI.abaEquipe = p1; UI.trocaSai = null; render(); break;
+    case 'trocapil': UI.trocaSai = UI.trocaSai === Number(p1) ? null : Number(p1); render(); break;
+    case 'contratar': {
+      const eq = eqSel(), pl = S.pilotos[Number(p1)], sai = S.pilotos[UI.trocaSai], c = custoContratacao(pl, eq);
+      abrirModal('<h3>Contratar ' + esc(pl.nome) + '</h3>' +
+        ln('Sai', esc(sai.nome) + ' (' + sai.nivel + ')', 'neg') + ln('Entra', esc(pl.nome) + ' (' + pl.nivel + ')', 'ok') +
+        ln('Luvas', moeda(c.luvas), 'neg') + (c.multa ? ln('Multa de rescisao', moeda(c.multa), 'neg', 'para a ' + S.equipes[pl.eq].nome) : '') +
+        (eq.cat === 0 ? ln('Salario anual', moeda(salarioPiloto(pl, 0)) + ' contra ' + moeda(salarioPiloto(sai, 0)), '', 'fora do teto de gastos') :
+          ln('Patrocinio pessoal', moeda(aportePagante(pl, eq.cat)) + ' contra ' + moeda(aportePagante(sai, eq.cat)), '', 'piloto pior traz mais dinheiro')) +
+        lnTot('Custo agora', moeda(c.total), 'neg') +
+        '<div class="gap"></div><button class="btn" data-a="contratar-ok:' + pl.id + '">Contratar</button><div class="gap"></div><button class="btn sec2" data-a="fechar">Cancelar</button>');
+      break;
+    }
+    case 'contratar-ok': { fecharModal(); const err = contratarPiloto(UI.equipe, Number(p1), UI.trocaSai); if (err) alerta('Nao deu', err); else { UI.trocaSai = null; render(); } break; }
+    case 'promover': {
+      const eq = eqSel(), pl = S.pilotos[Number(p1)];
+      abrirModal('<h3>Promover ' + esc(pl.nome) + '</h3><p class="msg" style="margin:8px 0 12px">Nivel ' + pl.nivel + '. Entra como titular da ' + esc(eq.nome) + ' (' + esc(DIVS[eq.cat]) + ') no lugar de:</p>' +
+        eq.p.pil.map(id => '<button class="btn gh" style="margin-bottom:7px" data-a="promover-ok:' + pl.id + ':' + id + '">' + esc(S.pilotos[id].nome) + ' (' + S.pilotos[id].nivel + ')</button>').join('') +
+        '<button class="btn sec2" data-a="fechar">Cancelar</button>');
+      break;
+    }
+    case 'promover-ok': { fecharModal(); const err = promoverProspecto(Number(p1), UI.equipe, Number(p2)); if (err) alerta('Nao deu', err); else render(); break; }
+    case 'vendeprosp': {
+      const pl = S.pilotos[Number(p1)];
+      abrirModal('<h3>Vender ' + esc(pl.nome) + '</h3>' + ln('Valor da venda', moeda(valorProspecto(pl)), 'ok', pl.nivel >= CATS[0].piloto[0] ? 'comprador: uma equipe de F1' : 'comprador: equipe de categoria de base') +
+        '<p class="msg" style="margin:10px 0 12px">O dinheiro entra no caixa da equipe que revelou o piloto.</p>' +
+        '<button class="btn warn" data-a="vendeprosp-ok:' + pl.id + '">Vender</button><div class="gap"></div><button class="btn sec2" data-a="fechar">Cancelar</button>');
+      break;
+    }
+    case 'vendeprosp-ok': { fecharModal(); const err = venderProspecto(Number(p1)); if (err) alerta('Nao deu', err); else render(); break; }
     case 'alav': { const err = aplicarAlavanca(eqSel(), p1); if (err) alerta('Nao deu', err); else render(); break; }
     case 'motor': { const err = trocarMotor(eqSel(), p1); if (err) alerta('Nao deu', err); else render(); break; }
     case 'aportar': modalValor('Aportar na equipe', 'Dinheiro do fundo para o caixa da equipe.', S.f.caixa, 'aportar-ok'); break;
