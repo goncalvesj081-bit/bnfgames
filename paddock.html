@@ -310,6 +310,10 @@ h1,h2,h3{font-weight:900;font-style:italic;letter-spacing:0}
 .mtz td.l,.mtz th.l{position:sticky;left:0;background:var(--panel);z-index:1}
 .mtz tr.eu td.l{background:#2A1416}
 .foco{border-color:var(--line2)}
+.riv{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font-size:13px;color:var(--muted)}
+.riv b{color:var(--txt);font-family:var(--disp);font-weight:900}
+.riv i{font-style:normal;font-family:var(--data);font-size:12px;margin-left:3px}
+.foco>.btn,.panel>.bd.tight>.btn{width:100%}
 </style>
 </head>
 <body>
@@ -2106,12 +2110,7 @@ function topo() {
     '<div class="duo"><div><div class="k">Campeonato' + (cp ? ' &middot; ' + esc(DIVS[cp.eq.cat]) : '') + '</div><div class="v">' + (cp ? cp.txt : 'Sem equipe') + '</div>' +
     '<div class="s">' + (cp ? cp.sub : 'compre uma no mercado') + '</div></div>' +
     '<div><div class="k">Patrimonio</div><div class="v">' + moeda(pat) + '</div><div class="s ' + (dv >= 0 ? 'ok' : 'neg') + '">' + sinal(dv) + (S.f.hist.length || rel ? ' na temporada' : ' desde o inicio') + '</div></div></div>' +
-    '<div class="stats">' +
-    '<div><span>Vitorias</span><b>' + vit + '</b></div>' +
-    '<div><span>Podios</span><b>' + pod + '</b></div>' +
-    '<div><span>Caixa</span><b>' + moeda(S.f.caixa) + '</b></div>' +
-    '<div><span>Reputacao</span><b>' + Math.round(S.f.reputacao) + '<span style="display:inline;font-size:9px;color:var(--muted2)">/100</span></b></div>' +
-    '</div></div>';
+    '</div>';
 }
 function nav() {
   const its = [['fundo', 'Paddock'], ['equipes', 'Equipes'], ['camp', 'Campeonato'], ['mercado', 'Mercado'], ['rel', 'Relatorios']];
@@ -2170,77 +2169,6 @@ function telaCriacao() {
 
 /* ---------------- tela: fundo ---------------- */
 /* ---------------- tela: paddock ---------------- */
-function telaFundo() {
-  let h = '<div class="wrap">';
-  const maisBarata = S.equipes.filter(e => !ehMeu(e.id) && acessoCat(e.cat)).reduce((m, e) => Math.min(m, precoAlvo(e)), Infinity);
-  if (S.fase === 'pre' && !S.donos.length && maisBarata > S.f.caixa + limiteCredito()) {
-    h += painel('FUNDO QUEBRADO', 'PRE-TEMPORADA ' + S.temporada,
-      '<p class="msg">O grupo esta sem equipes e sem caixa nem credito para comprar a mais barata do mercado (' + moeda(maisBarata) + '). ' +
-      'Nao ha como seguir: encerre e comece outra carreira.</p><div class="gap"></div>' +
-      '<button class="btn dgr" data-a="apagar">Encerrar a carreira</button>');
-  } else if (S.fase === 'pre' && !S.donos.length) {
-    h += painel('SEM EQUIPE NO GRID', 'PRE-TEMPORADA ' + S.temporada,
-      '<p class="msg">O grupo esta so com caixa. Compre pelo menos uma equipe no mercado para a temporada comecar.</p>' +
-      '<div class="gap"></div><button class="btn" data-a="nav:mercado">Ir ao mercado ' + ic('seta') + '</button>');
-  } else if (S.fase === 'pre') {
-    const prox = meus().slice().sort((a, b) => a.cat - b.cat)[0];
-    h += '<div class="panel">' + cartaoGP('Abertura da temporada ' + S.temporada, prox.cat, 0, 'janela aberta: compre, venda, invista e contrate antes da largada') +
-      '<div class="bd">' + meus().map(eq => ln(eq.nome, 'meta P' + metaPrevista(eq), '', DIVS[eq.cat] + ' &middot; ' + nCat(eq.cat) + ' equipes &middot; bater a meta paga ' + moeda(bonusMeta(eq, metaPrevista(eq), metaPrevista(eq))) + ' ou mais')).join('') +
-      '<div class="gap"></div><button class="btn" data-a="iniciar">Luzes apagadas: iniciar a temporada ' + ic('seta') + '</button></div></div>';
-  } else {
-    const eqs = meus().slice().sort((a, b) => a.cat - b.cat);
-    const cat = eqs[0].cat, k = S.cal[cat].findIndex(e => !e.res);
-    const outras = ATIVAS.filter(c => temNaCat(c) && c !== cat).map(c => { const e = S.cal[c].filter(x => !x.res)[0]; return e ? DIVS[c] + ': GP de ' + e.pista : ''; }).filter(Boolean);
-    h += '<div class="panel">' + (k >= 0 ? cartaoGP('Proximo GP', cat, k, outras.length ? esc(outras.join(' &middot; ')) : '') : '') +
-      '<div class="bd"><div class="prg" style="margin-top:0"><i style="width:' + pct(S.passo / S.passos) + '"></i></div>' +
-      '<div class="bt3"><button class="btn sm" data-a="correr">Correr</button>' +
-      '<button class="btn sm gh" data-a="avancar:5">+5 etapas</button>' +
-      '<button class="btn sm gh" data-a="pular">Ate o fim</button></div></div></div>';
-  }
-  if (S.donos.length) {
-    if (UI.focoEq === null || UI.focoEq === undefined || !ehMeu(UI.focoEq)) UI.focoEq = meus().slice().sort((a, b) => a.cat - b.cat)[0].id;
-    h += '<div class="gap"></div>' + trocador(listaAtivos(), UI.focoEq, 'focoeq') + painelFoco(S.equipes[UI.focoEq]);
-  }
-  const u = S.fase === 'temp' ? ultimoGP() : null;
-  if (u) h += '<div class="gap"></div>' + blocoUltimoGP(u);
-  h += painelPropostas();
-  if (S.donos.length) {
-    h += sec('classificacao', 'construtores');
-    meus().slice().sort((a, b) => a.cat - b.cat).forEach(eq => {
-      h += '<div class="panel"><div class="faixa" style="background:' + esc(eq.cor) + '"></div>' +
-        '<div class="hd"><span>' + esc(DIVS[eq.cat]) + ' &middot; ' + etapasCorridas(eq.cat) + '/' + CATS[eq.cat].etapas + '</span>' + statusMeta(eq) + '</div>' +
-        torre(eq.cat, 3) + '<div class="bd" style="padding-top:2px">' + botoesEstrategia(eq) + '</div></div><div class="gap"></div>';
-    });
-  }
-  const lista = meus();
-  h += sec('carteira', lista.length + ' equipe' + (lista.length === 1 ? '' : 's'));
-  if (!lista.length) h += painel('', '', vazio('Nenhuma equipe no grupo'), true);
-  else {
-    h += painel('', '', tabela(['Equipe', 'Valor', 'Projeto'], lista.map(eq => {
-      const b = balanco(eq);
-      return '<tr class="cl" data-a="verequipe:' + eq.id + '"><td>' + nomeEq(eq) +
-        '<span class="sub">' + esc(DIVS[eq.cat]) + ' &middot; carro ' + eq.p.carro + '</span></td>' +
-        '<td>' + moeda(b.valor) + '</td><td class="' + (b.resultado >= 0 ? 'ok' : 'neg') + '">' + sinal(b.resultado) + '</td></tr>';
-    })), true);
-    const totalValor = lista.reduce((t, eq) => t + valorMercado(eq).liquido + eq.p.caixa, 0);
-    h += '<div class="gap"></div>' + painel('', '', ln('Valor das equipes + caixa delas', moeda(totalValor)) +
-      ln('Caixa do grupo', moeda(S.f.caixa)) + ln('Divida do grupo', moeda(-S.f.divida), S.f.divida > 0 ? 'neg' : '') +
-      lnTot('Patrimonio liquido', moeda(patrimonio()), 'ok'));
-  }
-  const lim = limiteCredito();
-  h += sec('caixa e credito') +
-    painel('', '', ln('Limite de credito disponivel', moeda(lim), '', 'reputacao ' + Math.round(S.f.reputacao) + ' sobre o patrimonio') +
-      ln('Divida do grupo', moeda(S.f.divida), S.f.divida > 0 ? 'neg' : '') +
-      ln('Juros ao ano', '11%', '', S.f.divida > 0 ? 'custa ' + moeda(S.f.divida * JUROS) + ' por temporada' : '') +
-      '<div class="gap"></div><div class="bt2">' +
-      '<button class="btn gh" data-a="emprestimo" ' + (lim < 1e5 ? 'disabled' : '') + '>Tomar credito</button>' +
-      '<button class="btn sec2" data-a="quitarfundo" ' + (S.f.divida <= 0 || S.f.caixa <= 0 ? 'disabled' : '') + '>Abater divida</button></div>');
-  h += painelRegulamento();
-  const nts = S.noticias.slice(0, 8);
-  h += sec('radar do paddock', 'ultimas noticias') +
-    painel('', '', nts.length ? nts.map(n => '<div class="nt"><i class="' + n.tipo + '"></i><span><em>T' + n.temp + '</em>' + esc(n.t) + '</span></div>').join('') : vazio('Sem noticias'), true);
-  return h + '</div>';
-}
 
 /* ---------------- tela: equipes ---------------- */
 function telaEquipes() {
@@ -2271,47 +2199,6 @@ function faixaResultados(eq) {
     if (best === null) return '<span class="ab">AB</span>';
     return '<span class="' + (best <= 3 ? 'pd' : best <= 10 ? 'pt' : '') + '">' + best + '</span>';
   }).join('') + '</div>';
-}
-function painelEquipe(eq) {
-  const cat = eq.cat, v = valorMercado(eq);
-  let h = painel('ESTRATEGIA DE CORRIDA', ESTRATEGIAS[eq.p.estrategia || 'equilibrada'].n.toUpperCase(), botoesEstrategia(eq)) + '<div class="gap"></div>' +
-    painel('CAMPANHA', DIVS[cat],
-    ln('Meta da temporada', 'P' + metaDa(eq), '', 'bater a meta paga ' + moeda(bonusMeta(eq, metaDa(eq), metaDa(eq))) + ' ou mais e sobe a marca; ficar 3 posicoes abaixo derruba a marca') +
-    ln('Posicao no construtores', eq.st.c ? posDaEquipe(eq) + 'o de ' + nCat(cat) : 'temporada nao comecou', '', eq.ult ? 'temporada passada: ' + eq.ult + 'o' : '') +
-    ln('Pontos', String(eq.st.pts), '', etapasCorridas(cat) + ' de ' + CATS[cat].etapas + ' etapas') +
-    ln('Vitorias e podios', eq.st.v + ' V &middot; ' + eq.st.pod + ' P') +
-    ln('Abandonos', String(eq.st.ab), eq.st.ab ? 'neg' : '') +
-    faixaResultados(eq) +
-    '<div class="ex mono mut" style="font-size:9.5px;margin-top:7px">melhor carro da equipe em cada etapa</div>');
-  const ref = x => mediaCat(cat, x);
-  h += sec('classificacao', DIVS[cat]) + '<div class="panel">' + torre(cat, 5) + '</div>';
-  h += corridaACorrida(eq);
-  h += sec('indicadores', 'traco = media da categoria') +
-    painel('', '', [
-      mtr('Carro', eq.p.carro, ref(e => e.p.carro), 'Desempenho atual. Pesa 70% no ritmo de corrida'),
-      mtr('Confiabilidade', eq.p.confiab, ref(e => e.p.confiab), 'Chance de abandono por carro: ' + (chanceAbandono(eq) * 100).toFixed(1).replace('.', ',') + '% por corrida', eq.p.confiab < 60 ? 'neg' : ''),
-      mtr('Pilotos', nivelPilotos(eq), ref(nivelPilotos), 'Media dos dois titulares. Pesa 30% no ritmo'),
-      mtr('Simulador', eq.p.simulador, ref(e => e.p.simulador), 'Reduz a variacao de resultado de corrida para corrida', 'gd'),
-      mtr('Tunel de vento', eq.p.tunel, ref(e => e.p.tunel), 'Tunel e CFD: seguram o carro de uma temporada para a outra', 'gd'),
-      mtr('Fabrica', eq.p.fabrica, ref(e => e.p.fabrica), 'Produz pecas, melhora a confiabilidade e, acima de 60, vende tecnologia', 'gd'),
-      mtr('Marca', eq.p.marca, ref(e => e.p.marca), num(eq.p.fas) + ' fas. Puxa o patrocinio'),
-      mtr('Gestao', eq.p.gestao, ref(e => e.p.gestao), 'Corta ' + pct(1 - fatorGestao(eq.p) / 1.22) + ' do desperdicio em equipe e operacao', 'gd'),
-      mtr('Academia de pilotos', eq.p.academia, ref(e => e.p.academia), 'Revela e vende pilotos', 'gd')
-    ].join(''), true);
-  if (eq.cat === 0) h += '<div class="gap"></div>' + painel('', '', ln('Acordo de motor', MOTOR[eq.p.motor].n, '', MOTOR[eq.p.motor].d + '. Carro ate ' + tetoCarro(eq)) +
-    ln('Diretor tecnico', TECNICOS[eq.p.tecnico || 0].n));
-  h += obrasEquipe(eq);
-  h += sec('valor de mercado', 'conta aberta') +
-    painel('', '', ln('Valor da vaga na ' + DIVS[cat], moeda(v.vaga), '', 'uma vaga vale muito mesmo com equipe ruim') +
-      ln('Desempenho', 'x ' + v.fDesemp.toFixed(2), v.fDesemp < 1 ? 'neg' : 'ok', 'carro e posicao recente') +
-      ln('Marca e fas', 'x ' + v.fMarca.toFixed(2)) +
-      ln('Infraestrutura', 'x ' + v.fInfra.toFixed(2), '', 'tunel, fabrica e simulador') +
-      ln('Saude financeira', 'x ' + v.fSaude.toFixed(2), v.fSaude < 1 ? 'neg' : 'ok') +
-      ln('Momento', 'x ' + v.fMom.toFixed(2), v.fMom < 1 ? 'neg' : 'ok', 'titulos e podios recentes') +
-      ln('Ciclo de mercado', 'x ' + v.mCiclo.toFixed(2), v.mCiclo < 1 ? 'neg' : 'ok', FASES[S.ciclo.fase].n) +
-      ln('Divida da equipe', '- ' + moeda(v.divida), v.divida > 0 ? 'neg' : '') +
-      lnTot('Valor do ativo', moeda(v.liquido), 'ok'));
-  return h;
 }
 function pilotosEquipe(eq) {
   const pre = S.fase === 'pre';
@@ -2402,6 +2289,9 @@ function financasEquipe(eq) {
   return h;
 }
 function investirEquipe(eq) {
+  return indicadoresEquipe(eq) + investirAcoes(eq);
+}
+function investirAcoes(eq) {
   const p = eq.p;
   if (S.fase !== 'pre') {
     return painel('JANELA FECHADA', '', '<p class="msg">A temporada esta rolando. <b>Investimento so na pre-temporada</b>, quando voce monta o orcamento do ano.</p>') + painelTeto(eq) + obrasEquipe(eq);
@@ -2467,7 +2357,7 @@ function balancoEquipe(eq) {
     ln('Carro', p.compra.carro + ' para ' + p.carro, p.carro >= p.compra.carro ? 'ok' : 'neg') +
     ln('Valor de mercado', moeda(p.compra.valor) + ' para ' + moeda(vm.liquido), vm.liquido >= p.compra.valor ? 'ok' : 'neg') +
     ln('Temporadas no fundo', String(Math.max(0, S.temporada - p.compra.temp))));
-  h += graficosEquipe(eq);
+  h += valorEquipe(eq) + graficosEquipe(eq);
   h += '<div class="gap"></div><button class="btn warn" data-a="vender" ' + (S.fase !== 'pre' ? 'disabled' : '') + '>Vender a equipe</button>' +
     (S.fase !== 'pre' ? '<p class="msg" style="margin-top:8px">Venda so na pre-temporada.</p>' :
       S.donos.length <= 1 ? '<p class="msg" style="margin-top:8px">E sua unica equipe. Depois de vender, a temporada so comeca quando voce comprar outra.</p>' : '');
@@ -2696,6 +2586,7 @@ function telaCamp() {
     h += '<div class="panel"><div class="hd"><span>' + esc(DIVS[cat]) + ' &middot; construtores</span><b>' + nCat(cat) + ' EQUIPES</b></div>' + torre(cat) + '</div>' +
       '<div class="gap"></div>' + painel('', '', ln('Etapas disputadas', etapasCorridas(cat) + ' de ' + CATS[cat].etapas) +
         ln('Pontuacao', '25-18-15-12-10-8-6-4-2-1', '', 'dez primeiros de cada corrida'));
+    if (cat === 0) h += painelRegulamento();
   }
   return h + '</div>';
 }
@@ -2970,37 +2861,6 @@ function chipsForma(eq) {
   return '<div class="forma">' + f.map(x => '<div><b class="' + (x.best === null ? 'ab' : x.best <= 3 ? 'pd' : x.pts ? 'pt' : '') + '">' + (x.best === null ? 'AB' : 'P' + x.best) + '</b>' +
     '<span>' + esc(x.p) + ' &middot; +' + x.pts + '</span></div>').join('') + '</div>';
 }
-/* o painel principal do paddock: tudo sobre a equipe em foco */
-function painelFoco(eq) {
-  const cat = eq.cat, corridas = etapasCorridas(cat);
-  let h = '<div class="panel foco"><div class="faixa" style="background:' + esc(eq.cor) + '"></div>' +
-    '<div class="hd"><span>Minha equipe &middot; ' + esc(DIVS[cat]) + '</span>' + statusMeta(eq) + '</div>' +
-    '<div class="bd" style="padding:10px 11px 0"><div class="tt-eq">' + esc(eq.nome) + '</div>' +
-    '<div class="ex mono mut" style="font-size:10px;margin-top:4px">' + eq.p.pil.map(id => esc(S.pilotos[id].nome) + ' (' + S.pilotos[id].nivel + ')').join(' &middot; ') +
-    ' &middot; carro ' + eq.p.carro + '</div></div>';
-  if (!corridas) {
-    return h + '<div class="bd">' + ln('Meta da temporada', 'P' + metaDa(eq), '', 'previsao pela forca de carro e pilotos') +
-      ln('Temporada passada', eq.ult ? 'P' + eq.ult : 'estreia') + '</div></div>';
-  }
-  const tb = tabelaCat(cat), i = tb.indexOf(eq), lider = tb[0];
-  const media = eq.st.pts / corridas, frente = i > 0 ? tb[i - 1] : null, atras = tb[i + 1] || null;
-  const hist = historicoCat(cat), posH = hist.pos[eq.id];
-  const tend = posH.length > 1 ? posH[Math.max(0, posH.length - 4)] - posH[posH.length - 1] : 0;
-  h += '<div class="stats" style="border-top:1px solid var(--line);margin-top:10px">' +
-    celula('Posicao', 'P' + (i + 1), tend > 0 ? 'subiu ' + tend : tend < 0 ? 'caiu ' + (-tend) : 'estavel', tend > 0 ? 'ok' : tend < 0 ? 'neg' : '') +
-    celula('Pontos', String(eq.st.pts), corridas + ' corrida' + (corridas === 1 ? '' : 's')) +
-    celula('Lider', i === 0 ? 'voce' : '-' + (lider.st.pts - eq.st.pts), i === 0 ? 'na ponta' : esc(lider.ab), i === 0 ? 'ok' : '') +
-    celula('Media', media.toFixed(1).replace('.', ','), 'pts por corrida') + '</div>' +
-    '<div class="bd">' +
-    '<div class="mono mut" style="font-size:8.5px;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:6px">Forma - ultimas corridas</div>' + chipsForma(eq) +
-    '<div class="gap"></div>' +
-    (frente ? ln('A frente: ' + frente.nome, (frente.st.pts - eq.st.pts) + ' pts', 'neg', 'P' + i + ' - faltam ' + (frente.st.pts - eq.st.pts + 1) + ' pontos para passar') : ln('Ninguem a frente', 'lider', 'ok')) +
-    (atras ? ln('Atras: ' + atras.nome, '+' + (eq.st.pts - atras.st.pts) + ' pts', eq.st.pts - atras.st.pts <= 10 ? 'gd' : 'ok', 'P' + (i + 2)) : ln('Ninguem atras', 'lanterna', 'neg')) +
-    '</div>' +
-    '<div class="mono mut" style="font-size:8.5px;letter-spacing:1.3px;text-transform:uppercase;padding:0 11px">Pontos acumulados</div>' +
-    graficoPontos(eq, hist) + '<div style="height:10px"></div></div>';
-  return h;
-}
 /* aba corrida da equipe: corrida a corrida, posicao no campeonato e duelo interno */
 function corridaACorrida(eq) {
   const cat = eq.cat, hist = historicoCat(cat);
@@ -3023,9 +2883,7 @@ function corridaACorrida(eq) {
     if (pa < pb) duelo[0]++; else if (pb < pa) duelo[1]++;
   });
   const rot = hist.ks.map(k => siglaPista(S.cal[cat][k].pista));
-  return sec('posicao no campeonato', 'depois de cada corrida') +
-    painel('', '', '<div class="pw">' + svgMulti([{ cor: COR_MINHA, v: hist.pos[eq.id], eu: true }], rot, v => 'P' + Math.round(v), true) + '</div>', true) +
-    sec('corrida a corrida', hist.ks.length + ' de ' + CATS[cat].etapas) +
+  return sec('corrida a corrida', hist.ks.length + ' de ' + CATS[cat].etapas) +
     painel('', '', tabela(['GP', siglaPiloto(pls[0]), siglaPiloto(pls[1]), 'Pts', 'Camp'], linhas), true) +
     sec('duelo interno', 'quem chegou na frente') +
     painel('', '', ln(pls[0].nome, duelo[0] + ' x ' + duelo[1], duelo[0] >= duelo[1] ? 'ok' : '', pls[0].st.pts + ' pts no campeonato de pilotos') +
@@ -3052,9 +2910,112 @@ function evolucaoCat(cat) {
   return h;
 }
 
+function painelEquipe(eq) {
+  const cat = eq.cat, meta = metaDa(eq);
+  let h = painel('ESTRATEGIA DE CORRIDA', 'META P' + meta, botoesEstrategia(eq) +
+    '<div class="ex mono mut" style="font-size:9.5px;margin-top:8px">Bater a meta paga ' + moeda(bonusMeta(eq, meta, meta)) + ' ou mais dos patrocinadores. Ficar 3 posicoes abaixo derruba a marca.</div>');
+  if (!etapasCorridas(cat)) return h + '<div class="gap"></div>' + painel('', '', vazio('A temporada ainda nao comecou'), true);
+  const hist = historicoCat(cat);
+  h += sec('pontos acumulados', 'contra lider, rival e meta') + painel('', '', graficoPontos(eq, hist) + '<div style="height:8px"></div>', true);
+  return h + corridaACorrida(eq);
+}
+function indicadoresEquipe(eq) {
+  const cat = eq.cat, ref = x => mediaCat(cat, x);
+  return sec('como esta a equipe', 'traco = media da categoria') +
+    painel('', '', [
+      mtr('Carro', eq.p.carro, ref(e => e.p.carro), 'Pesa 70% no ritmo de corrida'),
+      mtr('Confiabilidade', eq.p.confiab, ref(e => e.p.confiab), 'Abandono por carro: ' + (chanceAbandono(eq) * 100).toFixed(1).replace('.', ',') + '% por corrida', eq.p.confiab < 60 ? 'neg' : ''),
+      mtr('Pilotos', nivelPilotos(eq), ref(nivelPilotos), 'Pesa 30% no ritmo'),
+      mtr('Infraestrutura', (eq.p.tunel + eq.p.fabrica + eq.p.simulador) / 3, ref(e => (e.p.tunel + e.p.fabrica + e.p.simulador) / 3),
+        'Tunel ' + eq.p.tunel + ' &middot; fabrica ' + eq.p.fabrica + ' &middot; simulador ' + eq.p.simulador, 'gd'),
+      mtr('Marca', eq.p.marca, ref(e => e.p.marca), num(eq.p.fas) + ' fas. Puxa o patrocinio'),
+      mtr('Gestao e academia', (eq.p.gestao + eq.p.academia) / 2, ref(e => (e.p.gestao + e.p.academia) / 2), 'Gestao ' + eq.p.gestao + ' &middot; academia ' + eq.p.academia, 'gd')
+    ].join(''), true);
+}
+function valorEquipe(eq) {
+  const v = valorMercado(eq), cat = eq.cat;
+  return sec('valor de mercado', 'conta aberta') +
+    painel('', '', ln('Valor da vaga na ' + DIVS[cat], moeda(v.vaga), '', 'uma vaga vale muito mesmo com equipe ruim') +
+      ln('Desempenho', 'x ' + v.fDesemp.toFixed(2), v.fDesemp < 1 ? 'neg' : 'ok', 'carro e posicao recente') +
+      ln('Marca e fas', 'x ' + v.fMarca.toFixed(2)) +
+      ln('Infraestrutura', 'x ' + v.fInfra.toFixed(2)) +
+      ln('Saude financeira', 'x ' + v.fSaude.toFixed(2), v.fSaude < 1 ? 'neg' : 'ok') +
+      ln('Momento e ciclo', 'x ' + (v.fMom * v.mCiclo).toFixed(2), v.fMom * v.mCiclo < 1 ? 'neg' : 'ok', 'resultados recentes e ' + FASES[S.ciclo.fase].n.toLowerCase()) +
+      ln('Divida da equipe', '- ' + moeda(v.divida), v.divida > 0 ? 'neg' : '') +
+      lnTot('Valor do ativo', moeda(v.liquido), 'ok'));
+}
+/* o painel do paddock: so o que importa para acompanhar a temporada */
+function painelFoco(eq) {
+  const cat = eq.cat, corridas = etapasCorridas(cat);
+  let h = '<div class="panel foco"><div class="faixa" style="background:' + esc(eq.cor) + '"></div>' +
+    '<div class="hd"><span>' + esc(eq.nome) + '</span>' + statusMeta(eq) + '</div>';
+  if (corridas) {
+    const tb = tabelaCat(cat), i = tb.indexOf(eq), lider = tb[0], frente = i > 0 ? tb[i - 1] : null, atras = tb[i + 1] || null;
+    h += '<div class="stats">' +
+      celula('Posicao', 'P' + (i + 1)) + celula('Pontos', String(eq.st.pts)) +
+      celula('Lider', i === 0 ? 'voce' : '-' + (lider.st.pts - eq.st.pts), '', i === 0 ? 'ok' : '') +
+      celula('Podios', String(eq.st.pod), eq.st.v ? eq.st.v + ' vitoria' + (eq.st.v === 1 ? '' : 's') : '') + '</div>' +
+      '<div class="bd">' + chipsForma(eq) +
+      '<div class="riv"><span>' + (frente ? 'A frente: <b>' + esc(frente.ab) + '</b> <i class="neg">' + (frente.st.pts - eq.st.pts) + ' pts</i>' : '<b class="ok">Lider</b>') + '</span>' +
+      '<span>' + (atras ? 'Atras: <b>' + esc(atras.ab) + '</b> <i class="' + (eq.st.pts - atras.st.pts <= 10 ? 'gd' : 'ok') + '">+' + (eq.st.pts - atras.st.pts) + ' pts</i>' : '<b class="neg">Lanterna</b>') + '</span></div>' +
+      botoesEstrategia(eq) + '</div>';
+  } else {
+    h += '<div class="bd">' + ln('Meta da temporada', 'P' + metaDa(eq), '', 'previsao pela forca de carro e pilotos') +
+      ln('Temporada passada', eq.ult ? 'P' + eq.ult : 'estreia') + botoesEstrategia(eq) + '</div>';
+  }
+  return h + '<button class="btn sec2 sm" style="border-radius:0;border-width:1px 0 0" data-a="verequipe:' + eq.id + '">Ver a temporada completa ' + ic('seta') + '</button></div>';
+}
+function telaFundo() {
+  let h = '<div class="wrap">';
+  const maisBarata = S.equipes.filter(e => !ehMeu(e.id) && acessoCat(e.cat)).reduce((m, e) => Math.min(m, precoAlvo(e)), Infinity);
+  if (S.fase === 'pre' && !S.donos.length && maisBarata > S.f.caixa + limiteCredito()) {
+    return h + painel('FUNDO QUEBRADO', 'PRE-TEMPORADA ' + S.temporada,
+      '<p class="msg">O grupo esta sem equipes e sem caixa nem credito para comprar a mais barata do mercado (' + moeda(maisBarata) + '). ' +
+      'Encerre e comece outra carreira.</p><div class="gap"></div><button class="btn dgr" data-a="apagar">Encerrar a carreira</button>') + '</div>';
+  }
+  if (S.fase === 'pre' && !S.donos.length) {
+    return h + painel('SEM EQUIPE NO GRID', 'PRE-TEMPORADA ' + S.temporada,
+      '<p class="msg">Compre pelo menos uma equipe no mercado para a temporada comecar.</p>' +
+      '<div class="gap"></div><button class="btn" data-a="nav:mercado">Ir ao mercado ' + ic('seta') + '</button>') + painelPropostas() + '</div>';
+  }
+  const prox = meus().slice().sort((a, b) => a.cat - b.cat)[0];
+  if (S.fase === 'pre') {
+    h += '<div class="panel">' + cartaoGP('Temporada ' + S.temporada, prox.cat, 0, 'janela aberta: compre, venda, invista e contrate antes da largada') +
+      '<div class="bd"><button class="btn" data-a="iniciar">Luzes apagadas: largar ' + ic('seta') + '</button></div></div>';
+  } else {
+    const k = S.cal[prox.cat].findIndex(e => !e.res);
+    h += '<div class="panel">' + (k >= 0 ? cartaoGP('Proximo GP', prox.cat, k) : '') +
+      '<div class="bd"><div class="bt3"><button class="btn sm" data-a="correr">Correr</button>' +
+      '<button class="btn sm gh" data-a="avancar:5">+5 etapas</button>' +
+      '<button class="btn sm gh" data-a="pular">Ate o fim</button></div></div></div>';
+  }
+  if (UI.focoEq === null || UI.focoEq === undefined || !ehMeu(UI.focoEq)) UI.focoEq = prox.id;
+  h += '<div class="gap"></div>' + trocador(listaAtivos(), UI.focoEq, 'focoeq') + painelFoco(S.equipes[UI.focoEq]);
+  h += painelPropostas();
+  const nts = S.noticias.slice(0, 3);
+  h += sec('radar do paddock') +
+    painel('', '', (nts.length ? nts.map(n => '<div class="nt"><i class="' + n.tipo + '"></i><span>' + esc(n.t) + '</span></div>').join('') : vazio('Sem noticias')) +
+      '<button class="btn sec2 sm" style="border-radius:0;border-width:1px 0 0" data-a="verrel:eventos">Todas as noticias</button>', true);
+  return h + '</div>';
+}
+/* caixa, credito e carteira consolidada: agora em relatorios */
+function painelGrupo() {
+  const lista = meus(), lim = limiteCredito();
+  const totalValor = lista.reduce((t, eq) => t + valorMercado(eq).liquido + eq.p.caixa, 0);
+  return sec('caixa e credito') + painel('', '',
+    ln('Valor das equipes + caixa delas', moeda(totalValor)) +
+    ln('Caixa do grupo', moeda(S.f.caixa)) +
+    ln('Divida do grupo', moeda(S.f.divida), S.f.divida > 0 ? 'neg' : '', S.f.divida > 0 ? 'juros de 11%: ' + moeda(S.f.divida * JUROS) + ' por temporada' : '') +
+    ln('Credito disponivel', moeda(lim), '', 'reputacao ' + Math.round(S.f.reputacao) + ' sobre o patrimonio') +
+    lnTot('Patrimonio liquido', moeda(patrimonio()), 'ok') +
+    '<div class="gap"></div><div class="bt2">' +
+    '<button class="btn gh" data-a="emprestimo" ' + (lim < 1e5 ? 'disabled' : '') + '>Tomar credito</button>' +
+    '<button class="btn sec2" data-a="quitarfundo" ' + (S.f.divida <= 0 || S.f.caixa <= 0 ? 'disabled' : '') + '>Abater divida</button></div>');
+}
+
 /* ---------------- tela: relatorios ---------------- */
 function telaRel() {
-  const abas = [['fundo', 'Fundo'], ['carteira', 'Carteira'], ['palmares', 'Palmares'], ['eventos', 'Eventos']];
+  const abas = [['fundo', 'Grupo'], ['carteira', 'Carteira'], ['palmares', 'Palmares'], ['eventos', 'Noticias']];
   if (!abas.some(x => x[0] === UI.abaRel)) UI.abaRel = 'fundo';
   let h = '<div class="wrap">' + seg(UI.abaRel, abas, 'abarel');
   if (UI.abaRel === 'eventos') h += relEventos();
@@ -3075,6 +3036,7 @@ function relFundo() {
     celula('Retorno total', (retorno >= 0 ? '+' : '') + Math.round(retorno * 100) + '%', varTxt(pat - inicial), retorno >= 0 ? 'ok' : 'neg') +
     celula('Por temporada', taxa(cagr), 'media composta', cagr >= 0 ? 'ok' : 'neg') +
     '</div></div>';
+  h += painelGrupo();
   if (!hist.length) return h + '<div class="gap"></div>' + painel('', '', vazio('Os graficos aparecem no fim da primeira temporada'), true);
   h += graficosFundo();
   h += sec('serie historica') +
@@ -3328,6 +3290,7 @@ document.addEventListener('click', e => {
     case 'verequipe': UI.equipe = Number(p1); TELA = 'equipes'; render(); break;
     case 'abaequipe': UI.abaEquipe = p1; UI.trocaSai = null; render(); break;
     case 'focoeq': UI.focoEq = Number(p1); render(); break;
+    case 'verrel': TELA = 'rel'; UI.abaRel = p1; render(); break;
     case 'trocapil': UI.trocaSai = UI.trocaSai === Number(p1) ? null : Number(p1); render(); break;
     case 'contratar': {
       const eq = eqSel(), pl = S.pilotos[Number(p1)], sai = S.pilotos[UI.trocaSai], c = custoContratacao(pl, eq);
