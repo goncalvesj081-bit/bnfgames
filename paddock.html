@@ -314,6 +314,8 @@ h1,h2,h3{font-weight:900;font-style:italic;letter-spacing:0}
 .riv b{color:var(--txt);font-family:var(--disp);font-weight:900}
 .riv i{font-style:normal;font-family:var(--data);font-size:12px;margin-left:3px}
 .foco>.btn,.panel>.bd.tight>.btn{width:100%}
+.estrela{font-size:24px;line-height:1;color:var(--muted2);padding:2px 4px;flex:none}
+.estrela.on{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -583,6 +585,7 @@ function correr(cat, etapa) {
     const m = S.f && S.f.marcos;
     if (m && r.pos && r.pos <= 3) m.podios++;
     if (m && r.pos === 1 && cat === 0) m.vitoriasF1++;
+    if (r.eq !== S.principal) return;
     if (r.pos === 1) noticia(pl.nome + ' venceu o GP de ' + etapa.pista + ' (' + DIVS[cat] + ') pela ' + eq.nome + '.', 'v');
     else if (r.pos && r.pos <= 3) noticia(pl.nome + ' fez podio no GP de ' + etapa.pista + ' (' + DIVS[cat] + '): ' + r.pos + 'o lugar.', 'v');
   });
@@ -1689,7 +1692,8 @@ function avancar(n) {
 /* avanca ate a proxima corrida de uma equipe do fundo */
 function correrProxima() {
   if (S.fase !== 'temp') return;
-  do { simularPasso(); } while (S.passo < S.passos && !(S.ultimos || []).some(u => temNaCat(u.cat)));
+  const cat = principal() ? principal().cat : null;
+  do { simularPasso(); } while (S.passo < S.passos && !(S.ultimos || []).some(u => u.cat === cat));
   if (S.passo >= S.passos) encerrarTemporada();
   salvar();
 }
@@ -1698,6 +1702,7 @@ function encerrarTemporada() {
   completarTemporada();
   const rel = { temporada: S.temporada, equipes: [], campeoes: [] };
   const patAntes = patrimonio(), caixaAntes = S.f.caixa, repAntes = S.f.reputacao;
+  rel.principal = principal() ? principal().id : null;
   rel.classif = {};
   ATIVAS.forEach(cat => {
     if (!temNaCat(cat)) return;
@@ -2059,7 +2064,8 @@ function blocoUltimoGP(u) {
     podioCorrida(et) + '<div style="border-top:1px solid var(--line)">' + meusNaCorrida(et) + '</div></div>';
 }
 function modalResultado() {
-  const l = (S.ultimos || []).filter(u => temNaCat(u.cat)).sort((a, b) => a.cat - b.cat);
+  const pr = principal();
+  const l = (S.ultimos || []).filter(u => pr && u.cat === pr.cat);
   if (!l.length) return;
   abrirModal(l.map(u => {
     const et = S.cal[u.cat][u.k];
@@ -2079,10 +2085,16 @@ function statusMeta(eq) {
   const pos = posDaEquipe(eq);
   return pos <= meta ? tag('P' + pos + ' - na meta', 'v') : pos >= meta + 3 ? tag('P' + pos + ' - longe da meta', 'r') : tag('P' + pos + ' - perto da meta', 'a');
 }
+/* a equipe que o jogador acompanha corrida a corrida; as outras aparecem no fechamento */
+function principal() {
+  if (!S.donos.length) return null;
+  if (S.principal === undefined || S.principal === null || !ehMeu(S.principal))
+    S.principal = meus().slice().sort((a, b) => a.cat - b.cat || (a.ult || 99) - (b.ult || 99))[0].id;
+  return S.equipes[S.principal];
+}
 function campanhaPrincipal() {
-  const eqs = meus().slice().sort((a, b) => a.cat - b.cat);
-  if (!eqs.length) return null;
-  const eq = eqs[0];
+  const eq = principal();
+  if (!eq) return null;
   if (S.fase === 'relatorio') {
     const l = S.relatorio.equipes.filter(x => x.id === eq.id)[0];
     if (l) return { eq: eq, txt: 'P' + l.pos + ' &middot; ' + l.st.pts + ' pts', sub: esc(eq.ab) + ' &middot; ' + (l.pos <= l.meta ? 'meta P' + l.meta + ' batida' : 'meta era P' + l.meta) };
@@ -2177,8 +2189,11 @@ function telaEquipes() {
   if (UI.equipe === null || !ehMeu(UI.equipe)) UI.equipe = lista[0].id;
   const eq = S.equipes[UI.equipe], v = valorMercado(eq);
   let h = '<div class="wrap">' + trocador(listaAtivos(), UI.equipe, 'verequipe');
+  const ehPrincipal = principal() === eq;
   h += '<div class="panel"><div class="faixa" style="background:' + esc(eq.cor) + '"></div><div class="hd"><span>' + esc(DIVS[eq.cat]) + ' &middot; desde a temp ' + eq.p.compra.temp + '</span>' + statusMeta(eq) + '</div>' +
-    '<div class="bd" style="padding:10px 11px 0"><div class="tt-eq">' + esc(eq.nome) + '</div></div>' +
+    '<div class="bd" style="padding:10px 11px 0;display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="tt-eq">' + esc(eq.nome) + '</div>' +
+    (ehPrincipal ? '<span class="estrela on" title="Equipe principal">&#9733;</span>' : '<button class="estrela" data-a="principal:' + eq.id + '" title="Acompanhar esta equipe">&#9734;</button>') + '</div>' +
+    (S.donos.length > 1 ? '<div class="ex mono mut" style="font-size:9.5px;padding:3px 11px 0">' + (ehPrincipal ? 'Equipe principal: voce acompanha esta corrida a corrida' : 'Toque na estrela para acompanhar esta equipe corrida a corrida') + '</div>' : '') +
     '<div class="stats" style="border-top:1px solid var(--line);margin-top:10px">' +
     '<div><span>Posicao</span><b>' + (eq.st.c ? 'P' + posDaEquipe(eq) : '-') + '</b></div>' +
     '<div><span>Pontos</span><b>' + eq.st.pts + '</b></div>' +
@@ -2978,7 +2993,7 @@ function telaFundo() {
       '<p class="msg">Compre pelo menos uma equipe no mercado para a temporada comecar.</p>' +
       '<div class="gap"></div><button class="btn" data-a="nav:mercado">Ir ao mercado ' + ic('seta') + '</button>') + painelPropostas() + '</div>';
   }
-  const prox = meus().slice().sort((a, b) => a.cat - b.cat)[0];
+  const prox = principal();
   if (S.fase === 'pre') {
     h += '<div class="panel">' + cartaoGP('Temporada ' + S.temporada, prox.cat, 0, 'janela aberta: compre, venda, invista e contrate antes da largada') +
       '<div class="bd"><button class="btn" data-a="iniciar">Luzes apagadas: largar ' + ic('seta') + '</button></div></div>';
@@ -2989,8 +3004,9 @@ function telaFundo() {
       '<button class="btn sm gh" data-a="avancar:5">+5 etapas</button>' +
       '<button class="btn sm gh" data-a="pular">Ate o fim</button></div></div></div>';
   }
-  if (UI.focoEq === null || UI.focoEq === undefined || !ehMeu(UI.focoEq)) UI.focoEq = prox.id;
-  h += '<div class="gap"></div>' + trocador(listaAtivos(), UI.focoEq, 'focoeq') + painelFoco(S.equipes[UI.focoEq]);
+  h += '<div class="gap"></div>' + painelFoco(prox);
+  if (S.donos.length > 1) h += '<p class="msg" style="margin:9px 2px 0">+' + (S.donos.length - 1) + ' equipe' + (S.donos.length > 2 ? 's' : '') +
+    ' na carteira correndo em paralelo. O resultado aparece no fechamento da temporada. Para trocar a equipe que voce acompanha, use a estrela na tela da equipe.</p>';
   h += painelPropostas();
   const nts = S.noticias.slice(0, 3);
   h += sec('radar do paddock') +
@@ -3084,6 +3100,32 @@ function relEventos() {
 }
 
 /* ---------------- fechamento de temporada ---------------- */
+function anoDaEquipe(x) {
+  const dv = x.valorDepois - x.valorAntes, dc = Math.round((x.carroDepois - x.carroAntes) * 10) / 10;
+  let conta;
+  if (x.saldo >= 0) conta = 'Arrecadou ' + moeda(x.rec.total) + ' e gastou ' + moeda(x.des.total) + '. A sobra de ' + moeda(x.saldo) + ' entrou no caixa da equipe.';
+  else if (x.calote) conta = 'Arrecadou ' + moeda(x.rec.total) + ' e gastou ' + moeda(x.des.total) + '. Faltou dinheiro: ' + moeda(x.calote) + ' viraram divida da equipe.';
+  else conta = 'Arrecadou ' + moeda(x.rec.total) + ' e gastou ' + moeda(x.des.total) + '. O grupo cobriu o rombo de ' + moeda(-x.saldo) + '.';
+  return '<div style="background:var(--bg2);border-bottom:1px solid var(--line)"><div class="stats c3">' +
+    celula('Abandonos', String(x.st.ab), '', x.st.ab ? 'neg' : '') +
+    celula('Carro', String(x.carroDepois), dc === 0 ? 'sem mudanca' : (dc > 0 ? '+' + dc : String(dc)) + ' no ano', dc > 0 ? 'ok' : dc < 0 ? 'neg' : '') +
+    celula('Valor', moeda(x.valorDepois), varTxt(dv), Math.abs(dv) < 1e4 ? '' : dv > 0 ? 'ok' : 'neg') +
+    '</div><div class="bd"><p class="msg">' + esc(conta) + (x.gastoAlav ? ' Em alavancas foram ' + esc(moeda(x.gastoAlav)) + '.' : '') + '</p>' +
+    (x.teto ? '<div class="gap"></div>' + ln('Teto de gastos', pct(x.teto.ratio), x.teto.ratio > 1 ? 'neg' : 'ok', moeda(x.teto.gasto) + ' de ' + moeda(TETO)) +
+      (x.teto.multa ? ln('Punicao do teto', moeda(x.teto.multa) + (x.teto.pontos ? ' e -' + x.teto.pontos + ' pts' : ''), 'neg', 'e menos tempo de tunel na proxima') : '') : '') +
+    '<div class="gap"></div>' +
+    ln('Premiacao', moeda(x.rec.premiacao), 'ok', x.pos + 'o lugar') + ln('Patrocinio', moeda(x.rec.patrocinio), 'ok') +
+    (x.rec.bonusMeta ? ln('Bonus da meta', moeda(x.rec.bonusMeta), 'ok') : '') +
+    (x.rec.pagantes ? ln('Pilotos pagantes', moeda(x.rec.pagantes), 'ok') : '') +
+    ln('Academia e tecnologia', moeda(x.rec.academia + x.rec.tecnologia), 'ok') +
+    lnTot('Receita', moeda(x.rec.total), 'ok') + '<div class="gap"></div>' +
+    (x.des.salarios ? ln('Salario dos pilotos', moeda(x.des.salarios), 'neg') : '') +
+    ln('Equipe e operacao', moeda(x.des.equipe + x.des.operacao), 'neg') +
+    ln('Desenvolvimento e fabrica', moeda(x.des.desenvolvimento + x.des.infra), 'neg') +
+    (x.des.motor ? ln('Motor', moeda(x.des.motor), 'neg') : '') + (x.des.diretor ? ln('Diretor tecnico', moeda(x.des.diretor), 'neg') : '') +
+    (x.des.juros ? ln('Juros', moeda(x.des.juros), 'neg') : '') +
+    lnTot('Despesa', moeda(x.des.total), 'neg') + '</div></div>';
+}
 function telaRelatorio() {
   const r = S.relatorio, f = r.fundo;
   const dPat = f.patrimonio - f.patrimonioAntes;
@@ -3100,49 +3142,24 @@ function telaRelatorio() {
     '<div class="num ' + (dPat >= 0 ? 'ok' : 'neg') + '" style="font-size:26px;font-weight:600;line-height:1">' + sinal(dPat) + '</div>' +
     '<div class="cap" style="font-family:var(--data);font-size:8.5px;letter-spacing:1.6px;color:var(--muted2);margin-top:4px">VARIACAO DO PATRIMONIO</div>' +
     '<p class="msg" style="margin-top:10px">' + esc(manchete) + '</p></div></div>';
-  Object.keys(r.classif || {}).forEach(cat => {
-    const cl = r.classif[cat], top = cl.filter(x => x.pos <= 3);
-    h += sec('construtores ' + DIVS[cat], 'classificacao final') + '<div class="panel">' +
+  const prL = r.equipes.filter(x => x.id === r.principal)[0] || r.equipes[0];
+  if (prL && r.classif && r.classif[prL.catId]) {
+    const cl = r.classif[prL.catId], top = cl.filter(x => x.pos <= 3);
+    h += sec('construtores ' + prL.cat, 'classificacao final') + '<div class="panel">' +
       podio(top.map(x => ({ nome: x.ab, sub: x.pts + ' pts', cor: x.cor }))) +
-      '<div style="border-top:1px solid var(--line)">' + cl.map(x => '<div class="tw' + (x.meu ? ' eu' : '') + '"><span class="p ' + posCls(x.pos) + '">' + x.pos + '</span>' +
+      '<div style="border-top:1px solid var(--line)">' + cl.filter(x => x.meu).map(x => '<div class="tw' + (x.meu ? ' eu' : '') + '"><span class="p ' + posCls(x.pos) + '">' + x.pos + '</span>' +
         '<span class="c" style="background:' + esc(x.cor) + '"></span><span class="a">' + esc(x.ab) + '</span><span class="n">' + esc(x.nome) + '</span>' +
         '<span class="pt">' + x.pts + '</span><span class="g">pts</span></div>').join('') + '</div></div>';
-  });
-  h += sec('metas da temporada') + painel('', '', r.equipes.map(x =>
-    ln(x.nome, x.pos <= x.meta ? tag('meta batida', 'v') : x.pos >= x.meta + 3 ? tag('muito abaixo', 'r') : tag('nao bateu', 'a'), '',
-      'meta P' + x.meta + ', terminou P' + x.pos + (x.rec.bonusMeta ? ' - bonus de ' + moeda(x.rec.bonusMeta) + ' dos patrocinadores' : ''))).join(''));
-  h += sec('o ano de cada equipe', r.equipes.length + ' equipe' + (r.equipes.length === 1 ? '' : 's'));
-  r.equipes.forEach(x => {
-    const dv = x.valorDepois - x.valorAntes, dc = Math.round((x.carroDepois - x.carroAntes) * 10) / 10;
-    let conta;
-    if (x.saldo >= 0) conta = 'Arrecadou ' + moeda(x.rec.total) + ' e gastou ' + moeda(x.des.total) + '. A sobra de ' + moeda(x.saldo) + ' entrou no caixa da equipe.';
-    else if (x.calote) conta = 'Arrecadou ' + moeda(x.rec.total) + ' e gastou ' + moeda(x.des.total) + '. Faltou dinheiro: ' + moeda(x.calote) + ' viraram divida da equipe.';
-    else conta = 'Arrecadou ' + moeda(x.rec.total) + ' e gastou ' + moeda(x.des.total) + '. O fundo cobriu o rombo de ' + moeda(-x.saldo) + '.';
+  }
+  const ordem = r.equipes.slice().sort((a, b) => (b.id === r.principal) - (a.id === r.principal) || a.catId - b.catId);
+  h += sec('suas equipes', 'toque para ver o ano de cada uma') + '<div class="panel">' + ordem.map(x => {
     const aberto = !!UI.relDet[x.id];
-    h += '<div class="panel"><div class="hd"><span>' + esc(x.nome) + '</span><b>' + x.pos + ' DE ' + x.n + '</b></div>' +
-      '<div class="bd" style="padding:11px 11px 0">' + (x.campeao ? tag('campea da ' + x.cat, 'v') : x.pos <= 3 ? tag(x.pos + 'o lugar na ' + x.cat, 'a') : tag(x.cat, 'n')) +
-      '<div class="mono mut" style="font-size:10.5px;margin-top:7px">' + x.st.pts + ' pts &middot; ' + x.st.v + ' V &middot; ' + x.st.pod + ' P &middot; ' + x.st.ab + ' abandonos</div></div>' +
-      '<div class="stats c3" style="border-top:1px solid var(--line);margin-top:11px">' +
-      celula('Resultado', moeda(x.saldo), x.saldo >= 0 ? 'sobrou' : 'faltou', x.saldo >= 0 ? 'ok' : 'neg') +
-      celula('Carro', String(x.carroDepois), dc === 0 ? 'sem mudanca' : (dc > 0 ? '+' + dc : String(dc)) + ' no ano', dc > 0 ? 'ok' : dc < 0 ? 'neg' : '') +
-      celula('Valor do ativo', moeda(x.valorDepois), varTxt(dv), Math.abs(dv) < 1e4 ? '' : dv > 0 ? 'ok' : 'neg') +
-      '</div><div class="bd" style="padding:11px"><p class="msg">' + esc(conta) + (x.gastoAlav ? ' Em alavancas foram ' + esc(moeda(x.gastoAlav)) + '.' : '') + '</p>' +
-      (x.teto ? '<div class="gap"></div>' + ln('Teto de gastos', pct(x.teto.ratio), x.teto.ratio > 1 ? 'neg' : 'ok', moeda(x.teto.gasto) + ' de ' + moeda(TETO)) +
-        (x.teto.multa ? ln('Punicao do teto', moeda(x.teto.multa) + (x.teto.pontos ? ' e -' + x.teto.pontos + ' pts' : ''), 'neg', 'e menos tempo de tunel na proxima') : '') : '') +
-      '<div class="gap"></div><button class="btn sec2 sm" data-a="reldet:' + x.id + '">' + (aberto ? 'Esconder as contas' : 'Ver as contas da temporada') + '</button>' +
-      (aberto ? '<div class="gap"></div>' +
-        ln('Premiacao', moeda(x.rec.premiacao), 'ok', x.pos + 'o lugar') + ln('Patrocinio', moeda(x.rec.patrocinio), 'ok') +
-        (x.rec.bonusMeta ? ln('Bonus da meta', moeda(x.rec.bonusMeta), 'ok') : '') +
-        (x.rec.pagantes ? ln('Pilotos pagantes', moeda(x.rec.pagantes), 'ok') : '') +
-        ln('Academia', moeda(x.rec.academia), 'ok') + ln('Tecnologia', moeda(x.rec.tecnologia), 'ok') +
-        lnTot('Receita', moeda(x.rec.total), 'ok') + '<div class="gap"></div>' +
-        (x.des.salarios ? ln('Salario dos pilotos', moeda(x.des.salarios), 'neg') : '') +
-        ln('Equipe', moeda(x.des.equipe), 'neg') + ln('Operacao', moeda(x.des.operacao), 'neg') +
-        ln('Desenvolvimento', moeda(x.des.desenvolvimento), 'neg') + (x.des.motor ? ln('Motor', moeda(x.des.motor), 'neg') : '') +
-        ln('Fabrica', moeda(x.des.infra), 'neg') + (x.des.diretor ? ln('Diretor tecnico', moeda(x.des.diretor), 'neg') : '') + ln('Juros', moeda(x.des.juros), 'neg') +
-        lnTot('Despesa', moeda(x.des.total), 'neg') : '') +
-      '</div></div><div class="gap"></div>';
-  });
+    const meta = x.pos <= x.meta ? tag('meta P' + x.meta + ' ok', 'v') : x.pos >= x.meta + 3 ? tag('meta P' + x.meta + ' longe', 'r') : tag('meta P' + x.meta, 'a');
+    return '<div class="item" data-a="reldet:' + x.id + '"><span class="p"><b>' + (x.id === r.principal ? '&#9733; ' : '') + esc(x.nome) + '</b>' +
+      '<span>' + esc(x.cat) + ' &middot; ' + x.st.pts + ' pts &middot; ' + x.st.v + ' V &middot; ' + x.st.pod + ' P &middot; ' + meta + '</span></span>' +
+      '<span class="d"><span class="' + posCls(x.pos) + '" style="font-family:var(--disp);font-weight:900;font-style:italic;font-size:18px;display:block;margin:0;color:inherit">P' + x.pos + '</span>' +
+      '<span class="' + (x.saldo >= 0 ? 'ok' : 'neg') + '">' + sinal(x.saldo) + '</span></span></div>' + (aberto ? anoDaEquipe(x) : '');
+  }).join('') + '</div>';
   const dRep = Math.round(f.reputacao - f.reputacaoAntes);
   h += sec('como o fundo fechou') +
     '<div class="panel"><div class="stats c3">' +
@@ -3289,7 +3306,7 @@ document.addEventListener('click', e => {
     case 'fecharrel': UI.relDet = {}; fecharRelatorio(); TELA = 'fundo'; render(); break;
     case 'verequipe': UI.equipe = Number(p1); TELA = 'equipes'; render(); break;
     case 'abaequipe': UI.abaEquipe = p1; UI.trocaSai = null; render(); break;
-    case 'focoeq': UI.focoEq = Number(p1); render(); break;
+    case 'principal': if (ehMeu(Number(p1))) { S.principal = Number(p1); salvar(); } render(); break;
     case 'verrel': TELA = 'rel'; UI.abaRel = p1; render(); break;
     case 'trocapil': UI.trocaSai = UI.trocaSai === Number(p1) ? null : Number(p1); render(); break;
     case 'contratar': {
