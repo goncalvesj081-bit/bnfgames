@@ -300,7 +300,7 @@ const CATS = [
   { n: 'F4 Italia', pais: 'Italia', etapas: 8, rep: 0, piloto: [34, 62] }
 ];
 /* categorias simuladas nesta versao */
-const ATIVAS = [2];
+const ATIVAS = [0, 1, 2, 3, 4];
 const NCAT = CATS.length;
 const DIVS = CATS.map(c => c.n);
 const PONTOS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
@@ -350,14 +350,16 @@ const SOBRENOMES = ['Werner', 'Marchand', 'Rinaldi', 'Salvatierra', 'Hale', 'Ara
   'Barros', 'Esposito', 'Dupont', 'Schmidt', 'Hughes', 'Price', 'Sato', 'Mendes', 'Prado', 'Ventura', 'Castro', 'Leclair',
   'Vasquez', 'Nunes', 'Albers', 'Strand', 'Kimura', 'Rocha', 'Teixeira', 'Fontana', 'Bauer', 'Quinn', 'Doyle', 'Amaral'];
 const PAISES = ['BRA', 'ITA', 'GBR', 'FRA', 'ALE', 'ESP', 'HOL', 'JAP', 'AUS', 'EUA', 'MEX', 'ARG', 'FIN', 'DIN', 'BEL', 'POR', 'CAN', 'CHN', 'SUI', 'AUT'];
-const N_CAT = CATS.map((c, i) => EQUIPES[i].length);
+/* numero de equipes da categoria: a F1 ganha uma vaga quando alguem paga a taxa de entrada */
+function nCat(cat) { return S && S.equipes ? S.equipes.filter(e => e.cat === cat).length : EQUIPES[cat].length; }
+const TAXA_F1 = 450e6, REP_F1 = 55, MAX_F1 = 12;
 
 /* economia por categoria, valores anuais em US$
    vaga: quanto vale ter uma vaga ali, mesmo com equipe ruim
    premio: premiacao do 1o e do ultimo no construtores
    pagante: quanto um piloto pagante leva para a equipe (F2 para baixo) */
 const ECO = [
-  { vaga: 650e6, premio: [140e6, 60e6], patro: 180e6, pagante: 0, equipe: 70e6, operacao: 60e6, desenv: 45e6, infra: 18e6, academia: 12e6, tecnologia: 25e6, fas: 2e6 },
+  { vaga: 650e6, premio: [150e6, 80e6], patro: 200e6, pagante: 0, equipe: 45e6, operacao: 38e6, desenv: 35e6, infra: 18e6, academia: 12e6, tecnologia: 25e6, fas: 2e6 },
   { vaga: 14e6, premio: [6e6, 1.2e6], patro: 9e6, pagante: 1.6e6, equipe: 2.6e6, operacao: 3.4e6, desenv: 1.2e6, infra: 1e6, academia: 1.5e6, tecnologia: 1e6, fas: 120e3 },
   { vaga: 5e6, premio: [2.2e6, 0.4e6], patro: 3.2e6, pagante: 0.9e6, equipe: 1.1e6, operacao: 1.5e6, desenv: 0.45e6, infra: 0.4e6, academia: 0.6e6, tecnologia: 0.3e6, fas: 40e3 },
   { vaga: 1.2e6, premio: [0.5e6, 0.08e6], patro: 0.8e6, pagante: 0.25e6, equipe: 0.3e6, operacao: 0.42e6, desenv: 0.12e6, infra: 0.12e6, academia: 0.2e6, tecnologia: 0.08e6, fas: 8e3 },
@@ -529,9 +531,9 @@ function resultadosDaEquipe(eq) {
    ECONOMIA DA EQUIPE
    ========================================================= */
 function fatorGestao(p) { return 1.22 - p.gestao / 100 * 0.40; }
-function meioGrid(cat) { return Math.ceil(N_CAT[cat] / 2); }
+function meioGrid(cat) { return Math.ceil(nCat(cat) / 2); }
 function premioPos(cat, pos) {
-  const e = ECO[cat], t = clamp((pos - 1) / Math.max(1, N_CAT[cat] - 1), 0, 1);
+  const e = ECO[cat], t = clamp((pos - 1) / Math.max(1, nCat(cat) - 1), 0, 1);
   return e.premio[0] + (e.premio[1] - e.premio[0]) * Math.pow(t, 0.85);
 }
 /* custo anual de um piloto para a equipe (so a F1 paga salario de verdade) */
@@ -547,7 +549,7 @@ function aportePagante(pl, cat) {
   return e.pagante * (1.3 - q);
 }
 function receitaEquipe(eq, pos) {
-  const e = ECO[eq.cat], p = eq.p, n = N_CAT[eq.cat];
+  const e = ECO[eq.cat], p = eq.p, n = nCat(eq.cat);
   pos = pos || meioGrid(eq.cat);
   const premiacao = premioPos(eq.cat, pos);
   const patrocinio = p.marca / 100 * e.patro * (0.8 + p.gestao / 100 * 0.4);
@@ -572,7 +574,7 @@ function despesaEquipe(eq) {
   return { salarios: salarios, equipe: equipe, operacao: operacao, desenvolvimento: desenvolvimento, motor: motor, infra: infra, juros: juros, total: total };
 }
 function valorMercado(eq) {
-  const p = eq.p, e = ECO[eq.cat], n = N_CAT[eq.cat];
+  const p = eq.p, e = ECO[eq.cat], n = nCat(eq.cat);
   const ref = mediaCat(eq.cat, x => x.p.carro);
   const posRec = eq.ult || meioGrid(eq.cat);
   const fDesemp = clamp(0.9 + (p.carro - ref) / 30 * 0.6 + (n - posRec) / Math.max(1, n - 1) * 0.2, 0.55, 1.6);
@@ -772,6 +774,50 @@ function arquivarAtivo(eq, venda, resultado, comprador) {
   if (S.f.arquivo.length > 40) S.f.arquivo.shift();
 }
 
+/* taxa de entrada: abre uma vaga nova na F1, com carro e infraestrutura do zero */
+function requisitosF1() {
+  const forte = meus().some(e => e.cat === 1 && (e.ult || 99) <= 4);
+  return [
+    { ok: S.fase === 'pre', t: 'Pre-temporada' },
+    { ok: !temNaCat(0), t: 'O fundo ainda nao tem equipe na F1' },
+    { ok: nCat(0) < MAX_F1, t: 'Vaga livre no grid (maximo de ' + MAX_F1 + ' equipes)' },
+    { ok: S.f.reputacao >= REP_F1, t: 'Reputacao ' + REP_F1 + ' ou mais (hoje ' + Math.round(S.f.reputacao) + ')' },
+    { ok: forte, t: 'Uma equipe sua de F2 entre as 4 primeiras na temporada passada' },
+    { ok: S.f.caixa >= TAXA_F1, t: 'Caixa de ' + moeda(TAXA_F1) + ' (hoje ' + moeda(S.f.caixa) + ')' }
+  ];
+}
+function entrarF1() {
+  const falta = requisitosF1().filter(r => !r.ok)[0];
+  if (falta) return 'Requisito pendente: ' + falta.t.toLowerCase();
+  const base = meus().filter(e => e.cat === 1).sort((a, b) => (a.ult || 99) - (b.ult || 99))[0];
+  const eq = { id: S.equipes.length, nome: S.f.nome + ' F1', ab: 'NOV', cor: '#FF4D2E', cat: 0, base: 60, dono: null, st: novoStEquipe(), nova: true };
+  eq.p = perfilInicial(eq);
+  Object.assign(eq.p, {
+    carro: 55, confiab: 55, tunel: 12, fabrica: 15, simulador: 10, motor: 'cliente',
+    marca: clamp(Math.round(base.p.marca * 0.6), 15, 60), fas: Math.round(base.p.fas * 4),
+    gestao: base.p.gestao, academia: base.p.academia, divida: 0, premio: 0.1
+  });
+  const usados = {};
+  S.pilotos.forEach(p => { usados[p.nome] = 1; });
+  for (let k = 0; k < 2; k++) {
+    const pl = novoPiloto(0, usados);
+    pl.nivel = ri(70, 77); pl.eq = eq.id;
+    S.pilotos.push(pl); eq.p.pil.push(pl.id);
+  }
+  S.equipes.push(eq);
+  eq.ult = nCat(0);
+  S.f.caixa -= TAXA_F1;
+  S.donos.push(eq.id);
+  S.dd[eq.id] = 1;
+  eq.p.compra = { temp: S.temporada, preco: TAXA_F1, carro: eq.p.carro, valor: valorMercado(eq).liquido, cat: 0, dd: true };
+  eq.p.aporte = 0; eq.p.retirado = 0; eq.p.hist = [];
+  rep(5);
+  invalidarTabelas();
+  noticia('Taxa de entrada paga: a ' + eq.nome + ' e a ' + nCat(0) + 'a equipe do grid da F1.', 'v');
+  salvar();
+  return null;
+}
+
 /* =========================================================
    CICLO DE TEMPORADA
    ========================================================= */
@@ -798,7 +844,7 @@ function encerrarTemporada() {
   });
   /* 1. fotografia e resultado financeiro das equipes do fundo */
   S.donos.forEach(id => {
-    const eq = S.equipes[id], p = eq.p, pos = posDaEquipe(eq), n = N_CAT[eq.cat];
+    const eq = S.equipes[id], p = eq.p, pos = posDaEquipe(eq), n = nCat(eq.cat);
     const rec = receitaEquipe(eq, pos), des = despesaEquipe(eq);
     const saldo = rec.total - des.total;
     const linha = {
@@ -937,6 +983,7 @@ function carregar() {
     if (!S.f.arquivo) S.f.arquivo = [];
     if (!S.dd) S.dd = {};
     if (!S.recusas) S.recusas = {};
+    if (S.passos !== passos() && S.fase !== 'temp') gerarCalendarios();
     S.passos = passos();
     invalidarTabelas();
     return true;
@@ -1183,7 +1230,7 @@ function faixaResultados(eq) {
 function painelEquipe(eq) {
   const cat = eq.cat, v = valorMercado(eq);
   let h = painel('CAMPANHA', DIVS[cat],
-    ln('Posicao no construtores', eq.st.c ? posDaEquipe(eq) + 'o de ' + N_CAT[cat] : 'temporada nao comecou', '', eq.ult ? 'temporada passada: ' + eq.ult + 'o' : '') +
+    ln('Posicao no construtores', eq.st.c ? posDaEquipe(eq) + 'o de ' + nCat(cat) : 'temporada nao comecou', '', eq.ult ? 'temporada passada: ' + eq.ult + 'o' : '') +
     ln('Pontos', String(eq.st.pts), '', etapasCorridas(cat) + ' de ' + CATS[cat].etapas + ' etapas') +
     ln('Vitorias e podios', eq.st.v + ' V &middot; ' + eq.st.pod + ' P') +
     ln('Abandonos', String(eq.st.ab), eq.st.ab ? 'neg' : '') +
@@ -1228,7 +1275,7 @@ function pilotosEquipe(eq) {
 function financasEquipe(eq) {
   const pos = eq.st.c ? posDaEquipe(eq) : meioGrid(eq.cat);
   const r = receitaEquipe(eq, pos), d = despesaEquipe(eq), saldo = r.total - d.total;
-  let h = painel('PROJECAO DA TEMPORADA', eq.st.c ? 'HOJE EM ' + pos + 'O DE ' + N_CAT[eq.cat] : 'CENARIO DE MEIO DE GRID',
+  let h = painel('PROJECAO DA TEMPORADA', eq.st.c ? 'HOJE EM ' + pos + 'O DE ' + nCat(eq.cat) : 'CENARIO DE MEIO DE GRID',
     ln('Receita', moeda(r.total), 'ok') + ln('Despesa', moeda(d.total), 'neg') +
     lnTot(saldo >= 0 ? 'Sobra projetada' : 'Rombo projetado', moeda(saldo), saldo >= 0 ? 'ok' : 'neg'));
   h += sec('receitas') + painel('', '',
@@ -1310,14 +1357,23 @@ function telaMercado() {
     campo('Categoria', selHTML('merccat', UI.mercCat, [['alc', 'Ao meu alcance']].concat(opsCats(acessoCat)))) +
     campo('Ordenar por', selHTML('mercord', UI.mercOrd, [['preco', 'Menor preco'], ['precod', 'Maior preco'], ['carro', 'Melhor carro']])) +
     '</div><div class="toggles"><button class="tg ' + (UI.mercCrise ? 'on' : '') + '" data-a="tgcrise">Em crise</button></div>';
-  if (!lista.length) return h + painel('', '', vazio('Nenhuma equipe nesse filtro'), true) + '</div>';
+  if (!lista.length) return h + painel('', '', vazio('Nenhuma equipe nesse filtro'), true) + painelEntradaF1() + '</div>';
   h += painel('', '', tabela(['Equipe', 'Carro', 'Preco'], lista.slice(0, 60).map(x => {
     const eq = x.eq, marcas = [DIVS[eq.cat], 'marca ' + eq.p.marca];
     if (temRelatorio(eq.id)) { marcas.push('analisada'); if (emCrise(eq)) marcas.push('em crise'); }
     return '<tr class="cl" data-a="alvo:' + eq.id + '"><td>' + nomeEq(eq) + '<span class="sub">' + esc(marcas.join(' - ')) + '</span></td>' +
       '<td>' + eq.p.carro + '</td><td class="' + (x.preco <= S.f.caixa ? 'ok' : 'mut') + '">' + moeda(x.preco) + '</td></tr>';
   })), true);
-  return h + '</div>';
+  return h + painelEntradaF1() + '</div>';
+}
+function painelEntradaF1() {
+  if (temNaCat(0) || nCat(0) >= MAX_F1) return '';
+  const req = requisitosF1(), ok = req.every(r => r.ok);
+  return sec('entrar na f1', 'taxa de ' + moeda(TAXA_F1)) +
+    painel('', '', '<p class="msg">A outra porta da F1: em vez de comprar uma equipe que ja existe, o fundo paga a taxa e abre uma <b>vaga nova</b>. ' +
+      'A equipe nasce com carro baixo e infraestrutura do zero, mas a vaga sozinha ja vale muito.</p><div class="gap"></div>' +
+      req.map(r => ln(r.t, r.ok ? tag('ok', 'v') : tag('falta', 'r'))).join('') +
+      '<div class="gap"></div><button class="btn" data-a="entrarf1" ' + (ok ? '' : 'disabled') + '>Pagar a taxa de entrada</button>');
 }
 function fichaMercado(id) {
   const eq = S.equipes[id], p = eq.p, temDD = temRelatorio(id), cat = eq.cat;
@@ -1408,7 +1464,7 @@ function telaCamp() {
       ln('Carro medio', String(Math.round(mediaCat(cat, e => e.p.carro))))) +
       '<div class="gap"></div>' + painel('', '', tabela(['Equipe', 'Receita', 'Divida', 'Valor'], linhas), true);
   } else {
-    h += painel(DIVS[cat], N_CAT[cat] + ' EQUIPES', tabela(['#', 'Equipe', 'Pts', 'V', 'P', 'Carro'], tabelaCat(cat).map((eq, i) =>
+    h += painel(DIVS[cat], nCat(cat) + ' EQUIPES', tabela(['#', 'Equipe', 'Pts', 'V', 'P', 'Carro'], tabelaCat(cat).map((eq, i) =>
       '<tr class="' + (ehMeu(eq.id) ? 'eu' : '') + '"><td class="l num" style="width:26px"><span class="' + posCls(i + 1) + '">' + (i + 1) + '</span></td>' +
       '<td class="l">' + nomeEq(eq) + '</td>' +
       '<td>' + eq.st.pts + '</td><td>' + eq.st.v + '</td><td>' + eq.st.pod + '</td><td>' + eq.p.carro + '</td></tr>'), [0, 1]), true) +
@@ -1666,6 +1722,17 @@ document.addEventListener('click', e => {
     case 'quitarfundo': modalValor('Abater divida do fundo', 'Usa o caixa livre para reduzir os juros.', Math.min(S.f.divida, S.f.caixa), 'quitarfundo-ok'); break;
     case 'quitarfundo-ok': { fecharModal(); const err = quitarDividaFundo(Number(p1)); if (err) alerta('Nao deu', err); else render(); break; }
     case 'tgcrise': UI.mercCrise = !UI.mercCrise; render(); break;
+    case 'entrarf1':
+      abrirModal('<h3>Entrar na F1</h3>' + ln('Taxa de entrada', moeda(TAXA_F1), 'neg') + ln('Caixa depois', moeda(S.f.caixa - TAXA_F1)) +
+        '<p class="msg" style="margin:10px 0 12px">A nova equipe se chama <b>' + esc(S.f.nome) + ' F1</b> e larga do fundo do grid.</p>' +
+        '<button class="btn" data-a="entrarf1-ok">Pagar e entrar</button><div class="gap"></div><button class="btn sec2" data-a="fechar">Cancelar</button>');
+      break;
+    case 'entrarf1-ok': {
+      fecharModal();
+      const err = entrarF1();
+      if (err) alerta('Nao deu', err); else { UI.equipe = S.donos[S.donos.length - 1]; TELA = 'equipes'; UI.abaEquipe = 'painel'; render(); }
+      break;
+    }
     case 'alvo': UI.alvo = Number(p1); render(); break;
     case 'voltarmerc': UI.alvo = null; render(); break;
     case 'dd': { const err = fazerDD(Number(p1)); if (err) alerta('Nao deu', err); else render(); break; }
