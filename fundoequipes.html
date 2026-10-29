@@ -436,7 +436,8 @@ function perfilInicial(eq) {
     fas: Math.round((eq.cat === 0 ? 2e6 : eq.cat === 1 ? 120e3 : eq.cat === 2 ? 40e3 : 8e3) * (0.4 + f * 1.6) * (0.75 + Math.random() * 0.5)),
     gestao: clamp(Math.round(30 + f * 30 + ri(-15, 15)), 8, 95),
     academia: clamp(Math.round(10 + f * 40 + ri(-10, 10)), 0, 95),
-    divida: 0, caixa: 0, momento: 0, obras: []
+    tecnico: eq.base >= 82 ? 2 : eq.base >= 70 ? 1 : 0,
+    divida: 0, caixa: 0, momento: 0, obras: [], gastoTeto: 0, tunelPen: 0, punicao: 0
   };
 }
 
@@ -456,7 +457,8 @@ function gerarCalendarios() {
 function equipesDa(cat) { return S.equipes.filter(e => e.cat === cat); }
 function ritmo(eq, pl) {
   const ruido = 4 * (1.15 - eq.p.simulador / 100 * 0.3);
-  return eq.p.carro * 0.70 + pl.nivel * 0.30 + normal() * ruido;
+  const motor = eq.cat === 0 ? MOTOR_B[eq.p.motor].b : 0;
+  return (eq.p.carro + motor) * 0.70 + pl.nivel * 0.30 + normal() * ruido;
 }
 function chanceAbandono(eq) { return (1 - eq.p.confiab / 100) * 0.18; }
 function correr(cat, etapa) {
@@ -569,9 +571,10 @@ function despesaEquipe(eq) {
   const desenvolvimento = e.desenv;
   const motor = eq.cat === 0 ? MOTOR[p.motor].c : 0;
   const infra = (p.tunel + p.fabrica + p.simulador) / 300 * e.infra;
+  const diretor = custoDiretor(eq);
   const juros = p.divida * JUROS;
-  const total = salarios + equipe + operacao + desenvolvimento + motor + infra + juros;
-  return { salarios: salarios, equipe: equipe, operacao: operacao, desenvolvimento: desenvolvimento, motor: motor, infra: infra, juros: juros, total: total };
+  const total = salarios + equipe + operacao + desenvolvimento + motor + infra + diretor + juros;
+  return { salarios: salarios, equipe: equipe, operacao: operacao, desenvolvimento: desenvolvimento, motor: motor, infra: infra, diretor: diretor, juros: juros, total: total };
 }
 function valorMercado(eq) {
   const p = eq.p, e = ECO[eq.cat], n = nCat(eq.cat);
@@ -597,6 +600,178 @@ function precoAlvo(eq) {
 function emCrise(eq) {
   const rec = receitaBase(eq), des = despesaEquipe(eq).total;
   return eq.p.divida > rec * 1.1 || des > rec * 1.18;
+}
+
+/* =========================================================
+   ALAVANCAS E TETO DE GASTOS
+   ========================================================= */
+/* diretor tecnico: custo anual (fracao do custo da equipe tecnica) e bonus de desenvolvimento */
+const TECNICOS = [
+  { n: 'Sem diretor de peso', c: 0, b: 0 },
+  { n: 'Diretor promissor', c: 0.12, b: 0.15 },
+  { n: 'Diretor experiente', c: 0.24, b: 0.30 },
+  { n: 'Diretor campeao', c: 0.40, b: 0.50 }
+];
+/* teto de gastos: so na F1. salario de piloto e marketing ficam fora */
+const TETO = 215e6;
+const TETO_FOLGA = 0.05;
+/* acordo de motor: bonus de ritmo e teto de desempenho do carro */
+const MOTOR_B = { cliente: { b: 0, teto: 86, troca: 0 }, parceria: { b: 1, teto: 92, troca: 25e6 }, fabrica: { b: 2.5, teto: 99, troca: 80e6 } };
+const ORDEM_MOTOR = ['cliente', 'parceria', 'fabrica'];
+
+/* a fabrica limita quantos pacotes saem por temporada */
+function maxPacotes(eq) { return 1 + Math.floor(eq.p.fabrica / 35); }
+function custoDiretor(eq) { return ECO[eq.cat].equipe * TECNICOS[eq.p.tecnico || 0].c; }
+function tetoCarro(eq) { return eq.cat === 0 ? MOTOR_B[eq.p.motor].teto : 99; }
+/* regra do tempo de tunel: quem terminou melhor desenvolve menos */
+function fatorTunel(eq) {
+  const n = nCat(eq.cat), pos = eq.ult || n;
+  return (0.75 + pos / n * 0.5) * (eq.p.tunelPen ? 0.75 : 1);
+}
+function ganhoPacote(eq) {
+  const p = eq.p;
+  const g = 2 * (0.7 + p.tunel / 100 * 0.6) * (1 + TECNICOS[p.tecnico || 0].b) * fatorTunel(eq);
+  return Math.round(Math.min(g, Math.max(0, tetoCarro(eq) - p.carro)) * 10) / 10;
+}
+/* o que entra no teto na temporada: operacao normal mais o que foi gasto em alavancas do teto */
+function gastoTeto(eq) {
+  const d = despesaEquipe(eq);
+  return d.equipe + d.operacao + d.desenvolvimento + d.infra + d.motor * 0.5 + d.diretor + (eq.p.gastoTeto || 0);
+}
+function alavancas(eq) {
+  const p = eq.p, e = ECO[eq.cat], c = eq.cat;
+  const obra = t => (p.obras || []).filter(o => o.t === t)[0];
+  const L = [];
+  const g = ganhoPacote(eq);
+  L.push({
+    id: 'pacote', nome: 'Pacote de atualizacoes', grupo: 'Carro', teto: true,
+    custo: Math.round(e.desenv * 0.5 * Math.pow(1 + Math.max(0, p.carro - 60) / 40, 2)), temps: 0, ativo: null,
+    efeito: '+' + String(g).replace('.', ',') + ' de carro agora (' + (p.pacotes || 0) + ' de ' + maxPacotes(eq) + ' pacotes da temporada). Perde parte se o regulamento mudar',
+    bloq: (p.pacotes || 0) >= maxPacotes(eq) ? 'A fabrica nao produz mais pecas nesta temporada' : g <= 0.1 ? (c === 0 && p.motor !== 'fabrica' ? 'Motor limita o carro' : 'Carro no teto') : null
+  });
+  L.push({
+    id: 'tunel', nome: 'Novo tunel de vento', grupo: 'Infraestrutura', teto: false,
+    custo: Math.round(e.infra * 3 * (1 + p.tunel / 100)), temps: 2, ativo: obra('tunel'),
+    efeito: '+12 de tunel em 2 temporadas: pacotes rendem mais e o carro segura melhor',
+    bloq: p.tunel >= 96 ? 'Tunel no teto' : null
+  });
+  L.push({
+    id: 'fabrica', nome: 'Ampliar fabrica', grupo: 'Infraestrutura', teto: false,
+    custo: Math.round(e.infra * 3.5 * (1 + p.fabrica / 100)), temps: 2, ativo: obra('fabrica'),
+    efeito: '+12 de fabrica e +5 de confiabilidade em 2 temporadas. Acima de 60, vende pecas',
+    bloq: p.fabrica >= 96 ? 'Fabrica no teto' : null
+  });
+  L.push({
+    id: 'simulador', nome: 'Simulador novo', grupo: 'Infraestrutura', teto: false,
+    custo: Math.round(e.infra * 1.5 * (1 + p.simulador / 100)), temps: 1, ativo: obra('simulador'),
+    efeito: '+15 de simulador em 1 temporada: menos variacao de resultado',
+    bloq: p.simulador >= 96 ? 'Simulador no teto' : null
+  });
+  L.push({
+    id: 'academia', nome: 'Academia de pilotos', grupo: 'Longo prazo', teto: false,
+    custo: Math.round(e.infra * 1.2 * (1 + p.academia / 100)), temps: 2, ativo: obra('academia'),
+    efeito: '+10 de academia em 2 temporadas: revela e vende pilotos todo ano',
+    bloq: p.academia >= 95 ? 'Academia no teto' : null
+  });
+  L.push({
+    id: 'marketing', nome: 'Marketing e conteudo', grupo: 'Marca', teto: false,
+    custo: Math.round(e.patro * 0.06 * (1 + p.marca / 100)), temps: 0, ativo: null,
+    efeito: '+6 de marca e +12% de fas agora: patrocinio e valor do ativo',
+    bloq: p.marca >= 97 ? 'Marca no teto' : null
+  });
+  L.push({
+    id: 'gestao', nome: 'Gestao e governanca', grupo: 'Equipe', teto: true,
+    custo: Math.round(e.equipe * 0.15 * (1 + p.gestao / 100)), temps: 0, ativo: null,
+    efeito: '+10 de gestao: corta desperdicio em equipe e operacao',
+    bloq: p.gestao >= 95 ? 'Gestao no teto' : null
+  });
+  return L;
+}
+function aplicarAlavanca(eq, id) {
+  const L = alavancas(eq).filter(x => x.id === id)[0];
+  if (!L) return 'Alavanca desconhecida';
+  if (S.fase !== 'pre') return 'Investimento so na pre-temporada';
+  if (L.bloq) return L.bloq;
+  if (L.ativo) return 'Ja tem obra dessa em andamento';
+  const err = pagar(eq, L.custo);
+  if (err) return err;
+  const p = eq.p;
+  p.gasto = (p.gasto || 0) + L.custo;
+  if (L.teto) p.gastoTeto = (p.gastoTeto || 0) + L.custo;
+  if (L.temps === 0) {
+    if (id === 'pacote') { p.carro = clamp(Math.round((p.carro + ganhoPacote(eq)) * 10) / 10, 30, tetoCarro(eq)); p.pacotes = (p.pacotes || 0) + 1; }
+    if (id === 'marketing') { p.marca = clamp(p.marca + 6, 0, 97); p.fas = Math.round(p.fas * 1.12); }
+    if (id === 'gestao') p.gestao = clamp(p.gestao + 10, 0, 95);
+    noticia(eq.nome + ': ' + L.nome.toLowerCase() + ' por ' + moeda(L.custo) + '.', 'a');
+  } else {
+    p.obras.push({ t: id, r: L.temps, custo: L.custo });
+    noticia(eq.nome + ': obra iniciada, ' + L.nome.toLowerCase() + ' (' + L.temps + ' temporada' + (L.temps > 1 ? 's' : '') + ').', 'a');
+  }
+  salvar();
+  return null;
+}
+function concluirObra(eq, o) {
+  const p = eq.p;
+  if (o.t === 'tunel') p.tunel = clamp(p.tunel + 12, 0, 96);
+  if (o.t === 'fabrica') { p.fabrica = clamp(p.fabrica + 12, 0, 96); p.confiab = clamp(p.confiab + 5, 0, 98); }
+  if (o.t === 'simulador') p.simulador = clamp(p.simulador + 15, 0, 96);
+  if (o.t === 'academia') p.academia = clamp(p.academia + 10, 0, 95);
+  const nomes = { tunel: 'novo tunel de vento', fabrica: 'ampliacao da fabrica', simulador: 'simulador novo', academia: 'academia de pilotos' };
+  noticia(eq.nome + ': ' + nomes[o.t] + ' concluida.', 'v');
+}
+function trocarDiretor(eq, nivel) {
+  if (S.fase !== 'pre') return 'Contrato so na pre-temporada';
+  eq.p.tecnico = clamp(nivel, 0, TECNICOS.length - 1);
+  salvar(); return null;
+}
+function requisitoMotor(eq, alvo) {
+  if (alvo === 'parceria' && eq.p.marca < 35) return 'Montadora so faz parceria com marca 35 ou mais';
+  if (alvo === 'fabrica' && eq.p.fabrica < 65) return 'Motor proprio pede fabrica 65 ou mais';
+  return null;
+}
+function trocarMotor(eq, alvo) {
+  if (eq.cat !== 0) return 'Acordo de motor so existe na F1';
+  if (S.fase !== 'pre') return 'Contrato so na pre-temporada';
+  if (!MOTOR_B[alvo] || alvo === eq.p.motor) return 'Esse ja e o acordo atual';
+  const sobe = ORDEM_MOTOR.indexOf(alvo) > ORDEM_MOTOR.indexOf(eq.p.motor);
+  if (sobe) {
+    const req = requisitoMotor(eq, alvo);
+    if (req) return req;
+    const err = pagar(eq, MOTOR_B[alvo].troca);
+    if (err) return err;
+    eq.p.gasto = (eq.p.gasto || 0) + MOTOR_B[alvo].troca;
+    eq.p.gastoTeto = (eq.p.gastoTeto || 0) + MOTOR_B[alvo].troca * 0.5;
+  }
+  eq.p.motor = alvo;
+  eq.p.carro = Math.min(eq.p.carro, tetoCarro(eq));
+  noticia(eq.nome + ': novo acordo de motor, ' + MOTOR[alvo].n.toLowerCase() + '.', 'a');
+  salvar(); return null;
+}
+/* fechamento do teto de gastos de uma equipe de F1 */
+function fecharTeto(eq, linha) {
+  const p = eq.p;
+  p.tunelPen = 0;
+  if (eq.cat !== 0) return;
+  const gasto = gastoTeto(eq), ratio = gasto / TETO;
+  linha.teto = { gasto: gasto, ratio: ratio };
+  if (ratio <= 1) { S.f.tetoLimpo = (S.f.tetoLimpo || 0) + 1; return; }
+  S.f.tetoLimpo = 0;
+  const excesso = gasto - TETO;
+  let multa, pontos = 0;
+  if (ratio <= 1 + TETO_FOLGA) {
+    multa = Math.round(excesso * 1.5);
+    rep(-2);
+    noticia(eq.nome + ': teto de gastos estourado em ' + moeda(excesso) + '. Multa de ' + moeda(multa) + ' e menos tempo de tunel na proxima temporada.', 'r');
+  } else {
+    multa = Math.round(excesso * 3);
+    pontos = clamp(Math.round((ratio - 1) * 150), 5, 40);
+    rep(-6);
+    noticia(eq.nome + ': estouro grave do teto de gastos. Multa de ' + moeda(multa) + ', menos tempo de tunel e ' + pontos + ' pontos a menos na proxima temporada.', 'r');
+  }
+  p.tunelPen = 1;
+  p.punicao = pontos;
+  linha.teto.multa = multa; linha.teto.pontos = pontos;
+  if (pagar(eq, multa)) { const doCaixa = Math.max(0, Math.min(S.f.caixa, multa)); S.f.caixa -= doCaixa; p.divida += multa - doCaixa; }
 }
 
 /* =========================================================
@@ -863,6 +1038,7 @@ function encerrarTemporada() {
         noticia(eq.nome + ' fechou no vermelho e rolou ' + moeda(resto) + ' para a divida.', 'r');
       }
     }
+    fecharTeto(eq, linha);
     rel.equipes.push(linha);
   });
   /* 2. posicao final de todo o grid, base do valor de mercado */
@@ -871,9 +1047,14 @@ function encerrarTemporada() {
   S.donos.forEach(id => {
     const eq = S.equipes[id], p = eq.p;
     const linha = rel.equipes.filter(x => x.id === id)[0], pos = linha.pos, n = linha.n;
+    p.obras.forEach(o => { o.r--; });
+    p.obras.filter(o => o.r <= 0).forEach(o => concluirObra(eq, o));
+    p.obras = p.obras.filter(o => o.r > 0);
+    linha.gastoAlav = p.gasto || 0;
+    p.gasto = 0; p.gastoTeto = 0; p.pacotes = 0;
     /* sem investimento o carro volta para a media da categoria; a infraestrutura empurra */
     const media = mediaCat(eq.cat, x => x.p.carro), infra = (p.tunel + p.fabrica + p.simulador) / 3;
-    p.carro = clamp(Math.round((p.carro + clamp((media - p.carro) * 0.15, -2, 2) + (infra - 50) / 25 + ri(-1, 1)) * 10) / 10, 30, 99);
+    p.carro = clamp(Math.round((p.carro + clamp((media - p.carro) * 0.15, -2, 2) + (infra - 50) / 25 + TECNICOS[p.tecnico || 0].b * 2 + ri(-1, 1)) * 10) / 10, 30, tetoCarro(eq));
     p.confiab = clamp(Math.round(p.confiab + (p.fabrica - 50) / 25 + ri(-2, 2)), 30, 98);
     p.marca = clamp(Math.round(p.marca + (pos <= 3 ? 3 : pos > n - 2 ? -2 : 0)), 5, 98);
     p.fas = Math.round(p.fas * (1 + (pos <= 3 ? 0.08 : pos > n - 2 ? -0.04 : 0.01)));
@@ -923,6 +1104,7 @@ function encerrarTemporada() {
   /* 6. virada */
   S.equipes.forEach(e => { e.st = novoStEquipe(); });
   S.pilotos.forEach(p => { p.st = novoStPiloto(); });
+  meus().forEach(eq => { if (eq.p.punicao) { eq.st.pts = -eq.p.punicao; eq.p.punicao = 0; } });
   invalidarTabelas();
   S.temporada++;
   S.passo = 0;
@@ -983,6 +1165,7 @@ function carregar() {
     if (!S.f.arquivo) S.f.arquivo = [];
     if (!S.dd) S.dd = {};
     if (!S.recusas) S.recusas = {};
+    S.equipes.forEach(e => { if (!e.p.obras) e.p.obras = []; if (e.p.tecnico === undefined) e.p.tecnico = 0; });
     if (S.passos !== passos() && S.fase !== 'temp') gerarCalendarios();
     S.passos = passos();
     invalidarTabelas();
@@ -1001,7 +1184,7 @@ const UI = {
   equipe: null, abaEquipe: 'painel',
   catCamp: null, visaoCamp: 'construtores',
   abaRel: 'fundo', relFiltro: 'todas', relDet: {},
-  abaMercado: 'equipes', mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
+  alavFiltro: 'todas', abaMercado: 'equipes', mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
   criaCat: 2, criaOrd: 'preco', nome: '', foco: null, escolha: null
 };
 let SCROLL = {}, ULTIMA = '';
@@ -1212,8 +1395,9 @@ function telaEquipes() {
     '<div><span>Valor</span><b>' + moeda(v.liquido) + '</b></div>' +
     '<div><span>Caixa</span><b>' + moeda(eq.p.caixa) + '</b></div>' +
     '<div><span>Divida</span><b class="' + (eq.p.divida > 0 ? 'neg' : 'mut') + '">' + moeda(eq.p.divida) + '</b></div></div></div>';
-  h += '<div style="height:11px"></div>' + seg(UI.abaEquipe, [['painel', 'Painel'], ['pilotos', 'Pilotos'], ['fin', 'Financas'], ['bal', 'Balanco']], 'abaequipe');
+  h += '<div style="height:11px"></div>' + seg(UI.abaEquipe, [['painel', 'Painel'], ['investir', 'Investir'], ['pilotos', 'Pilotos'], ['fin', 'Financas'], ['bal', 'Balanco']], 'abaequipe');
   if (UI.abaEquipe === 'pilotos') h += pilotosEquipe(eq);
+  else if (UI.abaEquipe === 'investir') h += investirEquipe(eq);
   else if (UI.abaEquipe === 'fin') h += financasEquipe(eq);
   else if (UI.abaEquipe === 'bal') h += balancoEquipe(eq);
   else h += painelEquipe(eq);
@@ -1249,7 +1433,9 @@ function painelEquipe(eq) {
       mtr('Gestao', eq.p.gestao, ref(e => e.p.gestao), 'Corta ' + pct(1 - fatorGestao(eq.p) / 1.22) + ' do desperdicio em equipe e operacao', 'gd'),
       mtr('Academia de pilotos', eq.p.academia, ref(e => e.p.academia), 'Revela e vende pilotos', 'gd')
     ].join(''), true);
-  if (eq.cat === 0) h += '<div class="gap"></div>' + painel('', '', ln('Acordo de motor', MOTOR[eq.p.motor].n, '', MOTOR[eq.p.motor].d));
+  if (eq.cat === 0) h += '<div class="gap"></div>' + painel('', '', ln('Acordo de motor', MOTOR[eq.p.motor].n, '', MOTOR[eq.p.motor].d + '. Carro ate ' + tetoCarro(eq)) +
+    ln('Diretor tecnico', TECNICOS[eq.p.tecnico || 0].n));
+  h += obrasEquipe(eq);
   h += sec('valor de mercado', 'conta aberta') +
     painel('', '', ln('Valor da vaga na ' + DIVS[cat], moeda(v.vaga), '', 'uma vaga vale muito mesmo com equipe ruim') +
       ln('Desempenho', 'x ' + v.fDesemp.toFixed(2), v.fDesemp < 1 ? 'neg' : 'ok', 'carro e posicao recente') +
@@ -1292,8 +1478,10 @@ function financasEquipe(eq) {
     ln('Desenvolvimento do carro', moeda(d.desenvolvimento), 'neg') +
     (d.motor ? ln('Motor', moeda(d.motor), 'neg', MOTOR[eq.p.motor].n) : '') +
     ln('Manutencao da fabrica', moeda(d.infra), 'neg', 'tunel, fabrica e simulador') +
+    (d.diretor ? ln('Diretor tecnico', moeda(d.diretor), 'neg', TECNICOS[eq.p.tecnico || 0].n) : '') +
     ln('Juros da divida', moeda(d.juros), 'neg') +
-    lnTot('Total', moeda(d.total), 'neg'));
+    lnTot('Total', moeda(d.total), 'neg') +
+    (eq.p.gastoTeto || eq.p.gasto ? ln('Alavancas ja pagas nesta temporada', moeda(eq.p.gasto || 0), 'gd', 'saem do caixa na hora, fora desta conta') : ''));
   h += painel('', '', '<p class="msg">' + (saldo >= 0
     ? 'A equipe se paga. A sobra entra no caixa dela no fechamento e voce decide se saca ou deixa la.'
     : 'A equipe gasta mais do que arrecada. No fechamento o fundo cobre o rombo, e se o fundo nao tiver caixa vira divida da equipe.') + '</p>');
@@ -1310,6 +1498,59 @@ function financasEquipe(eq) {
         '<td class="' + (x.saldo >= 0 ? 'ok' : 'neg') + '">' + moeda(x.saldo) + '</td><td>' + moeda(x.valor) + '</td></tr>')), true);
   }
   return h;
+}
+function investirEquipe(eq) {
+  const p = eq.p;
+  if (S.fase !== 'pre') {
+    return painel('JANELA FECHADA', '', '<p class="msg">A temporada esta rolando. <b>Investimento so na pre-temporada</b>, quando voce monta o orcamento do ano.</p>') + painelTeto(eq) + obrasEquipe(eq);
+  }
+  let h = sec('contratos da temporada') +
+    painel('', '', '<div class="filtros f1">' +
+      campo('Diretor tecnico', selHTML('tec', p.tecnico || 0, TECNICOS.map((t, i) => [i, t.n]))) + '</div>' +
+      ln('Custo do diretor', moeda(custoDiretor(eq)) + ' por ano', 'neg', '+' + pct(TECNICOS[p.tecnico || 0].b) + ' nos pacotes e +' + (TECNICOS[p.tecnico || 0].b * 2).toFixed(1).replace('.', ',') + ' de carro por temporada' + (eq.cat === 0 ? '. Conta no teto' : '')) +
+      (eq.cat === 0 ? '<div class="gap"></div><div class="mono mut" style="font-size:8.5px;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:5px">Acordo de motor</div>' +
+        '<div class="toggles">' + ORDEM_MOTOR.map(m =>
+          '<button class="tg ' + (p.motor === m ? 'on' : '') + '" data-a="motor:' + m + '">' + esc(MOTOR[m].n) + '</button>').join('') + '</div>' +
+        ln(MOTOR[p.motor].n, moeda(MOTOR[p.motor].c) + ' por ano', 'neg', MOTOR[p.motor].d + '. Carro ate ' + tetoCarro(eq) + ', +' + String(MOTOR_B[p.motor].b).replace('.', ',') + ' de ritmo') : ''));
+  h += painelTeto(eq);
+  const todas = alavancas(eq), cx = p.caixa + S.f.caixa;
+  const lista = todas.filter(L => UI.alavFiltro === 'todas' ? true : UI.alavFiltro === 'cabe' ? (!L.bloq && !L.ativo && L.custo <= cx) : UI.alavFiltro === 'agora' ? L.temps === 0 : L.temps > 0);
+  h += sec('alavancas', 'caixa disponivel ' + moeda(cx)) +
+    '<div class="filtros f1">' + campo('Mostrar', selHTML('alavf', UI.alavFiltro,
+      [['todas', 'Todas as alavancas'], ['cabe', 'So o que cabe no caixa'], ['agora', 'Efeito imediato'], ['obra', 'Obras de longo prazo']])) + '</div>';
+  h += lista.length ? painel('', '', lista.map(L => {
+    const falta = L.custo > cx;
+    const st = L.ativo ? tag('obra ' + L.ativo.r + ' temp', 'a') : L.bloq ? tag('bloqueada', 'n') : falta ? tag('sem caixa', 'r') : tag(L.temps ? L.temps + ' temp' : 'imediato', 'v');
+    const clicavel = !(L.ativo || L.bloq || falta);
+    return '<div class="item" ' + (clicavel ? 'data-a="alav:' + L.id + '"' : 'style="opacity:.55"') + '>' +
+      '<span class="p"><b>' + esc(L.nome) + '</b><span>' + esc(L.efeito) + (eq.cat === 0 ? (L.teto ? ' - conta no teto' : ' - fora do teto') : '') + (L.bloq ? ' - ' + esc(L.bloq) : '') + '</span></span>' +
+      '<span class="d">' + moeda(L.custo) + '<span>' + st + '</span></span></div>';
+  }).join(''), true) : painel('', '', vazio('Nada nesse filtro'), true);
+  if (eq.cat !== 0 || fatorTunel(eq) !== 1) {
+    h += '<p class="msg" style="margin-top:9px">Tempo de tunel: quem terminou melhor desenvolve menos. Na ' + esc(DIVS[eq.cat]) + ', o ' + (eq.ult || '-') + 'o lugar rende <b>' + pct(fatorTunel(eq)) + '</b> de cada pacote' + (p.tunelPen ? ', ja com o corte pela punicao do teto' : '') + '.</p>';
+  }
+  return h + obrasEquipe(eq);
+}
+function painelTeto(eq) {
+  if (eq.cat !== 0) return '';
+  const g = gastoTeto(eq), r = g / TETO, st = r > 1 + TETO_FOLGA ? 'neg' : r > 1 ? 'gd' : 'ok';
+  return sec('teto de gastos', 'limite de ' + moeda(TETO)) +
+    painel('', '', '<div class="bar" style="margin-top:2px"><i class="' + (st === 'neg' ? 'r' : st === 'gd' ? 'g' : '') + '" style="width:' +
+      clamp(r / 1.2 * 100, 2, 100).toFixed(1) + '%"></i><u style="left:' + (1 / 1.2 * 100).toFixed(1) + '%"></u></div><div class="gap"></div>' +
+      ln('Operacao, equipe e desenvolvimento', moeda(g - (eq.p.gastoTeto || 0)), '', 'inclui fabrica, diretor e metade do motor') +
+      ln('Alavancas do teto nesta temporada', moeda(eq.p.gastoTeto || 0)) +
+      lnTot('Comprometido', pct(r), st) +
+      '<p class="msg" style="margin-top:10px">' + (r > 1 + TETO_FOLGA ? 'Estouro grave: <b>multa pesada, perda de pontos e menos tunel</b> na proxima temporada.'
+        : r > 1 ? 'Estouro leve (ate 5%): multa e menos tempo de tunel na proxima temporada.'
+          : 'Folga de ' + moeda(TETO - g) + '. Dinheiro acima disso nao vira desempenho direto: vai para infraestrutura, que fica fora do teto.') + '</p>');
+}
+function obrasEquipe(eq) {
+  if (!eq.p.obras || !eq.p.obras.length) return '';
+  const todas = alavancas(eq);
+  return sec('obras em andamento') + painel('', '', eq.p.obras.map(o => {
+    const L = todas.filter(x => x.id === o.t)[0];
+    return ln(L ? L.nome : o.t, o.r + ' temp' + (o.r > 1 ? 's' : ''), 'gd', 'investido ' + moeda(o.custo));
+  }).join(''));
 }
 function balancoEquipe(eq) {
   const b = balanco(eq), v = valorVenda(eq), vm = valorMercado(eq), p = eq.p;
@@ -1571,7 +1812,9 @@ function telaRelatorio() {
       celula('Resultado', moeda(x.saldo), x.saldo >= 0 ? 'sobrou' : 'faltou', x.saldo >= 0 ? 'ok' : 'neg') +
       celula('Carro', String(x.carroDepois), dc === 0 ? 'sem mudanca' : (dc > 0 ? '+' + dc : String(dc)) + ' no ano', dc > 0 ? 'ok' : dc < 0 ? 'neg' : '') +
       celula('Valor do ativo', moeda(x.valorDepois), varTxt(dv), Math.abs(dv) < 1e4 ? '' : dv > 0 ? 'ok' : 'neg') +
-      '</div><div class="bd" style="padding:11px"><p class="msg">' + esc(conta) + '</p>' +
+      '</div><div class="bd" style="padding:11px"><p class="msg">' + esc(conta) + (x.gastoAlav ? ' Em alavancas foram ' + esc(moeda(x.gastoAlav)) + '.' : '') + '</p>' +
+      (x.teto ? '<div class="gap"></div>' + ln('Teto de gastos', pct(x.teto.ratio), x.teto.ratio > 1 ? 'neg' : 'ok', moeda(x.teto.gasto) + ' de ' + moeda(TETO)) +
+        (x.teto.multa ? ln('Punicao do teto', moeda(x.teto.multa) + (x.teto.pontos ? ' e -' + x.teto.pontos + ' pts' : ''), 'neg', 'e menos tempo de tunel na proxima') : '') : '') +
       '<div class="gap"></div><button class="btn sec2 sm" data-a="reldet:' + x.id + '">' + (aberto ? 'Esconder as contas' : 'Ver as contas da temporada') + '</button>' +
       (aberto ? '<div class="gap"></div>' +
         ln('Premiacao', moeda(x.rec.premiacao), 'ok', x.pos + 'o lugar') + ln('Patrocinio', moeda(x.rec.patrocinio), 'ok') +
@@ -1581,7 +1824,7 @@ function telaRelatorio() {
         (x.des.salarios ? ln('Salario dos pilotos', moeda(x.des.salarios), 'neg') : '') +
         ln('Equipe', moeda(x.des.equipe), 'neg') + ln('Operacao', moeda(x.des.operacao), 'neg') +
         ln('Desenvolvimento', moeda(x.des.desenvolvimento), 'neg') + (x.des.motor ? ln('Motor', moeda(x.des.motor), 'neg') : '') +
-        ln('Fabrica', moeda(x.des.infra), 'neg') + ln('Juros', moeda(x.des.juros), 'neg') +
+        ln('Fabrica', moeda(x.des.infra), 'neg') + (x.des.diretor ? ln('Diretor tecnico', moeda(x.des.diretor), 'neg') : '') + ln('Juros', moeda(x.des.juros), 'neg') +
         lnTot('Despesa', moeda(x.des.total), 'neg') : '') +
       '</div></div><div class="gap"></div>';
   });
@@ -1671,6 +1914,8 @@ document.addEventListener('change', e => {
     case 'merccat': UI.mercCat = v === 'alc' ? 'alc' : Number(v); break;
     case 'mercord': UI.mercOrd = v; break;
     case 'relf': UI.relFiltro = v === 'todas' ? 'todas' : Number(v); break;
+    case 'alavf': UI.alavFiltro = v; break;
+    case 'tec': { const err = trocarDiretor(S.equipes[UI.equipe], Number(v)); if (err) alerta('Nao deu', err); break; }
   }
   render();
 });
@@ -1711,6 +1956,8 @@ document.addEventListener('click', e => {
     case 'fecharrel': UI.relDet = {}; fecharRelatorio(); TELA = 'fundo'; render(); break;
     case 'verequipe': UI.equipe = Number(p1); TELA = 'equipes'; render(); break;
     case 'abaequipe': UI.abaEquipe = p1; render(); break;
+    case 'alav': { const err = aplicarAlavanca(eqSel(), p1); if (err) alerta('Nao deu', err); else render(); break; }
+    case 'motor': { const err = trocarMotor(eqSel(), p1); if (err) alerta('Nao deu', err); else render(); break; }
     case 'aportar': modalValor('Aportar na equipe', 'Dinheiro do fundo para o caixa da equipe.', S.f.caixa, 'aportar-ok'); break;
     case 'aportar-ok': { fecharModal(); const err = aportar(eqSel(), Number(p1)); if (err) alerta('Nao deu', err); else render(); break; }
     case 'retirar': modalValor('Sacar dividendo', 'Tira do caixa da equipe e leva para o fundo.', eqSel().p.caixa, 'retirar-ok'); break;
