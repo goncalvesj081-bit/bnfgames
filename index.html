@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BNF GAMES — Central de Jogos</title>
 <link rel="icon" href="./bnf-favicon.png" type="image/png">
-<meta name="description" content="BNF Games — O Míster e Nexus FC, dois jogos criados do zero.">
+<meta name="description" content="BNF Games — O Míster, Nexus FC e Fundo de Equipes, jogos criados do zero.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -211,6 +211,10 @@
     margin: 0 auto;
   }
 
+  @media (min-width: 1120px){
+    .cards-grid{ grid-template-columns: repeat(3, 1fr); }
+  }
+
   @media (max-width: 860px){
     .cards-grid{ grid-template-columns: 1fr; }
   }
@@ -226,6 +230,9 @@
   }
 
   .card-shell:hover{ background: var(--cyan-soft); }
+
+  .card-shell{ display:flex; }
+  .card-shell > .game-card{ flex:1; }
 
   .game-card{
     position: relative;
@@ -375,7 +382,7 @@
     <span class="badge"></span>
     <span>BNF Games</span>
   </div>
-  <div class="status-tag"><span class="dot-live"></span> 2 jogos online</div>
+  <div class="status-tag"><span class="dot-live"></span> 3 jogos online</div>
 </header>
 
 <section class="hero">
@@ -429,6 +436,29 @@
         <div class="card-bottom">
           <span class="whistle">Liga dos Nexos</span>
           <a class="kickoff-btn" href="./nexus.html">
+            Jogar
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <div class="card-shell">
+      <article class="game-card">
+        <div class="card-top">
+          <span class="tag">Simulador de investimento</span>
+          <span class="stat-mini">Modo<br>fundo</span>
+        </div>
+        <h2 class="game-title">Fundo de Equipes</h2>
+        <p class="game-desc">Comande um fundo que compra equipes de automobilismo. Comece na F4 ou na F3, invista em túnel de vento e fábrica, respeite o teto de gastos e venda no momento certo até chegar ao grid da F1.</p>
+        <ul class="feature-list">
+          <li>Da F4 à F1</li>
+          <li>Teto de gastos</li>
+          <li>Montadoras</li>
+        </ul>
+        <div class="card-bottom">
+          <span class="whistle">Edição F1</span>
+          <a class="kickoff-btn" href="./fundoequipes.html">
             Jogar
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
