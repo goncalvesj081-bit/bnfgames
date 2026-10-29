@@ -775,6 +775,217 @@ function fecharTeto(eq, linha) {
 }
 
 /* =========================================================
+   CICLO DE MERCADO
+   ========================================================= */
+const FASES = {
+  euforia: { n: 'Euforia', d: 'Multiplos inflados. Bom momento para vender, pessimo para comprar' },
+  alta: { n: 'Alta', d: 'Mercado aquecido, os donos pedem mais pelas equipes' },
+  estavel: { n: 'Estavel', d: 'Precos proximos do valor calculado' },
+  correcao: { n: 'Correcao', d: 'Mercado esfriando, aparecem pechinchas' },
+  crise: { n: 'Crise', d: 'Todo mundo vale menos. Quem tem caixa compra barato' }
+};
+function faseDe(i) {
+  return i >= 1.26 ? 'euforia' : i >= 1.09 ? 'alta' : i >= 0.93 ? 'estavel' : i >= 0.80 ? 'correcao' : 'crise';
+}
+function novoCiclo() { return { indice: 1, mom: 0, fase: 'estavel', hist: [] }; }
+function evoluirCiclo() {
+  const c = S.ciclo;
+  const reversao = (1 - c.indice) * 0.20;
+  const inercia = c.mom * 0.55;
+  const choque = (Math.random() - 0.5) * 0.17;
+  const d = reversao + inercia + choque;
+  c.mom = clamp(d, -0.22, 0.22);
+  c.indice = Math.round(clamp(c.indice + d, 0.62, 1.55) * 1000) / 1000;
+  const antes = c.fase;
+  c.fase = faseDe(c.indice);
+  c.hist.push({ t: S.temporada, i: c.indice });
+  if (c.hist.length > 24) c.hist.shift();
+  if (c.fase !== antes) noticia('Mercado em ' + FASES[c.fase].n.toLowerCase() + ': indice de multiplos em ' + c.indice.toFixed(2).replace('.', ',') + '.',
+    c.indice >= 1.09 ? 'v' : c.indice < 0.93 ? 'r' : '');
+}
+
+/* =========================================================
+   FUNDOS RIVAIS E MONTADORAS
+   ========================================================= */
+const PERFIS = {
+  agressivo: { n: 'agressivo', paga: 1.12, chance: 0.55, gosta: e => CATS[e.cat].rep + e.p.carro },
+  oportunista: { n: 'oportunista', paga: 0.94, chance: 0.45, gosta: e => (emCrise(e) ? 60 : 0) + e.p.marca },
+  paciente: { n: 'paciente', paga: 1.02, chance: 0.35, gosta: e => (e.p.tunel + e.p.fabrica) / 2 + e.p.academia },
+  conservador: { n: 'conservador', paga: 1.0, chance: 0.22, gosta: e => (e.p.divida < receitaBase(e) * 0.4 ? 50 : 0) + e.p.gestao },
+  /* montadora: so F1, paga acima do valor, compra por motivo de marca */
+  montadora: { n: 'montadora', paga: 1.30, chance: 0.10, gosta: e => e.p.marca + e.p.fabrica }
+};
+const TIERS = {
+  gigante: { n: 'gigante', caixa: [4e9, 9e9], rep: [76, 96], max: 4, piso: 300e6, compras: 3 },
+  grande: { n: 'consolidado', caixa: [600e6, 1.8e9], rep: [58, 80], max: 3, piso: 15e6, compras: 2 },
+  medio: { n: 'intermediario', caixa: [60e6, 250e6], rep: [38, 62], max: 3, piso: 2e6, compras: 2 },
+  pequeno: { n: 'emergente', caixa: [8e6, 45e6], rep: [15, 44], max: 2, piso: 0.2e6, compras: 1 },
+  montadora: { n: 'montadora', caixa: [8e9, 16e9], rep: [70, 90], max: 1, piso: 300e6, compras: 0 }
+};
+const RIVAIS_BASE = [
+  ['Meridian Motorsport Group', 'agressivo', 'gigante'],
+  ['Northgate Holdings', 'conservador', 'gigante'],
+  ['Solaris Racing Capital', 'paciente', 'gigante'],
+  ['Kestrel Capital', 'oportunista', 'grande'],
+  ['Vanguarda Capital', 'agressivo', 'grande'],
+  ['Helios Investimentos', 'paciente', 'grande'],
+  ['Bandeirantes Equity', 'conservador', 'grande'],
+  ['Orion Speed Fund', 'agressivo', 'medio'],
+  ['Grupo Pampa', 'oportunista', 'medio'],
+  ['Cobalto Capital', 'paciente', 'medio'],
+  ['Sextante Partners', 'conservador', 'medio'],
+  ['Fundo Serra Azul', 'oportunista', 'pequeno'],
+  ['Ventos do Sul Capital', 'paciente', 'pequeno'],
+  ['Nova Fronteira Racing', 'agressivo', 'pequeno'],
+  ['Farol Investimentos', 'oportunista', 'pequeno'],
+  ['Arkon Motors', 'montadora', 'montadora'],
+  ['Takeda Automotive', 'montadora', 'montadora'],
+  ['Valmont Automobiles', 'montadora', 'montadora']
+];
+function montarRival(i) {
+  const r = RIVAIS_BASE[i], t = TIERS[r[2]];
+  return {
+    id: i, nome: r[0], perfil: r[1], tier: r[2],
+    caixa: Math.round(t.caixa[0] + Math.random() * (t.caixa[1] - t.caixa[0])),
+    reputacao: ri(t.rep[0], t.rep[1]), equipes: []
+  };
+}
+function criarRivais() {
+  S.rivais = RIVAIS_BASE.map((r, i) => montarRival(i));
+  S.rivais.slice().sort((a, b) => b.caixa - a.caixa).forEach(r => {
+    for (let k = 0; k < TIERS[r.tier].compras; k++) rivalCompra(r, true);
+  });
+}
+function ehMontadora(r) { return r.perfil === 'montadora'; }
+function patrimonioRival(r) {
+  return r.caixa + r.equipes.reduce((t, id) => t + valorMercado(S.equipes[id]).liquido, 0);
+}
+function donoNome(eq) {
+  if (ehMeu(eq.id)) return S.f.nome;
+  return eq.dono === null || eq.dono === undefined ? null : S.rivais[eq.dono].nome;
+}
+function rivalCompra(r, inicial) {
+  const P = PERFIS[r.perfil], T = TIERS[r.tier];
+  if (r.equipes.length >= T.max) return false;
+  const teto = r.caixa * (inicial ? 0.75 : 0.55);
+  /* nenhuma categoria fica sem equipe livre: o jogador sempre tem onde comprar */
+  const livres = [];
+  S.equipes.forEach(e => { if (e.dono === null && !ehMeu(e.id)) livres[e.cat] = (livres[e.cat] || 0) + 1; });
+  const alvos = [];
+  S.equipes.forEach(e => {
+    if (e.dono !== null || ehMeu(e.id) || e.nova) return;
+    if ((livres[e.cat] || 0) <= 5) return;
+    if (ehMontadora(r) && e.cat !== 0) return;
+    if (CATS[e.cat].rep > r.reputacao + 24) return;
+    if (r.equipes.some(id => S.equipes[id].cat === e.cat)) return;
+    const preco = precoAlvo(e);
+    if (preco > teto || preco < T.piso) return;
+    alvos.push({ e: e, preco: preco, nota: P.gosta(e) + (valorMercado(e).liquido / preco) * 40 });
+  });
+  if (!alvos.length) return false;
+  alvos.sort((a, b) => b.nota - a.nota);
+  const esc = alvos[Math.min(alvos.length - 1, ri(0, 2))];
+  const pago = Math.round(esc.preco * P.paga);
+  if (pago > r.caixa) return false;
+  r.caixa -= pago;
+  r.equipes.push(esc.e.id);
+  esc.e.dono = r.id;
+  if (!inicial) noticia(r.nome + ' comprou a ' + esc.e.nome + ' (' + DIVS[esc.e.cat] + ') por ' + moeda(pago) + '.', 'a');
+  return true;
+}
+function rivalVende(r) {
+  if (r.equipes.length < 2 && !ehMontadora(r)) return;
+  if (!r.equipes.length) return;
+  const id = pick(r.equipes), e = S.equipes[id];
+  r.caixa += valorMercado(e).liquido;
+  r.equipes = r.equipes.filter(x => x !== id);
+  e.dono = null;
+  noticia(r.nome + ' colocou a ' + e.nome + ' de volta no mercado.', '');
+}
+/* montadoras ficam mais interessadas perto de uma mudanca de regulamento de motor */
+function janelaMotor() { return !!(S.reg && S.reg.motor && S.reg.motor - S.temporada <= 2 && S.reg.motor - S.temporada >= 0); }
+function turnoRivais() {
+  if (!S.rivais) return;
+  S.propostas = [];
+  S.rivais.forEach(r => {
+    const P = PERFIS[r.perfil], T = TIERS[r.tier];
+    r.equipes.forEach(id => {
+      const e = S.equipes[id], p = e.p;
+      r.caixa += valorMercado(e).liquido * 0.045;
+      if (Math.random() < 0.5) p.carro = clamp(Math.round(p.carro + ri(0, 2)), 30, 96);
+      if (Math.random() < 0.35) p.marca = clamp(p.marca + 1, 0, 98);
+      if (Math.random() < 0.3) p.tunel = clamp(p.tunel + 2, 0, 96);
+      p.divida = Math.max(0, Math.round(p.divida * 0.88));
+    });
+    r.caixa = Math.round(r.caixa * 0.95);
+    const chance = ehMontadora(r) ? (janelaMotor() ? 0.35 : P.chance) : P.chance;
+    if (r.equipes.length < T.max && Math.random() < chance) rivalCompra(r, false);
+    if (Math.random() < (ehMontadora(r) ? 0.05 : r.equipes.length >= T.max ? 0.30 : 0.08)) rivalVende(r);
+    /* proposta por uma equipe do jogador */
+    if (!S.donos.length) return;
+    const alvos = S.donos.filter(id => !r.equipes.some(x => S.equipes[x].cat === S.equipes[id].cat) && (!ehMontadora(r) || S.equipes[id].cat === 0));
+    if (!alvos.length) return;
+    const pch = ehMontadora(r) ? (janelaMotor() ? 0.40 : 0.12) : 0.05;
+    if (Math.random() >= pch) return;
+    const alvo = pick(alvos), e = S.equipes[alvo];
+    const v = Math.round(valorMercado(e).liquido * (ehMontadora(r) ? 1.35 + Math.random() * 0.45 : 1.12 + Math.random() * 0.34));
+    if (v > r.caixa) return;
+    S.propostas.push({ rival: r.id, id: alvo, valor: v, temp: S.temporada });
+    noticia(r.nome + ' fez uma proposta de ' + moeda(v) + ' pela ' + e.nome + '.', 'a');
+  });
+  invalidarTabelas();
+}
+function aceitarProposta(k) {
+  const pr = S.propostas[k];
+  if (!pr) return 'Proposta expirada';
+  if (S.fase !== 'pre') return 'Vendas so na pre-temporada';
+  const eq = S.equipes[pr.id], p = eq.p, b = balanco(eq), r = S.rivais[pr.rival];
+  S.f.caixa += pr.valor + p.caixa;
+  S.donos = S.donos.filter(x => x !== pr.id);
+  r.caixa -= pr.valor;
+  r.equipes.push(pr.id);
+  eq.dono = r.id;
+  const res = pr.valor + p.caixa + (p.retirado || 0) - b.investido;
+  rep(res > 0 ? 4 : 1);
+  arquivarAtivo(eq, pr.valor + p.caixa, res, r.nome);
+  p.caixa = 0;
+  delete p.compra; delete p.hist;
+  registrarVenda(res, ehMontadora(r));
+  noticia('Venda fechada com a ' + r.nome + ': ' + eq.nome + ' por ' + moeda(pr.valor) + '. Resultado do projeto: ' + sinal(res) + '.', 'v');
+  S.propostas.splice(k, 1);
+  S.propostas = S.propostas.filter(x => ehMeu(x.id));
+  salvar();
+  return null;
+}
+function recusarProposta(k) {
+  const pr = S.propostas[k];
+  if (!pr) return;
+  noticia('Proposta da ' + S.rivais[pr.rival].nome + ' pela ' + S.equipes[pr.id].nome + ' recusada.', '');
+  S.propostas.splice(k, 1);
+  salvar();
+}
+function registrarVenda(resultado, montadora) {
+  const m = S.f.marcos;
+  if (!m) return;
+  if (resultado > 0) m.vendasLucro++;
+  m.maiorLucro = Math.max(m.maiorLucro, resultado);
+  if (S.ciclo && S.ciclo.indice >= 1.26) m.vendaEuforia++;
+  if (montadora) m.montadora++;
+}
+function rankingFundos() {
+  const lista = (S.rivais || []).filter(r => !ehMontadora(r)).map(r => ({
+    id: r.id, nome: r.nome, pat: patrimonioRival(r), n: r.equipes.length, eu: false, tier: TIERS[r.tier].n
+  }));
+  lista.push({ id: 'eu', nome: S.f.nome, pat: patrimonio(), n: S.donos.length, eu: true, tier: 'seu fundo' });
+  lista.sort((a, b) => b.pat - a.pat);
+  lista.forEach((x, i) => { x.pos = i + 1; });
+  return lista;
+}
+function novosMarcos() {
+  return { vendasLucro: 0, maiorLucro: 0, vendaEuforia: 0, compraCrise: 0, montadora: 0, obras: 0, titulos: 0, podios: 0, vitoriasF1: 0, revelacao: 0 };
+}
+
+/* =========================================================
    FUNDO
    ========================================================= */
 function novoFundo(nome, idEquipe) {
@@ -783,7 +994,10 @@ function novoFundo(nome, idEquipe) {
   S.donos = []; S.noticias = []; S.relatorio = null; S.dd = {}; S.recusas = {};
   gerarCalendarios();
   invalidarTabelas();
+  S.ciclo = novoCiclo(); S.propostas = [];
+  S.f.marcos = novosMarcos();
   const err = comprarEquipe(idEquipe, 'justa', true);
+  criarRivais();
   noticia('Fundo ' + nome + ' constituido. Caixa inicial de ' + moeda(CAIXA0) + '.', 'v');
   S.f.pico = patrimonio();
   salvar();
@@ -903,6 +1117,13 @@ function comprarEquipe(id, tipoOferta, inicial) {
   const mesmaCat = temNaCat(eq.cat);
   const tinhaDD = temRelatorio(id);
   S.f.caixa -= preco;
+  if (eq.dono !== null && eq.dono !== undefined && S.rivais) {
+    const r = S.rivais[eq.dono];
+    r.caixa += preco; r.equipes = r.equipes.filter(x => x !== id);
+    noticia('Compra disputada: a ' + eq.nome + ' saiu das maos da ' + r.nome + '.', 'v');
+    eq.dono = null;
+  }
+  if (S.ciclo && S.ciclo.indice < 0.80 && S.f.marcos) S.f.marcos.compraCrise++;
   S.donos.push(id);
   S.dd[id] = 1;
   p.compra = { temp: S.temporada, preco: preco, carro: p.carro, valor: valorMercado(eq).liquido, cat: eq.cat, dd: tinhaDD || !!inicial };
@@ -930,6 +1151,8 @@ function venderEquipe(id) {
     noticia('Voce vendeu a ' + eq.nome + ' pior do que comprou. O mercado anotou.', 'r');
   } else if (b.resultado > 0) rep(3);
   arquivarAtivo(eq, v, b.resultado, 'mercado');
+  registrarVenda(b.resultado, false);
+  if (S.propostas) S.propostas = S.propostas.filter(x => ehMeu(x.id));
   p.caixa = 0;
   delete p.compra; delete p.hist;
   noticia('Venda da ' + eq.nome + ' por ' + moeda(v) + '. Resultado do projeto: ' + sinal(b.resultado) + '.', b.resultado >= 0 ? 'v' : 'r');
@@ -1073,14 +1296,17 @@ function encerrarTemporada() {
   });
   /* 4. resto do grid se ajusta: volta devagar para a forca de origem */
   S.equipes.forEach(eq => {
-    if (ehMeu(eq.id)) return;
+    if (ehMeu(eq.id) || (eq.dono !== null && eq.dono !== undefined)) return;
     const p = eq.p;
     p.carro = clamp(Math.round(p.carro + clamp(eq.base - p.carro, -2, 2) + ri(-2, 2)), 30, 96);
     p.confiab = clamp(Math.round(p.confiab + ri(-3, 3)), 35, 97);
     p.momento = Math.round(p.momento * 500) / 1000;
     p.divida = Math.max(0, Math.round(p.divida * (0.9 + Math.random() * 0.25)));
   });
-  /* 5. fundo */
+  /* 5. mercado e concorrencia */
+  evoluirCiclo();
+  turnoRivais();
+  /* 6. fundo */
   const juros = Math.round(S.f.divida * JUROS);
   if (juros > 0) {
     if (S.f.caixa >= juros) S.f.caixa -= juros;
@@ -1088,6 +1314,8 @@ function encerrarTemporada() {
   }
   const pat = patrimonio();
   if (pat > (S.f.pico || 0)) { rep(2); S.f.pico = pat; }
+  rel.ciclo = { indice: S.ciclo.indice, fase: S.ciclo.fase };
+  rel.ranking = rankingFundos();
   rel.fundo = {
     patrimonio: pat, caixa: S.f.caixa, divida: S.f.divida, juros: juros, reputacao: S.f.reputacao,
     patrimonioAntes: patAntes, caixaAntes: caixaAntes, reputacaoAntes: repAntes,
@@ -1098,10 +1326,10 @@ function encerrarTemporada() {
   S.f.hist.push({
     t: S.temporada, pat: Math.round(pat), caixa: Math.round(S.f.caixa), divida: Math.round(S.f.divida),
     rep: S.f.reputacao, n: S.donos.length, saldo: Math.round(rel.fundo.saldo),
-    pts: rel.equipes.reduce((t, x) => t + x.st.pts, 0), tit: rel.equipes.filter(x => x.campeao).length
+    pts: rel.equipes.reduce((t, x) => t + x.st.pts, 0), tit: rel.equipes.filter(x => x.campeao).length, ciclo: S.ciclo.indice
   });
   if (S.f.hist.length > 40) S.f.hist.shift();
-  /* 6. virada */
+  /* 7. virada */
   S.equipes.forEach(e => { e.st = novoStEquipe(); });
   S.pilotos.forEach(p => { p.st = novoStPiloto(); });
   meus().forEach(eq => { if (eq.p.punicao) { eq.st.pts = -eq.p.punicao; eq.p.punicao = 0; } });
@@ -1165,6 +1393,11 @@ function carregar() {
     if (!S.f.arquivo) S.f.arquivo = [];
     if (!S.dd) S.dd = {};
     if (!S.recusas) S.recusas = {};
+    if (!S.ciclo) S.ciclo = novoCiclo();
+    if (!S.propostas) S.propostas = [];
+    if (!S.f.marcos) S.f.marcos = novosMarcos();
+    S.equipes.forEach(e => { if (e.dono === undefined) e.dono = null; });
+    if (!S.rivais) criarRivais();
     S.equipes.forEach(e => { if (!e.p.obras) e.p.obras = []; if (e.p.tecnico === undefined) e.p.tecnico = 0; });
     if (S.passos !== passos() && S.fase !== 'temp') gerarCalendarios();
     S.passos = passos();
@@ -1184,7 +1417,7 @@ const UI = {
   equipe: null, abaEquipe: 'painel',
   catCamp: null, visaoCamp: 'construtores',
   abaRel: 'fundo', relFiltro: 'todas', relDet: {},
-  alavFiltro: 'todas', abaMercado: 'equipes', mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
+  alavFiltro: 'todas', abaMercado: 'equipes', mercLivre: false, mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
   criaCat: 2, criaOrd: 'preco', nome: '', foco: null, escolha: null
 };
 let SCROLL = {}, ULTIMA = '';
@@ -1343,6 +1576,7 @@ function telaFundo() {
       '<button class="btn sm gh" data-a="avancar:5">+5 etapas</button>' +
       '<button class="btn sm gh" data-a="pular">Ate o fim</button></div>');
   }
+  h += painelPropostas();
   const lista = meus();
   h += sec('posicao consolidada', lista.length + ' equipe' + (lista.length === 1 ? '' : 's'));
   if (!lista.length) h += painel('', '', vazio('Nenhuma equipe no portfolio'), true);
@@ -1443,6 +1677,7 @@ function painelEquipe(eq) {
       ln('Infraestrutura', 'x ' + v.fInfra.toFixed(2), '', 'tunel, fabrica e simulador') +
       ln('Saude financeira', 'x ' + v.fSaude.toFixed(2), v.fSaude < 1 ? 'neg' : 'ok') +
       ln('Momento', 'x ' + v.fMom.toFixed(2), v.fMom < 1 ? 'neg' : 'ok', 'titulos e podios recentes') +
+      ln('Ciclo de mercado', 'x ' + v.mCiclo.toFixed(2), v.mCiclo < 1 ? 'neg' : 'ok', FASES[S.ciclo.fase].n) +
       ln('Divida da equipe', '- ' + moeda(v.divida), v.divida > 0 ? 'neg' : '') +
       lnTot('Valor do ativo', moeda(v.liquido), 'ok'));
   return h;
@@ -1580,6 +1815,7 @@ function filtrarMercado() {
     const preco = precoAlvo(eq);
     if (UI.mercCat === 'alc' && preco > Math.max(S.f.caixa * 1.5, 8e6)) return;
     if (UI.mercCrise && !emCrise(eq)) return;
+    if (UI.mercLivre && eq.dono !== null && eq.dono !== undefined) return;
     lista.push({ eq: eq, preco: preco });
   });
   lista.sort((a, b) => UI.mercOrd === 'preco' ? a.preco - b.preco : UI.mercOrd === 'precod' ? b.preco - a.preco : b.eq.p.carro - a.eq.p.carro);
@@ -1587,20 +1823,19 @@ function filtrarMercado() {
 }
 function telaMercado() {
   if (UI.alvo !== null) return fichaMercado(UI.alvo);
+  let h = '<div class="wrap">' + seg(UI.abaMercado, [['equipes', 'Equipes a venda'], ['fundos', 'Fundos']], 'abamerc');
+  if (UI.abaMercado === 'fundos') return h + mercadoFundos() + '</div>';
   const lista = filtrarMercado();
-  let h = '<div class="wrap">' +
-    '<div class="panel"><div class="hd"><span>JANELA DE COMPRA</span><b>' + (S.fase === 'pre' ? 'ABERTA' : 'FECHADA') + '</b></div>' +
-    '<div class="bd"><p class="msg">' + (S.fase === 'pre'
-      ? 'Sua reputacao de <b>' + Math.round(S.f.reputacao) + '</b> define quais categorias atendem o fundo. A F1 pede ' + CATS[0].rep + ', a F2 pede ' + CATS[1].rep + ' (com 22 de folga).'
-      : 'A temporada esta rolando. Da para pesquisar, mas a compra so acontece na pre-temporada.') + '</p></div></div>';
+  h += painelCiclo();
   h += sec('filtros', lista.length + ' resultado' + (lista.length === 1 ? '' : 's')) +
     '<div class="filtros">' +
     campo('Categoria', selHTML('merccat', UI.mercCat, [['alc', 'Ao meu alcance']].concat(opsCats(acessoCat)))) +
     campo('Ordenar por', selHTML('mercord', UI.mercOrd, [['preco', 'Menor preco'], ['precod', 'Maior preco'], ['carro', 'Melhor carro']])) +
-    '</div><div class="toggles"><button class="tg ' + (UI.mercCrise ? 'on' : '') + '" data-a="tgcrise">Em crise</button></div>';
+    '</div><div class="toggles"><button class="tg ' + (UI.mercCrise ? 'on' : '') + '" data-a="tgcrise">Em crise</button>' +
+    '<button class="tg ' + (UI.mercLivre ? 'on' : '') + '" data-a="tglivre">Sem dono</button></div>';
   if (!lista.length) return h + painel('', '', vazio('Nenhuma equipe nesse filtro'), true) + painelEntradaF1() + '</div>';
   h += painel('', '', tabela(['Equipe', 'Carro', 'Preco'], lista.slice(0, 60).map(x => {
-    const eq = x.eq, marcas = [DIVS[eq.cat], 'marca ' + eq.p.marca];
+    const eq = x.eq, marcas = [DIVS[eq.cat], donoNome(eq) || 'sem dono'];
     if (temRelatorio(eq.id)) { marcas.push('analisada'); if (emCrise(eq)) marcas.push('em crise'); }
     return '<tr class="cl" data-a="alvo:' + eq.id + '"><td>' + nomeEq(eq) + '<span class="sub">' + esc(marcas.join(' - ')) + '</span></td>' +
       '<td>' + eq.p.carro + '</td><td class="' + (x.preco <= S.f.caixa ? 'ok' : 'mut') + '">' + moeda(x.preco) + '</td></tr>';
@@ -1621,7 +1856,7 @@ function fichaMercado(id) {
   const v = valorMercado(eq), r = receitaBase(eq), de = despesaEquipe(eq);
   const faixa = (x, s) => moeda(x * (1 - s)) + ' a ' + moeda(x * (1 + s));
   let h = '<div class="wrap"><button class="btn sec2 sm" data-a="voltarmerc">' + ic('volta') + ' Voltar ao mercado</button><div class="gap"></div>' +
-    '<div class="panel"><div class="hd"><span>' + esc(DIVS[cat]) + '</span><b>' + (temDD ? 'ANALISADA' : 'SEM RELATORIO') + '</b></div>' +
+    '<div class="panel"><div class="hd"><span>' + (donoNome(eq) ? 'SOB CONTROLE DE ' + esc(donoNome(eq).toUpperCase()) : esc(DIVS[cat]) + ' &middot; SEM DONO') + '</span><b>' + (temDD ? 'ANALISADA' : 'SEM RELATORIO') + '</b></div>' +
     '<div class="bd" style="padding:10px 11px 0"><div style="font-family:var(--disp);font-size:19px;text-transform:uppercase;line-height:1">' + corEq(eq) + esc(eq.nome) + '</div></div>' +
     '<div class="stats" style="border-top:1px solid var(--line);margin-top:10px">' +
     '<div><span>Carro</span><b>' + p.carro + '</b></div>' +
@@ -1654,6 +1889,7 @@ function fichaMercado(id) {
     ln('Marca e fas', 'x ' + v.fMarca.toFixed(2)) + ln('Infraestrutura', 'x ' + v.fInfra.toFixed(2)) +
     ln('Saude financeira', 'x ' + (temDD ? v.fSaude.toFixed(2) : 'a apurar'), temDD && v.fSaude < 1 ? 'neg' : 'gd') +
     ln('Momento', 'x ' + v.fMom.toFixed(2)) +
+    ln('Ciclo de mercado', 'x ' + v.mCiclo.toFixed(2), v.mCiclo < 1 ? 'neg' : 'ok', FASES[S.ciclo.fase].n) +
     lnTot('Valor estimado', temDD ? moeda(v.liquido) : faixa(v.liquido, 0.3), 'ok'));
   const bloq = S.fase !== 'pre' ? 'Janela fechada. Volte na pre-temporada.'
     : S.recusas[id] === S.temporada ? 'O dono recusou nesta temporada. Volte na proxima.' : null;
@@ -1669,6 +1905,89 @@ function fichaMercado(id) {
       }).join(''), true);
   }
   return h + '</div>';
+}
+
+function mercadoFundos() {
+  const rk = rankingFundos();
+  const eu = rk.filter(r => r.eu)[0], lider = rk[0];
+  const sob = S.equipes.filter(e => e.dono !== null && e.dono !== undefined).length;
+  let h = '<div class="panel"><div class="hd"><span>SUA POSICAO</span><b>' + eu.pos + ' DE ' + rk.length + '</b></div>' +
+    '<div class="stats c3">' +
+    celula('Patrimonio', moeda(eu.pat), eu.n + ' equipe' + (eu.n === 1 ? '' : 's')) +
+    celula('Lider', moeda(lider.pat), lider.eu ? 'e voce' : esc(lider.nome.split(' ')[0])) +
+    celula('Distancia', lider.eu ? '-' : moeda(lider.pat - eu.pat), lider.eu ? 'no topo' : 'ate o lider', lider.eu ? 'ok' : 'neg') +
+    '</div></div>';
+  h += sec('todos os fundos', sob + ' equipes com dono') +
+    painel('', '', tabela(['#', 'Fundo', 'Equipes', 'Patrimonio'], rk.map(linhaRanking), [0, 1]), true);
+  const mont = S.rivais.filter(ehMontadora);
+  h += sec('montadoras', janelaMotor() ? 'novo motor a caminho' : 'de olho na F1') +
+    painel('', '', mont.map(r => ln(r.nome, r.equipes.length ? esc(S.equipes[r.equipes[0]].nome) : 'sem equipe', r.equipes.length ? 'gd' : 'mut',
+      r.equipes.length ? 'dona de equipe na F1' : 'compra por marca, paga acima do valor')).join('')) +
+    '<p class="msg" style="margin-top:9px">Toque num fundo para ver a carteira. Equipe com dono tem premio de controle de 28% e o dono resiste mais a vender. ' +
+    'Montadoras so compram F1 e aparecem mais perto de uma mudanca de regulamento de motor: e a grande chance de venda.</p>';
+  return h;
+}
+function linhaRanking(r) {
+  return '<tr class="cl' + (r.eu ? ' eu' : '') + '" data-a="fundo:' + r.id + '">' +
+    '<td class="l num" style="width:24px">' + r.pos + '</td>' +
+    '<td class="l"><span class="nm">' + esc(r.nome) + '</span><span class="sub">' + esc(r.tier) + '</span></td>' +
+    '<td>' + r.n + '</td><td>' + moeda(r.pat) + '</td></tr>';
+}
+function modalFundo(idc) {
+  let nome, tier, caixa, rp, ids, perfil;
+  if (idc === 'eu') {
+    nome = S.f.nome; tier = 'seu fundo'; caixa = S.f.caixa; rp = S.f.reputacao; perfil = 'divida de ' + moeda(S.f.divida); ids = S.donos.slice();
+  } else {
+    const r = S.rivais[Number(idc)];
+    if (!r) return;
+    nome = r.nome; tier = TIERS[r.tier].n; caixa = r.caixa; rp = r.reputacao; perfil = 'perfil ' + PERFIS[r.perfil].n; ids = r.equipes.slice();
+  }
+  const valores = ids.map(id => valorMercado(S.equipes[id]).liquido);
+  const soma = valores.reduce((t, v) => t + v, 0);
+  const pat = idc === 'eu' ? patrimonio() : caixa + soma;
+  abrirModal('<h3>' + esc(nome) + '</h3>' +
+    '<div class="mono mut" style="font-size:10.5px;letter-spacing:1px;text-transform:uppercase;margin:5px 0 12px">' + esc(tier) + ' - ' + esc(perfil) + '</div>' +
+    '<div class="panel"><div class="stats c3">' +
+    celula('Patrimonio', moeda(pat), ids.length + ' equipe' + (ids.length === 1 ? '' : 's')) +
+    celula('Caixa livre', moeda(caixa), 'poder de compra') +
+    celula('Reputacao', Math.round(rp) + '/100', 'acesso as categorias') +
+    '</div></div><div class="gap"></div>' +
+    (ids.length ? '<div class="panel">' + tabela(['Equipe', '%', 'Valor'], ids.map((id, i) => {
+      const e = S.equipes[id];
+      return '<tr><td>' + nomeEq(e) + '<span class="sub">' + esc(DIVS[e.cat]) + ' - carro ' + e.p.carro + '</span></td>' +
+        '<td>' + (soma ? Math.round(valores[i] / soma * 100) : 0) + '%</td><td class="ok">' + moeda(valores[i]) + '</td></tr>';
+    })) + '</div>' : painel('', '', vazio('Sem equipes no momento'), true)) +
+    '<div class="gap"></div><button class="btn sec2" data-a="fechar">Fechar</button>');
+}
+function painelCiclo() {
+  const c = S.ciclo, f = FASES[c.fase];
+  return '<div class="panel"><div class="hd"><span>CICLO DE MERCADO</span><b>' + esc(f.n.toUpperCase()) + '</b></div>' +
+    '<div class="stats c2">' +
+    celula('Multiplo', 'x ' + c.indice.toFixed(2).replace('.', ','), 'sobre o valor calculado', c.indice >= 1.09 ? 'gd' : c.indice < 0.93 ? 'ok' : '') +
+    celula('Janela', S.fase === 'pre' ? 'aberta' : 'fechada', S.fase === 'pre' ? 'da para comprar' : 'so pesquisa', S.fase === 'pre' ? 'ok' : 'neg') +
+    '</div><div class="bd"><p class="msg">' + esc(f.d) + '. ' + (S.fase === 'pre'
+      ? 'Sua reputacao de <b>' + Math.round(S.f.reputacao) + '</b> define quais categorias atendem o fundo: a F1 pede ' + (CATS[0].rep - 22) + ', a F2 pede ' + (CATS[1].rep - 22) + '.'
+      : 'A compra so acontece na pre-temporada.') + '</p></div></div>';
+}
+function painelPropostas() {
+  if (S.fase !== 'pre' || !S.propostas || !S.propostas.length) return '';
+  S.propostas = S.propostas.filter(p => ehMeu(p.id));
+  if (!S.propostas.length) return '';
+  let h = sec('propostas recebidas', S.propostas.length + ' na mesa');
+  S.propostas.forEach((pr, k) => {
+    const eq = S.equipes[pr.id], p = eq.p, v = valorMercado(eq).liquido, r = S.rivais[pr.rival];
+    const premio = Math.round((pr.valor / Math.max(1, v) - 1) * 100);
+    const res = pr.valor + p.caixa + (p.retirado || 0) - (p.compra.preco + (p.aporte || 0));
+    h += painel(r.nome + (ehMontadora(r) ? ' (montadora)' : ''), eq.nome,
+      ln('Proposta na mesa', moeda(pr.valor), 'ok', premio >= 0 ? premio + '% acima do valor calculado' : Math.abs(premio) + '% abaixo do valor calculado') +
+      ln('Valor de mercado hoje', moeda(v)) +
+      ln('No mercado aberto voce faria', moeda(valorVenda(eq) + p.caixa)) +
+      ln(res >= 0 ? 'Lucro do projeto se aceitar' : 'Prejuizo do projeto se aceitar', moeda(Math.abs(res)), res >= 0 ? 'ok' : 'neg') +
+      '<div class="gap"></div><div class="bt2">' +
+      '<button class="btn sm" data-a="aceitar:' + k + '">Aceitar</button>' +
+      '<button class="btn sec2 sm" data-a="recusar:' + k + '">Recusar</button></div>') + '<div class="gap"></div>';
+  });
+  return h;
 }
 
 /* ---------------- tela: campeonatos ---------------- */
@@ -1697,7 +2016,7 @@ function telaCamp() {
     }), [0, 1]), true);
   } else if (UI.visaoCamp === 'eco') {
     const linhas = equipesDa(cat).map(eq => ({ eq: eq, r: receitaBase(eq), v: valorMercado(eq).liquido })).sort((a, b) => b.v - a.v)
-      .map(x => '<tr class="' + (ehMeu(x.eq.id) ? 'eu' : '') + '"><td>' + nomeEq(x.eq) + '<span class="sub">carro ' + x.eq.p.carro + ' &middot; marca ' + x.eq.p.marca + '</span></td>' +
+      .map(x => '<tr class="' + (ehMeu(x.eq.id) ? 'eu' : '') + '"><td>' + nomeEq(x.eq) + '<span class="sub">carro ' + x.eq.p.carro + ' &middot; ' + esc(donoNome(x.eq) || 'sem dono') + '</span></td>' +
         '<td>' + moeda(x.r) + '</td><td>' + (temRelatorio(x.eq.id) ? moeda(x.eq.p.divida) : '?') + '</td><td class="ok">' + moeda(x.v) + '</td></tr>');
     h += painel(DIVS[cat], 'PADRAO DA CATEGORIA',
       ln('Valor de uma vaga', moeda(ECO[cat].vaga)) +
@@ -1835,6 +2154,14 @@ function telaRelatorio() {
     celula('Divida', moeda(f.divida), f.juros > 0 ? moeda(f.juros) + ' de juros' : 'sem juros', f.divida > 0 ? 'neg' : '') +
     celula('Reputacao', Math.round(f.reputacao) + '/100', dRep === 0 ? 'estavel' : (dRep > 0 ? '+' + dRep : String(dRep)), dRep > 0 ? 'ok' : dRep < 0 ? 'neg' : '') +
     '</div><div class="bd">' + lnTot('Patrimonio liquido', moeda(f.patrimonio), 'ok') + '</div></div>';
+  if (r.ciclo) h += sec('mercado') + painel('', '',
+    ln('Fase do ciclo', FASES[r.ciclo.fase].n, r.ciclo.indice >= 1.09 ? 'gd' : r.ciclo.indice < 0.93 ? 'ok' : '') +
+    ln('Indice de multiplos', 'x ' + r.ciclo.indice.toFixed(2).replace('.', ','), '', FASES[r.ciclo.fase].d));
+  if (r.ranking) {
+    const meuRk = r.ranking.filter(x => x.eu)[0], topoRk = r.ranking.slice(0, 5);
+    if (topoRk.indexOf(meuRk) < 0) topoRk.push(meuRk);
+    h += sec('entre os fundos', meuRk.pos + ' de ' + r.ranking.length) + painel('', '', tabela(['#', 'Fundo', 'Equipes', 'Patrimonio'], topoRk.map(linhaRanking), [0, 1]), true);
+  }
   h += sec('campeoes') + painel('', '', r.campeoes.map(c =>
     ln(DIVS[c.cat], esc(c.equipe), c.meu ? 'ok' : '', 'pilotos: ' + c.piloto)).join(''));
   h += '<div class="gap"></div><button class="btn" data-a="fecharrel">Abrir a pre-temporada ' + S.temporada + ' ' + ic('seta') + '</button>';
@@ -1969,6 +2296,11 @@ document.addEventListener('click', e => {
     case 'quitarfundo': modalValor('Abater divida do fundo', 'Usa o caixa livre para reduzir os juros.', Math.min(S.f.divida, S.f.caixa), 'quitarfundo-ok'); break;
     case 'quitarfundo-ok': { fecharModal(); const err = quitarDividaFundo(Number(p1)); if (err) alerta('Nao deu', err); else render(); break; }
     case 'tgcrise': UI.mercCrise = !UI.mercCrise; render(); break;
+    case 'tglivre': UI.mercLivre = !UI.mercLivre; render(); break;
+    case 'abamerc': UI.abaMercado = p1; render(); break;
+    case 'fundo': modalFundo(p1); break;
+    case 'aceitar': { const err = aceitarProposta(Number(p1)); if (err) alerta('Nao deu', err); else { UI.equipe = null; render(); } break; }
+    case 'recusar': recusarProposta(Number(p1)); render(); break;
     case 'entrarf1':
       abrirModal('<h3>Entrar na F1</h3>' + ln('Taxa de entrada', moeda(TAXA_F1), 'neg') + ln('Caixa depois', moeda(S.f.caixa - TAXA_F1)) +
         '<p class="msg" style="margin:10px 0 12px">A nova equipe se chama <b>' + esc(S.f.nome) + ' F1</b> e larga do fundo do grid.</p>' +
