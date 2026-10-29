@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A0E13">
-<meta name="description" content="Fundo de Equipes - simulador de fundo de investimento em equipes de automobilismo.">
+<meta name="description" content="Paddock - simulador de fundo de investimento em equipes de automobilismo.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Fundo de Equipes</title>
+<title>Paddock</title>
 <link rel="icon" href="./bnf-favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -244,7 +244,7 @@ table.tbl{width:100%;border-collapse:collapse;font-family:var(--data);font-varia
 <div id="modal"></div>
 <script>
 /* =========================================================
-   FUNDO DE EQUIPES - simulador de fundo de investimento
+   PADDOCK - simulador de fundo de investimento
    em equipes de automobilismo. arquivo unico, dados locais
    ========================================================= */
 
@@ -274,7 +274,7 @@ const DB = {
   get(k) { try { const r = localStorage.getItem(k); return r === null ? (this.mem[k] || null) : r; } catch (e) { return this.mem[k] || null; } },
   del(k) { try { localStorage.removeItem(k); } catch (e) { } delete this.mem[k]; }
 };
-const CHAVE = 'fundodeequipes_v1';
+const CHAVE = 'paddock_v1';
 
 /* ---------------- icones ---------------- */
 const I = {
@@ -1888,7 +1888,7 @@ function nav() {
 /* ---------------- abertura ---------------- */
 function telaInicio() {
   const tem = !!DB.get(CHAVE);
-  return '<div class="hero"><h1>Fundo<em>de Equipes</em></h1><p>compre &middot; invista &middot; venda no momento certo</p></div>' +
+  return '<div class="hero"><h1>Paddock<em>fundo de equipes</em></h1><p>compre &middot; invista &middot; venda no momento certo</p></div>' +
     '<div class="wrap">' +
     painel('O QUE VOCE FAZ AQUI', '', '<p class="msg">Voce comanda um fundo de investimento no automobilismo. Nao pilota nem monta o carro: ' +
       '<b>compra equipes, investe nas alavancas certas e vende no momento certo</b>. O placar e o patrimonio liquido. ' +
@@ -3009,6 +3009,6 @@ document.addEventListener('click', e => {
 (function () { if (carregar()) { TELA = 'fundo'; render(); } else render(); })();
 </script>
 <script src="./bnf-config.js"></script>
-<script src="./bnf-analytics.js" data-page="Fundo de Equipes"></script>
+<script src="./bnf-analytics.js" data-page="Paddock"></script>
 </body>
 </html>
