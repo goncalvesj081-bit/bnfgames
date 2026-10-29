@@ -2121,7 +2121,9 @@ function topo() {
     '<span class="ctx">TEMP ' + (rel ? S.relatorio.temporada : S.temporada) + ' &middot; ' + ctx + '</span></div>' +
     '<div class="duo"><div><div class="k">Campeonato' + (cp ? ' &middot; ' + esc(DIVS[cp.eq.cat]) : '') + '</div><div class="v">' + (cp ? cp.txt : 'Sem equipe') + '</div>' +
     '<div class="s">' + (cp ? cp.sub : 'compre uma no mercado') + '</div></div>' +
-    '<div><div class="k">Patrimonio</div><div class="v">' + moeda(pat) + '</div><div class="s ' + (dv >= 0 ? 'ok' : 'neg') + '">' + sinal(dv) + (S.f.hist.length || rel ? ' na temporada' : ' desde o inicio') + '</div></div></div>' +
+    '<div data-a="verrel:fundo" style="cursor:pointer"><div class="k">Caixa disponivel</div><div class="v">' + moeda(S.f.caixa) + '</div>' +
+    '<div class="s">patrimonio ' + moeda(pat) + '</div>' +
+    (S.f.divida > 0 ? '<div class="s neg">divida ' + moeda(S.f.divida) + '</div>' : '') + '</div></div>' +
     '</div>';
 }
 function nav() {
@@ -3017,8 +3019,9 @@ function telaFundo() {
 /* caixa, credito e carteira consolidada: agora em relatorios */
 function painelGrupo() {
   const lista = meus(), lim = limiteCredito();
+  const expl = '<p class="msg" style="margin-bottom:10px"><b>Caixa</b> e o dinheiro livre para comprar e investir. <b>Patrimonio</b> e quanto o grupo vale: caixa + valor das equipes - dividas. E o placar de longo prazo.</p>';
   const totalValor = lista.reduce((t, eq) => t + valorMercado(eq).liquido + eq.p.caixa, 0);
-  return sec('caixa e credito') + painel('', '',
+  return sec('caixa e credito') + painel('', '', expl +
     ln('Valor das equipes + caixa delas', moeda(totalValor)) +
     ln('Caixa do grupo', moeda(S.f.caixa)) +
     ln('Divida do grupo', moeda(S.f.divida), S.f.divida > 0 ? 'neg' : '', S.f.divida > 0 ? 'juros de 11%: ' + moeda(S.f.divida * JUROS) + ' por temporada' : '') +
