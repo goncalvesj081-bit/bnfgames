@@ -300,6 +300,16 @@ h1,h2,h3{font-weight:900;font-style:italic;letter-spacing:0}
 .gp .rd{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ac)}
 .gp .tt{font-family:var(--disp);font-weight:900;font-style:italic;font-size:25px;text-transform:uppercase;line-height:1;margin-top:3px;padding-right:44px}
 .gp .sb{font-family:var(--data);font-size:10px;color:var(--muted);margin-top:5px;padding-right:44px}
+/* forma recente e matriz de resultados */
+.forma{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.forma>div{text-align:center}
+.forma b{display:block;font-family:var(--disp);font-weight:900;font-style:italic;font-size:15px;padding:5px 0;border-radius:3px;background:var(--panel3);color:var(--muted)}
+.forma b.pt{background:var(--pos2);color:var(--pos)} .forma b.pd{background:#2C2410;color:var(--gold)} .forma b.ab{background:#2C1512;color:#EE8880}
+.forma span{display:block;font-family:var(--data);font-size:9px;color:var(--muted2);margin-top:3px}
+.mtz th,.mtz td{padding:6px 7px;font-size:11.5px}
+.mtz td.l,.mtz th.l{position:sticky;left:0;background:var(--panel);z-index:1}
+.mtz tr.eu td.l{background:#2A1416}
+.foco{border-color:var(--line2)}
 </style>
 </head>
 <body>
@@ -1895,7 +1905,7 @@ const UI = {
   equipe: null, abaEquipe: 'painel',
   catCamp: null, visaoCamp: 'construtores',
   abaRel: 'fundo', relFiltro: 'todas', relDet: {},
-  alavFiltro: 'todas', abaMercado: 'equipes', mercLivre: false, trocaSai: null, mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
+  alavFiltro: 'todas', abaMercado: 'equipes', mercLivre: false, trocaSai: null, focoEq: null, mercCat: 'alc', mercOrd: 'preco', mercCrise: false, alvo: null,
   criaCat: 2, criaOrd: 'preco', nome: '', foco: null, escolha: null
 };
 let SCROLL = {}, ULTIMA = '';
@@ -2187,11 +2197,15 @@ function telaFundo() {
       '<button class="btn sm gh" data-a="avancar:5">+5 etapas</button>' +
       '<button class="btn sm gh" data-a="pular">Ate o fim</button></div></div></div>';
   }
+  if (S.donos.length) {
+    if (UI.focoEq === null || UI.focoEq === undefined || !ehMeu(UI.focoEq)) UI.focoEq = meus().slice().sort((a, b) => a.cat - b.cat)[0].id;
+    h += '<div class="gap"></div>' + trocador(listaAtivos(), UI.focoEq, 'focoeq') + painelFoco(S.equipes[UI.focoEq]);
+  }
   const u = S.fase === 'temp' ? ultimoGP() : null;
   if (u) h += '<div class="gap"></div>' + blocoUltimoGP(u);
   h += painelPropostas();
   if (S.donos.length) {
-    h += sec('seus campeonatos', 'construtores');
+    h += sec('classificacao', 'construtores');
     meus().slice().sort((a, b) => a.cat - b.cat).forEach(eq => {
       h += '<div class="panel"><div class="faixa" style="background:' + esc(eq.cor) + '"></div>' +
         '<div class="hd"><span>' + esc(DIVS[eq.cat]) + ' &middot; ' + etapasCorridas(eq.cat) + '/' + CATS[eq.cat].etapas + '</span>' + statusMeta(eq) + '</div>' +
@@ -2271,6 +2285,7 @@ function painelEquipe(eq) {
     '<div class="ex mono mut" style="font-size:9.5px;margin-top:7px">melhor carro da equipe em cada etapa</div>');
   const ref = x => mediaCat(cat, x);
   h += sec('classificacao', DIVS[cat]) + '<div class="panel">' + torre(cat, 5) + '</div>';
+  h += corridaACorrida(eq);
   h += sec('indicadores', 'traco = media da categoria') +
     painel('', '', [
       mtr('Carro', eq.p.carro, ref(e => e.p.carro), 'Desempenho atual. Pesa 70% no ritmo de corrida'),
@@ -2650,10 +2665,12 @@ function telaCamp() {
   const cat = UI.catCamp;
   let h = '<div class="wrap"><div class="filtros">' +
     campo('Categoria', selHTML('catcamp', cat, opsCats())) +
-    campo('Visao', selHTML('visaocamp', UI.visaoCamp, [['construtores', 'Construtores'], ['pilotos', 'Pilotos'], ['calendario', 'Calendario'], ['eco', 'Raio-x economico']])) +
+    campo('Visao', selHTML('visaocamp', UI.visaoCamp, [['construtores', 'Construtores'], ['evolucao', 'Evolucao e resultados'], ['pilotos', 'Pilotos'], ['calendario', 'Calendario'], ['eco', 'Raio-x economico']])) +
     '</div>';
   const ultK = S.cal[cat].map(e => !!e.res).lastIndexOf(true);
-  if (UI.visaoCamp === 'pilotos') {
+  if (UI.visaoCamp === 'evolucao') {
+    h += evolucaoCat(cat);
+  } else if (UI.visaoCamp === 'pilotos') {
     h += '<div class="panel"><div class="hd"><span>' + esc(DIVS[cat]) + '</span><b>PILOTOS</b></div>' + torrePilotos(cat) + '</div>' +
       '<p class="msg" style="margin-top:9px">O campeonato de pilotos e so informativo. O que paga a equipe e o de construtores.</p>';
   } else if (UI.visaoCamp === 'calendario') {
@@ -2867,6 +2884,172 @@ function graficosEquipe(eq) {
       legenda([['Receita', 'var(--ac)'], ['Despesa', '#3A4B5C']]), true) +
     sec('posicao final por temporada', 'mais alto e melhor') +
     painel('', '', '<div class="pw" style="padding-top:2px">' + svgLinha([{ dados: hc.map(x => ({ l: 'T' + x.t, v: -x.pos })) }], n => Math.round(-n) + 'o', 'gpos') + '</div>', true);
+}
+
+/* ---------------- acompanhamento da temporada ---------------- */
+/* pontos acumulados e posicao de cada equipe depois de cada corrida da categoria */
+function historicoCat(cat) {
+  const eqs = equipesDa(cat), tot = {}, acum = {}, pos = {}, ks = [];
+  eqs.forEach(e => {
+    const ganhos = S.cal[cat].reduce((t, et) => t + (et.res ? et.res.filter(r => r.eq === e.id).reduce((s, r) => s + r.pts, 0) : 0), 0);
+    tot[e.id] = e.st.pts - ganhos; /* punicao do teto entra como ponto de partida */
+    acum[e.id] = []; pos[e.id] = [];
+  });
+  S.cal[cat].forEach((et, k) => {
+    if (!et.res) return;
+    ks.push(k);
+    et.res.forEach(r => { if (tot[r.eq] !== undefined) tot[r.eq] += r.pts; });
+    eqs.forEach(e => acum[e.id].push(tot[e.id]));
+    eqs.slice().sort((a, b) => tot[b.id] - tot[a.id] || a.nome.localeCompare(b.nome)).forEach((e, i) => pos[e.id].push(i + 1));
+  });
+  return { ks: ks, acum: acum, pos: pos };
+}
+const SIGLAS = {
+  'Australia': 'AUS', 'Austria': 'AUT', 'Arabia Saudita': 'SAU', 'Abu Dhabi': 'ABU', 'Azerbaijao': 'AZE', 'Emilia-Romagna': 'IMO',
+  'Espanha': 'ESP', 'Estados Unidos': 'EUA', 'Gra-Bretanha': 'GBR', 'Sao Paulo': 'SAO', 'Singapura': 'SIN', 'Monaco': 'MON',
+  'Mexico': 'MEX', 'Miami': 'MIA', 'Monza': 'MZA', 'Misano': 'MIS', 'Mugello': 'MUG', 'Mogi Guacu': 'MOG', 'Santa Cruz do Sul': 'SCS',
+  'Paul Ricard': 'RIC', 'Red Bull Ring': 'RBR', 'Las Vegas': 'LVG', 'Catar': 'CAT', 'Canada': 'CAN', 'Holanda': 'HOL', 'Hungria': 'HUN'
+};
+function siglaPista(p) { return SIGLAS[p] || p.normalize('NFD').replace(/[^A-Za-z ]/g, '').replace(/ /g, '').slice(0, 3).toUpperCase(); }
+/* a equipe do fundo sempre em branco nos graficos, para nao se confundir com rivais de cor parecida */
+const COR_MINHA = '#F2F2F5';
+/* grafico de varias linhas, uma cor por equipe */
+function svgMulti(series, rotulos, fmt, invertido) {
+  const n = rotulos.length;
+  if (n < 2) return vazio('O grafico aparece depois da segunda corrida');
+  let lo = Infinity, hi = -Infinity;
+  series.forEach(s => s.v.forEach(v => { lo = Math.min(lo, v); hi = Math.max(hi, v); }));
+  if (invertido) { lo = 1; hi = Math.max(hi, 2); } else { lo = Math.min(0, lo); hi = Math.max(1, hi) * 1.08; }
+  const pl = margemY(lo, hi, fmt);
+  const x = i => pl + (GW - pl - GPR) * i / (n - 1);
+  const y = v => { const t = (v - lo) / (hi - lo); return GPT + (GH - GPT - GPB) * (invertido ? t : 1 - t); };
+  let eixo = '';
+  for (let k = 0; k <= 3; k++) {
+    const v = lo + (hi - lo) * k / 3, yy = y(v).toFixed(1);
+    eixo += '<line class="gl" x1="' + pl + '" y1="' + yy + '" x2="' + (GW - GPR) + '" y2="' + yy + '"/>' +
+      '<text class="ax" x="' + (pl - 5) + '" y="' + (Number(yy) + 2.5).toFixed(1) + '" text-anchor="end">' + esc(fmt(v)) + '</text>';
+  }
+  let corpo = '';
+  series.slice().sort((a, b) => (a.eu ? 1 : 0) - (b.eu ? 1 : 0)).forEach(s => {
+    const pts = s.v.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1));
+    corpo += '<path d="M' + pts.join('L') + '" fill="none" stroke="' + esc(s.cor) + '" stroke-width="' + (s.eu ? 2.6 : 1.4) + '"' +
+      (s.tr ? ' stroke-dasharray="3 3"' : '') + ' stroke-linejoin="round" stroke-linecap="round" opacity="' + (s.eu ? 1 : 0.8) + '"/>';
+    if (s.eu) corpo += '<circle cx="' + x(n - 1).toFixed(1) + '" cy="' + y(s.v[n - 1]).toFixed(1) + '" r="3.2" fill="' + esc(s.cor) + '" stroke="#0B0B0F" stroke-width="1.2"/>';
+  });
+  return '<svg class="chart" viewBox="0 0 ' + GW + ' ' + GH + '">' + eixo + corpo + eixoX(rotulos, x) + '</svg>';
+}
+/* cor da equipe do fundo no grafico: se for escura demais, usa o vermelho */
+function corLinha(eq) {
+  const c = eq.cor.replace('#', ''), r = parseInt(c.slice(0, 2), 16), g = parseInt(c.slice(2, 4), 16), b = parseInt(c.slice(4, 6), 16);
+  return (r * 0.299 + g * 0.587 + b * 0.114) < 60 ? '#9CA3AF' : eq.cor;
+}
+function graficoPontos(eq, hist) {
+  const tb = tabelaCat(eq.cat), i = tb.indexOf(eq), lider = tb[0], frente = i > 0 ? tb[i - 1] : null;
+  const rot = hist.ks.map(k => siglaPista(S.cal[eq.cat][k].pista));
+  const meta = metaDa(eq), naMeta = tb[meta - 1];
+  const series = [{ nome: eq.ab, cor: COR_MINHA, v: hist.acum[eq.id], eu: true }];
+  const leg = [[eq.ab + ' (sua)', COR_MINHA]];
+  if (lider && lider !== eq) { series.push({ nome: lider.ab, cor: corLinha(lider), v: hist.acum[lider.id] }); leg.push([lider.ab + ' (lider)', corLinha(lider)]); }
+  if (frente && frente !== lider) { series.push({ nome: frente.ab, cor: corLinha(frente), v: hist.acum[frente.id] }); leg.push([frente.ab + ' (a frente)', corLinha(frente)]); }
+  if (naMeta && naMeta !== eq && naMeta !== lider && naMeta !== frente) { series.push({ nome: 'meta', cor: '#DDB04A', v: hist.acum[naMeta.id], tr: true }); leg.push(['P' + meta + ' hoje (sua meta)', '#DDB04A']); }
+  return '<div class="pw">' + svgMulti(series, rot, v => String(Math.round(v))) + '</div>' + legenda(leg);
+}
+function formaRecente(eq, n) {
+  const its = [];
+  S.cal[eq.cat].forEach(et => {
+    if (!et.res) return;
+    const meus = et.res.filter(r => r.eq === eq.id);
+    const best = meus.reduce((m, r) => r.pos && (m === null || r.pos < m) ? r.pos : m, null);
+    its.push({ p: siglaPista(et.pista), best: best, pts: meus.reduce((t, r) => t + r.pts, 0) });
+  });
+  return its.slice(-n);
+}
+function chipsForma(eq) {
+  const f = formaRecente(eq, 5);
+  if (!f.length) return '<div class="ex mono mut" style="font-size:10px">Ainda sem corridas nesta temporada.</div>';
+  return '<div class="forma">' + f.map(x => '<div><b class="' + (x.best === null ? 'ab' : x.best <= 3 ? 'pd' : x.pts ? 'pt' : '') + '">' + (x.best === null ? 'AB' : 'P' + x.best) + '</b>' +
+    '<span>' + esc(x.p) + ' &middot; +' + x.pts + '</span></div>').join('') + '</div>';
+}
+/* o painel principal do paddock: tudo sobre a equipe em foco */
+function painelFoco(eq) {
+  const cat = eq.cat, corridas = etapasCorridas(cat);
+  let h = '<div class="panel foco"><div class="faixa" style="background:' + esc(eq.cor) + '"></div>' +
+    '<div class="hd"><span>Minha equipe &middot; ' + esc(DIVS[cat]) + '</span>' + statusMeta(eq) + '</div>' +
+    '<div class="bd" style="padding:10px 11px 0"><div class="tt-eq">' + esc(eq.nome) + '</div>' +
+    '<div class="ex mono mut" style="font-size:10px;margin-top:4px">' + eq.p.pil.map(id => esc(S.pilotos[id].nome) + ' (' + S.pilotos[id].nivel + ')').join(' &middot; ') +
+    ' &middot; carro ' + eq.p.carro + '</div></div>';
+  if (!corridas) {
+    return h + '<div class="bd">' + ln('Meta da temporada', 'P' + metaDa(eq), '', 'previsao pela forca de carro e pilotos') +
+      ln('Temporada passada', eq.ult ? 'P' + eq.ult : 'estreia') + '</div></div>';
+  }
+  const tb = tabelaCat(cat), i = tb.indexOf(eq), lider = tb[0];
+  const media = eq.st.pts / corridas, frente = i > 0 ? tb[i - 1] : null, atras = tb[i + 1] || null;
+  const hist = historicoCat(cat), posH = hist.pos[eq.id];
+  const tend = posH.length > 1 ? posH[Math.max(0, posH.length - 4)] - posH[posH.length - 1] : 0;
+  h += '<div class="stats" style="border-top:1px solid var(--line);margin-top:10px">' +
+    celula('Posicao', 'P' + (i + 1), tend > 0 ? 'subiu ' + tend : tend < 0 ? 'caiu ' + (-tend) : 'estavel', tend > 0 ? 'ok' : tend < 0 ? 'neg' : '') +
+    celula('Pontos', String(eq.st.pts), corridas + ' corrida' + (corridas === 1 ? '' : 's')) +
+    celula('Lider', i === 0 ? 'voce' : '-' + (lider.st.pts - eq.st.pts), i === 0 ? 'na ponta' : esc(lider.ab), i === 0 ? 'ok' : '') +
+    celula('Media', media.toFixed(1).replace('.', ','), 'pts por corrida') + '</div>' +
+    '<div class="bd">' +
+    '<div class="mono mut" style="font-size:8.5px;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:6px">Forma - ultimas corridas</div>' + chipsForma(eq) +
+    '<div class="gap"></div>' +
+    (frente ? ln('A frente: ' + frente.nome, (frente.st.pts - eq.st.pts) + ' pts', 'neg', 'P' + i + ' - faltam ' + (frente.st.pts - eq.st.pts + 1) + ' pontos para passar') : ln('Ninguem a frente', 'lider', 'ok')) +
+    (atras ? ln('Atras: ' + atras.nome, '+' + (eq.st.pts - atras.st.pts) + ' pts', eq.st.pts - atras.st.pts <= 10 ? 'gd' : 'ok', 'P' + (i + 2)) : ln('Ninguem atras', 'lanterna', 'neg')) +
+    '</div>' +
+    '<div class="mono mut" style="font-size:8.5px;letter-spacing:1.3px;text-transform:uppercase;padding:0 11px">Pontos acumulados</div>' +
+    graficoPontos(eq, hist) + '<div style="height:10px"></div></div>';
+  return h;
+}
+/* aba corrida da equipe: corrida a corrida, posicao no campeonato e duelo interno */
+function corridaACorrida(eq) {
+  const cat = eq.cat, hist = historicoCat(cat);
+  if (!hist.ks.length) return '';
+  const linhas = hist.ks.map((k, j) => {
+    const et = S.cal[cat][k];
+    const rs = eq.p.pil.map(id => et.res.filter(r => r.pl === id)[0]);
+    const outros = et.res.filter(r => r.eq === eq.id && eq.p.pil.indexOf(r.pl) < 0);
+    const cel = r => !r ? '<td class="mut">-</td>' : '<td class="' + (r.pos === null ? 'neg' : r.pos <= 3 ? 'gd' : r.pts ? 'ok' : '') + '">' + (r.pos === null ? 'AB' : r.pos) + '</td>';
+    const pts = et.res.filter(r => r.eq === eq.id).reduce((t, r) => t + r.pts, 0);
+    return '<tr><td class="l"><span class="nm">' + esc(et.pista) + '</span>' + (outros.length ? '<span class="sub">com piloto que ja saiu</span>' : '') + '</td>' +
+      rs.map(cel).join('') + '<td>' + (pts ? '+' + pts : '0') + '</td><td><span class="' + posCls(hist.pos[eq.id][j]) + '">P' + hist.pos[eq.id][j] + '</span></td></tr>';
+  }).reverse();
+  const pls = eq.p.pil.map(id => S.pilotos[id]);
+  let duelo = [0, 0];
+  hist.ks.forEach(k => {
+    const et = S.cal[cat][k], a = et.res.filter(r => r.pl === pls[0].id)[0], b = et.res.filter(r => r.pl === pls[1].id)[0];
+    if (!a || !b) return;
+    const pa = a.pos || 99, pb = b.pos || 99;
+    if (pa < pb) duelo[0]++; else if (pb < pa) duelo[1]++;
+  });
+  const rot = hist.ks.map(k => siglaPista(S.cal[cat][k].pista));
+  return sec('posicao no campeonato', 'depois de cada corrida') +
+    painel('', '', '<div class="pw">' + svgMulti([{ cor: COR_MINHA, v: hist.pos[eq.id], eu: true }], rot, v => 'P' + Math.round(v), true) + '</div>', true) +
+    sec('corrida a corrida', hist.ks.length + ' de ' + CATS[cat].etapas) +
+    painel('', '', tabela(['GP', siglaPiloto(pls[0]), siglaPiloto(pls[1]), 'Pts', 'Camp'], linhas), true) +
+    sec('duelo interno', 'quem chegou na frente') +
+    painel('', '', ln(pls[0].nome, duelo[0] + ' x ' + duelo[1], duelo[0] >= duelo[1] ? 'ok' : '', pls[0].st.pts + ' pts no campeonato de pilotos') +
+      ln(pls[1].nome, duelo[1] + ' x ' + duelo[0], duelo[1] >= duelo[0] ? 'ok' : '', pls[1].st.pts + ' pts no campeonato de pilotos'));
+}
+/* campeonato: evolucao dos pontos e matriz de resultados */
+function evolucaoCat(cat) {
+  const hist = historicoCat(cat);
+  if (hist.ks.length < 2) return painel('', '', vazio('A evolucao aparece depois da segunda corrida'), true);
+  const tb = tabelaCat(cat), escolhidas = tb.filter((e, i) => i < 5 || ehMeu(e.id));
+  const rot = hist.ks.map(k => siglaPista(S.cal[cat][k].pista));
+  let h = sec('pontos acumulados', '5 primeiros e suas equipes') +
+    painel('', '', '<div class="pw">' + svgMulti(escolhidas.map(e => ({ cor: ehMeu(e.id) ? COR_MINHA : corLinha(e), v: hist.acum[e.id], eu: ehMeu(e.id) })), rot, v => String(Math.round(v))) + '</div>' +
+      legenda(escolhidas.map(e => [e.ab + (ehMeu(e.id) ? ' (sua)' : ''), ehMeu(e.id) ? COR_MINHA : corLinha(e)])), true);
+  h += sec('pontos por corrida', 'role para o lado') +
+    '<div class="panel"><div style="overflow-x:auto"><table class="tbl mtz"><tr><th class="l">Equipe</th>' + rot.map(r => '<th>' + esc(r) + '</th>').join('') + '<th>Total</th></tr>' +
+    tb.map(e => '<tr class="' + (ehMeu(e.id) ? 'eu' : '') + '"><td class="l"><span class="nm" style="white-space:nowrap">' + corEq(e) + esc(e.ab) + '</span></td>' +
+      hist.ks.map(k => {
+        const p = S.cal[cat][k].res.filter(r => r.eq === e.id).reduce((t, r) => t + r.pts, 0);
+        const v = S.cal[cat][k].res[0].eq === e.id;
+        return '<td class="' + (v ? 'gd' : p ? '' : 'mut') + '">' + (p || '-') + '</td>';
+      }).join('') + '<td><b>' + e.st.pts + '</b></td></tr>').join('') + '</table></div></div>' +
+    '<p class="msg" style="margin-top:9px">Em dourado, a equipe que venceu a corrida.</p>';
+  return h;
 }
 
 /* ---------------- tela: relatorios ---------------- */
@@ -3144,6 +3327,7 @@ document.addEventListener('click', e => {
     case 'fecharrel': UI.relDet = {}; fecharRelatorio(); TELA = 'fundo'; render(); break;
     case 'verequipe': UI.equipe = Number(p1); TELA = 'equipes'; render(); break;
     case 'abaequipe': UI.abaEquipe = p1; UI.trocaSai = null; render(); break;
+    case 'focoeq': UI.focoEq = Number(p1); render(); break;
     case 'trocapil': UI.trocaSai = UI.trocaSai === Number(p1) ? null : Number(p1); render(); break;
     case 'contratar': {
       const eq = eqSel(), pl = S.pilotos[Number(p1)], sai = S.pilotos[UI.trocaSai], c = custoContratacao(pl, eq);
