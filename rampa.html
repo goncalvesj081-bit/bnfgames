@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0F14">
+<meta name="description" content="Rampa - simulador de eleição e governo: faça campanha, vença no voto e governe o Brasil por quatro anos. Grátis.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Rampa</title>
+<link rel="icon" href="./bnf-favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0F14; --bg2:#0D141B; --panel:#111A22; --panel2:#16212B; --panel3:#1C2A36;
+  --line:#1D2934; --line2:#2A3946; --txt:#E6EDF3; --muted:#7D8E9E; --muted2:#58697A;
+  --ac:#F2C230; --ac2:#2E260B; --green:#22B573; --green2:#0E2A1E; --red:#E2564B; --red2:#2E1210; --blue:#4D8FE6;
+  --disp:'Barlow Condensed',Impact,sans-serif;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  --data:'JetBrains Mono',ui-monospace,monospace;
+  --r:4px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:var(--body);font-size:15px}
+body{overscroll-behavior:none}
+button,input,select{font-family:inherit;color:inherit;font-size:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+button:disabled{cursor:not-allowed;opacity:.4}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+#app{max-width:560px;margin:0 auto;min-height:100vh;padding-bottom:84px}
+.wrap{padding:12px 12px 20px}
+
+/* cabeçalho */
+.hdr{position:sticky;top:0;z-index:40;background:var(--bg2);border-bottom:1px solid var(--line2)}
+.hdr .r1{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 7px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--disp);font-weight:800;font-size:16px;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.brand i{display:inline-block;width:14px;height:10px;background:var(--ac);clip-path:polygon(0 100%,100% 0,100% 100%)}
+.ctx{font-family:var(--data);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.ctx b{color:var(--ac);font-weight:500}
+.hdr .r2{padding:9px 12px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.big{font-family:var(--data);font-size:26px;font-weight:600;line-height:1;color:var(--ac);letter-spacing:-.5px}
+.cap{font-family:var(--data);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-top:4px}
+.delta{font-family:var(--data);font-size:11px;text-align:right;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.stats>div{padding:6px 9px;border-right:1px solid var(--line);min-width:0}
+.stats>div:last-child{border-right:0}
+.stats span{display:block;font-family:var(--data);font-size:8.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted2)}
+.stats b{display:block;font-family:var(--data);font-size:12.5px;font-weight:500;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* seções */
+.sec{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:18px 2px 8px}
+.sec:first-child{margin-top:2px}
+.sec h4{margin:0;font-family:var(--data);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.sec em{font-style:normal;font-family:var(--data);font-size:10px;color:var(--muted2)}
+.panel{border:1px solid var(--line2);background:var(--panel);border-radius:var(--r);overflow:hidden}
+.panel+.panel{margin-top:8px}
+.pad{padding:11px 12px}
+.muted{color:var(--muted)} .small{font-size:12.5px} .tiny{font-size:11px}
+.pos{color:var(--green)} .neg{color:var(--red)} .gold{color:var(--ac)}
+.mono{font-family:var(--data)}
+
+/* barras de pesquisa */
+.bar{display:grid;grid-template-columns:118px 1fr 48px;align-items:center;gap:8px;padding:6px 12px}
+.bar+.bar{border-top:1px solid var(--line)}
+.bar .nm{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .nm small{display:block;font-family:var(--data);font-size:9px;color:var(--muted2);letter-spacing:.5px}
+.bar .tr{height:9px;background:var(--panel3);border-radius:2px;overflow:hidden}
+.bar .tr>div{height:100%;border-radius:2px;transition:width .4s}
+.bar .vl{font-family:var(--data);font-size:12.5px;text-align:right}
+.bar.me .nm{font-weight:700}
+
+/* regiões */
+.regs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.reg{border:1px solid var(--line2);background:var(--panel);border-radius:var(--r);padding:7px 4px 6px;text-align:center;min-width:0}
+.reg.on{border-color:var(--ac);background:var(--ac2)}
+.reg .rid{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.5px}
+.reg .rp{font-family:var(--data);font-size:11.5px;margin-top:1px}
+.reg .rl{height:3px;margin-top:5px;border-radius:2px}
+.reg .rw{font-family:var(--data);font-size:8.5px;color:var(--muted2);margin-top:3px}
+
+/* ações */
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.act{border:1px solid var(--line2);background:var(--panel);border-radius:var(--r);padding:9px 10px;text-align:left;display:flex;flex-direction:column;gap:3px;min-height:64px}
+.act:not(:disabled):active{background:var(--panel3)}
+.act b{font-size:13.5px}
+.act span{font-size:11.5px;color:var(--muted);line-height:1.35}
+.act .cost{font-family:var(--data);font-size:10px;color:var(--ac);margin-top:auto}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line2);background:var(--panel);border-radius:20px;padding:6px 11px;font-size:12.5px}
+.chip.on{border-color:var(--ac);color:var(--ac)}
+
+/* cartas de evento */
+.card{border:1px solid var(--ac);background:linear-gradient(180deg,#1A1708,var(--panel));border-radius:var(--r);padding:13px 13px 12px}
+.card .kick{font-family:var(--data);font-size:9.5px;letter-spacing:1.8px;text-transform:uppercase;color:var(--ac)}
+.card h3{margin:5px 0 6px;font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:.3px;line-height:1.1}
+.card p{margin:0 0 10px;font-size:13.5px;line-height:1.5;color:#C9D4DE}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line2);background:var(--panel2);border-radius:var(--r);padding:10px 11px;font-size:13.5px;line-height:1.4}
+.opt+.opt{margin-top:6px}
+.opt:active{background:var(--panel3)}
+.opt small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.card.res{border-color:var(--line2);background:var(--panel)}
+
+/* botões */
+.btn{display:block;width:100%;background:var(--ac);color:#1A1500;font-family:var(--disp);font-weight:800;font-size:18px;letter-spacing:1.2px;text-transform:uppercase;padding:13px;border-radius:var(--r);text-align:center;text-decoration:none}
+.btn.sec2{background:var(--panel2);color:var(--txt);border:1px solid var(--line2)}
+.btn.sm{font-size:14px;padding:9px;display:inline-block;width:auto}
+.btn+.btn{margin-top:8px}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:50;background:linear-gradient(180deg,transparent,var(--bg) 30%);padding:18px 12px calc(12px + env(safe-area-inset-bottom))}
+.foot>div{max-width:536px;margin:0 auto}
+
+/* log */
+.log{list-style:none;margin:0;padding:0}
+.log li{padding:7px 12px;font-size:12.5px;line-height:1.45;color:#C3CED8;border-top:1px solid var(--line)}
+.log li:first-child{border-top:0}
+.log li b{font-family:var(--data);font-size:10px;color:var(--muted2);font-weight:500;margin-right:6px}
+
+/* tabelas */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:6px 8px;text-align:right;border-top:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--data);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);font-weight:500;border-top:0}
+th:first-child,td:first-child{text-align:left}
+.tw{overflow-x:auto}
+
+/* título */
+.title{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:28px 18px 40px}
+.logo{font-family:var(--disp);font-weight:800;font-size:76px;letter-spacing:6px;line-height:.9;text-transform:uppercase;position:relative}
+.logo::after{content:"";display:block;width:100%;height:14px;margin-top:10px;background:var(--ac);clip-path:polygon(0 100%,100% 0,100% 100%)}
+.sub{font-family:var(--data);font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--muted);margin:16px 0 26px}
+.how{margin:26px 0 0;padding:0;list-style:none;counter-reset:h}
+.how li{counter-increment:h;display:grid;grid-template-columns:26px 1fr;gap:8px;font-size:13px;line-height:1.5;color:#C3CED8;margin-bottom:9px}
+.how li::before{content:counter(h);font-family:var(--data);color:var(--ac);font-size:12px;padding-top:1px}
+.free{display:inline-block;font-family:var(--data);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);border:1px solid var(--green2);background:rgba(34,181,115,.08);padding:5px 9px;border-radius:3px;margin-bottom:14px}
+
+/* formulário */
+label.fl{display:block;font-family:var(--data);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin:16px 2px 7px}
+.inp{width:100%;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r);padding:11px 12px;font-size:15px}
+.inp:focus{outline:none;border-color:var(--ac)}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pk{border:1px solid var(--line2);background:var(--panel);border-radius:var(--r);padding:9px 10px;text-align:left;min-width:0}
+.pk.on{border-color:var(--ac);background:var(--ac2)}
+.pk b{display:block;font-size:13px}
+.pk span{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.35}
+.pk .tg{font-family:var(--data);font-size:9.5px;color:var(--ac);margin-top:4px}
+
+/* indicadores do governo */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.kpi{background:var(--panel);border:1px solid var(--line2);border-radius:var(--r);padding:7px 8px;min-width:0}
+.kpi span{display:block;font-family:var(--data);font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2)}
+.kpi b{display:block;font-family:var(--data);font-size:14px;font-weight:500;margin-top:3px}
+.kpi i{display:block;font-style:normal;font-family:var(--data);font-size:9.5px;margin-top:1px;color:var(--muted2)}
+.proj{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:9px 12px;border-top:1px solid var(--line)}
+.proj:first-child{border-top:0}
+.proj b{font-size:13px;display:block}
+.proj span{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.proj .pl{font-family:var(--data);font-size:10px;margin-top:3px}
+.mini{border:1px solid var(--line2);background:var(--panel2);border-radius:var(--r);padding:7px 10px;font-size:12px;font-weight:600;white-space:nowrap}
+.mini.y{border-color:var(--ac);color:var(--ac)}
+.party{display:grid;grid-template-columns:44px 1fr 70px 34px;gap:8px;align-items:center;padding:7px 12px;border-top:1px solid var(--line);font-size:12.5px}
+.party:first-child{border-top:0}
+.party .sg{font-family:var(--data);font-weight:600;font-size:11.5px}
+.party .sb{height:5px;background:var(--panel3);border-radius:3px;overflow:hidden}
+.party .sb>div{height:100%}
+.party .st{font-family:var(--data);font-size:11px;text-align:right}
+.spark{display:block;width:100%;height:46px}
+
+/* debate */
+.deb{padding:16px 12px}
+.deb .q{font-family:var(--disp);font-weight:700;font-size:24px;line-height:1.15;margin:8px 0 14px}
+.prog{display:flex;gap:4px;margin-bottom:14px}
+.prog i{flex:1;height:4px;background:var(--panel3);border-radius:2px}
+.prog i.on{background:var(--ac)}
+
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--panel3);border:1px solid var(--line2);padding:9px 14px;border-radius:var(--r);font-size:13px;z-index:80;max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.center{text-align:center}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.verdict{font-family:var(--disp);font-weight:800;font-size:40px;line-height:1;letter-spacing:1px;text-transform:uppercase;margin:6px 0 4px}
+a.back{font-family:var(--data);font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:1px}
+@media (max-width:380px){
+  .bar{grid-template-columns:96px 1fr 44px}
+  .reg .rid{font-size:15px}
+  .kpi b{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ================================================================
+   RAMPA — simulador de eleição e governo (BNF Games)
+   Todos os nomes de candidatos e partidos são fictícios.
+================================================================= */
+(function(){
+'use strict';
+
+/* ---------- utilidades ---------- */
+const $app = document.getElementById('app');
+const R = (a,b)=>a+Math.random()*(b-a);
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const f1=x=>(Math.round(x*10)/10).toFixed(1).replace('.',',');
+const f2=x=>(Math.round(x*100)/100).toFixed(2).replace('.',',');
+const pc=x=>f1(x*100)+'%';
+const mon=x=>'R$ '+f1(x)+' mi';
+const sg=x=>(x>0?'+':'')+f1(x);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const store={mem:{},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){this.mem[k]=v}},
+  get(k){try{const r=localStorage.getItem(k);return r===null?(this.mem[k]||null):r}catch(e){return this.mem[k]||null}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}delete this.mem[k]}};
+const KEY='rampa_save_v1', BEST='rampa_best_v1';
+
+/* ---------- dados ---------- */
+const REGS=[
+  {id:'SE',nome:'Sudeste',peso:.426,lean:.2},
+  {id:'NE',nome:'Nordeste',peso:.271,lean:-.7},
+  {id:'S', nome:'Sul',peso:.146,lean:.5},
+  {id:'N', nome:'Norte',peso:.081,lean:.05},
+  {id:'CO',nome:'Centro-Oeste',peso:.076,lean:.6},
+];
+const RG=id=>REGS.find(r=>r.id===id);
+
+const PARTIES=[
+  {id:'FP', nome:'Frente Progressista',ideo:-1.6,seats:68},
+  {id:'AT', nome:'Aliança Trabalhista',ideo:-1.0,seats:45},
+  {id:'PVS',nome:'Partido Verde Social',ideo:-0.6,seats:22},
+  {id:'MDC',nome:'Movimento Democrático de Centro',ideo:0.1,seats:82,centrao:true},
+  {id:'UR', nome:'União Republicana',ideo:0.5,seats:70,centrao:true},
+  {id:'BPC',nome:'Bloco Popular Cristão',ideo:0.9,seats:55,centrao:true},
+  {id:'ML', nome:'Movimento Liberal',ideo:1.0,seats:40},
+  {id:'PON',nome:'Partido da Ordem Nacional',ideo:1.5,seats:60},
+];
+const AVULSOS=71; // 442 + 71 = 513
+const PT=id=>PARTIES.find(p=>p.id===id);
+function ideoLabel(x){return x<-1.2?'Esquerda':x<-.4?'Centro-esquerda':x<=.4?'Centro':x<=1.2?'Centro-direita':'Direita'}
+
+const RIVALS=[
+  {nome:'Helena Prado',partido:'FP',home:'NE',str:1.15,cor:'#E2564B'},
+  {nome:'Augusto Ventura',partido:'PON',home:'CO',str:1.15,cor:'#4D8FE6'},
+  {nome:'Ricardo Albuquerque',partido:'MDC',home:'SE',str:1.0,cor:'#B48CF2'},
+  {nome:'Celso Ramalho',partido:'PVS',home:'N',str:.85,cor:'#22B573'},
+  {nome:'Lúcia Fontes',partido:'ML',home:'S',str:.9,cor:'#F08A3C'},
+  {nome:'Otávio Brandão',partido:'BPC',home:'SE',str:.95,cor:'#3CC6D8'},
+  {nome:'Dalva Moreira',partido:'AT',home:'NE',str:.95,cor:'#E07AB0'},
+  {nome:'Fernando Quintela',partido:'UR',home:'S',str:.95,cor:'#9FB34A'},
+];
+
+const PERFIS=[
+  {id:'gov',nome:'Governador(a)',desc:'Gestão bem avaliada: muito forte na região de origem.',money:25,fame:58,homeMul:2.4},
+  {id:'sen',nome:'Senador(a)',desc:'Trânsito no Congresso: mais TV e partidos querem se aliar.',money:25,fame:64,homeMul:1.6,tv:.35,ally:.2},
+  {id:'emp',nome:'Empresário(a)',desc:'Começa com caixa de campanha robusto.',money:55,fame:56,homeMul:1.5},
+  {id:'pop',nome:'Liderança popular',desc:'Comícios rendem mais. Pouco dinheiro.',money:16,fame:62,homeMul:1.8,rally:1.3},
+];
+const VICES=[
+  {id:'agro',nome:'Vice do agronegócio',desc:'Reforço no Centro-Oeste e no Sul.',bonus:{CO:1.25,S:1.15}},
+  {id:'ne',nome:'Vice nordestino(a)',desc:'Reforço no Nordeste.',bonus:{NE:1.22}},
+  {id:'emp',nome:'Vice empresário(a)',desc:'Reforço no Sudeste e +R$ 2 mi por semana.',bonus:{SE:1.1},income:2},
+  {id:'jov',nome:'Vice jovem e digital',desc:'Propaganda na TV e internet rende mais.',bonus:{},tv:.3},
+];
+const FAZENDA=[
+  {id:'orto',nome:'Ortodoxo(a)',desc:'Agrada o mercado e segura gastos. Crescimento um pouco menor.'},
+  {id:'prag',nome:'Pragmático(a)',desc:'Equilibrado. Sem grandes sustos para nenhum lado.'},
+  {id:'dev',nome:'Desenvolvimentista',desc:'Acelera o crescimento com gasto público. Mercado desconfia e a inflação pressiona.'},
+];
+
+/* ---------- estado ---------- */
+let S=null;
+let UI={screen:'title',setup:{nome:'',partido:'MDC',perfil:'gov',home:'SE',vice:'ne'},reg:'SE',atk:false,minis:false,apoio:false,toast:null,lastPhase:null};
+function save(){if(S)store.set(KEY,JSON.stringify(S))}
+function load(){try{const r=store.get(KEY);return r?JSON.parse(r):null}catch(e){return null}}
+function toast(msg){UI.toast=msg;render();clearTimeout(toast.t);toast.t=setTimeout(()=>{UI.toast=null;render()},2400)}
+
+/* ================================================================
+   CAMPANHA
+================================================================= */
+const ACTIONS={
+  comicio:{nome:'Comício',desc:'Grande ato na região selecionada.',cost:3,en:14,reg:true},
+  corpo:{nome:'Corpo a corpo',desc:'Feiras, mercados e visitas na região.',cost:.6,en:8,reg:true},
+  tv:{nome:'TV e internet',desc:'Propaganda nacional. Rende mais com alianças.',cost:6,en:4},
+  fundos:{nome:'Arrecadar',desc:'Jantares com doadores. Enche o caixa.',cost:0,en:6},
+  ataque:{nome:'Atacar rival',desc:'Expõe um adversário. Pode respingar em você.',cost:2,en:6},
+  prep:{nome:'Treinar debate',desc:'Ensaios com a equipe para o próximo debate.',cost:0,en:5,r1:true},
+  apoio:{nome:'Buscar apoio',desc:'Pede o apoio de um candidato eliminado.',cost:1,en:6,r2:true},
+  descanso:{nome:'Descansar',desc:'Recupera energia para a reta final.',cost:0,en:-28},
+};
+
+function me(){return S.camp.cands[0]}
+function active(){return S.camp.cands.filter(c=>!c.out)}
+function aff(c,r){return clamp(1.15-Math.abs(c.ideo/2-r.lean)*.5,.35,1.2)}
+function viceB(rid){const v=VICES.find(x=>x.id===S.player.vice);return (v&&v.bonus[rid])||1}
+function regShares(rid){
+  const cs=active(),o={};let t=0;
+  cs.forEach(c=>{const v=Math.pow(Math.max(1,S.camp.reg[rid][c.id]),1.15);o[c.id]=v;t+=v});
+  cs.forEach(c=>o[c.id]/=t);return o;
+}
+function natShares(){
+  const o={};active().forEach(c=>o[c.id]=0);
+  REGS.forEach(r=>{const s=regShares(r.id);for(const k in s)o[k]+=s[k]*r.peso});return o;
+}
+function boost(cid,regs,p){
+  const list=regs==='all'?REGS.map(r=>r.id):regs;
+  list.forEach(rid=>{S.camp.reg[rid][cid]=Math.max(3,S.camp.reg[rid][cid]*(1+p))});
+}
+function gainP(rid,base){
+  const C=S.camp,m=me(),r=RG(rid);
+  const s=regShares(rid)[m.id];
+  const g=base*aff(m,r)*viceB(rid)*clamp(1.5-s*1.8,.25,1.4)*(C.energy<30?.6:1);
+  C.reg[rid][m.id]+=g;return g;
+}
+function clog(t){S.camp.log.unshift({w:S.camp.week,t});S.camp.log=S.camp.log.slice(0,14)}
+
+function newCampaign(o){
+  const P=S.player,party=PT(P.partido);
+  const pool=RIVALS.filter(r=>r.partido!==P.partido);
+  const riv=o.reelect?shuffle(pool).slice(0,3):pool.slice(0,3);
+  const cands=[{id:'P',nome:P.nome,partido:P.partido,ideo:party.ideo,cor:'#F2C230',me:true}];
+  riv.forEach((r,i)=>cands.push({id:'R'+i,nome:r.nome,partido:r.partido,ideo:PT(r.partido).ideo,cor:r.cor,home:r.home,str:r.str*(o.reelect?1.08:1)}));
+  const perfil=PERFIS.find(p=>p.id===P.perfil);
+  const reg={};
+  REGS.forEach(r=>{
+    reg[r.id]={};
+    cands.forEach(c=>{
+      if(c.me){
+        let base=o.reelect?100*(.25+o.aprov/52):perfil.fame;
+        let v=base*aff(c,r)*viceB(r.id);
+        if(!o.reelect&&r.id===P.home)v*=perfil.homeMul;
+        reg[r.id][c.id]=v;
+      }else{
+        let v=100*aff(c,r)*c.str;if(r.id===c.home)v*=1.4;reg[r.id][c.id]=v*R(.92,1.08);
+      }
+    });
+  });
+  const vice=VICES.find(v=>v.id===P.vice);
+  S.camp={round:1,week:1,weeks:o.weeks,debates:o.debates,debatesDone:[],reelect:!!o.reelect,
+    money:o.reelect?40:perfil.money,energy:100,agenda:3,penalty:0,prep:0,
+    tvMul:1+(perfil.tv||0)+(vice.tv||0),income:3+(vice.income||0),allyBonus:perfil.ally||0,
+    allies:o.allies?o.allies.slice():[],risk:0,cands,reg,und:.24,log:[],ev:null,evRes:null,offer:null,
+    endorsed:[],used:[],r1:null};
+  clog(o.reelect?'Começa a campanha pela reeleição. O governo está em jogo.':'Candidatura registrada. Hora de ganhar o país.');
+  startWeek();
+}
+
+function startWeek(){
+  const C=S.camp;
+  C.agenda=Math.max(1,3-C.penalty);C.penalty=0;
+  C.ev=null;C.evRes=null;C.offer=null;
+  // debate?
+  if(C.debates.includes(C.week)&&!C.debatesDone.includes(C.week)){
+    C.debate={qs:shuffle(DEBQ.map((_,i)=>i)).slice(0,3),i:0,score:0,picks:[],order:null};
+    S.phase='debate';
+  }
+  // evento: escândalo tem prioridade
+  if(C.risk>0&&Math.random()<C.risk*.35&&!C.used.includes('pf')){C.ev='pf';C.used.push('pf')}
+  else if(Math.random()<.55){
+    const pool=CEV.filter(e=>!C.used.includes(e.id)&&!e.only);
+    if(pool.length){const e=pick(pool);C.ev=e.id;C.used.push(e.id)}
+  }
+  // oferta de aliança
+  const rivP=active().filter(c=>!c.me).map(c=>c.partido);
+  const avail=PARTIES.filter(p=>p.id!==S.player.partido&&!rivP.includes(p.id)&&!C.allies.includes(p.id)&&Math.abs(p.ideo-me().ideo)<=1.8);
+  if(avail.length&&Math.random()<.42+C.allyBonus){
+    const p=pick(avail);C.offer=p.id;
+  }
+}
+
+function doAction(a,arg){
+  const C=S.camp,A=ACTIONS[a];
+  if(C.agenda<=0)return toast('Agenda da semana cheia.');
+  if(A.cost>C.money)return toast('Caixa insuficiente.');
+  if(A.en>0&&C.energy<A.en)return toast('Sem energia. Descanse.');
+  let msg='';
+  const rid=UI.reg,rn=RG(rid).nome;
+  switch(a){
+    case 'comicio':{const p=PERFIS.find(x=>x.id===S.player.perfil);const g=gainP(rid,14*(p.rally||1));msg=`Comício lotado no ${rn}.`+(g<5?' Mas a região já está saturada.':'');break}
+    case 'corpo':{gainP(rid,6.5);msg=`Corpo a corpo no ${rn}.`;break}
+    case 'tv':{REGS.forEach(r=>gainP(r.id,4.4*C.tvMul));msg='Nova peça de propaganda no ar em todo o país.';break}
+    case 'fundos':{const v=R(6,9.5);C.money+=v;if(Math.random()<.12)C.risk+=.25;msg=`Jantar com doadores rende ${mon(v)}.`;break}
+    case 'ataque':{
+      const t=C.cands.find(c=>c.id===arg);if(!t)return;
+      boost(t.id,'all',-.075);let bk=Math.random()<.3;if(bk)boost('P','all',-.035);
+      msg=`Ataque a ${t.nome}.`+(bk?' O eleitor achou baixaria e você também perdeu.':' O golpe acertou.');UI.atk=false;break}
+    case 'prep':{if(C.prep>=3)return toast('Já está no máximo de preparo.');C.prep++;msg=`Treino de debate (preparo ${C.prep}/3).`;break}
+    case 'apoio':{
+      const t=C.cands.find(c=>c.id===arg);if(!t)return;
+      const d=Math.abs(t.ideo-me().ideo);const ok=Math.random()<clamp(.8-d*.22,.12,.85);
+      C.endorsed.push(t.id);
+      if(ok){REGS.forEach(r=>{C.reg[r.id].P+=(t.r1share||.1)*130*aff(t,r)});msg=`${t.nome} declara apoio a você no 2º turno!`}
+      else msg=`${t.nome} recusa o apoio e fica neutro.`;
+      UI.apoio=false;break}
+    case 'descanso':{msg='Dia de descanso e reunião de estratégia.';break}
+  }
+  C.money-=A.cost;C.energy=clamp(C.energy-A.en,0,100);C.agenda--;
+  clog(msg);save();render();
+}
+
+function rivalsAct(){
+  const C=S.camp;
+  active().filter(c=>!c.me).forEach(c=>{
+    const n=C.round===2?4:3;
+    for(let k=0;k<n;k++){
+      const ws=REGS.map(r=>r.peso*Math.pow(aff(c,r),2));let t=ws.reduce((a,b)=>a+b),x=Math.random()*t,ri=0;
+      while(x>ws[ri]){x-=ws[ri];ri++}
+      const r=REGS[Math.min(ri,4)];const s=regShares(r.id)[c.id];
+      C.reg[r.id][c.id]+=6.5*aff(c,r)*c.str*clamp(1.5-s*1.8,.25,1.4)*R(.7,1.3);
+    }
+    REGS.forEach(r=>C.reg[r.id][c.id]+=1.6*aff(c,r));
+  });
+  // adversário ataca o líder ou você
+  const ns=natShares(),rv=active().filter(c=>!c.me);
+  if(rv.length&&Math.random()<.22){
+    const lead=Object.keys(ns).sort((a,b)=>ns[b]-ns[a])[0];
+    if(lead==='P'||Math.random()<.4){const a=pick(rv);boost('P','all',-.04);clog(`${a.nome} ataca você em inserções na TV.`)}
+  }
+  REGS.forEach(r=>active().forEach(c=>C.reg[r.id][c.id]*=.985));
+}
+
+function endWeek(){
+  const C=S.camp;
+  rivalsAct();
+  C.money+=C.income+C.allies.reduce((a,id)=>a+PT(id).seats/40,0);
+  C.energy=clamp(C.energy+12,0,100);
+  C.week++;
+  const prog=Math.min(1,(C.week-1)/C.weeks);
+  C.und=(C.round===1?.24:.12)*Math.pow(1-prog,.8)+.04;
+  if(C.week>C.weeks){election();return}
+  startWeek();save();render();window.scrollTo(0,0);
+}
+
+function election(){
+  const C=S.camp;
+  const res={reg:{},nat:{}};
+  active().forEach(c=>res.nat[c.id]=0);
+  REGS.forEach(r=>{
+    const s=regShares(r.id),o={};let t=0;
+    for(const k in s){o[k]=Math.max(.001,s[k]*R(.93,1.07));t+=o[k]}
+    for(const k in o){o[k]/=t;res.nat[k]+=o[k]*r.peso}
+    res.reg[r.id]=o;
+  });
+  const order=Object.keys(res.nat).sort((a,b)=>res.nat[b]-res.nat[a]);
+  res.order=order;res.round=C.round;res.abst=R(.18,.23);res.nulos=R(.03,.06);
+  if(order.length===2||res.nat[order[0]]>.5){
+    res.winner=order[0];
+  }else res.second=[order[0],order[1]];
+  C.result=res;S.phase='result';save();render();window.scrollTo(0,0);
+}
+
+function startRound2(){
+  const C=S.camp,res=C.result;
+  C.r1=res;
+  C.cands.forEach(c=>{if(!res.second.includes(c.id)&&!c.out){c.out=true;c.r1share=res.nat[c.id]||0}});
+  const fin=active();
+  REGS.forEach(r=>{
+    C.cands.filter(c=>c.out&&!c.transferred).forEach(e=>{
+      const ws=fin.map(f=>1/(.4+Math.abs(e.ideo-f.ideo)));const t=ws.reduce((a,b)=>a+b);
+      fin.forEach((f,i)=>C.reg[r.id][f.id]+=C.reg[r.id][e.id]*.72*ws[i]/t);
+    });
+  });
+  C.cands.forEach(c=>{if(c.out)c.transferred=true});
+  C.round=2;C.week=1;C.weeks=3;C.debates=[2];C.debatesDone=[];C.prep=Math.min(C.prep,1);C.und=.12;
+  C.money+=8;C.energy=clamp(C.energy+25,0,100);
+  clog('Começa o 2º turno. Tudo ou nada.');
+  S.phase='camp';startWeek();save();render();window.scrollTo(0,0);
+}
+
+/* ---------- debate ---------- */
+const DEBQ=[
+  {q:'O desemprego entre jovens bateu recorde. O que você vai fazer?',o:[
+    ['Programa de primeiro emprego com incentivo fiscal por vaga, metas anuais e custo já calculado.',3],
+    ['Vou gerar milhões de empregos. Confiem em mim.',1],
+    ['Quem criou esse desastre foi o grupo político do meu adversário.',2]]},
+  {q:'Como você vai pagar as promessas que fez nesta campanha?',o:[
+    ['Corte de isenções a grandes setores e revisão de gastos ineficientes. Os números estão no meu plano.',3],
+    ['Dinheiro tem. O que falta é vontade política.',1],
+    ['Com crescimento econômico, a arrecadação vai subir naturalmente.',2]]},
+  {q:'Seu adversário diz que você é contra o agronegócio. É verdade?',o:[
+    ['Mentira. Defendo o agro que produz e respeita a lei, com crédito e logística.',3],
+    ['Não vou responder a esse tipo de provocação.',1],
+    ['Quem é contra o produtor é quem apoiou os juros altos.',2]]},
+  {q:'A violência nas grandes cidades assusta. Qual a sua proposta?',o:[
+    ['Polícia integrada, inteligência contra o crime organizado e prevenção com escola em tempo integral.',3],
+    ['Bandido bom é bandido preso, e ponto.',2],
+    ['Segurança é responsabilidade dos estados.',1]]},
+  {q:'O que você fará pela saúde pública?',o:[
+    ['Mutirão nacional para zerar a fila de cirurgias e contratar médicos para o interior.',3],
+    ['A saúde vai melhorar muito no meu governo.',1],
+    ['Vou cobrar dos governadores que façam a parte deles.',2]]},
+  {q:'Você foi citado(a) numa reportagem sobre uso de jatinho de empresário. Explique.',o:[
+    ['Viajei, paguei a minha parte e apresento os comprovantes agora, ao vivo.',3],
+    ['Isso é perseguição da imprensa.',1],
+    ['Meu adversário tem coisa muito pior para explicar.',2]]},
+  {q:'O que fazer com o preço dos alimentos?',o:[
+    ['Estoques reguladores, crédito ao pequeno produtor e cesta básica com imposto zero.',3],
+    ['Vou baixar o preço da comida, vocês vão ver.',1],
+    ['O mercado se ajusta sozinho, o governo não deve interferir.',2]]},
+  {q:'Qual sua posição sobre a Amazônia?',o:[
+    ['Desmatamento ilegal zero, com bioeconomia gerando renda para quem vive na floresta.',3],
+    ['A Amazônia é nossa e ninguém de fora manda nela.',2],
+    ['Isso não é prioridade diante dos problemas do povo.',1]]},
+  {q:'Por que o eleitor deveria confiar em você?',o:[
+    ['Pelo que eu já fiz: aqui estão os resultados concretos da minha trajetória.',3],
+    ['Porque eu sou diferente de tudo o que está aí.',2],
+    ['Porque o outro lado é muito pior.',1]]},
+];
+
+function debateAnswer(i){
+  const C=S.camp,D=C.debate;
+  const q=DEBQ[D.qs[D.i]];const opt=D.order[i];
+  D.score+=q.o[opt][1];D.picks.push(q.o[opt][1]);D.i++;D.order=null;
+  if(D.i>=3){
+    const sc=D.score+C.prep*1.2+R(-1.5,2);
+    let r,txt;
+    if(sc>=8.6){r='win';boost('P','all',.09);active().filter(c=>!c.me).forEach(c=>boost(c.id,'all',-.02));txt='Você venceu o debate. As redes só falam da sua atuação.'}
+    else if(sc>=6){r='draw';boost('P','all',.02);txt='Debate morno. Ninguém saiu muito na frente.'}
+    else{r='lose';boost('P','all',-.06);txt='Você foi mal no debate e virou meme.'}
+    D.done=r;D.txt=txt;C.debatesDone.push(C.week);C.prep=0;clog('Debate na TV: '+txt);
+  }
+  save();render();
+}
+
+/* ---------- eventos de campanha ---------- */
+const CEV=[
+  {id:'video',t:'Vídeo antigo viraliza',d:'Um trecho editado de uma entrevista sua de dez anos atrás circula nas redes com milhões de visualizações.',o:[
+    {t:'Pedir desculpas publicamente',f:()=>{boost('P','all',-.02);return 'Desgaste pequeno. O assunto morre em dois dias.'}},
+    {t:'Dizer que é montagem',f:()=>{if(Math.random()<.55){boost('P','all',.015);return 'A checagem confirma a edição. Você sai fortalecido(a).'}boost('P','all',-.07);return 'O vídeo era autêntico. A negativa pegou muito mal.'}},
+    {t:'Ignorar o assunto',f:()=>{boost('P','all',-.04);return 'O silêncio foi lido como culpa.'}}]},
+  {id:'caixa',t:'Doação "por fora"',d:'Um empresário oferece R$ 15 milhões em dinheiro vivo, sem registro na Justiça Eleitoral.',o:[
+    {t:'Recusar e seguir a lei',f:()=>'Você recusa. A campanha segue com o caixa apertado, mas limpa.'},
+    {t:'Aceitar discretamente',f:()=>{S.camp.money+=15;S.camp.risk+=.45;S.integ=(S.integ||80)-20;return 'O dinheiro entra. Ninguém viu... por enquanto.'}}]},
+  {id:'enchente',t:'Enchentes no Sul',d:'Chuvas históricas deixam milhares de desabrigados em cidades do Sul.',o:[
+    {t:'Suspender a agenda e visitar a região',f:()=>{S.camp.energy=clamp(S.camp.energy-15,0,100);boost('P',['S'],.08);boost('P','all',.01);return 'Sua presença foi notada e elogiada.'}},
+    {t:'Doar parte do fundo de campanha',f:()=>{S.camp.money-=3;boost('P',['S'],.05);boost('P','all',.012);return 'R$ 3 mi para abrigos. Gesto bem recebido.'}},
+    {t:'Soltar uma nota de solidariedade',f:()=>{boost('P',['S'],-.02);return 'A nota passou despercebida.'}}]},
+  {id:'sindicato',t:'Centrais sindicais pedem compromisso',d:'As centrais querem que você assine uma carta contra mudanças nos direitos trabalhistas.',o:[
+    {t:'Assinar a carta',f:()=>{boost('P',['NE'],.05);boost('P',['N'],.02);boost('P',['S','CO'],-.03);return 'Apoio sindical garantido. O empresariado torceu o nariz.'}},
+    {t:'Recusar',f:()=>{boost('P',['NE'],-.03);boost('P',['S','CO'],.02);return 'As centrais acusam você de estar com os patrões.'}}]},
+  {id:'agro',t:'Convite para a maior feira do agro',d:'Você é convidado(a) para discursar na abertura da principal feira agropecuária do país.',o:[
+    {t:'Ir e prometer crédito ao produtor',f:()=>{S.camp.energy=clamp(S.camp.energy-10,0,100);boost('P',['CO'],.07);boost('P',['S'],.04);return 'Aplausos de pé no Centro-Oeste.'}},
+    {t:'Recusar, alegando agenda',f:()=>{boost('P',['CO'],-.03);boost('P',['NE'],.01);return 'O setor anotou a ausência.'}}]},
+  {id:'influ',t:'Influenciador oferece apoio',d:'Um influenciador com 30 milhões de seguidores quer gravar um vídeo com você.',o:[
+    {t:'Aceitar',f:()=>{if(Math.random()<.7){boost('P','all',.03);return 'O vídeo bomba entre os jovens.'}boost('P','all',-.035);return 'Antigos posts polêmicos dele vêm à tona e respingam em você.'}},
+    {t:'Recusar educadamente',f:()=>'Você prefere não arriscar.'}]},
+  {id:'igreja',t:'Líderes religiosos cobram posição',d:'Um encontro de igrejas quer saber sua opinião sobre pautas de costumes.',o:[
+    {t:'Adotar discurso conservador',f:()=>{REGS.forEach(r=>boost('P',[r.id],r.lean>0?.045:-.025));return 'Bem recebido no interior, criticado nas capitais.'}},
+    {t:'Defender posição progressista',f:()=>{REGS.forEach(r=>boost('P',[r.id],r.lean<0?.04:-.03));return 'Ganha jovens e capitais, perde parte do eleitorado religioso.'}},
+    {t:'Dizer que o Estado é laico e mudar de assunto',f:()=>{boost('P','all',-.012);return 'Resposta segura, mas soou evasiva.'}}]},
+  {id:'rouco',t:'Você perdeu a voz',d:'Depois de semanas de comícios, o médico recomenda três dias de silêncio total.',o:[
+    {t:'Obedecer e reduzir a agenda',f:()=>{S.camp.agenda=Math.max(0,S.camp.agenda-1);S.camp.energy=clamp(S.camp.energy+20,0,100);return 'Uma atividade a menos nesta semana, mas energia recuperada.'}},
+    {t:'Ignorar e seguir em frente',f:()=>{S.camp.energy=clamp(S.camp.energy-25,0,100);return 'Você segue, mas está exausto(a).'}}]},
+  {id:'fake',t:'Fake news contra sua família',d:'Uma montagem acusando um parente seu de corrupção se espalha por grupos de mensagem.',o:[
+    {t:'Entrar na Justiça',f:()=>{S.camp.money-=2;boost('P','all',.01);return 'A Justiça manda remover o conteúdo.'}},
+    {t:'Responder com humor',f:()=>{if(Math.random()<.5){boost('P','all',.03);return 'Sua resposta viraliza mais que a mentira.'}boost('P','all',-.02);return 'A piada não pegou bem.'}},
+    {t:'Ignorar',f:()=>{boost('P','all',-.025);return 'A mentira continua circulando.'}}]},
+  {id:'caminhao',t:'Ameaça de greve dos caminhoneiros',d:'Caminhoneiros ameaçam parar o país por causa do diesel e pedem seu posicionamento.',o:[
+    {t:'Apoiar as reivindicações',f:()=>{boost('P',['CO','S'],.04);boost('P',['SE'],-.02);return 'A categoria agradece.'}},
+    {t:'Criticar a paralisação',f:()=>{boost('P',['SE'],.02);boost('P',['CO'],-.04);return 'Os caminhoneiros prometem não esquecer.'}},
+    {t:'Pedir diálogo e não tomar lado',f:()=>'Ninguém ficou bravo, ninguém ficou feliz.'}]},
+  {id:'marq',t:'Marqueteiro famoso disponível',d:'O marqueteiro que venceu as últimas três eleições estaduais quer trabalhar com você. Ele é caro.',o:[
+    {t:'Contratar por R$ 8 mi',f:()=>{if(S.camp.money<8)return 'Não havia caixa para isso. Ele foi trabalhar para outro.';S.camp.money-=8;S.camp.tvMul+=.35;return 'Sua propaganda fica muito mais eficiente.'}},
+    {t:'Dispensar',f:()=>'Você mantém a equipe atual.'}]},
+  {id:'sabatina',t:'Sabatina em rádio popular',d:'Um programa de rádio com enorme audiência no Nordeste convida você para uma entrevista ao vivo.',o:[
+    {t:'Aceitar',f:()=>{if(Math.random()<.65){boost('P',['NE'],.06);return 'Entrevista excelente. Você conquistou o apresentador.'}boost('P',['NE'],-.03);return 'Uma resposta atravessada virou piada local.'}},
+    {t:'Mandar o vice no seu lugar',f:()=>{boost('P',['NE'],.02);return 'O vice se saiu bem.'}}]},
+  {id:'pf',only:true,t:'Polícia Federal investiga sua campanha',d:'Uma operação apura doações não declaradas. Seu nome está nas manchetes.',o:[
+    {t:'Negar tudo com veemência',f:()=>{if(Math.random()<.4){boost('P','all',-.02);return 'Não acharam provas. O caso esfria.'}boost('P','all',-.12);return 'Surgem comprovantes. Estrago enorme.'}},
+    {t:'Assumir o erro e devolver o dinheiro',f:()=>{S.camp.money=Math.max(0,S.camp.money-15);boost('P','all',-.06);return 'Desgaste real, mas a franqueza limitou o dano.'}}]},
+];
+function evOf(id){return CEV.find(e=>e.id===id)}
+function evChoose(i){
+  const C=S.camp,e=evOf(C.ev);C.evRes={t:e.t,r:e.o[i].f()};clog(e.t+': '+C.evRes.r);C.ev=null;save();render();
+}
+function offerAnswer(yes){
+  const C=S.camp,p=PT(C.offer);
+  if(yes){
+    C.allies.push(p.id);C.tvMul+=p.seats/160;
+    const d=Math.abs(p.ideo-me().ideo);
+    if(d>1.1){REGS.forEach(r=>{if(Math.sign(r.lean)===Math.sign(me().ideo||.01))boost('P',[r.id],-.025)});clog(`Aliança com ${p.id} fechada. Parte da sua base estranhou a mistura.`)}
+    else clog(`Aliança com ${p.nome} (${p.seats} deputados). Mais TV e mais recursos.`);
+  }else clog(`Você recusou a aliança com ${p.id}.`);
+  C.offer=null;save();render();
+}
+
+/* ================================================================
+   GOVERNO
+================================================================= */
+const PROJ=[
+  {id:'trib',nome:'Reforma Tributária',tipo:'PEC',ideo:.3,pc:3,desc:'Simplifica impostos sobre consumo.',ef:{merc:8,aprov:-1},lag:4,later:{pibT:.4}},
+  {id:'fiscal',nome:'Regra Fiscal Rígida',tipo:'PL',ideo:.9,pc:2,desc:'Limita o crescimento de gastos.',ef:{merc:12,aprov:-2,divT:-.25,pibT:-.1}},
+  {id:'salmin',nome:'Valorização do Salário Mínimo',tipo:'PL',ideo:-1.2,pc:2,desc:'Reajuste acima da inflação todo ano.',ef:{aprov:5,aprovB:1.5,inflP:.3,divT:.1,merc:-4}},
+  {id:'renda',nome:'Renda Básica Ampliada',tipo:'PL',ideo:-1.5,pc:3,desc:'Amplia a transferência de renda às famílias pobres.',ef:{aprov:6,aprovB:2.5,divT:.25,merc:-6}},
+  {id:'prev',nome:'Reforma da Previdência',tipo:'PEC',ideo:1.2,pc:4,desc:'Idade mínima maior e regras mais duras.',ef:{divT:-.35,merc:15,aprov:-7,aprovB:-1}},
+  {id:'adm',nome:'Reforma Administrativa',tipo:'PEC',ideo:1.0,pc:3,desc:'Muda regras de estabilidade do servidor.',ef:{divT:-.15,merc:8,aprov:-3}},
+  {id:'priv',nome:'Privatização da Eletronacional',tipo:'PL',ideo:1.4,pc:3,desc:'Vende a estatal de energia.',ef:{div:-3,merc:10,aprov:-4}},
+  {id:'infra',nome:'Plano Nacional de Obras',tipo:'PL',ideo:-.2,pc:2,desc:'Rodovias, ferrovias e saneamento.',ef:{divT:.15,aprov:2,desT:-.05},lag:2,later:{pibT:.5}},
+  {id:'seg',nome:'Pacote de Segurança Pública',tipo:'PL',ideo:1.3,pc:2,desc:'Penas maiores e integração das polícias.',ef:{aprov:4,aprovB:1,divT:.03}},
+  {id:'ir',nome:'Isenção do IR até 5 salários',tipo:'PL',ideo:-.6,pc:2,desc:'Alivia o imposto da classe média.',ef:{aprov:6,aprovB:2,divT:.2,merc:-5,inflP:.1}},
+  {id:'trab',nome:'Flexibilização Trabalhista',tipo:'PL',ideo:1.5,pc:3,desc:'Contratos mais flexíveis.',ef:{merc:10,aprov:-5,aprovB:-1},lag:2,later:{desT:-.08}},
+  {id:'amb',nome:'Marco da Amazônia',tipo:'PL',ideo:-1.0,pc:2,desc:'Desmatamento ilegal zero e bioeconomia.',ef:{merc:5,aprov:1},lag:4,later:{pibT:.1}},
+  {id:'edu',nome:'Escola em Tempo Integral',tipo:'PEC',ideo:-.8,pc:3,desc:'Investimento obrigatório em educação básica.',ef:{divT:.1,aprov:3,aprovB:1},lag:6,later:{pibT:.3}},
+  {id:'sus',nome:'Fortalecimento do SUS',tipo:'PL',ideo:-1.0,pc:2,desc:'Mais médicos e fim das filas de cirurgia.',ef:{aprov:3,aprovB:1.5,divT:.12}},
+  {id:'abert',nome:'Abertura Comercial',tipo:'PL',ideo:1.2,pc:2,desc:'Reduz tarifas de importação.',ef:{inflP:-.3,merc:6,aprov:-2,desT:.03},lag:3,later:{pibT:.25}},
+  {id:'pol',nome:'Reforma Política',tipo:'PEC',ideo:0,pc:3,desc:'Fim das coligações e corte de fundo partidário.',ef:{aprov:3,integ:10,satAll:-10}},
+];
+const QUORUM={PL:257,PEC:308};
+
+const GEV=[
+  {id:'prof',t:'Greve nacional dos professores',d:'Professores da rede federal param por reajuste salarial.',o:[
+    {t:'Conceder o reajuste',ef:{aprov:3,div:.4}},{t:'Negociar reajuste parcelado',ef:{aprov:1,div:.15}},{t:'Endurecer e cortar o ponto',ef:{aprov:-3,merc:3}}]},
+  {id:'seca',t:'Seca histórica no Nordeste',d:'Reservatórios no menor nível em décadas. Prefeitos pedem socorro.',o:[
+    {t:'Pacote emergencial federal',ef:{aprov:4,div:.5}},{t:'Linha de crédito subsidiada',ef:{aprov:1,div:.1}},{t:'Deixar com os estados',ef:{aprov:-4}}]},
+  {id:'gasol',t:'Preço da gasolina dispara',d:'O barril de petróleo subiu 40% no mercado internacional.',o:[
+    {t:'Segurar preço na estatal',ef:{aprov:3,merc:-10,inflS:-.3}},{t:'Zerar impostos federais',ef:{div:.4,inflS:-.4,aprov:2}},{t:'Deixar o preço subir',ef:{inflS:.5,aprov:-3,merc:5}}]},
+  {id:'desmat',t:'Desmatamento recorde',d:'Dados de satélite mostram a maior derrubada da Amazônia em 15 anos. Europa ameaça sanções.',o:[
+    {t:'Grande operação de fiscalização',ef:{merc:4,aprov:2,satRight:-8}},{t:'Captar fundo internacional',ef:{merc:6,div:-.1}},{t:'Minimizar os dados',ef:{merc:-6,aprov:-1,satRight:4}}]},
+  {id:'crise',t:'Crise financeira global',d:'Um grande banco estrangeiro quebra e as bolsas despencam no mundo inteiro.',o:[
+    {t:'Pacote de estímulo fiscal',ef:{pibS:-.4,div:1}},{t:'Austeridade para acalmar o mercado',ef:{pibS:-1.3,merc:8,aprov:-3}},{t:'Esperar a tempestade passar',ef:{pibS:-1.6}}]},
+  {id:'violencia',t:'Onda de violência em capitais',d:'Facções promovem ataques coordenados a ônibus e delegacias.',o:[
+    {t:'Enviar a Força Nacional',ef:{aprov:3,div:.1}},{t:'Plano integrado com governadores',ef:{aprov:1,pc:-1,satAll:4}},{t:'Deixar com os estados',ef:{aprov:-3}}]},
+  {id:'bc',t:'Banco Central sobe os juros',d:'O BC eleva a Selic e aliados pressionam você a criticar o presidente do banco.',o:[
+    {t:'Criticar o BC publicamente',ef:{aprov:1,merc:-12,satAll:3}},{t:'Respeitar a autonomia',ef:{merc:4,satAll:-2}}]},
+  {id:'dengue',t:'Epidemia de dengue',d:'Casos explodem em vários estados e hospitais lotam.',o:[
+    {t:'Campanha nacional e mutirões',ef:{div:.2,aprov:2}},{t:'Repassar verba aos municípios',ef:{div:.1}},{t:'Ação mínima',ef:{aprov:-4}}]},
+  {id:'copa',t:'A seleção é campeã!',d:'O Brasil vence a Copa do Mundo. Os jogadores podem ser recebidos em Brasília.',o:[
+    {t:'Festa na rampa do Palácio',ef:{aprov:3}},{t:'Parabenizar sem uso político',ef:{aprov:1,integ:5}}]},
+  {id:'judic',t:'Aumento salarial do Judiciário',d:'O Congresso aprovou reajuste para juízes. Você pode sancionar ou vetar.',o:[
+    {t:'Sancionar',ef:{satAll:5,div:.3,aprov:-3}},{t:'Vetar',ef:{aprov:2,satAll:-6}}]},
+  {id:'bigtech',t:'Big tech ameaça sair do país',d:'Uma gigante digital diz que deixará o Brasil se a regulação das redes for aprovada.',o:[
+    {t:'Manter a regulação',ef:{aprov:1,merc:-3}},{t:'Recuar',ef:{merc:3,aprov:-2}}]},
+  {id:'estados',t:'Estados quebrados pedem socorro',d:'Seis governadores dizem que não conseguem pagar salários.',o:[
+    {t:'Renegociar as dívidas',ef:{satAll:8,div:.6}},{t:'Negar ajuda',ef:{satAll:-8,merc:4}}]},
+  {id:'fake',t:'Fake news contra o governo',d:'Um vídeo falso dizendo que você vai confiscar a poupança viraliza.',o:[
+    {t:'Campanha de esclarecimento',ef:{pc:-1,aprov:1}},{t:'Ignorar',ef:{aprov:-2}}]},
+  {id:'ue',t:'Acordo comercial com a Europa',d:'Depois de 20 anos de negociação, o acordo está pronto para ser assinado.',o:[
+    {t:'Assinar',ef:{merc:6,satRight:4,pibS:.2}},{t:'Exigir revisões',ef:{satLeft:3}}]},
+  {id:'enchente',t:'Enchentes devastam cidades',d:'Temporais deixam 200 mil desabrigados no Sul e Sudeste.',o:[
+    {t:'Reconstrução federal',ef:{div:.5,aprov:4}},{t:'Crédito para reconstrução',ef:{aprov:1,div:.1}}]},
+  {id:'centrao',t:'Partidos do centro exigem cargos',d:'Líderes do centro dizem que sem ministérios não votam mais nada.',o:[
+    {t:'Ceder cargos',ef:{satCentrao:15,aprov:-2,integ:-5}},{t:'Recusar',ef:{satCentrao:-15,integ:3}}]},
+  {id:'petro',t:'Nova reserva de petróleo',d:'Uma reserva gigante é descoberta na costa. Como explorar?',o:[
+    {t:'Leilão para empresas privadas',ef:{div:-.8,merc:6,aprov:-1}},{t:'Exploração pela estatal',ef:{aprov:2,div:.2,pibS:.2}}]},
+  {id:'dolar',t:'Dólar dispara',d:'A moeda americana bate recorde e pressiona os preços.',cond:g=>g.mercado<45,o:[
+    {t:'Vender reservas',ef:{merc:8}},{t:'Anunciar corte de gastos',ef:{merc:12,aprov:-3,div:-.2}},{t:'Não intervir',ef:{inflS:.8}}]},
+  {id:'comida',t:'Inflação dos alimentos',d:'Arroz, feijão e carne sobem mais de 20% em um ano.',cond:g=>g.infl>5,o:[
+    {t:'Imposto zero na cesta básica',ef:{inflS:-.4,div:.3,aprov:2}},{t:'Tabelar preços',ef:{aprov:3,merc:-12,inflS:-.5}},{t:'Não fazer nada',ef:{aprov:-3}}]},
+  {id:'diesel',t:'Greve dos caminhoneiros',d:'Rodovias bloqueadas e postos sem combustível em vários estados.',o:[
+    {t:'Subsidiar o diesel',ef:{div:.4,aprov:1}},{t:'Criar frete mínimo',ef:{merc:-3,satRight:3}},{t:'Liberar as estradas com a polícia',ef:{aprov:-3,merc:2}}]},
+  {id:'univ',t:'Universidades sem verba',d:'Reitores avisam que não terão como pagar a conta de luz até o fim do ano.',o:[
+    {t:'Liberar recursos',ef:{div:.2,aprov:1}},{t:'Manter o contingenciamento',ef:{aprov:-2,merc:2}}]},
+  {id:'cupula',t:'Convite para sediar cúpula mundial',d:'O Brasil pode receber a próxima cúpula do clima com 150 chefes de Estado.',o:[
+    {t:'Aceitar',ef:{div:.3,merc:3,aprov:1}},{t:'Recusar por economia',ef:{}}]},
+  {id:'ministro',t:'Ministro da Fazenda pede demissão',d:'Seu ministro da economia sai alegando cansaço. Quem escolher?',o:[
+    {t:'Um(a) técnico(a) de mercado',ef:{merc:10,aprov:-1,satLeft:-4}},{t:'Um aliado político',ef:{satAll:6,merc:-8}}]},
+  {id:'escandalo',t:'Escândalo em ministério',d:'A Polícia Federal prende assessores de um ministro por desvio de verbas.',cond:g=>g.integ<70,o:[
+    {t:'Demitir o ministro na hora',ef:{aprov:1,satAll:-6}},{t:'Defender o ministro',ef:{aprov:-6,integ:-10}},{t:'Abrir investigação independente',ef:{pc:-1,aprov:1,integ:4}}]},
+];
+
+function seatsOf(pid){const p=PT(pid);return p.seats+(pid===S.player.partido?14:0)}
+function inCoal(pid){return pid===S.player.partido||S.gov.coal[pid]!==undefined}
+function baseSeats(){return PARTIES.filter(p=>inCoal(p.id)).reduce((a,p)=>a+seatsOf(p.id),0)}
+function partyYes(p,proj){
+  const G=S.gov,d=Math.abs(p.ideo-proj.ideo);
+  if(p.id===S.player.partido)return .96;
+  if(inCoal(p.id))return clamp(.5+G.coal[p.id]/250-d*.13+G.emendas,.05,.97);
+  const pop=(proj.ef.aprov||0)>0?1:-1;
+  return clamp(.27-d*.12+(G.aprov-40)/160+pop*.03,.02,.75);
+}
+function avulsoYes(){return clamp(.3+(S.gov.aprov-40)/150+S.gov.emendas*1.5,.05,.8)}
+function estimate(proj){
+  let y=0;PARTIES.forEach(p=>y+=seatsOf(p.id)*partyYes(p,proj));
+  return y+(AVULSOS-14)*avulsoYes();
+}
+function glog(t){S.gov.log.unshift({q:S.gov.q,t});S.gov.log=S.gov.log.slice(0,16)}
+function qLabel(q){const y=2026+(S.gov.mandato-1)*4+Math.ceil(q/4);return y+' · '+(((q-1)%4)+1)+'º tri'}
+
+function startGov(fz){
+  const res=S.camp.result,marg=res.nat.P-.5;
+  const prev=S.gov;
+  const coal={};
+  if(prev){for(const k in prev.coal)coal[k]=55}
+  S.camp.allies.forEach(id=>{coal[id]=65});
+  S.gov={mandato:prev?2:1,q:1,fazenda:fz,
+    aprov:prev?clamp(prev.aprov+6,30,75):clamp(52+marg*40,45,62),
+    pib:prev?prev.pib:1.8,infl:prev?prev.infl:4.8,desemp:prev?prev.desemp:8.5,selic:prev?prev.selic:11.25,divida:prev?prev.divida:76,mercado:prev?prev.mercado:50,
+    pc:5,coal,emendas:0,did:{},projTried:false,passed:prev?prev.passed.slice():[],failed:[],
+    mods:prev?prev.mods:{pibT:0,inflP:0,divT:0,desT:0,aprovB:0},pending:prev?prev.pending:[],
+    integ:S.integ===undefined?80:S.integ,hist:prev?prev.hist:[],used:[],dil:null,dilRes:null,log:[],impeach:null,report:null,
+    totalQ:prev?prev.totalQ:0};
+  const G=S.gov;
+  if(!prev){
+    if(fz==='orto'){G.mercado+=12;G.mods.pibT-=.15;G.mods.divT-=.1}
+    if(fz==='dev'){G.mercado-=10;G.mods.pibT+=.25;G.mods.inflP+=.4;G.mods.divT+=.12}
+    if(fz==='prag'){G.mercado+=3}
+  }
+  glog(prev?'Começa o segundo mandato.':'Posse! Você sobe a rampa do Palácio com a faixa presidencial.');
+  newQuarter();
+  S.phase='gov';save();render();window.scrollTo(0,0);
+}
+
+function newQuarter(){
+  const G=S.gov;
+  G.did={};G.projTried=false;G.emendas=0;G.dilRes=null;
+  let pool=GEV.filter(e=>!G.used.includes(e.id)&&(!e.cond||e.cond(G)));
+  if(G.integ<60&&!G.used.includes('escandalo')&&Math.random()<(60-G.integ)/80)pool=[GEV.find(e=>e.id==='escandalo')];
+  if(!pool.length){G.used=[];pool=GEV.filter(e=>!e.cond||e.cond(G))}
+  const e=pick(pool);G.dil=e.id;G.used.push(e.id);
+}
+
+function applyEf(ef){
+  const G=S.gov,ch=[];
+  if(ef.aprov){G.aprov=clamp(G.aprov+ef.aprov,2,95);ch.push(`aprovação ${sg(ef.aprov)}`)}
+  if(ef.merc){G.mercado=clamp(G.mercado+ef.merc,0,100);ch.push(`mercado ${sg(ef.merc)}`)}
+  if(ef.div){G.divida+=ef.div;ch.push(`dívida ${sg(ef.div)} pp`)}
+  if(ef.pibS){G.pibS=(G.pibS||0)+ef.pibS;ch.push(`PIB ${sg(ef.pibS)} pp`)}
+  if(ef.inflS){G.inflS=(G.inflS||0)+ef.inflS;ch.push(`inflação ${sg(ef.inflS)} pp`)}
+  if(ef.pc){G.pc=clamp(G.pc+ef.pc,0,12);ch.push(`capital político ${ef.pc>0?'+':''}${ef.pc}`)}
+  if(ef.integ){G.integ=clamp(G.integ+ef.integ,0,100)}
+  const satF=(f,v)=>{for(const k in G.coal)if(f(PT(k)))G.coal[k]=clamp(G.coal[k]+v,0,100)};
+  if(ef.satAll){satF(()=>true,ef.satAll);ch.push(`base aliada ${ef.satAll>0?'satisfeita':'irritada'}`)}
+  if(ef.satCentrao)satF(p=>p.centrao,ef.satCentrao);
+  if(ef.satRight)satF(p=>p.ideo>.4,ef.satRight);
+  if(ef.satLeft)satF(p=>p.ideo<-.4,ef.satLeft);
+  // modificadores permanentes
+  ['pibT','inflP','divT','desT','aprovB'].forEach(k=>{if(ef[k])G.mods[k]+=ef[k]});
+  return ch.join(' · ');
+}
+
+function dilChoose(i){
+  const G=S.gov,e=GEV.find(x=>x.id===G.dil),o=e.o[i];
+  const ch=applyEf(o.ef);G.dilRes={t:e.t,o:o.t,ch};glog(`${e.t}: ${o.t}.`);G.dil=null;save();render();
+}
+
+function sendProj(id){
+  const G=S.gov,p=PROJ.find(x=>x.id===id);
+  if(G.projTried)return toast('Só um projeto por trimestre.');
+  if(G.pc<p.pc)return toast('Capital político insuficiente.');
+  G.pc-=p.pc;G.projTried=true;
+  let y=0;PARTIES.forEach(pt=>{const s=seatsOf(pt.id);y+=s*clamp(partyYes(pt,p)+R(-.08,.08),0,1)});
+  y+=(AVULSOS-14)*clamp(avulsoYes()+R(-.1,.1),0,1);y=Math.round(y);
+  const need=QUORUM[p.tipo],ok=y>=need;
+  G.lastVote={id,y,need,ok};
+  if(ok){
+    G.passed.push(id);applyEf(p.ef);
+    if(p.later)G.pending.push({at:G.totalQ+(p.lag||0),ef:p.later,nome:p.nome});
+    for(const k in G.coal){const d=Math.abs(PT(k).ideo-p.ideo);G.coal[k]=clamp(G.coal[k]+(1-d)*6,0,100)}
+    glog(`APROVADO: ${p.nome} (${y} votos, precisava ${need}).`);
+  }else{
+    G.failed.push(id);G.aprov=clamp(G.aprov-2,2,95);
+    glog(`DERROTA: ${p.nome} teve só ${y} votos (precisava ${need}).`);
+  }
+  save();render();
+}
+
+const GACT={
+  emendas:{nome:'Liberar emendas',desc:'Verba para as bases dos deputados. Aumenta a fidelidade nas votações deste trimestre.',pc:2},
+  minis:{nome:'Oferecer ministério',desc:'Traz um partido para a base do governo.',pc:3},
+  pron:{nome:'Pronunciamento em rede',desc:'Fala à nação em cadeia de rádio e TV.',pc:1},
+  viagem:{nome:'Viagem internacional',desc:'Busca investimentos e acordos lá fora.',pc:2},
+};
+function gAct(a,arg){
+  const G=S.gov,A=GACT[a];
+  if(G.did[a])return toast('Já feito neste trimestre.');
+  if(G.pc<A.pc)return toast('Capital político insuficiente.');
+  switch(a){
+    case 'emendas':G.emendas=.12;G.divida+=.25;for(const k in G.coal)G.coal[k]=clamp(G.coal[k]+10,0,100);glog('Emendas liberadas: base mais fiel, contas públicas piores.');break;
+    case 'minis':{const p=PT(arg);if(!p||inCoal(p.id))return;const d=Math.abs(p.ideo-PT(S.player.partido).ideo);
+      if(d>2.2&&Math.random()<.6){G.pc-=1;G.did[a]=true;UI.minis=false;glog(`${p.nome} recusa o ministério: distância ideológica grande demais.`);save();render();return}
+      G.coal[p.id]=d>1.5?45:60;G.aprov=clamp(G.aprov-1,2,95);G.integ=clamp(G.integ-2,0,100);UI.minis=false;glog(`${p.nome} ganha um ministério e entra na base (+${seatsOf(p.id)} deputados).`);break}
+    case 'pron':{const v=G.aprov<30?R(-2,2):R(-1,3);G.aprov=clamp(G.aprov+v,2,95);glog(`Pronunciamento em rede nacional: aprovação ${sg(v)}.`);break}
+    case 'viagem':G.mercado=clamp(G.mercado+5,0,100);G.aprov=clamp(G.aprov+.5,2,95);glog('Viagem internacional traz anúncios de investimento.');break;
+  }
+  G.pc-=A.pc;G.did[a]=true;save();render();
+}
+
+function endQuarter(){
+  const G=S.gov,M=G.mods,before={aprov:G.aprov,pib:G.pib,infl:G.infl,desemp:G.desemp,selic:G.selic,divida:G.divida,mercado:G.mercado,base:baseSeats()};
+  const news=[];
+  G.totalQ++;
+  G.pending=G.pending.filter(p=>{if(G.totalQ>=p.at){applyEf(p.ef);news.push(`Efeitos de longo prazo de "${p.nome}" chegam à economia.`);return false}return true});
+  // economia
+  const trend=1.9+M.pibT+(G.mercado-50)*.02-Math.max(0,G.selic-9)*.15;
+  G.pib=clamp(.6*G.pib+.4*trend+(G.pibS||0)+R(-.5,.5),-6,8);G.pibS=0;
+  const iT=3.5+(G.divida-76)*.04+(50-G.mercado)*.05+Math.max(0,G.pib-2.5)*.5-(G.selic-10.5)*.3+M.inflP;
+  G.infl=clamp(G.infl+(iT-G.infl)*.35+(G.inflS||0)+R(-.3,.3),0,25);G.inflS=0;
+  const ds=clamp((G.infl-3.5)*.4-(G.selic-9.5)*.15+(G.pib-2)*.08,-1,1.25);
+  G.selic=clamp(Math.round((G.selic+ds)*4)/4,2,25);
+  G.desemp=clamp(G.desemp-(G.pib-1.6)*.22+M.desT+R(-.15,.15),3,22);
+  const dd=.35+M.divT+(G.selic-G.infl-G.pib)*.02;
+  G.divida=clamp(G.divida+dd,30,160);
+  G.mercado=clamp(G.mercado+(50-G.mercado)*.1-(dd-.4)*4+R(-2,2),0,100);
+  const hm=G.q<=2?(G.mandato===1?8:4):0;
+  const aT=44+(G.pib-1.5)*3.5-(G.infl-4)*2.5-(G.desemp-8)*2+M.aprovB+hm-(G.mandato===2?3:0);
+  G.aprov=clamp(G.aprov+(aT-G.aprov)*.25+R(-1.2,1.2),2,95);
+  // base aliada
+  for(const k in G.coal){
+    const p=PT(k);G.coal[k]=clamp(G.coal[k]-(p.centrao?6:4)+(G.aprov>50?2:0),0,100);
+    if(G.coal[k]<20){delete G.coal[k];news.push(`${p.nome} rompe com o governo e deixa a base.`)}
+  }
+  // capital político
+  G.pc=clamp(G.pc+2+Math.floor(G.aprov/25),0,10);
+  if(G.selic!==before.selic)news.push(`Banco Central ${G.selic>before.selic?'sobe':'corta'} a Selic para ${f2(G.selic)}%.`);
+  // impeachment
+  let imp=null;
+  if(G.aprov<20&&baseSeats()<200&&!G.impeachTried){
+    G.impeachTried=true;
+    const coalS=PARTIES.filter(p=>inCoal(p.id)&&p.id!==S.player.partido);
+    let v=PARTIES.filter(p=>!inCoal(p.id)).reduce((a,p)=>a+seatsOf(p.id),0)*clamp(1.05-G.aprov/80,.4,.97);
+    v+=coalS.reduce((a,p)=>a+seatsOf(p.id)*clamp(.38-G.coal[p.id]/250,.02,.4),0);
+    v+=(AVULSOS-14)*clamp(1-G.aprov/45,.2,.9);v=Math.round(v*R(.94,1.06));
+    imp={v,ok:v>=342};
+    if(!imp.ok){G.aprov=clamp(G.aprov+3,2,95);news.push(`A Câmara rejeita o impeachment: ${v} votos a favor, eram precisos 342.`)}
+  }
+  G.hist.push({aprov:G.aprov,pib:G.pib,infl:G.infl,desemp:G.desemp,m:G.mandato,q:G.q});
+  G.report={before,news,imp,label:qLabel(G.q)};
+  S.phase='gov_report';save();render();window.scrollTo(0,0);
+}
+
+function nextQuarter(){
+  const G=S.gov;
+  if(G.report&&G.report.imp&&G.report.imp.ok){finish('impeach');return}
+  G.report=null;G.q++;
+  if(G.q>16){S.phase='mandate_end';save();render();window.scrollTo(0,0);return}
+  newQuarter();S.phase='gov';save();render();window.scrollTo(0,0);
+}
+
+function startReelection(){
+  S.integ=S.gov.integ;
+  const allies=Object.keys(S.gov.coal);
+  newCampaign({weeks:6,debates:[3],reelect:true,aprov:S.gov.aprov,allies});
+  S.phase=S.phase==='debate'?'debate':'camp';save();render();window.scrollTo(0,0);
+}
+
+function legacy(kind){
+  const G=S.gov;const h=G?G.hist:[];
+  if(!h.length)return {score:0};
+  const avg=k=>h.reduce((a,x)=>a+x[k],0)/h.length;
+  const a=avg('aprov'),p=avg('pib'),i=avg('infl'),d=avg('desemp');
+  let sc=(a-15)+p*5-Math.max(0,i-4)*3-Math.max(0,d-7)*2+G.passed.length+(G.mandato===2&&kind!=='impeach'?8:0)+(kind==='impeach'?-40:0);
+  sc=Math.round(clamp(sc,0,100));
+  return {score:sc,a,p,i,d,passed:G.passed.length};
+}
+function finish(kind){
+  S.final={kind,leg:legacy(kind)};
+  if(S.final.leg.score){const b=+store.get(BEST)||0;if(S.final.leg.score>b)store.set(BEST,String(S.final.leg.score))}
+  S.phase='final';save();render();window.scrollTo(0,0);
+}
+
+/* ================================================================
+   VIEWS
+================================================================= */
+function hdr(ctx,big,cap,delta,stats){
+  return `<div class="hdr"><div class="r1"><div class="brand"><i></i>Rampa</div><div class="ctx">${ctx}</div></div>
+  <div class="r2"><div><div class="big">${big}</div><div class="cap">${cap}</div></div><div class="delta">${delta||''}</div></div>
+  <div class="stats">${stats.map(s=>`<div><span>${s[0]}</span><b class="${s[2]||''}">${s[1]}</b></div>`).join('')}</div></div>`;
+}
+
+function vTitle(){
+  const sv=load(),best=+store.get(BEST)||0;
+  return `<div class="title">
+    <span class="free">100% grátis · sem cadastro</span>
+    <div class="logo">Rampa</div>
+    <div class="sub">Da campanha ao Palácio</div>
+    ${sv&&sv.phase!=='final'?`<button class="btn" data-a="continue">Continuar jogo</button><button class="btn sec2" data-a="new">Nova candidatura</button>`:`<button class="btn" data-a="new">Lançar candidatura</button>`}
+    ${best?`<p class="center tiny muted mt12 mono">Melhor legado: ${best} pts</p>`:''}
+    <ol class="how">
+      <li>Monte sua candidatura: partido, perfil, região de origem e vice.</li>
+      <li>Faça campanha semana a semana: comícios, TV, alianças, debates e crises. Vença no 1º ou no 2º turno.</li>
+      <li>Governe por 16 trimestres: aprove projetos no Congresso, segure a inflação, mantenha a base aliada e a aprovação.</li>
+      <li>Fuja do impeachment, dispute a reeleição e deixe seu legado.</li>
+    </ol>
+    <p class="tiny muted mt12">Candidatos, partidos e eventos são fictícios.</p>
+    <p class="mt16"><a class="back" href="./index.html">← BNF GAMES</a></p>
+  </div>`;
+}
+
+function vSetup(){
+  const u=UI.setup;
+  const pk=(list,key,fn)=>`<div class="pick">${list.map(x=>`<button class="pk ${u[key]===x.id?'on':''}" data-a="set" data-v="${key}:${x.id}">${fn(x)}</button>`).join('')}</div>`;
+  return `<div class="hdr"><div class="r1"><div class="brand"><i></i>Rampa</div><div class="ctx">Nova <b>candidatura</b></div></div></div>
+  <div class="wrap">
+    <label class="fl" for="nm">Nome na urna</label>
+    <input id="nm" class="inp" maxlength="24" placeholder="Ex.: Joana Silva" value="${esc(u.nome)}" autocomplete="off">
+    <label class="fl">Partido</label>
+    ${pk(PARTIES,'partido',p=>`<b>${p.id}</b><span>${p.nome}</span><div class="tg">${ideoLabel(p.ideo)} · ${p.seats} dep.</div>`)}
+    <label class="fl">Perfil</label>
+    ${pk(PERFIS,'perfil',p=>`<b>${p.nome}</b><span>${p.desc}</span><div class="tg">Caixa ${mon(p.money)}</div>`)}
+    <label class="fl">Região de origem</label>
+    <div class="chips">${REGS.map(r=>`<button class="chip ${u.home===r.id?'on':''}" data-a="set" data-v="home:${r.id}">${r.nome}</button>`).join('')}</div>
+    <label class="fl">Vice na chapa</label>
+    ${pk(VICES,'vice',v=>`<b>${v.nome}</b><span>${v.desc}</span>`)}
+    <div class="mt16"></div>
+    <button class="btn" data-a="launch">Registrar candidatura</button>
+    <button class="btn sec2" data-a="title">Voltar</button>
+  </div>`;
+}
+
+function pollBars(shares,und,cands){
+  const list=cands.slice().sort((a,b)=>shares[b.id]-shares[a.id]);
+  const mx=Math.max(...list.map(c=>shares[c.id]));
+  let h=list.map(c=>{const v=shares[c.id]*(1-und);return `<div class="bar ${c.me?'me':''}"><div class="nm">${esc(c.nome)}${c.me?' (você)':''}<small>${c.partido} · ${ideoLabel(c.ideo)}</small></div><div class="tr"><div style="width:${v/(mx*(1-und))*100}%;background:${c.cor}"></div></div><div class="vl">${pc(v)}</div></div>`}).join('');
+  if(und>0)h+=`<div class="bar"><div class="nm muted">Indecisos</div><div class="tr"><div style="width:${und/mx*100}%;background:var(--muted2)"></div></div><div class="vl muted">${pc(und)}</div></div>`;
+  return h;
+}
+
+function vCamp(){
+  const C=S.camp,m=me(),ns=natShares(),cs=active();
+  const order=Object.keys(ns).sort((a,b)=>ns[b]-ns[a]);
+  const pos=order.indexOf('P')+1;
+  const myV=ns.P*(1-C.und);
+  const rLabel=C.reelect?'Reeleição':(C.round===1?'1º turno':'2º turno');
+  let h=hdr(`${rLabel} · <b>semana ${C.week}/${C.weeks}</b>`,pc(myV),'Intenção de voto','Pesquisa Instituto Vox<br>margem ±2 pp',[
+    ['Caixa',mon(C.money),C.money<3?'neg':''],['Energia',Math.round(C.energy)+'%',C.energy<30?'neg':''],['Agenda',C.agenda+'/3'],['Posição',pos+'º',pos===1?'gold':'']]);
+  h+='<div class="wrap">';
+  // evento / resultado de evento
+  if(C.ev){const e=evOf(C.ev);h+=`<div class="sec"><h4>Fato da semana</h4></div><div class="card"><div class="kick">Urgente</div><h3>${e.t}</h3><p>${e.d}</p>${e.o.map((o,i)=>`<button class="opt" data-a="ev" data-v="${i}">${o.t}</button>`).join('')}</div>`}
+  else if(C.evRes){h+=`<div class="sec"><h4>Fato da semana</h4></div><div class="card res"><div class="kick">${C.evRes.t}</div><p class="mt8" style="margin-bottom:0">${C.evRes.r}</p></div>`}
+  if(C.offer){const p=PT(C.offer);const d=Math.abs(p.ideo-m.ideo);h+=`<div class="sec"><h4>Proposta de aliança</h4></div><div class="card"><div class="kick">${p.id} · ${ideoLabel(p.ideo)}</div><h3>${p.nome}</h3><p>Oferece ${p.seats} deputados, mais tempo de TV e ${mon(p.seats/40)} por semana. ${d>1.1?'<b class="neg">Partido distante do seu: parte da sua base pode estranhar.</b>':'Afinidade razoável com seu programa.'}</p><button class="opt" data-a="offer" data-v="1">Fechar aliança</button><button class="opt" data-a="offer" data-v="0">Recusar</button></div>`}
+  // pesquisa
+  h+=`<div class="sec"><h4>Pesquisa nacional</h4><em>${C.debates.filter(w=>w>=C.week&&!C.debatesDone.includes(w)).length?'Próximo debate: semana '+C.debates.find(w=>w>=C.week&&!C.debatesDone.includes(w)):''}</em></div><div class="panel">${pollBars(ns,C.und,cs)}</div>`;
+  // regiões
+  h+=`<div class="sec"><h4>Regiões</h4><em>toque para escolher onde agir</em></div><div class="regs">${REGS.map(r=>{const s=regShares(r.id);const lead=Object.keys(s).sort((a,b)=>s[b]-s[a])[0];const lc=C.cands.find(c=>c.id===lead);return `<button class="reg ${UI.reg===r.id?'on':''}" data-a="reg" data-v="${r.id}"><div class="rid">${r.id}</div><div class="rp ${lead==='P'?'gold':''}">${pc(s.P*(1-C.und))}</div><div class="rl" style="background:${lc.cor}"></div><div class="rw">${Math.round(r.peso*100)}% eleit.</div></button>`}).join('')}</div>`;
+  // ações
+  const dis=a=>{const A=ACTIONS[a];return C.agenda<=0||A.cost>C.money||(A.en>0&&C.energy<A.en)||!!C.ev};
+  const acts=Object.keys(ACTIONS).filter(a=>{const A=ACTIONS[a];if(A.r1&&(C.round!==1||!C.debates.some(w=>w>=C.week&&!C.debatesDone.includes(w))))return false;if(A.r2&&(C.round!==2||!C.cands.some(c=>c.out&&!C.endorsed.includes(c.id))))return false;return true});
+  h+=`<div class="sec"><h4>Agenda da semana</h4><em>${C.agenda} atividade${C.agenda===1?'':'s'} restante${C.agenda===1?'':'s'}</em></div><div class="acts">${acts.map(a=>{const A=ACTIONS[a];const c=[];if(A.cost)c.push(mon(A.cost));if(A.en>0)c.push('-'+A.en+' energia');if(A.en<0)c.push('+'+(-A.en)+' energia');if(a==='fundos')c.push('+R$ 6–9 mi');return `<button class="act" data-a="act" data-v="${a}" ${dis(a)?'disabled':''}><b>${A.nome}${A.reg?' · '+UI.reg:''}</b><span>${A.desc}</span><div class="cost">${c.join(' · ')||'—'}</div></button>`}).join('')}</div>`;
+  if(UI.atk)h+=`<div class="panel pad mt8"><div class="small muted">Atacar quem?</div><div class="chips mt8">${cs.filter(c=>!c.me).map(c=>`<button class="chip" data-a="atk" data-v="${c.id}">${esc(c.nome)}</button>`).join('')}<button class="chip" data-a="atkx">Cancelar</button></div></div>`;
+  if(UI.apoio)h+=`<div class="panel pad mt8"><div class="small muted">Pedir apoio a quem?</div><div class="chips mt8">${C.cands.filter(c=>c.out&&!C.endorsed.includes(c.id)).map(c=>`<button class="chip" data-a="apo" data-v="${c.id}">${esc(c.nome)} · ${pc(c.r1share||0)}</button>`).join('')}<button class="chip" data-a="apox">Cancelar</button></div></div>`;
+  if(C.prep&&C.round===1)h+=`<p class="tiny muted mt8 mono">Preparo para debate: ${'●'.repeat(C.prep)}${'○'.repeat(3-C.prep)}</p>`;
+  if(C.allies.length)h+=`<p class="tiny muted mt8">Coligação: ${[m.partido,...C.allies].join(' · ')}</p>`;
+  // diário
+  h+=`<div class="sec"><h4>Diário de campanha</h4></div><div class="panel"><ul class="log">${C.log.map(l=>`<li><b>S${l.w}</b>${esc(l.t)}</li>`).join('')}</ul></div>`;
+  h+='</div>';
+  h+=`<div class="foot"><div><button class="btn" data-a="endweek" ${C.ev||C.offer?'disabled':''}>${C.week===C.weeks?'Ir para a votação':'Encerrar semana'}</button></div></div>`;
+  return h;
+}
+
+function vDebate(){
+  const C=S.camp,D=C.debate;
+  let h=hdr(`Debate na TV · <b>${C.reelect?'Reeleição':C.round+'º turno'}</b>`,'Ao vivo','Rede nacional','Preparo<br>'+'●'.repeat(C.prep)+'○'.repeat(3-C.prep),[['Pergunta',Math.min(D.i+1,3)+'/3'],['Preparo',C.prep+'/3'],['Adversários',active().length-1],['Audiência',Math.round(R(28,36))+' pts']]);
+  h+='<div class="deb">';
+  if(D.done){
+    const col=D.done==='win'?'pos':D.done==='lose'?'neg':'gold';
+    h+=`<div class="kick mono tiny muted">Resultado</div><div class="verdict ${col}">${D.done==='win'?'Vitória':D.done==='lose'?'Derrota':'Empate'}</div><p>${D.txt}</p><button class="btn mt16" data-a="debend">Voltar à campanha</button>`;
+  }else{
+    const q=DEBQ[D.qs[D.i]];
+    if(!D.order){D.order=shuffle([0,1,2]);save()}
+    h+=`<div class="prog">${[0,1,2].map(i=>`<i class="${i<=D.i?'on':''}"></i>`).join('')}</div><div class="tiny muted mono">A mediadora pergunta:</div><div class="q">${q.q}</div>${D.order.map((oi,i)=>`<button class="opt" data-a="deb" data-v="${i}">${q.o[oi][0]}</button>`).join('')}`;
+  }
+  return h+'</div>';
+}
+
+function vResult(){
+  const C=S.camp,res=C.result,cs=res.order.map(id=>C.cands.find(c=>c.id===id));
+  const won=res.winner==='P',lost=res.winner&&!won,toR2=res.second&&res.second.includes('P'),outR1=res.second&&!res.second.includes('P');
+  let verdict,col,txt;
+  if(won){verdict=C.reelect?'Reeleito(a)!':'Eleito(a)!';col='gold';txt=`Você venceu com ${pc(res.nat.P)} dos votos válidos.`}
+  else if(toR2){verdict='2º turno!';col='gold';const o=cs.find(c=>res.second.includes(c.id)&&!c.me);txt=`Ninguém passou de 50%. Você enfrenta ${esc(o.nome)} no 2º turno.`}
+  else{verdict='Derrota';col='neg';const w=cs[0];txt=outR1?`Você ficou fora do 2º turno.`:`${esc(w.nome)} venceu com ${pc(res.nat[w.id])} dos votos válidos.`}
+  let h=hdr(`Apuração · <b>${C.reelect?'reeleição':res.round+'º turno'}</b>`,'100%','Urnas apuradas','TSE fictício',[['Abstenção',pc(res.abst)],['Brancos/nulos',pc(res.nulos)],['Válidos',pc(1-res.abst-res.nulos)],['Sua posição',(res.order.indexOf('P')+1)+'º']]);
+  h+=`<div class="wrap"><div class="center mt8"><div class="verdict ${col}">${verdict}</div><p class="muted small">${txt}</p></div>`;
+  h+=`<div class="sec"><h4>Votos válidos</h4></div><div class="panel">${pollBars(res.nat,0,cs)}</div>`;
+  h+=`<div class="sec"><h4>Por região</h4></div><div class="panel tw"><table><tr><th>Região</th>${cs.map(c=>`<th style="color:${c.cor}">${esc(c.nome.split(' ')[0])}</th>`).join('')}</tr>${REGS.map(r=>`<tr><td>${r.nome}</td>${cs.map(c=>{const v=res.reg[r.id][c.id];const top=Math.max(...cs.map(x=>res.reg[r.id][x.id]))===v;return `<td class="mono ${top?'gold':''}">${pc(v)}</td>`}).join('')}</tr>`).join('')}</table></div>`;
+  h+='<div class="mt16"></div>';
+  if(won){
+    if(S.gov)h+=`<button class="btn" data-a="govnext">Assumir o 2º mandato</button>`;
+    else h+=`<button class="btn" data-a="tofaz">Montar o governo</button>`;
+  }else if(toR2)h+=`<button class="btn" data-a="r2">Começar o 2º turno</button>`;
+  else{
+    if(S.gov)h+=`<button class="btn" data-a="finish" data-v="lostre">Ver legado</button>`;
+    else h+=`<button class="btn" data-a="new">Tentar de novo</button><button class="btn sec2" data-a="title">Menu</button>`;
+  }
+  return h+'</div>';
+}
+
+function vFaz(){
+  let h=hdr('Transição · <b>montando o governo</b>','Eleito(a)',esc(S.player.nome),'',[['Partido',S.player.partido],['Coligação',(S.camp.allies.length+1)+' part.'],['Votos',pc(S.camp.result.nat.P)],['Posse','1º jan']]);
+  h+=`<div class="wrap"><div class="sec"><h4>Ministério da Fazenda</h4></div><p class="small muted" style="margin:0 2px 10px">A primeira decisão do governo: quem cuida da economia define o tom dos próximos quatro anos.</p>`;
+  h+=FAZENDA.map(f=>`<button class="opt" data-a="faz" data-v="${f.id}"><b>${f.nome}</b><small>${f.desc}</small></button>`).join('');
+  return h+'</div>';
+}
+
+function spark(arr,col,lo,hi){
+  if(arr.length<2)return '';
+  const w=300,hh=46,mn=lo!==undefined?lo:Math.min(...arr),mx=hi!==undefined?hi:Math.max(...arr),rg=mx-mn||1;
+  const pts=arr.map((v,i)=>`${(i/(arr.length-1)*w).toFixed(1)},${(hh-3-(v-mn)/rg*(hh-6)).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${w} ${hh}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+
+function vGov(){
+  const G=S.gov,bs=baseSeats();
+  let h=hdr(`${G.mandato}º mandato · <b>${qLabel(G.q)}</b>`,f1(G.aprov)+'%','Aprovação do governo',`Trimestre ${G.q}/16<br>Capital político: <b class="gold">${G.pc}</b>`,[
+    ['Base',bs+' dep.',bs<257?'neg':bs>=308?'pos':''],['Capital',G.pc+' pts'],['Selic',f2(G.selic)+'%'],['Mercado',Math.round(G.mercado),G.mercado<35?'neg':G.mercado>65?'pos':'']]);
+  h+='<div class="wrap">';
+  h+=`<div class="kpis">
+    <div class="kpi"><span>PIB</span><b class="${G.pib<0?'neg':G.pib>2.5?'pos':''}">${sg(G.pib)}%</b><i>ao ano</i></div>
+    <div class="kpi"><span>Inflação</span><b class="${G.infl>6?'neg':G.infl<4.5?'pos':''}">${f1(G.infl)}%</b><i>meta 3,5%</i></div>
+    <div class="kpi"><span>Desemprego</span><b class="${G.desemp>10?'neg':G.desemp<7?'pos':''}">${f1(G.desemp)}%</b><i>&nbsp;</i></div>
+    <div class="kpi"><span>Dívida</span><b class="${G.divida>90?'neg':''}">${f1(G.divida)}%</b><i>do PIB</i></div></div>`;
+  if(G.hist.length>1)h+=`<div class="panel pad mt8"><div class="tiny muted mono">APROVAÇÃO AO LONGO DO GOVERNO</div>${spark(G.hist.map(x=>x.aprov).concat([G.aprov]),'var(--ac)',0,100)}</div>`;
+  // dilema
+  if(G.dil){const e=GEV.find(x=>x.id===G.dil);h+=`<div class="sec"><h4>Decisão do trimestre</h4><em>obrigatória</em></div><div class="card"><div class="kick">Gabinete presidencial</div><h3>${e.t}</h3><p>${e.d}</p>${e.o.map((o,i)=>`<button class="opt" data-a="dil" data-v="${i}">${o.t}</button>`).join('')}</div>`}
+  else if(G.dilRes)h+=`<div class="sec"><h4>Decisão do trimestre</h4></div><div class="card res"><div class="kick">${G.dilRes.t}</div><p class="mt8" style="margin-bottom:4px"><b>${G.dilRes.o}</b></p><p class="tiny muted" style="margin:0">${G.dilRes.ch||'Sem efeitos imediatos.'}</p></div>`;
+  // congresso
+  const avail=PROJ.filter(p=>!G.passed.includes(p.id));
+  h+=`<div class="sec"><h4>Congresso</h4><em>${G.projTried?'pauta do trimestre já votada':'1 projeto por trimestre'}</em></div>`;
+  if(G.lastVote&&G.projTried){const p=PROJ.find(x=>x.id===G.lastVote.id);h+=`<div class="panel pad" style="border-color:${G.lastVote.ok?'var(--green)':'var(--red)'}"><b class="${G.lastVote.ok?'pos':'neg'}">${G.lastVote.ok?'Aprovado':'Rejeitado'}</b> · ${p.nome}<div class="tiny muted mono mt8">${G.lastVote.y} votos sim · necessários ${G.lastVote.need} (${p.tipo})</div></div>`}
+  h+=`<div class="panel mt8">${avail.map(p=>{const e=Math.round(estimate(p)),need=QUORUM[p.tipo],tried=G.failed.includes(p.id);const cl=e>=need+15?'pos':e>=need-10?'gold':'neg';return `<div class="proj"><div><b>${p.nome} <span class="mono" style="display:inline;color:var(--muted2);font-size:10px">${p.tipo}</span></b><span>${p.desc} ${efHint(p)}</span><div class="pl"><span class="${cl}" style="display:inline">placar estimado ${e}/${need}</span> · ${p.pc} capital${tried?' · já derrotado antes':''}</div></div><button class="mini ${G.pc>=p.pc&&!G.projTried?'y':''}" data-a="proj" data-v="${p.id}" ${G.projTried||G.pc<p.pc?'disabled':''}>Enviar</button></div>`}).join('')||'<div class="pad small muted">Todos os projetos foram aprovados.</div>'}</div>`;
+  // articulação
+  h+=`<div class="sec"><h4>Articulação política</h4><em>${G.pc} de capital</em></div><div class="acts">${Object.keys(GACT).map(a=>{const A=GACT[a];return `<button class="act" data-a="gact" data-v="${a}" ${G.did[a]||G.pc<A.pc?'disabled':''}><b>${A.nome}</b><span>${A.desc}</span><div class="cost">${A.pc} capital${G.did[a]?' · feito':''}</div></button>`}).join('')}</div>`;
+  if(UI.minis){const out=PARTIES.filter(p=>!inCoal(p.id));h+=`<div class="panel pad mt8"><div class="small muted">Qual partido recebe o ministério?</div><div class="chips mt8">${out.map(p=>`<button class="chip" data-a="minp" data-v="${p.id}">${p.id} · ${seatsOf(p.id)} dep. · ${ideoLabel(p.ideo)}</button>`).join('')||'<span class="small muted">Todos já estão na base.</span>'}<button class="chip" data-a="minx">Cancelar</button></div></div>`}
+  // coalizão
+  const coalP=PARTIES.filter(p=>inCoal(p.id));
+  h+=`<div class="sec"><h4>Base aliada</h4><em>${bs}/513 · PL 257 · PEC 308</em></div><div class="panel">${coalP.map(p=>{const me_=p.id===S.player.partido;const s=me_?100:G.coal[p.id];return `<div class="party"><span class="sg">${p.id}</span><div class="sb"><div style="width:${s}%;background:${s<35?'var(--red)':s<60?'var(--ac)':'var(--green)'}"></div></div><span class="st">${me_?'seu partido':'satisf. '+Math.round(s)}</span><span class="st">${seatsOf(p.id)}</span></div>`}).join('')}</div>`;
+  h+=`<div class="sec"><h4>Notícias</h4></div><div class="panel"><ul class="log">${G.log.map(l=>`<li><b>T${l.q}</b>${esc(l.t)}</li>`).join('')}</ul></div>`;
+  h+=`<p class="tiny muted mt12">Projetos aprovados: ${G.passed.length?G.passed.map(id=>PROJ.find(p=>p.id===id).nome).join(', '):'nenhum ainda'}.</p>`;
+  h+='</div>';
+  h+=`<div class="foot"><div><button class="btn" data-a="endq" ${G.dil?'disabled':''}>${G.dil?'Tome a decisão do trimestre':'Encerrar trimestre'}</button></div></div>`;
+  return h;
+}
+function efHint(p){
+  const e=Object.assign({},p.ef,p.later||{}),t=[];
+  if(e.aprov)t.push(e.aprov>0?'popular':'impopular');
+  if(e.merc)t.push(e.merc>0?'mercado gosta':'mercado não gosta');
+  if(e.divT||e.div)t.push((e.divT||e.div)>0?'aumenta gastos':'melhora as contas');
+  if(e.pibT)t.push('crescimento'+(p.lag?' a longo prazo':''));
+  if(e.inflP)t.push(e.inflP>0?'pressiona inflação':'reduz inflação');
+  if(e.desT)t.push(e.desT<0?'gera empregos':'');
+  return t.length?'<em style="font-style:normal;color:var(--muted2)">('+t.filter(Boolean).join(', ')+')</em>':'';
+}
+
+function vReport(){
+  const G=S.gov,r=G.report,b=r.before;
+  const row=(n,a,v,u,good)=>{const d=v-a;const cl=Math.abs(d)<.05?'':((d>0)===good?'pos':'neg');return `<tr><td>${n}</td><td class="mono">${f1(a)}${u}</td><td class="mono">${f1(v)}${u}</td><td class="mono ${cl}">${sg(d)}</td></tr>`};
+  let h=hdr(`Balanço · <b>${r.label}</b>`,f1(G.aprov)+'%','Aprovação',`Base: ${baseSeats()} dep.`,[['PIB',sg(G.pib)+'%'],['Inflação',f1(G.infl)+'%'],['Desemp.',f1(G.desemp)+'%'],['Selic',f2(G.selic)+'%']]);
+  h+='<div class="wrap">';
+  if(r.imp){h+=`<div class="card" style="border-color:${r.imp.ok?'var(--red)':'var(--green)'}"><div class="kick">Câmara dos Deputados</div><h3>Votação do impeachment</h3><p>${r.imp.v} deputados votaram pelo afastamento. Eram necessários 342.</p><div class="verdict ${r.imp.ok?'neg':'pos'}">${r.imp.ok?'Afastado(a)':'Sobreviveu'}</div></div>`}
+  h+=`<div class="sec"><h4>Indicadores do trimestre</h4></div><div class="panel tw"><table><tr><th>Indicador</th><th>Antes</th><th>Agora</th><th>Var.</th></tr>
+  ${row('Aprovação',b.aprov,G.aprov,'%',true)}${row('PIB (anual)',b.pib,G.pib,'%',true)}${row('Inflação',b.infl,G.infl,'%',false)}${row('Desemprego',b.desemp,G.desemp,'%',false)}${row('Dívida/PIB',b.divida,G.divida,'%',false)}${row('Mercado',b.mercado,G.mercado,'',true)}
+  <tr><td>Base aliada</td><td class="mono">${b.base}</td><td class="mono">${baseSeats()}</td><td class="mono ${baseSeats()<b.base?'neg':baseSeats()>b.base?'pos':''}">${baseSeats()-b.base>0?'+':''}${baseSeats()-b.base}</td></tr></table></div>`;
+  if(r.news.length)h+=`<div class="sec"><h4>Manchetes</h4></div><div class="panel"><ul class="log">${r.news.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></div>`;
+  if(G.aprov<25&&!r.imp)h+=`<p class="small neg mt12">Aprovação muito baixa. Se cair abaixo de 20% com a base fraca, a oposição abre um processo de impeachment.</p>`;
+  h+='</div>';
+  h+=`<div class="foot"><div><button class="btn" data-a="nextq">${r.imp&&r.imp.ok?'Ver o fim da história':G.q>=16?'Fim do mandato':'Próximo trimestre'}</button></div></div>`;
+  return h;
+}
+
+function vMandateEnd(){
+  const G=S.gov,can=G.mandato===1&&G.aprov>=25;
+  let h=hdr(`Fim do ${G.mandato}º mandato`,f1(G.aprov)+'%','Aprovação final','',[['PIB',sg(G.pib)+'%'],['Inflação',f1(G.infl)+'%'],['Desemp.',f1(G.desemp)+'%'],['Projetos',G.passed.length]]);
+  h+='<div class="wrap center">';
+  if(G.mandato===1){
+    h+=`<div class="verdict ${can?'gold':'neg'} mt16">${can?'Reeleição?':'Sem clima'}</div><p class="muted small">${can?'Seu governo chega competitivo à eleição. Você pode disputar mais quatro anos — mas os adversários vêm fortes.':'Com aprovação abaixo de 25%, o partido não banca sua reeleição.'}</p>`;
+    if(can)h+=`<button class="btn mt16" data-a="reelect">Disputar a reeleição</button>`;
+    h+=`<button class="btn sec2 ${can?'':'mt16'}" data-a="finish" data-v="end">Encerrar e ver legado</button>`;
+  }else{
+    h+=`<div class="verdict gold mt16">Missão cumprida</div><p class="muted small">Oito anos de governo. Hora de passar a faixa.</p><button class="btn mt16" data-a="finish" data-v="end">Ver legado</button>`;
+  }
+  return h+'</div>';
+}
+
+function vFinal(){
+  const F=S.final,L=F.leg,G=S.gov;
+  let grade,col;
+  const sc=L.score||0;
+  if(F.kind==='impeach'){grade='Afastado(a)';col='neg'}
+  else if(sc>=80){grade='Estadista';col='gold'}
+  else if(sc>=62){grade='Bom governo';col='pos'}
+  else if(sc>=45){grade='Mandato morno';col=''}
+  else{grade='Desastre';col='neg'}
+  const best=+store.get(BEST)||0;
+  let h=hdr('Fim de jogo',sc+' pts','Legado','Recorde: '+best+' pts',[['Aprov. média',L.a!==undefined?f1(L.a)+'%':'—'],['PIB médio',L.p!==undefined?sg(L.p)+'%':'—'],['Inflação média',L.i!==undefined?f1(L.i)+'%':'—'],['Projetos',L.passed||0]]);
+  h+=`<div class="wrap center"><div class="verdict ${col} mt16">${grade}</div><p class="muted small">${F.kind==='impeach'?'A Câmara aprovou seu afastamento. Seu governo termina antes do fim.':F.kind==='lostre'?'Você perdeu a reeleição e entrega a faixa ao adversário.':G&&G.mandato===2?'Você governou por dois mandatos completos.':'Você completou o mandato.'}</p>`;
+  if(G&&G.hist.length>1)h+=`<div class="panel pad mt12" style="text-align:left"><div class="tiny muted mono">APROVAÇÃO</div>${spark(G.hist.map(x=>x.aprov),'var(--ac)',0,100)}<div class="tiny muted mono mt8">PIB</div>${spark(G.hist.map(x=>x.pib),'var(--green)')}<div class="tiny muted mono mt8">INFLAÇÃO</div>${spark(G.hist.map(x=>x.infl),'var(--red)')}</div>`;
+  h+=`<button class="btn mt16" data-a="new">Nova candidatura</button><button class="btn sec2" data-a="title">Menu</button></div>`;
+  return h;
+}
+
+function render(){
+  let h='';
+  if(UI.screen==='title')h=vTitle();
+  else if(UI.screen==='setup')h=vSetup();
+  else switch(S.phase){
+    case 'camp':h=vCamp();break;
+    case 'debate':h=vDebate();break;
+    case 'result':h=vResult();break;
+    case 'faz':h=vFaz();break;
+    case 'gov':h=vGov();break;
+    case 'gov_report':h=vReport();break;
+    case 'mandate_end':h=vMandateEnd();break;
+    case 'final':h=vFinal();break;
+  }
+  if(UI.toast)h+=`<div class="toast">${esc(UI.toast)}</div>`;
+  $app.innerHTML=h;
+}
+
+/* ---------- controle ---------- */
+function act(a,v){
+  switch(a){
+    case 'new':UI.screen='setup';UI.setup.nome='';render();window.scrollTo(0,0);break;
+    case 'title':UI.screen='title';render();break;
+    case 'continue':S=load();if(S){UI.screen='game';render()}break;
+    case 'set':{const [k,x]=v.split(':');UI.setup[k]=x;render();break}
+    case 'launch':{
+      const u=UI.setup,nome=(u.nome||'').trim();
+      if(nome.length<2)return toast('Digite o nome na urna.');
+      S={v:1,player:{nome,partido:u.partido,perfil:u.perfil,home:u.home,vice:u.vice},integ:80,phase:'camp'};
+      UI.screen='game';UI.reg=u.home;
+      newCampaign({weeks:10,debates:[4,8]});
+      if(S.phase!=='debate')S.phase='camp';
+      save();render();window.scrollTo(0,0);break}
+    case 'reg':UI.reg=v;render();break;
+    case 'act':
+      if(v==='ataque'){UI.atk=!UI.atk;UI.apoio=false;render();return}
+      if(v==='apoio'){UI.apoio=!UI.apoio;UI.atk=false;render();return}
+      doAction(v);break;
+    case 'atk':doAction('ataque',v);break;
+    case 'atkx':UI.atk=false;render();break;
+    case 'apo':doAction('apoio',v);break;
+    case 'apox':UI.apoio=false;render();break;
+    case 'ev':evChoose(+v);break;
+    case 'offer':offerAnswer(v==='1');break;
+    case 'endweek':UI.atk=false;UI.apoio=false;endWeek();break;
+    case 'deb':debateAnswer(+v);break;
+    case 'debend':S.camp.debate=null;S.phase='camp';save();render();window.scrollTo(0,0);break;
+    case 'r2':startRound2();break;
+    case 'tofaz':S.phase='faz';save();render();window.scrollTo(0,0);break;
+    case 'faz':startGov(v);break;
+    case 'govnext':startGov(S.gov.fazenda);break;
+    case 'dil':dilChoose(+v);break;
+    case 'proj':sendProj(v);break;
+    case 'gact':if(v==='minis'){UI.minis=!UI.minis;render();return}gAct(v);break;
+    case 'minp':gAct('minis',v);break;
+    case 'minx':UI.minis=false;render();break;
+    case 'endq':UI.minis=false;endQuarter();break;
+    case 'nextq':nextQuarter();break;
+    case 'reelect':startReelection();break;
+    case 'finish':finish(v);break;
+  }
+}
+$app.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;act(b.dataset.a,b.dataset.v)});
+$app.addEventListener('input',e=>{if(e.target.id==='nm')UI.setup.nome=e.target.value});
+
+// gancho para testes automatizados
+window.__rampa={get S(){return S},act,natShares:()=>S&&S.camp?natShares():null};
+render();
+})();
+</script>
+<script src="./bnf-config.js"></script>
+<script src="./bnf-analytics.js" data-page="Rampa"></script>
+</body>
+</html>
