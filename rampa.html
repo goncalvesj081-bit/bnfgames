@@ -313,6 +313,25 @@ const FAZENDA=[
   {id:'prag',nome:'Pragmático(a)',desc:'Equilibrado. Sem grandes sustos para nenhum lado.'},
   {id:'dev',nome:'Desenvolvimentista',desc:'Acelera o crescimento com gasto público. Mercado desconfia e a inflação pressiona.'},
 ];
+const LEADERS=[
+  {id:'L1',nome:'Marta Siqueira',cargo:'Governadora',uf:'SP',ideo:.6},
+  {id:'L2',nome:'Rui Bandeira',cargo:'Governador',uf:'MG',ideo:.1},
+  {id:'L3',nome:'Edson Lacerda',cargo:'Governador',uf:'RJ',ideo:.9},
+  {id:'L4',nome:'Iara Monteiro',cargo:'Governadora',uf:'BA',ideo:-1.2},
+  {id:'L5',nome:'Paulo Cavalcanti',cargo:'Governador',uf:'PE',ideo:-.7},
+  {id:'L6',nome:'Cida Rocha',cargo:'Governadora',uf:'CE',ideo:-1.0},
+  {id:'L7',nome:'Jorge Salles',cargo:'Governador',uf:'PR',ideo:1.1},
+  {id:'L8',nome:'Heitor Brum',cargo:'Governador',uf:'RS',ideo:.4},
+  {id:'L9',nome:'Lauro Antunes',cargo:'Governador',uf:'GO',ideo:1.2},
+  {id:'L10',nome:'Nilda Farias',cargo:'Governadora',uf:'PA',ideo:-.3},
+  {id:'L11',nome:'Vítor Amaral',cargo:'Senador',uf:'SC',ideo:1.4},
+  {id:'L12',nome:'Tânia Correia',cargo:'Senadora',uf:'MA',ideo:-1.1},
+  {id:'L13',nome:'Osmar Pinheiro',cargo:'Senador',uf:'MT',ideo:1.0},
+  {id:'L14',nome:'Regina Paes',cargo:'Senadora',uf:'DF',ideo:.2},
+];
+const LD=id=>LEADERS.find(l=>l.id===id);
+const THEMES={econ:'a economia',seg:'a segurança',saude:'a saúde',corr:'a corrupção'};
+const TONES={deb:{nome:'Debochando',desc:'Alto risco: viraliza ou vira contra você.'},dados:{nome:'Sério, com dados',desc:'Ganho menor, mas garantido.'},gente:{nome:'Falando como gente',desc:'Ganho médio. Rende mais na reta final.'}};
 const MEDS=['Sílvia Antunes','Marcos Prata','Renata Coutinho','Paulo Viana'];
 const TVS=['Rede Horizonte','TV Nacional','Canal 7 e Rádio Brasil','Rede Aurora'];
 const JOURN=[
@@ -340,6 +359,8 @@ const ACTIONS={
   ataque:{nome:'Atacar rival',desc:'Expõe um adversário. Pode respingar em você.',cost:2,en:6},
   prep:{nome:'Treinar debate',desc:'Ensaios com a equipe para o próximo debate.',cost:0,en:5},
   apoio:{nome:'Buscar apoio',desc:'Pede o apoio de um candidato eliminado.',cost:1,en:6,r2:true},
+  lider:{nome:'Apoio de liderança',desc:'Governador ou senador entra na chapa em troca de um ministério.',cost:0,en:5},
+  live:{nome:'Live nas redes',desc:'Uma por semana, fora da agenda. Assunto da semana rende o dobro.',cost:0,en:6,free:true},
   descanso:{nome:'Descansar',desc:'Recupera energia para a reta final.',cost:0,en:-28},
 };
 
@@ -396,7 +417,7 @@ function newCampaign(o){
     money:o.reelect?40:perfil.money,energy:100,agenda:3,penalty:0,prep:0,
     tvMul:1+(perfil.tv||0)+(vice.tv||0),income:3+(vice.income||0),allyBonus:perfil.ally||0,
     allies:o.allies?o.allies.slice():[],risk:0,cands,reg,und:.24,log:[],ev:null,evRes:null,offer:null,sab:null,sabs:0,
-    endorsed:[],used:[],r1:null,hist:[],visits:{},lastDebate:null};
+    endorsed:[],used:[],r1:null,hist:[],visits:{},lastDebate:null,leaders:{},minProm:0,atk:{},topics:[],liveDone:false};
   clog(o.reelect?'Começa a campanha pela reeleição. O governo está em jogo.':'Candidatura registrada. Hora de ganhar o país.');
   startWeek();
 }
@@ -404,7 +425,9 @@ function newCampaign(o){
 function startWeek(){
   const C=S.camp;
   C.agenda=Math.max(1,3-C.penalty);C.penalty=0;
-  C.ev=null;C.evRes=null;C.offer=null;C.sab=null;C.visits={};
+  C.ev=null;C.evRes=null;C.offer=null;C.sab=null;C.visits={};C.liveDone=false;
+  if(!C.leaders)C.leaders={};if(!C.atk)C.atk={};
+  C.topics=shuffle(active().filter(c=>!c.me).map(c=>c.id).concat(Object.keys(THEMES))).slice(0,3);
   const debateNow=C.debates.includes(C.week)&&!C.debatesDone.includes(C.week);
   if(debateNow){C.debate=buildDebate('deb');S.phase='debate'}
   if(C.risk>0&&Math.random()<C.risk*.35&&!C.used.includes('pf')){C.ev='pf';C.used.push('pf')}
@@ -420,36 +443,77 @@ function startWeek(){
 
 function doAction(a,arg){
   const C=S.camp,A=ACTIONS[a];
-  if(C.agenda<=0)return toast('Agenda da semana cheia.');
+  if(!A.free&&C.agenda<=0)return toast('Agenda da semana cheia.');
+  if(A.free&&C.liveDone)return toast('Já teve live nesta semana.');
   if(A.cost>C.money)return toast('Caixa insuficiente.');
   if(A.en>0&&C.energy<A.en)return toast('Sem energia. Descanse.');
   let msg='';
-  const sid=UI.st,sn=ST(sid).nome;
+  const sid=UI.st,sn=ST(sid).nome,nv=C.visits[sid]||0,rm=1/(1+.4*nv);
   switch(a){
-    case 'comicio':{const p=PERFIS.find(x=>x.id===S.player.perfil);const g=gainP(sid,18*(p.rally||1),.35);C.visits[sid]=1;msg=`Comício lotado em ${sn}.`+(g<6?' Mas o estado já está saturado.':'');break}
-    case 'corpo':{gainP(sid,8,.2);C.visits[sid]=1;msg=`Corpo a corpo em ${sn}.`;break}
+    case 'comicio':{const p=PERFIS.find(x=>x.id===S.player.perfil);const g=gainP(sid,18*(p.rally||1)*rm,.35);C.visits[sid]=nv+1;msg=`Comício lotado em ${sn}.`+(nv?' Repetir o mesmo estado na semana rende menos.':g<6?' Mas o estado já está saturado.':'');break}
+    case 'corpo':{gainP(sid,8*rm,.2);C.visits[sid]=nv+1;msg=`Corpo a corpo em ${sn}.`+(nv?' Rendeu menos: você já esteve aqui nesta semana.':'');break}
+    case 'lider':{
+      const L=LD(arg);if(!L||C.leaders[L.id])return;
+      const sh=regShares(L.uf).P,ch=clamp(.75-Math.abs(L.ideo-me().ideo)*.25+(sh-.3)*.8,.1,.9);
+      if(Math.random()<ch){C.leaders[L.id]='P';C.minProm++;msg=`${L.cargo} ${L.nome} (${L.uf}) sobe no seu palanque. Preço: um ministério.`}
+      else{const rv=active().filter(c=>!c.me).sort((x,y)=>Math.abs(x.ideo-L.ideo)-Math.abs(y.ideo-L.ideo))[0];
+        if(rv&&Math.random()<.75){C.leaders[L.id]=rv.id;msg=`${L.nome} recusou e foi para o palanque de ${rv.nome}.`}
+        else{C.leaders[L.id]='X';msg=`${L.nome} recusou e decidiu ficar neutro.`}}
+      UI.lider=false;break}
+    case 'live':{
+      const tg=UI.liveT,tone=arg,mult=C.topics.includes(tg)?2:1,riv=C.cands.find(c=>c.id===tg);
+      let ok=true,own=0;
+      if(tone==='deb'){ok=Math.random()<.55;own=ok?.028:-.02}else if(tone==='dados')own=.012;else own=.017+(C.week>=C.weeks-2||C.round===2?.008:0);
+      if(own>0)own*=mult;
+      boost('P','all',own);
+      if(riv&&ok)boost(riv.id,'all',-(tone==='deb'?.02:.01)*mult);
+      if(riv)C.atk[riv.id]=(C.atk[riv.id]||0)+1;
+      const reach=R(1.5,4)*mult*(ok?1:.6);
+      const alvo=riv?riv.nome:THEMES[tg];
+      msg=`Live (${TONES[tone].nome.toLowerCase()}) sobre ${alvo}: ${f1(reach)} mi de alcance.`+(mult>1?' Era o assunto da semana: rendeu o dobro.':'')+(ok?'':' O tom pegou mal e virou contra você.');
+      C.liveDone=true;UI.live=false;UI.liveT=null;break}
     case 'tv':{STATES.forEach(st=>gainCore(st.id,4.4*C.tvMul));msg='Nova peça de propaganda no ar em todo o país.';break}
     case 'fundos':{const ns=natShares(),lead=Object.keys(ns).sort((x,y)=>ns[y]-ns[x])[0]==='P';const v=R(6,9.5)*(lead?1.2:1);C.money+=v;if(Math.random()<.12)C.risk+=.25;msg=`Jantar com doadores rende ${mon(v)}.`+(lead?' Quem lidera atrai dinheiro.':'');break}
     case 'ataque':{
       const t=C.cands.find(c=>c.id===arg);if(!t)return;
-      boost(t.id,'all',-.075);const bk=Math.random()<.3;if(bk)boost('P','all',-.035);
+      boost(t.id,'all',-.075);C.atk[t.id]=(C.atk[t.id]||0)+1;const bk=Math.random()<.3;if(bk)boost('P','all',-.035);
       msg=`Ataque a ${t.nome}.`+(bk?' O eleitor achou baixaria e você também perdeu.':' O golpe acertou.');UI.atk=false;break}
     case 'prep':{if(C.prep>=3)return toast('Já está no máximo de preparo.');C.prep++;msg=`Treino de debate (preparo ${C.prep}/3).`;break}
     case 'apoio':{
       const t=C.cands.find(c=>c.id===arg);if(!t)return;
-      const d=Math.abs(t.ideo-me().ideo),ok=Math.random()<clamp(.8-d*.22,.12,.85);
+      const d=Math.abs(t.ideo-me().ideo),ok=Math.random()<clamp(.8-d*.22-((C.atk||{})[t.id]||0)*.1,.08,.85);
       C.endorsed.push(t.id);
       if(ok){STATES.forEach(st=>{C.reg[st.id].P+=(t.r1share||.1)*130*aff(t,st)});msg=`${t.nome} declara apoio a você no 2º turno!`}
       else msg=`${t.nome} recusa o apoio e fica neutro.`;
       UI.apoio=false;break}
     case 'descanso':msg='Dia de descanso e reunião de estratégia.';break;
   }
-  C.money-=A.cost;C.energy=clamp(C.energy-A.en,0,100);C.agenda--;
+  C.money-=A.cost;C.energy=clamp(C.energy-A.en,0,100);if(!A.free)C.agenda--;
   clog(msg);save();render();
 }
 
+function leaderRates(){
+  const C=S.camp,o={};
+  Object.keys(C.leaders||{}).forEach(lid=>{const h=C.leaders[lid];if(h==='X')return;(o[h]=o[h]||[]).push(lid)});
+  return o;
+}
+function leadersAct(){
+  const C=S.camp,by=leaderRates();
+  for(const h in by){
+    const c=C.cands.find(x=>x.id===h);if(!c||c.out)continue;
+    by[h].forEach((lid,k)=>{const L=LD(lid),w=(L.cargo.startsWith('Gov')?7:4.5)*Math.pow(.85,k);
+      if(h==='P'){gainCore(L.uf,w);STATES.filter(s=>s.reg===ST(L.uf).reg&&s.id!==L.uf).forEach(s=>gainCore(s.id,w*.2))}
+      else{C.reg[L.uf][h]+=w*aff(c,ST(L.uf))*.9;STATES.filter(s=>s.reg===ST(L.uf).reg&&s.id!==L.uf).forEach(s=>C.reg[s.id][h]+=w*.18*aff(c,s))}});
+  }
+  const free=LEADERS.filter(l=>!C.leaders[l.id]);
+  if(free.length&&Math.random()<.3){
+    const L=pick(free),rv=active().filter(c=>!c.me).sort((x,y)=>Math.abs(x.ideo-L.ideo)-Math.abs(y.ideo-L.ideo))[0];
+    if(rv){C.leaders[L.id]=rv.id;clog(`${L.cargo} ${L.nome} (${L.uf}) declara apoio a ${rv.nome}.`)}
+  }
+}
 function rivalsAct(){
   const C=S.camp;
+  leadersAct();
   active().filter(c=>!c.me).forEach(c=>{
     const n=C.round===2?4:3;
     for(let k=0;k<n;k++){
@@ -509,7 +573,7 @@ function startRound2(){
   const fin=active();
   STATES.forEach(st=>{
     C.cands.filter(c=>c.out&&!c.transferred).forEach(e=>{
-      const ws=fin.map(f=>1/(.4+Math.abs(e.ideo-f.ideo)));const t=ws.reduce((a,b)=>a+b);
+      const ws=fin.map(f=>(1/(.4+Math.abs(e.ideo-f.ideo)))*(f.me?1/(1+.35*((C.atk||{})[e.id]||0)):1));const t=ws.reduce((a,b)=>a+b);
       fin.forEach((f,i)=>C.reg[st.id][f.id]+=C.reg[st.id][e.id]*.72*ws[i]/t);
     });
   });
@@ -624,6 +688,9 @@ const RX={
   emp:/\b(povo|familia|familias|trabalhador|trabalhadores|mae|maes|criancas?|gente|brasileiros?|brasileiras?|juventude|idosos?|voce que)\b/,
   eva:/nao vou responder|proxima pergunta|nao sei|sem comentarios|nao vem ao caso|prefiro nao|nao tenho opiniao/,
   ins:/\b(idiota|burr[oa]|ladr[aoe]|vagabund|lixo|canalha|imbecil|otari|safad)/,
+  own:/\b(errei|erramos|reconheco|assumo|admito|e verdade|nao fiz|falhei|eu falhei|foi um erro)\b/,
+  jar:/(beneficios fiscais|renuncia fiscal|arcabouco|superavit primario|deficit nominal|resultado primario|\bspread\b|pib potencial|choque de oferta|contingenciamento|ajuste estrutural)/,
+  con:/(\bsim\b.*\bnao\b|\bnao\b.*\bsim\b|\beles\b.*\bnos\b|\benquanto\b|\bnao e\b.*\be\b|\bem vez de\b|\bao inves\b|\bmenos\b.*\bmais\b|\bnao\b.*\bmas\b|,[^,]*\bnao\s*$|\b(nunca|jamais)\b)/,
   atk:/\b(adversari|o senhor|a senhora|seu partido|seu governo|seu grupo|mentir|mentira|corrup|hipocr|fugiu)/,
 };
 function gradeAnswer(text,step,timeout){
@@ -649,6 +716,13 @@ function gradeAnswer(text,step,timeout){
   if(RX.emp.test(n)){s+=step.plain?8:5;if(fb.length<3)fb.push('Falou com o eleitor, não com o jornalista.')}
   if(step.plain&&words>70){s-=6;fb.push('Complicou demais. A dona de casa mudou de canal.')}
   if(RX.eva.test(n)){s-=12;fb.push('Frase evasiva. Vai virar meme.')}
+  if(RX.own.test(n)){s+=6;fb.unshift('Assumiu o erro sem enrolar. Isso gera confiança.')}
+  if(RX.jar.test(n)){s-=6;fb.push('Jargão de técnico. O eleitor quer saber onde dói no bolso dele.')}
+  const sents=t.split(/[.!?]+/).map(x=>x.trim()).filter(Boolean),last=sents.length?norm(sents[sents.length-1]):'';
+  if(sents.length>=2&&last.split(/\s+/).length<=14&&RX.con.test(last)){s+=8;fb.unshift('Fechou com uma frase de efeito que faz contraste. Vai virar corte.')}
+  else if(words>=25&&s>=60&&fb.length<3)fb.push('Faltou um fecho marcante: termine com uma frase curta de contraste.');
+  if(step.time<=60&&words>60){s-=8;fb.unshift('Longa demais para 60 segundos: a frase final foi cortada.')}
+  else if(words>=8&&words<20){s-=5;fb.push('Resposta curta: faltou desenvolver.')}
   if(RX.ins.test(n)){s-=22;fb.push('A ofensa pegou muito mal. Foi o corte mais compartilhado da noite.')}
   if(RX.atk.test(n)){
     if(step.ctx==='rep'||step.ctx==='rivq'){s+=5;fb.push('Devolveu a provocação com firmeza.')}
@@ -668,15 +742,14 @@ function buildDebate(kind){
     const j=JOURN[C.sab],qs=shuffle(SABQ).slice(0,3);
     return {kind,j:C.sab,i:0,res:[],rivS:[],steps:[{t:'intro'},...qs.map((q,k)=>({t:'q',who:j.nome,cor:j.cor,label:`${j.nome} · pergunta ${k+1} de 3`,text:q.q,kw:q.kw,sug:q.o,time:90,ctx:'sab',num:!!j.num,plain:!!j.plain}))]};
   }
-  const med=pick(MEDS),q=pick(DEBQ),asker=pick(riv),fl=pick(FLANKS[arch(me().ideo)]);
+  const med=pick(MEDS),q=pick(DEBQ),fl=pick(FLANKS[arch(me().ideo)]),ns=natShares();
+  const skipped=riv.filter(c=>Math.random()<(ns[c.id]>ns.P?(C.round===2?.12:.28):.06)).map(c=>c.id);
+  const present=riv.filter(c=>!skipped.includes(c.id)),asker=present.length?pick(present):null;
   const n=(C.round===2?4:0)+C.debatesDone.length+1;
-  return {kind,med,tv:pick(TVS),n,i:0,res:[],rivS:[],steps:[
-    {t:'intro'},
-    {t:'q',who:med,cor:'#7D8E9E',label:`${med} · mediação`,text:q.q,kw:q.kw,sug:q.o,time:90,ctx:'med'},
-    {t:'ask'},
-    {t:'q',who:asker.nome,cor:asker.cor,label:`${asker.nome} pergunta`,text:fl.ask,kw:fl.kw,sug:REPL.map(r=>[r[0].replace('O senhor fugiu da pergunta, e o eleitor percebeu. ',''),r[1]]),time:90,ctx:'rivq'},
-    {t:'q',who:med,cor:'#7D8E9E',label:'Considerações finais',text:'Considerações finais. Olhe para a câmera.',kw:['brasil','povo','futuro','vou','compromisso','familia','trabalho','voto','emprego'],sug:FINAL,time:60,ctx:'final'},
-  ]};
+  const steps=[{t:'intro'},{t:'q',who:med,cor:'#7D8E9E',label:`${med} · mediação`,text:q.q,kw:q.kw,sug:q.o,time:90,ctx:'med'}];
+  if(asker)steps.push({t:'ask'},{t:'q',who:asker.nome,cor:asker.cor,label:`${asker.nome} pergunta`,text:fl.ask,kw:fl.kw,sug:REPL.map(r=>[r[0].replace('O senhor fugiu da pergunta, e o eleitor percebeu. ',''),r[1]]),time:90,ctx:'rivq'});
+  steps.push({t:'q',who:med,cor:'#7D8E9E',label:'Considerações finais',text:'Considerações finais. Olhe para a câmera.',kw:['brasil','povo','futuro','vou','compromisso','familia','trabalho','voto','emprego'],sug:FINAL,time:60,ctx:'final'});
+  return {kind,med,tv:pick(TVS),n,i:0,res:[],rivS:[],skipped,steps};
 }
 function stepStart(){
   const D=S.camp.debate,st=D.steps[D.i];
@@ -701,13 +774,15 @@ function debAsk(){
 }
 function debFinish(){
   const C=S.camp,D=C.debate;
-  const my=D.res.reduce((a,x)=>a+x.s,0)/Math.max(1,D.res.length)+(D.kind==='deb'?C.prep*3:0);
+  let my=D.res.reduce((a,x)=>a+x.s,0)/Math.max(1,D.res.length)+(D.kind==='deb'?C.prep*3:0);
+  if(C.energy<35){my-=8;D.tired=true}
   D.my=Math.round(clamp(my,0,100));
   if(D.kind==='sab'){
     C.sabs++;
     if(D.my>=60){boost('P','all',.045);D.v='win';D.txt='Saiu maior do que entrou.'}
     else if(D.my>=45){boost('P','all',.01);D.v='draw';D.txt='Entrevista correta. Sem estragos.'}
-    else{boost('P','all',-.04);D.v='lose';D.txt='Três evasivas viraram manchete.'}
+    else{boost('P','all',-.04);D.v='lose';D.txt='Entrevista ruim. Os cortes não ajudaram.'}
+    if(D.res.filter(r=>r.s<40).length>=3){boost('P','all',-.02);D.v='lose';D.txt='Três evasivas viraram manchete.'}
   }else{
     const rv=(D.rivS.length?D.rivS.reduce((a,b)=>a+b,0)/D.rivS.length:55)*.5+R(48,62)*.5;D.rv=Math.round(rv);
     const diff=D.my-rv;
@@ -715,6 +790,7 @@ function debFinish(){
     else if(D.my<45||diff<-8){D.v='lose';D.txt='Você perdeu o debate e virou meme.';boost('P','all',-.06)}
     else{D.v='draw';D.txt='Debate termina sem vencedor claro.';boost('P','all',.015)}
     C.debatesDone.push(C.week);C.prep=0;
+    (D.skipped||[]).forEach(id=>{boost(id,'all',-.03);const c=C.cands.find(x=>x.id===id);clog(`${c.nome} faltou ao debate. A cadeira vazia rodou o país.`)});
   }
   C.lastDebate={kind:D.kind,v:D.v,txt:D.txt,my:D.my,w:C.week,r:C.round};
   clog((D.kind==='sab'?'Sabatina: ':'Debate: ')+D.txt+` Nota ${D.my}.`);
@@ -935,7 +1011,7 @@ function startGov(fz){
     pc:5,coal,emendas:0,did:{},projTried:false,passed:prev?prev.passed.slice():[],failed:[],
     mods:prev?prev.mods:{pibT:0,inflP:0,divT:0,desT:0,aprovB:0},pending:prev?prev.pending:[],
     integ:S.integ===undefined?80:S.integ,hist:prev?prev.hist:[],used:[],dil:null,dilRes:null,log:[],report:null,
-    totalQ:prev?prev.totalQ:0,
+    totalQ:prev?prev.totalQ:0,minProm:prev?0:(S.camp.minProm||0),
     prom:(S.prom||[]).map(id=>({id,dl:promDeadline(PJ(id)),st:(prev&&prev.passed.includes(id))?'ok':'pend'}))};
   const G=S.gov;
   if(!prev){
@@ -952,6 +1028,7 @@ function startGov(fz){
 function newQuarter(){
   const G=S.gov;
   G.did={};G.projTried=false;G.emendas=0;G.dilRes=null;
+  if(G.q===1&&G.minProm>0&&!G.used.includes('cobranca')){G.dil='cobranca';G.used.push('cobranca');return}
   let pool=GEV.filter(e=>!G.used.includes(e.id)&&(!e.cond||e.cond(G)));
   if(G.integ<60&&!G.used.includes('escandalo')&&Math.random()<(60-G.integ)/80)pool=[GEV.find(e=>e.id==='escandalo')];
   if(!pool.length){G.used=[];pool=GEV.filter(e=>!e.cond||e.cond(G))}
@@ -975,8 +1052,15 @@ function applyEf(ef){
   ['pibT','inflP','divT','desT','aprovB'].forEach(k=>{if(ef[k])G.mods[k]+=ef[k]});
   return ch.join(' · ');
 }
+function dilOf(id){
+  if(id==='cobranca'){const N=S.gov.minProm;return {id,t:'Os aliados vieram cobrar',d:`Na campanha você prometeu ${N} ministério(s) a governadores e senadores em troca de apoio. A fila está na porta do Palácio, e o eleitor lembra que você prometeu um governo enxuto.`,o:[
+    {t:`Entregar os ${N} ministérios`,ef:{satAll:8,aprov:-Math.round(N*.7),integ:-N*2}},
+    {t:'Entregar metade e enrolar o resto',ef:{satAll:-3,aprov:-Math.round(N*.3),integ:-N}},
+    {t:'Enxugar a Esplanada e dar o calote nos aliados',ef:{satAll:-15,aprov:3,integ:5}}]}}
+  return GEV.find(x=>x.id===id);
+}
 function dilChoose(i){
-  const G=S.gov,e=GEV.find(x=>x.id===G.dil),o=e.o[i];
+  const G=S.gov,e=dilOf(G.dil),o=e.o[i];
   const ch=applyEf(o.ef);G.dilRes={t:e.t,o:o.t,ch};glog(`${e.t}: ${o.t}.`);G.dil=null;save();render();
 }
 function sendProj(id){
@@ -1181,18 +1265,25 @@ function vCamp(){
   else if(C.evRes)h+=`<div class="sec"><h4>Aconteceu</h4></div><div class="card res"><div class="kick">${C.evRes.t}</div><p class="mt8" style="margin-bottom:0">${C.evRes.r}</p></div>`;
   if(C.sab!==null&&C.sab!==undefined){const j=JOURN[C.sab];h+=`<div class="sec"><h4>Convite</h4></div><div class="card blue"><div class="kick">Hoje · sabatina ${C.sabs+1}</div><h3>${j.nome}</h3><p>${j.estilo} Três perguntas de 90 segundos, com insistência. Aceitar usa 1 atividade da agenda. Recusar libera o dia, mas vira manchete de quem não foi.</p><div class="row2"><button class="opt" data-a="sab" data-v="1" ${C.agenda<=0?'disabled':''}>Sentar na bancada</button><button class="opt" data-a="sab" data-v="0">Recusar</button></div></div>`}
   if(C.offer){const p=PT(C.offer),d=Math.abs(p.ideo-m.ideo);h+=`<div class="sec"><h4>Proposta de aliança</h4></div><div class="card"><div class="kick">${p.id} · ${ideoLabel(p.ideo)}</div><h3>${p.nome}</h3><p>Oferece ${p.seats} deputados, mais tempo de TV e ${mon(p.seats/40)} por semana. ${d>1.1?'<b class="neg">Partido distante do seu: parte da sua base pode estranhar.</b>':'Afinidade razoável com seu programa.'}</p><button class="opt" data-a="offer" data-v="1">Fechar aliança</button><button class="opt" data-a="offer" data-v="0">Recusar</button></div>`}
+  h+=`<div class="chips" style="margin:12px 0 0;align-items:center"><span class="tiny muted">Nas redes esta semana:</span>${C.topics.map(k=>{const c=C.cands.find(x=>x.id===k);return `<span class="chip" style="padding:4px 9px;font-size:11.5px">${c?esc(c.nome):THEMES[k]}</span>`}).join('')}</div>`;
   h+=`<div class="sec"><h4>A corrida</h4><em>${nextDeb?'Próximo debate: semana '+nextDeb:''}</em></div><div class="panel">${pollBars(ns,C.und,cs)}</div>`;
   const st=ST(UI.st),ss=regShares(st.id),sl=Object.keys(ss).sort((a,b)=>ss[b]-ss[a])[0],slc=C.cands.find(c=>c.id===sl);
   h+=`<div class="sec"><h4>O mapa</h4><em>toque num estado para fazer campanha nele</em></div>`;
   h+=vMap(regShares,cs,{click:true,sel:UI.st,visits:C.visits});
   h+=`<div class="stinfo"><div><b>${st.nome}</b> <span class="tiny muted">${RN(st.reg)} · ${f1(st.peso*100)}% do eleitorado</span></div><div class="mono small">você ${pc(ss.P*(1-C.und))} · <span style="color:${slc.cor}">${sl==='P'?'liderando':esc(slc.nome.split(' ')[0])+' lidera'}</span></div></div>`;
-  const dis=a=>{const A=ACTIONS[a];return C.agenda<=0||A.cost>C.money||(A.en>0&&C.energy<A.en)||!!C.ev};
-  const acts=Object.keys(ACTIONS).filter(a=>{const A=ACTIONS[a];if(a==='prep'&&!nextDeb)return false;if(A.r2&&(C.round!==2||!C.cands.some(c=>c.out&&!C.endorsed.includes(c.id))))return false;return true});
+  const dis=a=>{const A=ACTIONS[a];if(A.free)return C.liveDone||C.energy<A.en||!!C.ev;if(a==='lider'&&!LEADERS.some(l=>!C.leaders[l.id]))return true;return C.agenda<=0||A.cost>C.money||(A.en>0&&C.energy<A.en)||!!C.ev};
+  const acts=Object.keys(ACTIONS).filter(a=>{const A=ACTIONS[a];if(a==='prep'&&!nextDeb)return false;if(a==='lider'&&C.round===2)return false;if(A.r2&&(C.round!==2||!C.cands.some(c=>c.out&&!C.endorsed.includes(c.id))))return false;return true});
   h+=`<div class="sec"><h4>A agenda da semana</h4><em>${C.agenda} atividade${C.agenda===1?'':'s'} restante${C.agenda===1?'':'s'}</em></div>`;
   if(C.energy<30)h+=`<p class="small neg" style="margin:0 2px 8px">Energia abaixo de 30: tudo rende 60%. Descanse.</p>`;
-  h+=`<div class="acts">${acts.map(a=>{const A=ACTIONS[a],c=[];if(A.cost)c.push(mon(A.cost));if(A.en>0)c.push('-'+A.en+' energia');if(A.en<0)c.push('+'+(-A.en)+' energia');if(a==='fundos')c.push('+R$ 6–9 mi');return `<button class="act" data-a="act" data-v="${a}" ${dis(a)?'disabled':''}><b>${A.nome}${A.st?' · '+UI.st:''}</b><span>${A.desc}</span><div class="cost">${c.join(' · ')||'—'}</div></button>`}).join('')}</div>`;
+  h+=`<div class="acts">${acts.map(a=>{const A=ACTIONS[a],c=[];if(A.cost)c.push(mon(A.cost));if(A.en>0)c.push('-'+A.en+' energia');if(A.en<0)c.push('+'+(-A.en)+' energia');if(a==='fundos')c.push('+R$ 6–9 mi');if(A.free)c.push(C.liveDone?'feita':'grátis');return `<button class="act" data-a="act" data-v="${a}" ${dis(a)?'disabled':''}><b>${A.nome}${A.st?' · '+UI.st:''}</b><span>${A.desc}</span><div class="cost">${c.join(' · ')||'—'}</div></button>`}).join('')}</div>`;
   if(UI.atk)h+=`<div class="panel pad mt8"><div class="small muted">Atacar quem?</div><div class="chips mt8">${cs.filter(c=>!c.me).map(c=>`<button class="chip" data-a="atk" data-v="${c.id}">${esc(c.nome)}</button>`).join('')}<button class="chip" data-a="atkx">Cancelar</button></div></div>`;
   if(UI.apoio)h+=`<div class="panel pad mt8"><div class="small muted">Pedir apoio a quem?</div><div class="chips mt8">${C.cands.filter(c=>c.out&&!C.endorsed.includes(c.id)).map(c=>`<button class="chip" data-a="apo" data-v="${c.id}">${esc(c.nome)} · ${pc(c.r1share||0)}</button>`).join('')}<button class="chip" data-a="apox">Cancelar</button></div></div>`;
+  if(UI.live){const tg=active().filter(c=>!c.me).map(c=>[c.id,c.nome]).concat(Object.keys(THEMES).map(k=>[k,THEMES[k]]));
+    h+=`<div class="panel pad mt8"><div class="small muted">Sobre quem ou o quê?</div><div class="chips mt8">${tg.map(([k,l])=>`<button class="chip ${UI.liveT===k?'on':''}" data-a="livet" data-v="${k}">${esc(l)}${C.topics.includes(k)?' 🔥':''}</button>`).join('')}</div><div class="small muted mt12">Em que tom?</div>${Object.keys(TONES).map(k=>`<button class="opt" data-a="livego" data-v="${k}"><b>${TONES[k].nome}</b><small>${TONES[k].desc}</small></button>`).join('')}<div class="chips mt8"><button class="chip" data-a="livex">Cancelar</button></div></div>`}
+  if(UI.lider){const fr=LEADERS.filter(l=>!C.leaders[l.id]);
+    h+=`<div class="panel pad mt8"><div class="small muted">Quem você procura? A chance depende da afinidade e da sua força no estado. Quem recusa costuma ir para um rival.</div><div class="chips mt8">${fr.map(l=>{const sh=regShares(l.uf).P,ch=clamp(.75-Math.abs(l.ideo-m.ideo)*.25+(sh-.3)*.8,.1,.9);return `<button class="chip" data-a="lid" data-v="${l.id}">${l.cargo.slice(0,3)}. ${esc(l.nome)} · ${l.uf} · ${ch>.6?'alta':ch>.35?'média':'baixa'}</button>`}).join('')}<button class="chip" data-a="lidx">Cancelar</button></div></div>`}
+  {const by=leaderRates();const ks=Object.keys(by).filter(k=>C.cands.find(c=>c.id===k&&!c.out));
+    if(ks.length)h+=`<div class="sec"><h4>Apoios</h4><em>${C.minProm?C.minProm+' ministério(s) prometido(s)':''}</em></div><div class="panel pad small">${ks.sort((a,b)=>a==='P'?-1:b==='P'?1:0).map(k=>{const c=C.cands.find(x=>x.id===k);return `<p style="margin:0 0 6px"><b style="color:${c.cor}">${c.me?'Você':esc(c.nome)}:</b> ${by[k].map(id=>{const L=LD(id);return `${esc(L.nome)} (${L.uf})`}).join(', ')}</p>`}).join('')}<p class="tiny muted" style="margin:0">Cada apoio rende votos toda semana no estado e na região. Cada novo apoio pesa um pouco menos que o anterior.</p></div>`}
   if(C.prep&&nextDeb)h+=`<p class="tiny muted mt8 mono">Preparo para debate: ${'●'.repeat(C.prep)}${'○'.repeat(3-C.prep)}</p>`;
   if(C.allies.length)h+=`<p class="tiny muted mt8">Coligação: ${[m.partido,...C.allies].join(' · ')}</p>`;
   if(S.prom&&S.prom.length)h+=`<div class="sec"><h4>O seu programa</h4><em>registrado no TSE</em></div><div class="panel pad small">${S.prom.map(id=>`<div style="margin-bottom:4px"><b>${PJ(id).nome}</b> <span class="tiny muted">${dlLabel(promDeadline(PJ(id)))}</span></div>`).join('')}</div>`;
@@ -1212,23 +1303,24 @@ function vDebate(){
   const sab=D.kind==='sab',j=sab?JOURN[D.j]:null;
   let h=`<div class="studio"><span class="rec">AO VIVO</span><div class="lbl"><small>${sab?`Sabatina ${C.sabs+(D.done?0:1)} · rádio e coluna`:`Debate ${D.n} · ${D.tv}`}</small><b>${sab?esc(j.nome):'No estúdio'}</b></div></div>`;
   h+=`<div class="wrap">`;
-  h+=`<div class="tiny muted mono" style="display:flex;justify-content:space-between;gap:10px;margin:0 2px 10px"><span>${sab?esc(j.estilo):'mediação: '+esc(D.med)}</span><span>${sab?'':(active().length)+' na mesa'}</span></div>`;
+  h+=`<div class="tiny muted mono" style="display:flex;justify-content:space-between;gap:10px;margin:0 2px 10px"><span>${sab?esc(j.estilo):'mediação: '+esc(D.med)}</span><span>${sab?'':(active().length-(D.skipped||[]).length)+' na mesa'}</span></div>`;
   h+=`<div class="panel pad">`;
   if(D.done){
     const col=D.v==='win'?'pos':D.v==='lose'?'neg':'gold';
     h+=`<div class="tiny muted mono">${sab?'A ENTREVISTA':'A NOITE'}</div><div class="score"><b class="${col}">${D.my}</b><span style="font-family:var(--serif);font-size:18px;font-weight:600">${D.txt}</span></div>`;
     if(!sab)h+=`<p class="tiny muted mono" style="margin:0 0 6px">Média dos adversários: ${D.rv}</p>`;
+    if(D.tired)h+=`<p class="tiny neg mono" style="margin:0 0 6px">Cansaço: −8 na nota (energia abaixo de 35).</p>`;
     h+=`<ul class="fb">${D.res.map(r=>`<li><b class="${r.s>=60?'pos':r.s<45?'neg':'gold'}">${r.s}</b>${esc(r.fb[0])}</li>`).join('')}</ul>`;
     h+=`<button class="btn grn mt16" data-a="debend">${sab?'Sair da bancada':'Sair do estúdio'}</button>`;
   }else if(st.t==='intro'){
     h+=sab?`<p style="font-family:var(--serif);font-size:17px;line-height:1.45;margin:0 0 12px">Três perguntas de 90 segundos. Escreva sua resposta: o jogo avalia se você respondeu o que foi perguntado, se trouxe números e propostas, e se falou com o eleitor. Evasivas viram manchete.</p>`
-      :`<p style="font-family:var(--serif);font-size:17px;line-height:1.45;margin:0 0 6px">${C.round===2?'Só dois na mesa. Toda pergunta é para você ou para ele.':'Mesa cheia. Uma pergunta da mediação, uma sua para um adversário, uma de um adversário para você e as considerações finais.'}</p><p class="tiny muted" style="margin:0 0 12px">Preparo: ${'●'.repeat(C.prep)}${'○'.repeat(3-C.prep)} (cada ponto soma 3 na nota final). Faltar custa caro e a cadeira vazia roda o país.</p>`;
+      :`<p style="font-family:var(--serif);font-size:17px;line-height:1.45;margin:0 0 6px">${C.round===2?'Só dois na mesa. Toda pergunta é para você ou para ele.':'Mesa cheia. Uma pergunta da mediação, uma sua para um adversário, uma de um adversário para você e as considerações finais.'}</p><p class="tiny muted" style="margin:0 0 12px">Preparo: ${'●'.repeat(C.prep)}${'○'.repeat(3-C.prep)} (cada ponto soma 3 na nota final). Faltar custa caro e a cadeira vazia roda o país.</p>${(D.skipped||[]).length?`<p class="small gold" style="margin:0 0 10px">Cadeira vazia: ${D.skipped.map(id=>esc(C.cands.find(c=>c.id===id).nome)).join(' e ')} faltou. Ponto para quem foi.</p>`:''}${C.energy<35?'<p class="small neg" style="margin:0 0 10px">Energia abaixo de 35: sua nota final perde 8 pontos.</p>':''}`;
     h+=`<div class="row2"><button class="btn grn" data-a="debgo">${sab?'Começar':'Entrar no estúdio'}</button><button class="btn sec2" style="width:auto;margin:0" data-a="debskip">Faltar</button></div>`;
   }else if(st.t==='show'){
     h+=speaker(st.who,st.cor,st.label,st.text);
     h+=`<button class="btn grn mt16" data-a="debnext">Réplica · 60 s</button>`;
   }else if(st.t==='ask'){
-    const riv=active().filter(c=>!c.me);
+    const riv=active().filter(c=>!c.me&&!(D.skipped||[]).includes(c.id));
     if(!UI.askR&&riv.length===1)UI.askR=riv[0].id;
     const r=riv.find(c=>c.id===UI.askR);
     h+=`<b style="font-size:16px">Sua pergunta</b><p class="small muted" style="margin:4px 0 10px">Escolha quem e por onde. Cada adversário tem os flancos que a imprensa cobra dele.</p>`;
@@ -1242,6 +1334,7 @@ function vDebate(){
       h+=`<div class="score mt12"><b class="${col}">${g.s}</b></div><ul class="fb">${g.fb.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
       const nx=D.steps[D.i+1];
       h+=`<button class="btn grn mt16" data-a="debnext">${!nx?'Encerrar':nx.t==='ask'?'Sua pergunta':nx.ctx==='final'?'Considerações finais · 60 s':'Próxima pergunta'}</button>`;
+      if(!nx||nx.ctx==='final')h+=`<p class="tiny muted" style="margin:10px 0 0">Dica: assuma o que precisa, mostre o concreto com número e feche com uma frase curta de contraste.</p>`;
     }else{
       const left=Math.max(0,(D.deadline||Date.now())-Date.now());
       h+=`<div class="timer ${left<15000?'low':''}" id="tmrx"><b id="tmr">${fmtT(left)}</b><div class="tb"><div id="tmrb" style="width:${left/(st.time*1000)*100}%"></div></div></div>`;
@@ -1334,7 +1427,7 @@ function vGov(){
     <div class="kpi"><span>Desemprego</span><b class="${G.desemp>10?'neg':G.desemp<7?'pos':''}">${f1(G.desemp)}%</b><i>&nbsp;</i></div>
     <div class="kpi"><span>Dívida</span><b class="${G.divida>90?'neg':''}">${f1(G.divida)}%</b><i>do PIB</i></div></div>`;
   if(G.hist.length>1)h+=`<div class="panel pad mt8"><div class="tiny muted mono">APROVAÇÃO AO LONGO DO GOVERNO</div>${spark(G.hist.map(x=>x.aprov).concat([G.aprov]),'var(--ac)',0,100)}</div>`;
-  if(G.dil){const e=GEV.find(x=>x.id===G.dil);h+=`<div class="sec"><h4>Decisão do trimestre</h4><em>obrigatória</em></div><div class="card"><div class="kick">Gabinete presidencial</div><h3>${e.t}</h3><p>${e.d}</p>${e.o.map((o,i)=>`<button class="opt" data-a="dil" data-v="${i}">${o.t}</button>`).join('')}</div>`}
+  if(G.dil){const e=dilOf(G.dil);h+=`<div class="sec"><h4>Decisão do trimestre</h4><em>obrigatória</em></div><div class="card"><div class="kick">Gabinete presidencial</div><h3>${e.t}</h3><p>${e.d}</p>${e.o.map((o,i)=>`<button class="opt" data-a="dil" data-v="${i}">${o.t}</button>`).join('')}</div>`}
   else if(G.dilRes)h+=`<div class="sec"><h4>Decisão do trimestre</h4></div><div class="card res"><div class="kick">${G.dilRes.t}</div><p class="mt8" style="margin-bottom:4px"><b>${G.dilRes.o}</b></p><p class="tiny muted" style="margin:0">${G.dilRes.ch||'Sem efeitos imediatos.'}</p></div>`;
   if(G.prom.length)h+=`<div class="sec"><h4>Promessas de campanha</h4><em>${G.prom.filter(p=>p.st==='ok').length}/${G.prom.length} cumpridas</em></div><div class="panel">${G.prom.map(p=>`<div class="proj"><div><b>${PJ(p.id).nome}</b><span>${p.st==='pend'?dlLabel(p.dl)+(G.q>=p.dl-1?' · <b class="neg" style="display:inline">vence agora</b>':''):p.st==='ok'?'Aprovada no Congresso.':'Prazo vencido. A oposição cobra todo dia.'}</span></div><span class="tag ${p.st==='ok'?'ok':p.st==='bad'?'bad':''}">${p.st==='ok'?'CUMPRIDA':p.st==='bad'?'QUEBRADA':'PENDENTE'}</span></div>`).join('')}</div>`;
   const avail=PROJ.filter(p=>!G.passed.includes(p.id));
@@ -1433,11 +1526,18 @@ function act(a,v){
     case 'act':
       if(v==='ataque'){UI.atk=!UI.atk;UI.apoio=false;render();return}
       if(v==='apoio'){UI.apoio=!UI.apoio;UI.atk=false;render();return}
+      if(v==='lider'){UI.lider=!UI.lider;UI.live=false;render();return}
+      if(v==='live'){UI.live=!UI.live;UI.lider=false;UI.liveT=null;render();return}
       doAction(v);break;
     case 'atk':doAction('ataque',v);break;
     case 'atkx':UI.atk=false;render();break;
     case 'apo':doAction('apoio',v);break;
     case 'apox':UI.apoio=false;render();break;
+    case 'lid':doAction('lider',v);break;
+    case 'lidx':UI.lider=false;render();break;
+    case 'livet':UI.liveT=v;render();break;
+    case 'livego':if(!UI.liveT)return toast('Escolha o alvo da live.');doAction('live',v);break;
+    case 'livex':UI.live=false;render();break;
     case 'ev':evChoose(+v);break;
     case 'offer':offerAnswer(v==='1');break;
     case 'sab':sabAnswer(v==='1');break;
