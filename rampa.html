@@ -265,6 +265,9 @@ body{background:radial-gradient(1200px 600px at 50% -200px,rgba(31,191,106,.10),
 .score b{font-size:60px}
 .kpi{border-radius:12px;background:linear-gradient(180deg,var(--panel2),var(--panel));border-color:var(--line)}
 .whoc .av{font-size:16px}
+.av.face{overflow:hidden;background:none}
+.av.face svg{display:block}
+.bigav{display:flex;justify-content:center;margin:4px 0 8px}
 @media (max-width:420px){.who{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
@@ -293,7 +296,78 @@ const sg=x=>(x>0?'+':'')+f1(x);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
 const initials=n=>n.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
-const av=(name,cor,sz)=>`<span class="av" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.4)}px;background:linear-gradient(160deg,${cor},${rgba(cor,.65)})">${name==='+'?'+':esc(initials(name))}</span>`;
+/* ---------- avatares desenhados (SVG próprio, sem fotos) ---------- */
+const FACES={
+  'Lula':{skin:'#E2B08A',hair:'full',hc:'#E9E9E9',beard:'full',bc:'#EFEFEF',tie:'#C8102E',brow:'#DADADA',old:1},
+  'Flávio Bolsonaro':{skin:'#F0C6A0',hair:'short',hc:'#2A1E16',tie:'#1D4ED8'},
+  'Ratinho Júnior':{skin:'#E8B993',hair:'quiff',hc:'#2E241C',beard:'stubble',bc:'#2E241C',tie:'#0284C7'},
+  'Ronaldo Caiado':{skin:'#F2CBA8',hair:'combed',hc:'#CFCFCF',tie:'#0F766E',old:1},
+  'Romeu Zema':{skin:'#F3CDAE',hair:'sides',hc:'#9A9A9A',glasses:1,tie:'#EA580C',old:1},
+  'Renan Santos':{skin:'#EFC39C',hair:'quiff',hc:'#1F1712',beard:'short',bc:'#1F1712',open:1,shirt:'#E5E7EB'},
+  'Simone Tebet':{skin:'#F1C8A4',hair:'long',hc:'#7A5A3A',woman:1,top:'#15803D',ear:'#F5C518'},
+  'Tarcísio de Freitas':{skin:'#EBC09B',hair:'bald',hc:'#3A2E25',tie:'#1E40AF'},
+  'Guilherme Boulos':{skin:'#E7B892',hair:'short',hc:'#2B2019',beard:'stubble',bc:'#2B2019',casual:'#7F1D1D'},
+  'Vera Magalhães':{skin:'#F1CBA8',hair:'long',hc:'#2A1E18',woman:1,glasses:1,top:'#1F2937',ear:'#E5E7EB'},
+  'Reinaldo Azevedo':{skin:'#F0C8A6',hair:'cap',hc:'#B5B5B5',cap:'#3F3F46',glasses:1,tie:'#7C3AED',old:1},
+  'José Luiz Datena':{skin:'#E9BE97',hair:'combed',hc:'#BDBDBD',tie:'#7C2D12',old:1,grin:1},
+  'César Tralli':{skin:'#EBC4A0',hair:'short',hc:'#3A2C22',tie:'#334155'},
+};
+function hashStr(t){let h=7;for(const c of t)h=(h*31+c.charCodeAt(0))>>>0;return h}
+function genFace(name){
+  const h=hashStr(name),sk=['#F3D0B0','#E8B993','#D49A70','#B9794F','#8D5A3B'],hc=['#1F1712','#3A2A1E','#6B4A2E','#A8A8A8','#C9A26B'];
+  const woman=/a$/i.test(name.trim().split(' ')[0]);
+  return {skin:sk[h%5],hair:woman?'long':['short','quiff','sides','combed'][(h>>3)%4],hc:hc[(h>>5)%5],woman,top:'#1F2937',ear:'#F5C518',
+    beard:!woman&&(h>>7)%3===0?'short':'',bc:hc[(h>>5)%5],glasses:(h>>9)%4===0,tie:'#F5C518'};
+}
+function faceSVG(f,cor){
+  const dk=c=>{const n=parseInt(c.slice(1),16),r=Math.max(0,(n>>16)-38),g=Math.max(0,((n>>8)&255)-38),b=Math.max(0,(n&255)-38);return `rgb(${r},${g},${b})`};
+  let o=`<svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><defs><radialGradient id="bg${cor.slice(1)}" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="${cor}"/><stop offset="1" stop-color="${dk(cor)}"/></radialGradient></defs><circle cx="32" cy="32" r="32" fill="url(#bg${cor.slice(1)})"/>`;
+  // cabelo comprido atrás
+  if(f.hair==='long')o+=`<path d="M17 30 C15 14 49 14 47 30 C49 42 50 50 46 56 L18 56 C14 50 15 42 17 30Z" fill="${f.hc}"/>`;
+  // corpo
+  if(f.woman)o+=`<path d="M10 64 C12 52 21 47 32 47 C43 47 52 52 54 64Z" fill="${f.top}"/><path d="M27 47 Q32 53 37 47" fill="${f.skin}"/>`;
+  else if(f.casual)o+=`<path d="M9 64 C11 51 21 46 32 46 C43 46 53 51 55 64Z" fill="${f.casual}"/><path d="M27 46 L32 52 L37 46Z" fill="${dk(f.casual)}"/>`;
+  else{o+=`<path d="M8 64 C10 51 20 46 32 46 C44 46 54 51 56 64Z" fill="#1B2533"/><path d="M26.5 46 L32 58 L37.5 46Z" fill="${f.shirt||'#F3F4F6'}"/>`;
+    if(!f.open)o+=`<path d="M30.6 48.5 L33.4 48.5 L34.6 59 L32 62 L29.4 59Z" fill="${f.tie}"/><path d="M30.4 46.5 L33.6 46.5 L33.2 49 L30.8 49Z" fill="${dk(f.tie)}"/>`;
+    o+=`<path d="M26.5 46 L23 52 L29 56Z M37.5 46 L41 52 L35 56Z" fill="#111827" opacity=".55"/>`}
+  // pescoço, orelhas, cabeça
+  o+=`<rect x="27" y="37" width="10" height="10" rx="3" fill="${dk(f.skin)}"/><circle cx="20" cy="29" r="2.8" fill="${f.skin}"/><circle cx="44" cy="29" r="2.8" fill="${f.skin}"/><ellipse cx="32" cy="28" rx="12" ry="14" fill="${f.skin}"/>`;
+  if(f.ear)o+=`<circle cx="20" cy="32.5" r="1.1" fill="${f.ear}"/><circle cx="44" cy="32.5" r="1.1" fill="${f.ear}"/>`;
+  // cabelo
+  const H=f.hc;
+  switch(f.hair){
+    case 'short':o+=`<path d="M19.3 29.5 C16.5 9.5 47.5 9.5 44.7 29.5 C44 23 41.5 20.4 37.5 20 C33 21.2 28 21 24.5 19.8 C21.5 21 20 24 19.3 29.5Z" fill="${H}"/>`;break;
+    case 'quiff':o+=`<path d="M19.6 27 C18 13 30 9 38 12 C44 14 46 19 44.4 27 C43 21 39 18.5 33 18.5 C27 18.5 21.5 21 19.6 27Z" fill="${H}"/>`;break;
+    case 'combed':o+=`<path d="M19.6 28 C18 14 44 11 44.6 26 C42 19.5 35 17 26 19.5 C23 20.5 21 23 19.6 28Z" fill="${H}"/><path d="M26 19.5 C31 16.8 38 16.5 43 20" stroke="${dk(H)}" stroke-width=".8" fill="none"/>`;break;
+    case 'full':o+=`<path d="M19.4 28 C18 15 24 13 32 13.5 C40 13 46 15 44.6 28 C43 22 41 19.5 37 19 C34 21 30 21 27 19 C23 19.5 21 22 19.4 28Z" fill="${H}"/>`;break;
+    case 'sides':o+=`<path d="M19.6 31 C19 25 20 22 22.5 20.5 L23 31Z M44.4 31 C45 25 44 22 41.5 20.5 L41 31Z" fill="${H}"/><ellipse cx="29" cy="18" rx="4" ry="1.6" fill="#fff" opacity=".25"/>`;break;
+    case 'bald':o+=`<path d="M19.8 30 C19.5 25 20.5 22.5 22.5 21.5 L22.8 30Z M44.2 30 C44.5 25 43.5 22.5 41.5 21.5 L41.2 30Z" fill="${H}" opacity=".8"/><ellipse cx="28" cy="18.5" rx="4.5" ry="1.8" fill="#fff" opacity=".28"/>`;break;
+    case 'long':o+=`<path d="M19.5 29 C19 15 45 15 44.5 29 C42 22 36 19 31 20.5 C27 22 22 24 19.5 29Z" fill="${H}"/>`;break;
+    case 'cap':o+=`<path d="M19.8 30 C19.5 26 20.2 24 21.5 23 L22.5 30Z M44.2 30 C44.5 26 43.8 24 42.5 23 L41.5 30Z" fill="${H}"/><path d="M18.5 22 C19 12 45 11 45.5 21 C40 19.6 26 19.6 18.5 22Z" fill="${f.cap}"/><path d="M18.5 22 C26 19.8 40 19.6 47.5 21.8 C41 23.6 25 23.6 18.5 22Z" fill="${dk(f.cap)}"/>`;break;
+  }
+  // rugas
+  if(f.old)o+=`<path d="M27 20.5 Q32 19.6 37 20.5 M28 22.3 Q32 21.6 36 22.3" stroke="${dk(f.skin)}" stroke-width=".5" fill="none" opacity=".7"/>`;
+  // barba
+  if(f.beard==='full')o+=`<path d="M20.2 28 C20 42 26 44.5 32 44.5 C38 44.5 44 42 43.8 28 C43 34.5 39 37.2 32 37.6 C25 37.2 21 34.5 20.2 28Z" fill="${f.bc}"/><path d="M27 33.6 C29 32.2 35 32.2 37 33.6 C35 34.7 29 34.7 27 33.6Z" fill="${f.bc}"/>`;
+  if(f.beard==='short')o+=`<path d="M21 30 C21.5 40 26 42.5 32 42.5 C38 42.5 42.5 40 43 30 C41.5 35 38 37.3 32 37.6 C26 37.3 22.5 35 21 30Z" fill="${f.bc}" opacity=".9"/><path d="M27.5 33.7 C29.5 32.6 34.5 32.6 36.5 33.7 C34.5 34.5 29.5 34.5 27.5 33.7Z" fill="${f.bc}"/>`;
+  if(f.beard==='stubble')o+=`<path d="M21 30 C21.5 40 26 42.5 32 42.5 C38 42.5 42.5 40 43 30 C41.5 35 38 37.3 32 37.6 C26 37.3 22.5 35 21 30Z" fill="${f.bc}" opacity=".32"/>`;
+  // olhos, sobrancelhas, nariz, boca
+  const br=f.brow||f.hc;
+  o+=`<path d="M24.5 24.3 Q27 23 29.4 24.1 M34.6 24.1 Q37 23 39.5 24.3" stroke="${br}" stroke-width="1.3" stroke-linecap="round" fill="none"/>`;
+  o+=`<ellipse cx="27" cy="27.6" rx="1.5" ry="1.7" fill="#1A1410"/><ellipse cx="37" cy="27.6" rx="1.5" ry="1.7" fill="#1A1410"/><circle cx="27.5" cy="27" r=".45" fill="#fff"/><circle cx="37.5" cy="27" r=".45" fill="#fff"/>`;
+  o+=`<path d="M32 28.5 Q30.4 32.4 32.6 32.6" stroke="${dk(f.skin)}" stroke-width="1" fill="none" stroke-linecap="round"/>`;
+  o+=f.grin?`<path d="M27.6 35 Q32 39.5 36.4 35 Z" fill="#7A2E2E"/><path d="M28.2 35.3 L35.8 35.3 L35.4 36.2 L28.6 36.2Z" fill="#fff"/>`:`<path d="M28.3 35.2 Q32 37.6 35.7 35.2" stroke="#8A3B32" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+  if(f.woman)o+=`<ellipse cx="25" cy="32" rx="2" ry="1.1" fill="#E58A8A" opacity=".35"/><ellipse cx="39" cy="32" rx="2" ry="1.1" fill="#E58A8A" opacity=".35"/>`;
+  if(f.glasses)o+=`<g fill="none" stroke="#1F2937" stroke-width="1.1"><rect x="23.2" y="25" width="7.6" height="5.6" rx="2"/><rect x="33.2" y="25" width="7.6" height="5.6" rx="2"/><path d="M30.8 27 Q32 26.2 33.2 27 M23.2 27 L20.5 26.4 M40.8 27 L43.5 26.4"/></g>`;
+  return o+'</svg>';
+}
+function av(name,cor,sz){
+  let n=name==='Você'&&S&&S.player?S.player.nome:name;
+  const f=FACES[n]||(n&&n!=='+'&&n!=='?'&&!/^Bancada/.test(n)?genFace(n):null);
+  const st=`width:${sz}px;height:${sz}px`;
+  if(f)return `<span class="av face" style="${st}">${faceSVG(f,cor&&cor[0]==='#'?cor:'#3A4A5A')}</span>`;
+  return `<span class="av" style="${st};font-size:${Math.round(sz*.4)}px;background:linear-gradient(160deg,${cor},${rgba(cor,.65)})">${n==='+'?'+':n==='?'?'?':esc(initials(n))}</span>`;
+}
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 
 const store={mem:{},
@@ -1387,7 +1461,7 @@ function shuffleFixed(a,seed){return a.map((x,i)=>[x,(i*7+seed*3)%5]).sort((p,q)
 function vDebate(){
   const C=S.camp,D=C.debate,st=D.steps[D.i];
   const sab=D.kind==='sab',j=sab?JOURN[D.j]:null;
-  let h=`<div class="studio"><span class="rec">AO VIVO</span><div class="lbl"><small>${sab?`Sabatina ${C.sabs+(D.done?0:1)} · rádio e coluna`:`Debate ${D.n} · ${D.tv}`}</small><b>${sab?esc(j.nome):'No estúdio'}</b></div></div>`;
+  let h=`<div class="studio"><span class="rec">AO VIVO</span>${sab?`<div style="position:absolute;right:14px;bottom:12px;z-index:2">${av(j.nome,j.cor,64)}</div>`:''}<div class="lbl"><small>${sab?`Sabatina ${C.sabs+(D.done?0:1)} · rádio e coluna`:`Debate ${D.n} · ${D.tv}`}</small><b>${sab?esc(j.nome):'No estúdio'}</b></div></div>`;
   h+=`<div class="wrap">`;
   h+=`<div class="tiny muted mono" style="display:flex;justify-content:space-between;gap:10px;margin:0 2px 10px"><span>${sab?esc(j.estilo):'mediação: '+esc(D.med)}</span><span>${sab?'':(active().length-(D.skipped||[]).length)+' na mesa'}</span></div>`;
   h+=`<div class="panel pad">`;
@@ -1448,7 +1522,8 @@ function vResult(){
   else{verdict='Derrota';col='neg';const w=cs[0];txt=outR1?`Você ficou fora do 2º turno com ${pc(res.nat.P)}.`:`${esc(w.nome)} venceu com ${pc(res.nat[w.id])} dos votos válidos. ${keyS.nome} decidiu a eleição.`}
   let h=won?confetti():'';
   h+=hdr(`Apuração · <b>${C.reelect?'reeleição':res.round+'º turno'}</b>`,'100%','Urnas apuradas','27 de 27 estados',[['Abstenção',pc(res.abst)],['Brancos/nulos',pc(res.nulos)],['Válidos',pc(1-res.abst-res.nulos)],['Sua posição',(res.order.indexOf('P')+1)+'º']]);
-  h+=`<div class="wrap"><div class="center mt8"><div class="verdict ${col}">${verdict}</div><p class="muted small">${txt}</p></div>`;
+  const hero=won?me():res.winner?cs[0]:me();
+  h+=`<div class="wrap"><div class="center mt8"><div class="bigav">${av(hero.nome,hero.cor,92)}</div><div class="verdict ${col}">${verdict}</div><p class="muted small">${txt}</p></div>`;
   h+=`<div class="sec"><h4>Votos válidos</h4></div><div class="panel">${pollBars(res.nat,0,cs)}</div>`;
   h+=`<div class="sec"><h4>O mapa da apuração</h4><em>% do mais votado em cada estado</em></div>${vMap(sid=>res.reg[sid],cs,{lead:true})}`;
   h+=`<div class="sec"><h4>Por região</h4></div><div class="panel tw"><table><tr><th>Região</th>${cs.map(c=>`<th style="color:${c.cor}">${esc(c.nome.split(' ')[0])}</th>`).join('')}</tr>${REGS.map(r=>{const sts=STATES.filter(s=>s.reg===r.id),w=sts.reduce((a,s)=>a+s.peso,0);const v=id=>sts.reduce((a,s)=>a+res.reg[s.id][id]*s.peso,0)/w;const mx=Math.max(...cs.map(c=>v(c.id)));return `<tr><td>${r.nome}</td>${cs.map(c=>{const x=v(c.id);return `<td class="mono ${x===mx?'gold':''}">${pc(x)}</td>`}).join('')}</tr>`}).join('')}</table></div>`;
@@ -1474,7 +1549,7 @@ function vTrans(){
   let h=hdr('A semana seguinte',esc(S.player.nome),'Presidente eleito(a)','',null);
   h+=`<div class="wrap"><div class="tiny mono pos" style="letter-spacing:2px">A SEMANA SEGUINTE</div><div class="verdict" style="font-size:44px">A transição</div>
   <p style="font-family:var(--serif);font-size:17px;line-height:1.45;margin:6px 0 0">Vitória por <b class="mono">${f1(m*100)}</b> pontos. ${esc(ru.nome)} reconheceu na mesma noite.</p>
-  <div class="quote"><small>${esc(ru.nome)}, na coletiva da derrota · fala fictícia</small><p>"${CONCEDE[arch(ru.ideo)]}"</p></div>
+  <div class="quote" style="display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start">${av(ru.nome,ru.cor,56)}<div><small>${esc(ru.nome)}, na coletiva da derrota · fala fictícia</small><p>"${CONCEDE[arch(ru.ideo)]}"</p></div></div>
   <div class="sec mt16"><h4>O tom do seu governo começa aqui</h4></div>
   <button class="opt" data-a="trans" data-v="1"><b>Estender a mão</b><small>Uma ligação, uma foto, um convite ao partido do adversário para a transição. O ${ru.partido} entra na base com pouca vontade; a sua militância acha que você amoleceu antes de começar.</small></button>
   <button class="opt" data-a="trans" data-v="0"><b>A vitória é do país, não da conciliação</b><small>Discurso da vitória sem citar o adversário. O embalo fica inteiro (+3 de aprovação), mas quem não estende a mão começa cobrado no Congresso.</small></button></div>`;
