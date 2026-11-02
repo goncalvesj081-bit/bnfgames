@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0B2545">
-<meta name="description" content="Distintivo - simulador de carreira de delegado: concurso, delegacia no interior, combate ao roubo de celular em São Paulo e à letalidade violenta no Rio de Janeiro. Grátis.">
+<meta name="description" content="Distintivo - história interativa da carreira de um(a) delegado(a): concurso, delegacia no interior, roubo de celular em São Paulo e letalidade violenta no Rio de Janeiro. Grátis.">
 <title>Distintivo</title>
 <link rel="icon" href="./bnf-favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Archivo:wdth,wght@100..125,700..900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
 <style>
 :root{
   --hd:#0B2545;--hd2:#13315C;--bg:#E8ECF1;--pn:#FFFFFF;--pn2:#F5F7FA;--ln:#D2D9E2;--ln2:#E6EAF0;
@@ -157,6 +157,70 @@ textarea:focus,input.in:focus{outline:none;border-color:var(--pr);box-shadow:0 0
 .tl>div::before{content:"";position:absolute;left:-21px;top:7px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--mu2)}
 .tl>div.d::before{background:var(--ok);border-color:var(--ok)}
 .tl>div.n::before{background:var(--pr);border-color:var(--pr);box-shadow:0 0 0 3px var(--pr2)}
+
+/* ===== história ===== */
+@keyframes sir{0%,100%{opacity:.2}50%{opacity:.95}}
+.sirR{animation:sir 1.1s infinite}.sirB{animation:sir 1.1s .55s infinite}
+@media (prefers-reduced-motion:reduce){.sirR,.sirB{animation:none}}
+body.dark,body.dark #app{background:#0C0E12}
+.hud{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;background:rgba(12,14,18,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #1E222A;color:#E8E6E1}
+.hl{display:flex;align-items:center;gap:10px;min-width:0}
+.hl b{display:block;font-family:'Archivo',sans-serif;font-stretch:125%;font-weight:900;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.hl span{display:block;font-size:11.5px;color:#8C93A0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hseal svg{display:block;width:26px;height:26px}
+.hbtn{flex-shrink:0;height:32px;padding:0 12px;border-radius:8px;border:1px solid #2C313B;color:#E8E6E1;font-size:12.5px;font-weight:600;background:#171A20}
+.scene{background:#0C0E12;color:#E8E6E1;min-height:calc(100vh - 53px);padding-bottom:110px}
+.art{margin:0;position:relative;aspect-ratio:16/9;overflow:hidden;background:#111}
+.art svg{display:block;width:100%;height:100%}
+.art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,14,18,0) 55%,rgba(12,14,18,1) 100%)}
+.art figcaption{position:absolute;left:16px;bottom:12px;z-index:2;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#C9CDD5;background:rgba(0,0,0,.45);padding:4px 8px;border-radius:4px}
+.sb{padding:6px 18px 0}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#E0A33A}
+.stt{margin:8px 0 14px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:30px;line-height:1.05;letter-spacing:-.01em}
+.pers{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+.pface{width:48px;height:48px;border-radius:50%;overflow:hidden;background:#222;flex-shrink:0;box-shadow:0 0 0 2px #2C313B}
+.pface svg{display:block;width:100%;height:100%}
+.pers b{display:block;font-size:15px}
+.pers span{display:block;font-size:12.5px;color:#8C93A0}
+.txt p{font-family:'Source Serif 4',Georgia,serif;font-size:18.5px;line-height:1.62;color:#D8D4CB;margin:0 0 14px}
+.chs{margin-top:18px}
+.ch{display:block;width:100%;padding:15px 16px;border-radius:14px;border:1px solid #2A2F38;background:#15181E;margin-bottom:10px;transition:border-color .15s,background .15s;color:#E8E6E1}
+.ch:hover{border-color:#E0A33A;background:#1A1D24}
+.ch b{display:block;font-size:16px;font-weight:600;line-height:1.35}
+.ch span{display:block;font-size:13.5px;color:#8C93A0;margin-top:4px}
+.chosen{font-size:13px;color:#8C93A0;border-left:3px solid #E0A33A;padding:4px 0 4px 10px;margin:0 0 14px}
+.chosen b{color:#E8E6E1;font-weight:600}
+.dts{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 22px}
+.dt{font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:99px;background:#1A1D24;border:1px solid #2A2F38;color:#B9BEC8}
+.dt.up{color:#4FCB8E;border-color:#1F4A35;background:#11231A}
+.dt.dn{color:#F07A7A;border-color:#4A1F22;background:#241315}
+.focus{border-top:1px solid #20242C;padding-top:18px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.fc{padding:12px;border-radius:12px;border:1px solid #2A2F38;background:#15181E;color:#E8E6E1;min-width:0}
+.fc b{display:block;font-size:13.5px;font-weight:600;line-height:1.3}
+.fc span{display:block;font-size:12px;color:#8C93A0;margin-top:4px;line-height:1.35}
+.fc em{display:block;font-style:normal;font-size:11px;color:#E0A33A;margin-top:6px}
+.fc.on{border-color:#E0A33A;background:#231D10}
+.sfoot{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(12,14,18,0),#0C0E12 35%)}
+.sbtn{display:block;width:100%;max-width:788px;margin:0 auto;height:54px;border-radius:14px;background:#E0A33A;color:#1A1205;font-family:'Archivo',sans-serif;font-stretch:115%;font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.sbtn:disabled{background:#2A2F38;color:#8C93A0;opacity:1}
+.panelw{background:#0C0E12;color:#E8E6E1;min-height:100vh}
+.ph{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:18px;border-bottom:1px solid #1E222A}
+.ph h2{margin:6px 0 4px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:20px;line-height:1.1}
+.ph span{font-size:12.5px;color:#8C93A0}
+.psec{padding:16px 18px;border-bottom:1px solid #1E222A}
+.mb{margin-top:12px}
+.mbh{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.mbh b{font-family:var(--mono);font-weight:600}
+.mbh b.ok{color:#4FCB8E} .mbh b.bad{color:#F07A7A}
+.mbh i{font-style:normal;color:#6B7280;font-weight:400}
+.mbb{height:6px;border-radius:99px;background:#1E222A;overflow:hidden;margin-top:6px}
+.mbb>div{height:100%;border-radius:99px}
+.pn2{font-size:12px;color:#7C8390;line-height:1.5;margin:12px 0 0}
+.dd{font-size:13.5px;color:#C9CDD5;line-height:1.45;padding:9px 0;border-bottom:1px solid #1A1D24}
+.dd span{font-family:var(--mono);font-size:11px;color:#E0A33A;margin-right:8px}
+.evm{margin:0 0 16px}
+@media (min-width:700px){.stt{font-size:38px}.txt p{font-size:19.5px}}
 </style>
 </head>
 <body>
@@ -181,7 +245,7 @@ const f1=x=>(Math.round(x*10)/10).toFixed(1).replace('.',',');
 const pct=x=>(x>0?'+':'')+f1(x*100)+'%';
 const money=x=>'R$ '+f1(x)+' mil';
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-const KEY='distintivo_v2',BEST='distintivo_best2';
+const KEY='distintivo_v3',BEST='distintivo_best3';
 const store={mem:{},set(k,v){try{localStorage.setItem(k,v)}catch(e){this.mem[k]=v}},get(k){try{const r=localStorage.getItem(k);return r===null?(this.mem[k]||null):r}catch(e){return this.mem[k]||null}}};
 let S=null;
 let UI={screen:'cover',mod:'painel',ip:null,memo:null,sel:null,setup:{nome:'',fundo:'rec',sexo:'f'},ans:'',toast:null};
@@ -305,387 +369,363 @@ function gradeDisc(t){
 function runTAF(){const F=S.c.fit,c=Math.round(1700+F*13+R(-180,180)),b=Math.max(0,Math.round(F/9+R(-2,2))),a=Math.round(18+F*.42+R(-5,5));S.taf={res:[{n:'Corrida de 12 minutos',v:c+' m',ok:c>=2400,min:'2.400 m'},{n:'Barra fixa',v:b+' rep.',ok:b>=3,min:'3 rep.'},{n:'Abdominal (1 min)',v:a+' rep.',ok:a>=35,min:'35 rep.'}],i:0};S.taf.ok=S.taf.res.every(r=>r.ok);S.phase='taf'}
 function finishOral(){const O=S.oral,pts=O.ans.reduce((a,x)=>a+x,0),kav=MAT.reduce((a,m)=>a+S.c.k[m.id],0)/MAT.length;S.notas.oral=Math.round(clamp(pts/(O.qs.length*3)*70+kav*.3+R(-3,3),0,100));const fin=S.notas.obj*.4+S.notas.disc*.35+S.notas.oral*.25;S.notas.fin=Math.round(fin*10)/10;S.notas.vagas=60;S.notas.rank=Math.max(1,Math.round(60*Math.exp((71-fin)/7.5)));S.notas.ok=S.notas.rank<=60;S.phase='resultado'}
 
+function rng(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296}}
 /* ================================================================
-   CARREIRA
+   CARREIRA — HISTÓRIA COM ESCOLHAS
 ================================================================= */
 const SMALL=[
-  {cidade:'Itaverá',pop:'38 mil hab.',d:'Município do interior paulista em crescimento por causa de uma usina nova. Furtos em alta e violência doméstica subnotificada.'},
-  {cidade:'Cedro Alto',pop:'24 mil hab.',d:'Cidade agrícola do interior paulista. Furtos a propriedades rurais, brigas de bar e violência doméstica.'},
-  {cidade:'Lagoa Funda',pop:'31 mil hab.',d:'Cidade turística do interior paulista. Furtos a residências de veraneio e um ponto de tráfico que cresce na periferia.'},
+  {cidade:'Itaverá',pop:'38 mil hab.',d:'Cidade do interior paulista que cresceu rápido com uma usina nova. Furtos em alta e violência doméstica escondida atrás das portas.'},
+  {cidade:'Cedro Alto',pop:'24 mil hab.',d:'Cidade agrícola do interior paulista. Furtos a sítios, brigas de bar e violência doméstica.'},
+  {cidade:'Lagoa Funda',pop:'31 mil hab.',d:'Cidade turística do interior paulista. Furtos a casas de veraneio e um ponto de tráfico crescendo na periferia.'},
 ];
-const POSTS=[
-  {id:'int',uf:'SP',sigla:'DP',cargo:'Delegado(a) de Polícia de 3ª Classe',semanas:26,orc:5,team:5,
-   crimes:{furto:{n:'Furto',b:16},roubo:{n:'Roubo',b:4},domestica:{n:'Violência doméstica',b:6},trafico:{n:'Tráfico de drogas',b:3},homicidio:{n:'Homicídio doloso',b:.4}},
-   metas:[{k:'furto',r:.2},{k:'domestica',r:.15},{k:'venc',max:3}],
-   pol:['mp_patrulha','sala_mulher','conseg','cameras_mun','receptacao','ponto_trafico'],cases:{furto:5,roubo:2,domestica:3,trafico:1.5,homicidio:.5},nCases:[1,2]},
-  {id:'sp',cidade:'São Paulo',uf:'SP',unidade:'1ª Delegacia Seccional de Polícia — Centro',sigla:'1ª Seccional',pop:'Centro expandido',cargo:'Delegado(a) Seccional de 1ª Classe',semanas:40,orc:22,team:12,
-   d:'Estações de metrô, comércio popular e fluxo de mais de um milhão de pessoas por dia. O furto e o roubo de celular são a principal queixa da população.',
-   crimes:{celular:{n:'Furto e roubo de celular',b:640},transeunte:{n:'Roubo a transeunte',b:170},furto:{n:'Outros furtos',b:280},golpe:{n:'Golpes digitais (PIX)',b:140},homicidio:{n:'Homicídio doloso',b:1.2}},
-   metas:[{k:'celular',r:.2},{k:'golpe',r:.15},{k:'venc',max:6}],
-   pol:['imei','recept_cel','hotspot','metro','bike','ciber','exportacao','social_centro'],cases:{roubo:4,furto:4,golpe:3,trafico:1.5,homicidio:.8,latrocinio:.3},nCases:[2,3]},
-  {id:'rj',cidade:'Rio de Janeiro',uf:'RJ',unidade:'Secretaria de Estado de Polícia Civil',sigla:'SEPOL',pop:'Estado do Rio de Janeiro',cargo:'Secretário(a) de Estado de Polícia Civil',semanas:52,orc:60,team:20,
-   d:'Convite do governador para comandar a Polícia Civil fluminense. Letalidade violenta alta, milícias em expansão, roubo de rua e de cargas.',
-   crimes:{letal:{n:'Letalidade violenta',b:24},rua:{n:'Roubo de rua',b:950},carga:{n:'Roubo de carga',b:85},milicia:{n:'Extorsão por milícia',b:70},letalpol:{n:'Mortes por intervenção de agente do Estado',b:7}},
-   metas:[{k:'letal',r:.2},{k:'rua',r:.15},{k:'letalpol',r:.1},{k:'venc',max:6}],
-   pol:['dh_forca','intel_milicia','carga','armas','proximidade','cameras_corp','desaparecidos','operacoes'],cases:{homicidio:3,roubo:3,trafico:2,corrupcao:1,latrocinio:.5,sequestro:.2},nCases:[1,2]},
+const STAGES=[
+  {id:'int',uf:'SP',weeks:10,cargo:'Delegado(a) de Polícia de 3ª Classe',
+   metas:[{k:'furto',r:.2,n:'Furtos'},{k:'domestica',r:.15,n:'Violência doméstica'}],
+   focos:[
+     {id:'rondas',n:'Rondas e prevenção nos bairros',d:'Equipe na rua, presença nos pontos de furto.',fx:{furto:-3.6,com:1}},
+     {id:'recept',n:'Apertar os receptadores',d:'Ferro-velho, loja de usados: quem compra o furto.',fx:{furto:-4.4,pol:-1}},
+     {id:'mulher',n:'Rede de proteção à mulher',d:'Visitas às vítimas com medida protetiva.',fx:{domestica:-4.4,com:1}},
+     {id:'casos',n:'Investigar os casos graves',d:'Inquéritos parados, autoria, relatório ao MP.',fx:{furto:-1.6,domestica:-1.6,imp:1}},
+     {id:'folga',n:'Dar folga à equipe',d:'Ninguém aguenta todo dia.',fx:{eq:6,stress:-10}}]},
+  {id:'sp',cidade:'São Paulo',uf:'SP',unidade:'1ª Delegacia Seccional — Centro',weeks:12,cargo:'Delegado(a) Seccional',
+   metas:[{k:'celular',r:.2,n:'Furto e roubo de celular'},{k:'golpe',r:.15,n:'Golpes com celular roubado'}],
+   focos:[
+     {id:'recept',n:'Receptação de celulares',d:'Lojas, assistências e anúncios que revendem aparelhos.',fx:{celular:-4}},
+     {id:'pm',n:'Pontos críticos com a PM',d:'Mancha criminal e policiamento nas esquinas certas.',fx:{celular:-3.4,pol:1}},
+     {id:'golpe',n:'Contas-laranja e golpes por PIX',d:'Rastrear para onde vai o dinheiro.',fx:{golpe:-4.6,celular:-.8}},
+     {id:'rede',n:'Investigação de longo prazo',d:'Chegar a quem está no topo da cadeia.',fx:{celular:-2.4,golpe:-1.6,imp:1}},
+     {id:'folga',n:'Dar folga à equipe',d:'Descanso e reorganização.',fx:{eq:6,stress:-10}}]},
+  {id:'rj',cidade:'Rio de Janeiro',uf:'RJ',unidade:'Secretaria de Estado de Polícia Civil',weeks:14,cargo:'Secretário(a) de Polícia Civil',
+   metas:[{k:'letal',r:.15,n:'Letalidade violenta'},{k:'rua',r:.12,n:'Roubo de rua'},{k:'letalpol',r:.12,n:'Mortes em ações policiais'}],
+   focos:[
+     {id:'dh',n:'Esclarecer homicídios',d:'Quem mata e não é preso mata de novo.',fx:{letal:-3.8}},
+     {id:'milicia',n:'Atacar o dinheiro da milícia',d:'Lavagem, imóveis, transporte e gatonet.',fx:{letal:-2.2,rua:-.8,stress:2}},
+     {id:'rua',n:'Roubos de rua e de carga',d:'Receptadores e quadrilhas que agem no centro e na orla.',fx:{rua:-4.2}},
+     {id:'forca',n:'Controle do uso da força',d:'Protocolos, câmeras e corregedoria atuante.',fx:{letalpol:-5,pol:-1,eq:-1}},
+     {id:'operacao',n:'Grandes operações',d:'Resultado rápido, risco alto de confronto.',fx:{rua:-3,letal:1.2,letalpol:6,pol:2,com:-2}},
+     {id:'folga',n:'Dar folga à equipe',d:'Descanso e reorganização.',fx:{eq:6,stress:-10}}]},
 ];
-const POL={
-  mp_patrulha:{n:'Patrulha Maria da Penha com a Guarda Municipal',d:'Visitas periódicas às mulheres com medida protetiva e resposta rápida a descumprimentos.',c:.6,once:0,ef:1,mat:4,e:{domestica:.3,homicidio:.1},req:{gov:35},fx:{com:3}},
-  sala_mulher:{n:'Sala de atendimento especializado à mulher',d:'Espaço reservado para registro e escuta qualificada. Aumenta a confiança das vítimas e as protetivas pedidas a tempo.',c:.2,once:5,ef:0,mat:3,e:{domestica:.12},fx:{com:5}},
-  conseg:{n:'Conselho comunitário e iluminação pública',d:'Mapeia pontos escuros com a prefeitura e os moradores: troca de lâmpadas, poda e limpeza de terrenos.',c:.4,once:6,ef:0,mat:6,e:{furto:.12,roubo:.12},req:{gov:30},fx:{com:4,gov:3}},
-  cameras_mun:{n:'Rede de câmeras com o comércio',d:'Câmeras de comerciantes integradas à delegacia e leitura de placas nas entradas da cidade.',c:.4,once:12,ef:0,mat:5,e:{furto:.15,roubo:.18}},
-  receptacao:{n:'Fiscalização de receptação',d:'Ferros-velhos, lojas de usados e oficinas. Quem compra produto furtado sustenta o furto.',c:.5,once:0,ef:2,mat:6,e:{furto:.22},fx:{gov:-2}},
-  ponto_trafico:{n:'Investigação do ponto de tráfico',d:'Campana, interceptação e prisão dos gerentes, não apenas dos vendedores de rua.',c:.8,once:0,ef:2,mat:8,e:{trafico:.35,homicidio:.25,roubo:.05}},
-  imei:{n:'Bloqueio de IMEI com as operadoras',d:'Aparelho roubado bloqueado em horas perde valor no mercado ilegal.',c:2,once:0,ef:1,mat:4,e:{celular:.12,golpe:.06}},
-  recept_cel:{n:'Operação contra receptação de celulares',d:'Lojas de usados, assistências técnicas e anúncios online que revendem aparelhos roubados.',c:3,once:0,ef:3,mat:6,e:{celular:.2},fx:{imp:3}},
-  hotspot:{n:'Mancha criminal e policiamento da PM',d:'Boletins georreferenciados apontam ruas e horários; a PM concentra o efetivo nesses pontos.',c:2,once:0,ef:2,mat:3,e:{celular:.16,transeunte:.12},disp:{furto:.06},req:{pm:40},fx:{pm:2}},
-  metro:{n:'Integração com Metrô e CPTM',d:'Câmeras das estações e agentes à paisana nos horários de pico.',c:1.5,once:0,ef:2,mat:4,e:{celular:.1}},
-  bike:{n:'Força-tarefa contra roubos de bicicleta e moto',d:'Identifica os grupos que arrancam celulares e a rede que compra os aparelhos.',c:2.5,once:0,ef:3,mat:5,e:{celular:.12,transeunte:.15}},
-  ciber:{n:'Núcleo de crimes cibernéticos',d:'Rastreia contas-laranja que recebem PIX feitos com celulares roubados e bloqueia valores com os bancos.',c:3,once:10,ef:2,mat:6,e:{golpe:.28,celular:.05}},
-  exportacao:{n:'Investigação da rota de envio ao exterior',d:'Quadrilhas mandam aparelhos para fora do país. Investigação longa e de alto impacto.',c:3.5,once:0,ef:4,mat:12,e:{celular:.22,transeunte:.05}},
-  social_centro:{n:'Ação integrada com saúde e assistência social',d:'Atendimento a pessoas em situação de rua e usuários, separando dependência química de tráfico.',c:2,once:0,ef:1,mat:8,e:{furto:.1,celular:.04},fx:{com:6,imp:2,gov:-3}},
-  dh_forca:{n:'Força-tarefa de homicídios',d:'Mais investigadores e perícia para esclarecer homicídios. Quem mata e não é preso mata de novo.',c:8,once:0,ef:4,mat:10,e:{letal:.16}},
-  intel_milicia:{n:'Inteligência financeira contra milícias',d:'Lavagem, imóveis irregulares, transporte clandestino e TV pirata: atacar o dinheiro.',c:6,once:0,ef:3,mat:12,e:{milicia:.35,letal:.05}},
-  carga:{n:'Delegacia de roubo de cargas reforçada',d:'Rastreamento das cargas e dos receptadores, com apoio das transportadoras.',c:5,once:0,ef:3,mat:6,e:{carga:.3}},
-  armas:{n:'Rastreamento de armas e munições',d:'Cada arma apreendida rastreada até a origem: desvios, comércio irregular e fronteira.',c:4,once:0,ef:2,mat:8,e:{letal:.1,rua:.04}},
-  proximidade:{n:'Policiamento de proximidade no centro e na orla',d:'Bases fixas e equipes conhecidas pelos comerciantes em áreas de grande circulação.',c:5,once:0,ef:3,mat:5,e:{rua:.15}},
-  cameras_corp:{n:'Câmeras corporais e protocolo de uso da força',d:'Todo agente em operação grava a ação. Reduz abusos e protege o policial que age corretamente.',c:4,once:20,ef:0,mat:6,e:{letalpol:.35},fx:{pm:-3,imp:4,com:4}},
-  desaparecidos:{n:'Delegacia de descoberta de paradeiros reforçada',d:'Desaparecimentos muitas vezes escondem homicídios. Investigar rápido muda o resultado.',c:2,once:0,ef:2,mat:6,e:{letal:.05},fx:{com:4}},
-  operacoes:{n:'Grandes operações em comunidades',d:'Efeito rápido sobre roubos e cargas, mas com alto risco de confronto. O STF exige justificativa de excepcionalidade (ADPF 635).',c:10,once:0,ef:4,mat:1,e:{rua:.07,carga:.06},disp:{letalpol:.6,letal:.08},fx:{com:-6,imp:-3,gov:4}},
+const PEOPLE={
+  lurdes:{n:'Lurdes Siqueira',r:'Escrivã · 31 anos de polícia',f:1},tavares:{n:'Tavares',r:'Investigador',f:0},anselmo:{n:'Anselmo Ferraz',r:'Dono da ótica do centro',f:0},
+  rosangela:{n:'Rosângela',r:'Vítima com medida protetiva',f:1},prefeito:{n:'Osmar Brito',r:'Prefeito',f:0},darcio:{n:'Dárcio Vilela',r:'Empresário',f:0},
+  jandira:{n:'Jandira Lopes',r:'Rádio Cidade FM',f:1},vigia:{n:'Seu Joaquim',r:'Vigia da praça',f:0},
+  katia:{n:'Kátia Nogueira',r:'Delegada assistente',f:1},coronel:{n:'Cel. Albuquerque',r:'Comando da PM no centro',f:0},lucas:{n:'@lucasnocentro',r:'Influenciador · 2 mi de seguidores',f:0},
+  jairo:{n:'Jairo',r:'Dono de assistência técnica',f:0},helena:{n:'Helena Paiva',r:'Promotora de Justiça',f:1},claudia:{n:'Cláudia',r:'Enfermeira, vítima de golpe',f:1},secretario:{n:'O secretário',r:'Secretaria da Segurança Pública',f:0},
+  gov:{n:'O governador',r:'Governo do Estado do Rio de Janeiro',f:0},bianca:{n:'Bianca Moura',r:'Delegada de Homicídios',f:1},neide:{n:'Dona Neide',r:'Moradora do Morro do Cajueiro',f:1},
+  deputado:{n:'Wanderley Couto',r:'Deputado estadual',f:0},flavia:{n:'Flávia Antunes',r:'Repórter',f:1},siqueira:{n:'Cel. Siqueira',r:'Comando da PM',f:0},marcelo:{n:'Marcelo Arruda',r:'Seu chefe de gabinete',f:0},
 };
-const RELN={gov:['Prefeitura','Secretaria de Segurança','Governo do Estado'],pm:'Polícia Militar',mp:'Ministério Público',jud:'Poder Judiciário',imp:'Imprensa',com:'Comunidade'};
-const relName=k=>k==='gov'?RELN.gov[S.g.post]:RELN[k];
+const g=(f,m)=>S.sexo==='f'?f:m;
+function fill(t){const G=S.g;return t.replace(/\{cid\}/g,G.city).replace(/\{nome\}/g,S.nome.split(' ')[0]).replace(/\{dr\}/g,g('doutora','doutor')).replace(/\{Dr\}/g,g('Doutora','Doutor')).replace(/\{a\}/g,g('a','o')).replace(/\{del\}/g,g('delegada','delegado'))}
 
-/* inquéritos */
-const CR={
-  furto:{n:'Furto',g:1,d:1,p:6},golpe:{n:'Estelionato',g:1,d:3,p:8},roubo:{n:'Roubo',g:2,d:2,p:5},domestica:{n:'Violência doméstica',g:2,d:1,p:2},
-  trafico:{n:'Tráfico de drogas',g:3,d:3,p:8},homicidio:{n:'Homicídio',g:5,d:3,p:6},latrocinio:{n:'Latrocínio',g:5,d:4,p:5},sequestro:{n:'Extorsão mediante sequestro',g:5,d:4,p:3},corrupcao:{n:'Corrupção / lavagem',g:4,d:5,p:12},
-};
-const BAIRROS=['Centro','Vila Nova','Jardim América','São José','Bela Vista','Santa Luzia','Boa Esperança','Distrito Industrial','Vila Operária','Parque das Flores','Conjunto Habitacional','Beira-Rio'];
-const TIT={
-  furto:['Furto a residência — {b}','Furto de veículo — {b}','Arrombamento de comércio — {b}','Furto de cabos — {b}'],
-  golpe:['Golpe do falso parente por aplicativo','Fraude via PIX contra idosos','Loja virtual falsa','Clonagem de cartões — {b}'],
-  roubo:['Roubo a pedestre — {b}','Roubo a farmácia — {b}','Roubo em coletivo — {b}','Roubo de carga em rodovia'],
-  domestica:['Violência doméstica — {b}','Descumprimento de medida protetiva — {b}','Ameaça por ex-companheiro — {b}'],
-  trafico:['Ponto de venda de drogas — {b}','Entrega de drogas por aplicativo','Depósito de entorpecentes — {b}'],
-  homicidio:['Homicídio em via pública — {b}','Encontro de cadáver — {b}','Homicídio após discussão — {b}'],
-  latrocinio:['Latrocínio em posto de combustível — {b}','Latrocínio contra comerciante — {b}'],
-  sequestro:['Extorsão mediante sequestro de empresário'],
-  corrupcao:['Desvio na merenda escolar','Fraude em licitação de obras','Lavagem em empresa de fachada'],
-};
-const NM=['Carlos','Rafael','Marcos','André','Paulo','Diego','Thiago','Rodrigo','Fábio','Leandro','Eduardo','Sérgio','Júlio','Renato'];
-const NF=['Ana','Patrícia','Juliana','Fernanda','Camila','Luciana','Renata','Aline','Débora','Vanessa','Cristina','Mariana','Tatiane','Priscila'];
-const SB=['Almeida','Barbosa','Cardoso','Duarte','Esteves','Ferraz','Gouveia','Lacerda','Moraes','Nogueira','Pacheco','Queiroz','Rezende','Siqueira','Teixeira','Valadares'];
-const CARGO=['Investigador(a) de Polícia','Investigador(a) de Polícia','Escrivão(ã) de Polícia','Agente de Polícia'];
-function mkAgent(post,sk){const fem=Math.random()<.42;return {id:'a'+Math.random().toString(36).slice(2,8),nome:(fem?pick(NF):pick(NM))+' '+pick(SB),fem,cargo:pick(CARGO),mat:RI(100000,999999),sk:sk||clamp(RI(1,3)+(post>0?1:0),1,5),mor:RI(55,80),al:null}}
+const SC=[
+/* ------------------------- INTERIOR ------------------------- */
+{id:'chegada',st:0,first:1,loc:'delegacia',time:'segunda, 7h50',who:'lurdes',kick:'Primeira semana',t:'A delegacia de {cid}',
+ p:['A delegacia fica num casarão alugado ao lado da rodoviária. Uma viatura sem pneu no pátio, um computador para três pessoas e uma pilha de boletins de ocorrência que ninguém mexe há meses.','Lurdes, a escrivã, serve café num copo de vidro. "Bem-vind{a}, {dr}. Aqui a gente faz o que dá. O último titular ficou quatro meses e pediu remoção." Tavares, o investigador mais antigo, nem levanta da cadeira.'],
+ o:[{t:'Reunir todo mundo e ouvir a equipe',s:'Começar pelas pessoas.',fx:{eq:8,stress:2},r:'A reunião dura duas horas. Lurdes fala do medo das vítimas de violência doméstica, que voltam para casa sem proteção. Tavares, no fim, admite: "Os furtos são sempre os mesmos caras. O problema é para quem eles vendem."'},
+    {t:'Virar a noite lendo os inquéritos parados',s:'Começar pelos papéis.',fx:{stress:8,furto:-2,domestica:-1},r:'Às três da manhã você encontra o padrão: quase todos os furtos do centro somem no mesmo dia. Alguém compra rápido. A equipe chega de manhã e vê o café frio e os post-its na parede.'},
+    {t:'Visitar o prefeito antes de tudo',s:'Começar pela política.',fx:{pol:8,eq:-4},r:'Osmar Brito te recebe com abraço e foto para as redes. Promete conserto da viatura "semana que vem". Na delegacia, a equipe comenta que o novo titular foi primeiro ao gabinete.'}]},
+{id:'serie',st:0,loc:'praca',time:'quarta, 18h30',who:'anselmo',kick:'Furtos em série',t:'Quinta vez em dois meses',
+ p:['Anselmo Ferraz mostra a vitrine estilhaçada da ótica. "Quinta vez, {dr}. Levam óculos, relógio, qualquer coisa que venda rápido. Os comerciantes da praça estão falando em contratar uns rapazes para resolver do jeito deles."','Do outro lado da rua, Seu Joaquim, o vigia, varre os cacos sem olhar para ninguém.'],
+ o:[{t:'Montar campana com a equipe nas noites seguintes',s:'Cansativo, mas pega em flagrante.',fx:{eq:-3,stress:4,furto:-4},set:'pista',r:'Na terceira noite, Tavares pega dois rapazes com uma mochila cheia de relógios. Um deles, assustado, solta um nome: "a gente leva tudo pro ferro-velho do cunhado do vereador".'},
+    {t:'Propor câmeras dos comerciantes integradas à delegacia',s:'Investimento coletivo, efeito duradouro.',fx:{com:5,furto:-3},set:'cameras',r:'Os comerciantes fazem uma vaquinha. Em duas semanas, doze câmeras apontam para a praça e mandam imagem para o computador da delegacia.'},
+    {t:'Prometer rondas e pedir paciência',s:'Ganha tempo.',fx:{com:-2},r:'Anselmo agradece sem acreditar. No grupo dos comerciantes, alguém escreve: "polícia de novo prometendo".'}]},
+{id:'ferro',st:0,need:'pista',loc:'loja',time:'sexta, 9h15',who:'tavares',kick:'Furtos em série',t:'O ferro-velho do cunhado',
+ p:['O ferro-velho fica na saída da cidade. Tavares estaciona longe. "O dono é cunhado do Gerson, vereador da base do prefeito. Se a gente entrar lá, o prefeito vai ligar antes do almoço."','Pela cerca, dá para ver bicicletas, fios de cobre enrolados e uma caixa de relógios.'],
+ o:[{t:'Representar por mandado de busca e entrar com tudo documentado',s:'O caminho da lei, custe o que custar.',fx:{furto:-7,pol:-8,integ:5,imp:3},r:'O juiz defere em 24 horas. Vocês encontram 140 objetos com registro de furto. O prefeito liga às 11h40. Você não atende. No dia seguinte, a rádio fala da "operação ferro-velho".'},
+    {t:'Ter uma "conversa" com o dono para ele parar de comprar',s:'Resolve sem barulho, sem processo.',fx:{furto:-3,integ:-8,pol:2},r:'O dono jura que nunca mais. Os furtos diminuem por um tempo. Tavares te olha diferente, como quem aprendeu que aqui as coisas se resolvem assim.'},
+    {t:'Deixar para depois',s:'Escolher a briga certa.',fx:{furto:2},r:'O ferro-velho segue funcionando. Na semana seguinte, mais duas lojas da praça são arrombadas.'}]},
+{id:'rosa1',st:0,loc:'casa',time:'domingo, 22h10',who:'rosangela',kick:'Medida protetiva',t:'Rosângela voltou',
+ p:['Rosângela chega com o filho de seis anos no colo. É a segunda vez no mês que o ex-companheiro aparece na porta dela, mesmo com a medida protetiva. "Ele disse que da próxima vez não vai só bater no portão."','Lurdes te olha. O plantão regional fecha às 22h. O próximo carro só amanhã.'],
+ o:[{t:'Representar pela prisão preventiva e mandar a viatura agora',s:'Descumprimento de medida protetiva é crime.',fx:{domestica:-5,eq:-2,stress:3},set:'rosa_ok',r:'O ex-companheiro é preso de madrugada na casa da mãe dele. O juiz mantém a prisão. Rosângela dorme pela primeira vez em semanas.'},
+    {t:'Registrar a ocorrência e encaminhar ao juiz no prazo',s:'O procedimento padrão: 48 horas.',fx:{domestica:-1},set:'rosa_risco',r:'Tudo correto no papel. Rosângela vai para a casa da irmã. Lurdes passa a noite olhando o celular.'},
+    {t:'Chamar o ex-companheiro para uma conversa',s:'Tentar acalmar a situação.',fx:{integ:-4,domestica:1},set:'rosa_risco',r:'Ele vem, educado, diz que foi um mal-entendido. Assina um papel prometendo distância. Lurdes não diz nada, mas o silêncio dela pesa.'}]},
+{id:'rosa2a',st:0,need:'rosa_risco',after:'rosa1',loc:'velorio',time:'quinta, 4h20',who:'lurdes',kick:'Medida protetiva',t:'O telefone toca de madrugada',
+ p:['É a Lurdes, chorando. O ex-companheiro de Rosângela invadiu a casa da irmã. Rosângela foi esfaqueada e está na UTI. O menino viu tudo.','Às oito da manhã, a cidade inteira sabe. A rádio pergunta o que a polícia fez com os dois registros anteriores.'],
+ o:[{t:'Revisar todas as medidas protetivas da cidade em força-tarefa',s:'Ninguém mais vai cair nessa fresta.',fx:{domestica:-7,stress:10,eq:-3,imp:2},set:'protetivas',r:'Vocês visitam 63 mulheres em uma semana. Em três casos, o agressor já rondava a casa. Rosângela sobrevive. A cidade não esquece, mas vê a delegacia nas ruas.'},
+    {t:'Dar uma entrevista assumindo a falha',s:'Sem desculpas, com explicação.',fx:{imp:3,com:3,integ:4,domestica:-2},r:'Você diz no ar: "Nós falhamos com a Rosângela." Jandira, da rádio, fica um segundo em silêncio. Depois, as mensagens de ouvintes chegam: outras mulheres pedem ajuda.'},
+    {t:'Soltar uma nota oficial',s:'Proteger a instituição.',fx:{imp:-6,com:-5},r:'A nota fala em "procedimentos cumpridos". Ninguém lê até o fim.'}]},
+{id:'rosa2b',st:0,need:'rosa_ok',after:'rosa1',loc:'delegacia',time:'terça, 15h00',who:'rosangela',kick:'Medida protetiva',t:'Um bolo na mesa da escrivania',
+ p:['Rosângela aparece com um bolo de fubá e o filho escondido atrás da perna dela. "Vim agradecer. E vim dizer que tem mais mulher na minha rua passando pelo mesmo. Elas têm medo de vir aqui."','Lurdes sugere duas coisas: uma sala reservada para ouvir as vítimas e uma patrulha da Guarda Municipal para visitar quem tem medida protetiva.'],
+ o:[{t:'Criar a patrulha com a Guarda Municipal',s:'Depende do prefeito.',fx:{domestica:-7,pol:2,com:3},set:'patrulha',r:'O prefeito topa: gosta da ideia de aparecer na inauguração. Duas guardas fazem visitas toda semana. Os descumprimentos caem pela metade.'},
+    {t:'Montar uma sala de atendimento reservada',s:'Mudar a forma de receber as vítimas.',fx:{domestica:-5,com:5},r:'Uma sala com sofá, brinquedos e porta fechada. Em um mês, os registros aumentam, porque as mulheres finalmente vêm, e as agressões graves caem.'}]},
+{id:'festa',st:0,loc:'praca',time:'sábado, 20h00',who:'darcio',kick:'A festa da cidade',t:'O palanque de Dárcio',
+ p:['A Festa do Peão é patrocinada por Dárcio Vilela, o homem que "empresta" dinheiro na cidade e cobra com visitas noturnas. Ele faz questão de te chamar ao palanque, ao lado do prefeito.','"Uma foto, {dr}. A cidade precisa ver que autoridade e quem gera emprego andam juntos."'],
+ o:[{t:'Recusar e abrir investigação sobre agiotagem',s:'Integridade, com preço político.',fx:{integ:6,pol:-6,com:2},set:'agiota',r:'Você agradece e vai embora. Na segunda-feira, três pessoas aparecem na delegacia para contar das "visitas" de cobrança.'},
+    {t:'Subir ao palanque por cinco minutos',s:'Boa relação com quem manda na cidade.',fx:{pol:6,integ:-6},r:'A foto vai para as redes do prefeito e do Dárcio. Nos comentários, alguém escreve: "agora a polícia é sócia".'}]},
+{id:'praca',st:0,loc:'praca',time:'terça, 10h30',who:'prefeito',kick:'Pressão política',t:'"Limpar" a praça',
+ p:['O prefeito quer a praça central "limpa" antes da visita do governador: retirar à força as pessoas em situação de rua e os usuários de drogas que dormem nos bancos. A Guarda Municipal faria o serviço. Ele quer a Polícia Civil junto, "para dar respaldo".'],
+ o:[{t:'Recusar a remoção forçada e propor ação com o CAPS',s:'Saúde para uns, polícia para o tráfico.',fx:{pol:-6,com:3,integ:3,furto:-1},r:'O prefeito desliga irritado. A assistente social do CAPS te liga dois dias depois: quatro pessoas aceitaram tratamento. O traficante que abastecia a praça foi preso na semana seguinte.'},
+    {t:'Apoiar a ação do prefeito',s:'A praça fica bonita na foto.',fx:{pol:6,integ:-6,com:-4,furto:2},r:'A praça amanhece vazia. Três dias depois, os mesmos rostos estão nos bancos da rodoviária e os furtos ali aumentam.'}]},
+{id:'poste',st:0,loc:'rua',time:'quinta, 19h45',who:'tavares',kick:'Justiça com as próprias mãos',t:'Amarrado ao poste',
+ p:['Um adolescente suspeito de furtar uma bicicleta foi espancado e amarrado a um poste por moradores do bairro São José. O vídeo já tem 40 mil visualizações. Tavares chega com ele algemado: "Os caras que bateram estão lá rindo, {dr}. Metade do bairro apoia."'],
+ o:[{t:'Prender os agressores e apurar o furto separadamente',s:'A lei vale para todos.',fx:{integ:6,com:-3,imp:3},r:'Três homens autuados por lesão corporal. Parte do bairro te xinga nas redes. O promotor manda uma mensagem: "Era isso que tinha que ser feito."'},
+    {t:'Registrar só o furto',s:'Não comprar briga com o bairro.',fx:{integ:-10,com:3},r:'O bairro aplaude. Na semana seguinte, outro suspeito é agredido em outra rua. Agora com mais gente filmando.'}]},
+{id:'radio',st:0,loc:'estudio',time:'segunda, 7h05',who:'jandira',kick:'Ao vivo',t:'Rádio Cidade FM',
+ p:['Jandira Lopes comanda o programa mais ouvido da cidade. "{Dr}, a pergunta que o ouvinte faz: a polícia de {cid} vai continuar só registrando furto ou vai prender alguém?"'],
+ o:[{t:'Responder com dados e um plano claro',s:'Seriedade.',fx:{imp:4,com:2},r:'Você explica que a maior parte dos furtos acaba no mesmo comprador e que é ali que vai agir. Jandira encerra: "Vamos cobrar, viu?"'},
+    {t:'Prometer resultado em um mês',s:'Ganha a manhã, cria uma cobrança.',fx:{imp:6,stress:6},set:'promessa',r:'O trecho viraliza nos grupos da cidade. Agora todo mundo conta os dias.'},
+    {t:'Culpar a audiência de custódia e a falta de efetivo',s:'Verdade parcial, soa como desculpa.',fx:{imp:-3,com:2},r:'Ouvintes concordam. Jandira não: "Mas e o senhor, faz o quê?"'}]},
+{id:'taxa',st:0,loc:'delegacia',time:'sexta, 18h20',who:'tavares',kick:'Dentro de casa',t:'A "taxa" do Tavares',
+ p:['Um comerciante te procura discretamente: há anos paga uma "taxa" mensal a Tavares para ter ronda na porta. Ele mostra transferências no celular.','Tavares é o melhor investigador que você tem. Sem ele, metade das prisões não teria acontecido.'],
+ o:[{t:'Afastar Tavares e comunicar a Corregedoria',s:'Ninguém está acima da lei.',fx:{integ:8,eq:-8},r:'A equipe fica em silêncio por uma semana. Lurdes, na sexta, deixa um café na sua mesa sem dizer nada. É o jeito dela de aprovar.'},
+    {t:'Chamar Tavares para uma conversa franca',s:'Dar uma chance, sem processo.',fx:{integ:-5,eq:2},r:'Ele nega, depois admite, depois promete parar. Você não sabe se acredita.'},
+    {t:'Fingir que não viu',s:'Preservar o time.',fx:{integ:-14,eq:3},r:'O comerciante sai sem resposta. Você sabe que ele vai contar a outros.'}]},
+{id:'plantao',st:0,loc:'rua',time:'sábado, 1h30',who:'lurdes',kick:'A cidade sem plantão',t:'Oitenta quilômetros',
+ p:['Uma jovem vítima de estupro precisou viajar 80 km até o plantão regional para registrar a ocorrência e fazer o exame. Voltou de carona com o pai, de madrugada. Lurdes está furiosa: "A gente não pode deixar isso acontecer de novo."'],
+ o:[{t:'Montar sobreaviso local com a equipe',s:'Mais trabalho para todos.',fx:{com:6,eq:-5,domestica:-2},r:'A escala fica pesada, mas a cidade passa a ter alguém para atender de madrugada. A notícia corre pelas igrejas e escolas.'},
+    {t:'Oficiar a Delegacia Seccional pedindo plantão 24 horas',s:'O caminho formal.',fx:{pol:2,com:1},r:'O ofício segue. A resposta vem em seis semanas: "em análise".'}]},
+/* ------------------------- SÃO PAULO ------------------------- */
+{id:'sp1',st:1,first:1,loc:'centro',time:'segunda, 8h00',who:'katia',kick:'O centro',t:'Seiscentos celulares por semana',
+ p:['Do décimo andar da Seccional dá para ver a praça da Sé, o Viaduto do Chá e a fila do metrô. Kátia Nogueira, sua delegada assistente, abre uma planilha: "Seiscentos e quarenta celulares furtados ou roubados por semana só aqui. Bicicleta, moto, mão leve na escada do metrô."','"E tem o pior: com o celular desbloqueado eles limpam a conta da vítima pelo PIX em quinze minutos."'],
+ o:[{t:'Mapear os horários e as esquinas antes de qualquer coisa',s:'Dados primeiro.',fx:{celular:-3,eq:2},set:'mapa',r:'Em uma semana, o mapa mostra onde tudo acontece: 70% dos casos em nove esquinas e três saídas de metrô, entre 17h e 20h.'},
+    {t:'Ir para a rua de noite sem distintivo',s:'Sentir a cidade.',fx:{com:4,stress:5},r:'Em duas horas você vê três furtos e uma moto passando devagar demais. Um camelô te reconhece e sussurra: "Os aparelhos vão tudo pra uma galeria aqui perto."'},
+    {t:'Reunir-se com o comando da PM no centro',s:'Ninguém resolve isso sozinho.',fx:{pol:4,celular:-2},r:'O Coronel Albuquerque é desconfiado, mas aceita trocar dados toda semana. "Se a Civil trouxer o mapa, a gente põe gente na esquina."'}]},
+{id:'sp_lucas',st:1,loc:'centro',time:'quarta, 18h40',who:'lucas',kick:'Viralizou',t:'"Cadê a polícia?"',
+ p:['Lucas, um influenciador com dois milhões de seguidores, filmou o próprio celular sendo arrancado da mão na saída do metrô São Bento. O vídeo termina com ele olhando para a câmera: "Cadê a polícia, São Paulo?". Cinco milhões de visualizações em um dia.','O secretário de Segurança te liga: "Eu preciso de uma resposta até amanhã."'],
+ o:[{t:'Responder com dados e anunciar ação naquela saída do metrô',s:'Assumir a narrativa.',fx:{imp:6,stress:5,celular:-2},r:'Você grava um vídeo curto com o mapa e a nova escala. Lucas reposta: "Pelo menos responderam." Na semana seguinte, aquela saída tem 40% menos casos.'},
+    {t:'Achar o autor em 48 horas',s:'Show de eficiência.',fx:{imp:5,eq:-4,celular:-1},r:'A equipe acha o rapaz de bicicleta. É a sétima passagem dele. O vídeo da prisão bomba. Os furtos no resto do centro continuam iguais.'},
+    {t:'Não responder',s:'Polícia não trabalha para rede social.',fx:{imp:-7,pol:-3},r:'O vídeo segue rodando. O secretário não liga de novo, o que é pior.'}]},
+{id:'sp_jairo',st:1,loc:'loja',time:'sexta, 14h20',who:'jairo',kick:'A rede',t:'A assistência técnica',
+ p:['Numa galeria do centro, a assistência técnica de Jairo "desbloqueia qualquer aparelho em uma hora". Kátia monitora há uma semana: entram mochilas cheias de celulares de manhã e saem caixas lacradas à tarde.','"Se a gente prender o Jairo agora, a gente pega vinte celulares. Se esperar, pega quem compra dele."'],
+ o:[{t:'Esperar e investigar quem está acima dele',s:'Interceptação, paciência, risco de vazar.',fx:{celular:-2,stress:4},set:'rede',r:'O juiz autoriza a interceptação. Em três semanas, vocês descobrem que as caixas vão para um galpão em Guarulhos e, de lá, para fora do país.'},
+    {t:'Operação imediata na galeria',s:'Resultado visível hoje.',fx:{celular:-5,imp:5},r:'Duzentos aparelhos apreendidos, Jairo preso, foto nos jornais. Em dez dias, outra assistência abre no andar de cima.'},
+    {t:'Transformar Jairo em informante',s:'Uma fonte dentro da rede.',fx:{celular:-3,integ:-4},set:'rede',r:'Jairo topa, em troca de "esquecerem" as caixas dele. Ele entrega um nome por semana. Você não dorme muito bem com isso.'}]},
+{id:'sp_rota',st:1,need:'rede',after:'sp_jairo',loc:'operacao',time:'terça, 5h10',who:'katia',kick:'A rede',t:'O galpão de Guarulhos',
+ p:['O galpão tem prateleiras do chão ao teto com celulares embalados como produtos novos. Os aparelhos saem em contêineres e voltam a ser vendidos em outros países, onde o bloqueio não funciona.','A Polícia Federal quer entrar no caso. Kátia acha que é a chance de derrubar a rede. A Seccional perderia o protagonismo.'],
+ o:[{t:'Montar força-tarefa com a Polícia Federal',s:'Golpe na rede inteira.',fx:{celular:-9,eq:-3,pol:3,imp:3},r:'A operação prende onze pessoas em três estados. O preço do celular roubado no centro despenca, porque não tem mais para quem vender.'},
+    {t:'Fazer a operação só com a Seccional',s:'Rápido, mas parcial.',fx:{celular:-5,imp:6},r:'Vocês prendem o gerente do galpão. Os chefes, que estavam fora do país, seguem livres.'}]},
+{id:'sp_crack',st:1,loc:'centro',time:'segunda, 6h00',who:'secretario',kick:'Pressão política',t:'Dispersar a cena de uso',
+ p:['O governo quer uma grande operação para dispersar a concentração de usuários de crack no centro, antes de um evento internacional. A Seccional deve apoiar com investigadores.','Especialistas avisam: a dispersão espalha os usuários e os furtos por bairros vizinhos.'],
+ o:[{t:'Apoiar só a parte contra o tráfico, com saúde para os usuários',s:'Desagrada o governo.',fx:{pol:-6,com:4,integ:2},r:'Vocês prendem dois fornecedores. O secretário reclama que você "não é do time". O furto no centro não sobe.'},
+    {t:'Apoiar a dispersão',s:'O governo fica satisfeito.',fx:{pol:6,celular:4,com:-4},r:'As imagens do centro "limpo" rodam na TV. Uma semana depois, os furtos de celular explodem em três bairros vizinhos.'}]},
+{id:'sp_claudia',st:1,loc:'delegacia',time:'quinta, 19h00',who:'claudia',kick:'O golpe',t:'As economias de Cláudia',
+ p:['Cláudia é enfermeira. Teve o celular arrancado na saída do plantão. Em vinte minutos, levaram R$ 11 mil da conta: a reserva para a cirurgia da mãe. O banco diz que "a transação foi feita com a senha".','"Eu não consigo nem chorar mais, {dr}."'],
+ o:[{t:'Priorizar o rastreio das contas-laranja',s:'Seguir o dinheiro.',fx:{golpe:-6,eq:-2},set:'laranja',r:'O dinheiro passou por oito contas em uma hora. A sétima é de um universitário que "alugou" a conta por R$ 300. Ele entrega quem o recrutou. Parte do valor é bloqueada.'},
+    {t:'Propor aos bancos um convênio de bloqueio rápido',s:'Mudar o sistema.',fx:{golpe:-5,pol:2},set:'bancos',r:'Três bancos aceitam bloquear transferências suspeitas em minutos quando o celular é registrado como roubado.'}]},
+{id:'sp_bike',st:1,loc:'rua',time:'terça, 20h15',who:'katia',kick:'Prende e solta',t:'A quinta vez',
+ p:['Os rapazes da bicicleta que arrancam celulares na Avenida Paulista foram soltos na audiência de custódia pela quinta vez. O vídeo da última prisão circula com a legenda "prende e solta".'],
+ o:[{t:'Ir atrás de quem compra os celulares deles',s:'Cortar o motivo do roubo.',fx:{celular:-4},r:'Sem comprador, o celular vale pouco. Em duas semanas, o grupo some da Paulista.'},
+    {t:'Criticar publicamente o Judiciário',s:'Popular, mas desgasta.',fx:{com:3,imp:2,pol:-2},r:'O juiz responde em nota. O debate ocupa a semana, os roubos não mudam.'}]},
+{id:'sp_salve',st:1,loc:'operacao',time:'domingo, 23h50',who:'katia',kick:'Facção',t:'O "salve"',
+ p:['Um áudio interceptado: uma facção criminosa paulista ordena ataques a agentes de segurança em retaliação à transferência de líderes para presídios federais. Dois policiais da Seccional moram na zona leste, no território do grupo.'],
+ o:[{t:'Reforçar a proteção da equipe e a inteligência',s:'Protege, custa.',fx:{eq:6,stress:6},r:'Vocês mudam rotinas, trocam viaturas e escoltam os dois policiais. O ataque não acontece. Talvez nunca fosse acontecer, mas ninguém dorme preocupado.'},
+    {t:'Divulgar o alerta para a imprensa',s:'Transparência, com medo na cidade.',fx:{imp:4,com:-4},r:'A notícia vira manchete. A população fica assustada e o governo reclama da "exposição desnecessária".'}]},
+{id:'sp_assedio',st:1,loc:'delegacia',time:'quarta, 16h00',who:'katia',kick:'Dentro de casa',t:'A denúncia',
+ p:['Uma escrivã nova procura Kátia, que te procura: um investigador antigo faz comentários sobre o corpo dela há meses e já tentou beijá-la no elevador. "Ela tem medo de ser transferida se falar", diz Kátia.'],
+ o:[{t:'Afastar o investigador e abrir apuração imediatamente',s:'Proteger quem denuncia.',fx:{integ:6,eq:-3,com:2},r:'Outras duas servidoras fazem relatos parecidos. A apuração segue. A escrivã continua na equipe.'},
+    {t:'Trocar a escrivã de setor para "protegê-la"',s:'Resolve o incômodo, pune a vítima.',fx:{integ:-8,eq:-2},r:'Ela é transferida. O investigador continua. Kátia passa a falar com você só o necessário.'}]},
+{id:'sp_camera',st:1,loc:'estudio',time:'quinta, 21h00',who:'flavia',kick:'Debate público',t:'Câmeras corporais',
+ p:['O governo estuda reduzir o uso de câmeras corporais pela Polícia Militar. Uma repórter de TV quer sua opinião ao vivo, como delegado(a) seccional do centro.'],
+ o:[{t:'Defender as câmeras com base em resultados',s:'Desagrada governo e parte da PM.',fx:{imp:5,pol:-5,com:3},r:'A entrevista é elogiada por especialistas. O coronel da PM no centro manda um recado seco: "Ouvi a sua entrevista."'},
+    {t:'Apoiar a posição do governo',s:'Agrada quem manda.',fx:{pol:5,imp:-4},r:'O secretário agradece. Nas redes, sua fala vira meme entre especialistas em segurança.'},
+    {t:'Dizer que é assunto da PM',s:'Neutro.',fx:{},r:'A repórter insiste duas vezes e desiste. Ninguém lembra da entrevista no dia seguinte.'}]},
+/* ------------------------- RIO DE JANEIRO ------------------------- */
+{id:'rj1',st:2,first:1,loc:'palacio',time:'segunda, 10h00',who:'gov',kick:'O convite',t:'O Palácio Guanabara',
+ p:['O governador do Rio te recebe pessoalmente. Viu seus resultados em São Paulo e quer alguém de fora para comandar a Polícia Civil. "Letalidade violenta, milícia, roubo de rua. E menos mortes em operação: a imprensa internacional está em cima. Quais são as suas condições?"'],
+ o:[{t:'Exigir autonomia total para nomear e investigar',s:'Comando de verdade, governador desconfortável.',fx:{pol:-5,integ:5,eq:4},set:'autonomia',r:'Ele hesita, depois aceita. "Mas se der errado, é com você." O chefe de gabinete, Marcelo Arruda, anota tudo.'},
+    {t:'Exigir câmeras corporais e protocolo de uso da força',s:'Controle desde o primeiro dia.',fx:{letalpol:-6,pol:-2,imp:3},r:'O governador concorda em público e pede discrição no privado. A tropa recebe a notícia com desconfiança.'},
+    {t:'Aceitar sem condições',s:'Começar alinhado ao governo.',fx:{pol:6},r:'O governador sorri. Na foto oficial, você está um passo atrás dele.'}]},
+{id:'rj_policial',st:2,loc:'velorio',time:'quarta, 15h00',who:'siqueira',kick:'Luto',t:'O sargento Rodrigues',
+ p:['O sargento Rodrigues, da PM, foi morto com um tiro na cabeça durante patrulhamento na Zona Norte. No velório, policiais cantam o hino. Nos grupos de mensagens, circula uma convocação para "devolver na mesma moeda" nas próximas noites.','O Coronel Siqueira te puxa de lado: "A tropa quer resposta."'],
+ o:[{t:'Investigação técnica pela Homicídios e proibição de represálias',s:'A resposta é a prisão do autor.',fx:{eq:-5,integ:6,letalpol:-3,letal:-2},r:'Bianca Moura, da Homicídios, identifica o autor em nove dias. Preso, sem nenhum tiro. Siqueira não te cumprimenta no anúncio, mas também não contesta.'},
+    {t:'Liberar uma ofensiva na região',s:'A tropa satisfeita.',fx:{eq:6,integ:-12,letalpol:10,letal:4,com:-6},r:'Em três noites, nove mortos. Entre eles, um entregador de 17 anos sem passagem pela polícia. A Defensoria abre procedimento.'}]},
+{id:'rj_neide',st:2,loc:'comunidade',time:'terça, 7h30',who:'neide',kick:'Bala perdida',t:'Ana Clara, 9 anos',
+ p:['Ana Clara, 9 anos, foi atingida a caminho da escola durante uma operação no Morro do Cajueiro. Morreu no hospital. Dona Neide, a avó, segura a mochila da menina na porta da delegacia. "Disseram que foi confronto. Não tinha confronto. Eu estava lá."'],
+ o:[{t:'Perícia independente, afastamento dos envolvidos e apoio à família',s:'Transparência total.',fx:{com:6,integ:5,eq:-5,letalpol:-4,imp:3},r:'A perícia aponta que o tiro saiu de arma policial. Os agentes respondem a processo. Dona Neide te abraça no enterro. A tropa fica dividida.'},
+    {t:'Sustentar a versão inicial da corporação',s:'Proteger a instituição.',fx:{com:-10,imp:-8,integ:-8,eq:3},r:'Três semanas depois, um vídeo de morador desmonta a versão. A crise passa a ser sua.'}]},
+{id:'rj_deputado',st:2,loc:'gabinete',time:'quinta, 19h00',who:'deputado',kick:'Milícia',t:'Um aliado na Assembleia',
+ p:['Wanderley Couto, deputado estadual com base eleitoral na Zona Oeste, oferece apoio para aumentar o orçamento da Polícia Civil. Ele foi citado em inquéritos antigos sobre milícia. Pede só "sensibilidade" com operações na região dele.'],
+ o:[{t:'Recusar e mandar a inteligência olhar a região dele',s:'Um inimigo poderoso.',fx:{integ:6,pol:-5,letal:-2},set:'milicia',r:'Couto sai sorrindo. No dia seguinte, aparecem notas plantadas na imprensa sobre "o forasteiro paulista".'},
+    {t:'Aceitar o apoio',s:'Mais dinheiro, compromisso perigoso.',fx:{integ:-14,pol:4,eq:3,letal:3},r:'O orçamento sobe. Na Zona Oeste, a milícia expande os negócios com tranquilidade.'}]},
+{id:'rj_milicia',st:2,need:'milicia',after:'rj_deputado',loc:'operacao',time:'sexta, 5h00',who:'bianca',kick:'Milícia',t:'Seguir o dinheiro',
+ p:['A inteligência encontrou: a milícia controla gatonet, transporte alternativo, venda de gás e construções irregulares. Fatura milhões por mês. Bianca propõe uma operação de lavagem de dinheiro com o Ministério Público e a Receita.','"Prender os matadores é enxugar gelo. Sem o dinheiro, eles não pagam os matadores."'],
+ o:[{t:'Operação de lavagem com MP e Receita',s:'Longa, complexa, golpe no coração do negócio.',fx:{letal:-7,stress:8,eq:-3,imp:4},r:'Quarenta e dois imóveis bloqueados, sete empresas de fachada, dois vereadores e um assessor do deputado Couto presos. A Zona Oeste tem o mês menos violento em cinco anos.'},
+    {t:'Prender os executores identificados',s:'Resultado imediato.',fx:{letal:-4,imp:3},r:'Seis presos. Em três semanas, novos nomes ocupam os lugares deles.'}]},
+{id:'rj_fuzis',st:2,loc:'delegacia',time:'segunda, 11h00',who:'marcelo',kick:'Dentro de casa',t:'Os fuzis sumidos',
+ p:['A Corregedoria descobriu que fuzis apreendidos sumiram do depósito de uma delegacia. A suspeita é de venda para o tráfico. Marcelo Arruda, seu chefe de gabinete, sugere resolver "internamente".'],
+ o:[{t:'Investigação conjunta com Corregedoria e Ministério Público',s:'Expõe a instituição, estanca o desvio.',fx:{integ:6,eq:-4,letal:-3,imp:2},r:'Um inspetor e dois agentes presos. Os fuzis são rastreados até uma comunidade da Zona Norte. Três recuperados.'},
+    {t:'Resolver internamente',s:'Se vazar, o estrago é enorme.',fx:{integ:-12},set:'abafou',r:'Ninguém sabe. Por enquanto.'}]},
+{id:'rj_adpf',st:2,loc:'gabinete',time:'quarta, 17h00',who:'helena',kick:'A operação',t:'A exigência do STF',
+ p:['Uma grande operação contra o tráfico no Complexo do Cajueiro está marcada. Por decisão do STF na ADPF 635, operações em comunidades precisam ser excepcionais, justificadas e comunicadas ao Ministério Público, com cuidados como ambulância e câmeras.','A promotora Helena Paiva quer saber o que você vai fazer.'],
+ o:[{t:'Fundamentar, comunicar e operar com câmeras e ambulância',s:'Dentro da lei.',fx:{rua:-3,letalpol:1,integ:3},r:'A operação apreende armas e drogas. Uma pessoa ferida, socorrida a tempo. As imagens das câmeras protegem a equipe de acusações.'},
+    {t:'Cancelar e trocar por investigação de inteligência',s:'Sem confronto. O governador cobra.',fx:{pol:-5,com:4,letalpol:-3},r:'O governador quer saber por que "a polícia recuou". Em seis semanas, a investigação prende o gerente do tráfico sem disparar um tiro.'},
+    {t:'Operar sem comunicar',s:'Ilegal e arriscado.',fx:{integ:-12,letalpol:8,rua:-3},r:'Seis mortos. O MP pede explicações formais. Seu nome aparece em um pedido de investigação.'}]},
+{id:'rj_carnaval',st:2,loc:'orla',time:'sábado de Carnaval',who:'marcelo',kick:'Carnaval',t:'Seis milhões nas ruas',
+ p:['Os blocos de Carnaval vão levar milhões de pessoas às ruas. Ano passado, os roubos de celular dobraram em quatro dias. O governo quer um plano.'],
+ o:[{t:'Delegacias móveis, câmeras e agentes à paisana nos blocos',s:'Caro, mas controla.',fx:{rua:-5,eq:-4,stress:5},r:'Os roubos sobem só 10%, contra 100% no ano anterior. A imprensa elogia a "Polícia Civil na rua".'},
+    {t:'Efetivo de rotina',s:'Economiza recursos.',fx:{rua:6,imp:-4},r:'Os vídeos de arrastão nos blocos dominam o noticiário da Quarta-Feira de Cinzas.'}]},
+{id:'rj_flavia',st:2,loc:'estudio',time:'domingo, 20h00',who:'flavia',kick:'Transparência',t:'Os números escondidos',
+ p:['Flávia Antunes, repórter investigativa, conseguiu uma planilha interna com mortes em ações policiais que não aparecem nas estatísticas oficiais. Ela vai publicar de qualquer jeito e te oferece direito de resposta.'],
+ o:[{t:'Reconhecer os números e anunciar auditoria',s:'Assumir o problema.',fx:{imp:6,com:4,pol:-5,letalpol:-3},r:'A reportagem sai com a sua resposta. O governador fica furioso. Organizações de direitos humanos, pela primeira vez, elogiam a Polícia Civil.'},
+    {t:'Contestar a planilha',s:'Defender os dados oficiais.',fx:{imp:-6,pol:3},r:'A reportagem sai com documentos que confirmam tudo. Sua resposta envelhece mal.'}]},
+{id:'rj_desap',st:2,loc:'comunidade',time:'terça, 9h00',who:'neide',kick:'Desaparecidos',t:'"Ele saiu para trabalhar"',
+ p:['Dona Neide volta à delegacia, agora acompanhando uma vizinha. O filho dela, Diego, 22 anos, entregador, saiu para trabalhar há doze dias e não voltou. Na delegacia do bairro, disseram para "esperar, que ele aparece".'],
+ o:[{t:'Tratar o desaparecimento como possível homicídio e investigar já',s:'Não esperar.',fx:{letal:-3,com:5,eq:-2},r:'A Homicídios encontra o corpo num cemitério clandestino usado pela milícia. Três presos. Outras famílias aparecem com casos parecidos.'},
+    {t:'Reforçar a delegacia de desaparecidos',s:'Resolver o sistema, não só o caso.',fx:{letal:-2,com:3},r:'Novo protocolo: busca imediata em casos de risco. Diego é encontrado morto semanas depois. O protocolo, porém, salva outros dois jovens.'}]},
+/* ------------------------- QUALQUER ETAPA ------------------------- */
+{id:'propina',st:'*',loc:'rua',time:'sexta, 21h00',who:'darcio',kick:'A oferta',t:'Uma contribuição mensal',
+ p:['Um empresário oferece uma contribuição mensal "para melhorar a estrutura da delegacia". Em troca, pede que as denúncias de funcionários contra ele "não andem tão rápido".'],
+ o:[{t:'Recusar e registrar formalmente a oferta',s:'',fx:{integ:6},r:'O termo vai para o Ministério Público. O empresário passa a ser investigado.'},
+    {t:'Recusar educadamente',s:'',fx:{integ:1},r:'Ele sorri, guarda o envelope e vai embora.'},
+    {t:'Aceitar',s:'',fx:{integ:-22,eq:3},set:'propina',r:'O dinheiro compra computadores novos. Também compra um problema.'}]},
+{id:'greve',st:'*',loc:'delegacia',time:'segunda, 8h00',who:'lurdes',kick:'Greve',t:'Indicativo de greve',
+ p:['A assembleia dos policiais civis aprovou greve por reajuste salarial a partir da próxima semana. A equipe quer saber de que lado você está.'],
+ o:[{t:'Manter só os serviços essenciais e apoiar o diálogo',s:'',fx:{eq:4,pol:-3},r:'Flagrantes e casos urgentes seguem. Os inquéritos atrasam.'},
+    {t:'Exigir trabalho normal',s:'',fx:{eq:-10,pol:3},r:'A equipe obedece, de cara fechada.'}]},
+{id:'familia',st:'*',loc:'casa',time:'domingo, 13h00',who:null,kick:'Fora do expediente',t:'O almoço de domingo',
+ p:['Faz dois meses que você não aparece num almoço de família. Sua mãe liga: "Só quero saber se você está vivo(a)."'],
+ o:[{t:'Ir ao almoço e desligar o celular',s:'',fx:{stress:-14},r:'Lasanha, conversa à toa, sobrinho no colo. Você tinha esquecido como era.'},
+    {t:'Prometer que vai na próxima',s:'',fx:{stress:6},r:'Ela não acredita. Você também não.'}]},
+{id:'corregedoria',st:'*',special:1,loc:'gabinete',time:'segunda, 9h00',who:null,kick:'Corregedoria',t:'O processo disciplinar',
+ p:['A Corregedoria abriu processo administrativo disciplinar para apurar condutas incompatíveis com o cargo durante a sua gestão: ofertas aceitas, casos abafados, pedidos políticos atendidos.'],
+ o:[{t:'Apresentar defesa e colaborar',s:'O resultado depende da sua conduta.',fx:{pad:1},r:''}]},
+];
+const SCN=id=>SC.find(s=>s.id===id);
 
-function startPost(pi,city){
-  const P=POSTS[pi],prev=S.g;
-  const C=Object.assign({},P,pi===0?{cidade:city.cidade,unidade:'Delegacia de Polícia do Município de '+city.cidade,pop:city.pop,d:city.d}:{});
-  S.phase='car';UI.mod='painel';UI.ip=null;UI.memo=null;
-  const crimes={};for(const k in P.crimes)crimes[k]={hist:[],base:P.crimes[k].b};
-  S.g={post:pi,P:{cidade:C.cidade,unidade:C.unidade,pop:C.pop,d:C.d},sem:prev?prev.sem:1,w:0,dl:P.semanas,ext:false,
-    team:Array.from({length:P.team},()=>mkAgent(pi)),cases:[],nid:prev?prev.nid:1,atos:5,orc:P.orc*3,
-    rel:{gov:50,pm:50,mp:55,jud:55,imp:50,com:45},integ:prev?prev.integ:85,stress:prev?Math.min(prev.stress,35):15,
-    crimes,pol:{},temp:[],memos:[],arch:[],news:[],solved:prev?prev.solved:0,unsolved:prev?prev.unsolved:0,burn:prev?prev.burn:0,
-    hist:prev?prev.hist:[],posts:(prev?prev.posts:[]).concat([{nome:C.unidade,cidade:C.cidade,from:prev?prev.sem:1}]),bonus:S.bonus||{},rep:null,eval:null};
-  const G=S.g;
-  // semana zero: série histórica (4 semanas antes da posse)
-  for(let i=0;i<4;i++)for(const k in G.crimes)G.crimes[k].hist.push(Math.max(0,P.crimes[k].b*R(.9,1.1)));
-  for(let i=0;i<(pi===0?3:5);i++)newCase(true);
-  if(pi===2){G.rel.gov=60;G.rel.pm=45}
-  memo('posse');
+function startStory(city){
+  S.phase='car';UI.out=null;UI.panel=false;
+  S.g={stage:0,city:city.cidade,uf:'SP',unidade:'Delegacia de Polícia de '+city.cidade,cityD:city.d,pop:city.pop,sem:1,w:0,dl:STAGES[0].weeks,ext:false,
+    com:45,eq:50,pol:50,imp:50,integ:85,stress:15,idx:{},used:[],flags:{},queue:[],diary:[],focus:null,lastFocus:null,streak:0,scene:null,hist:[]};
+  initIdx();nextScene();save();render();top();
+}
+function initIdx(){const G=S.g,st=STAGES[G.stage];G.idx={};st.metas.forEach(m=>G.idx[m.k]=100);G.hist=[]}
+function stageInfo(){const G=S.g,st=STAGES[G.stage];return {nome:G.stage===0?G.unidade:st.unidade,cidade:G.stage===0?G.city:st.cidade,uf:st.uf}}
+function nextScene(){
+  const G=S.g,st=G.stage;
+  let id=null;
+  const q=G.queue.findIndex(x=>x.at<=G.w);if(q>=0){id=G.queue[q].id;G.queue.splice(q,1)}
+  if(!id){const f=SC.find(s=>s.st===st&&s.first&&!G.used.includes(s.id));if(f)id=f.id}
+  if(!id){const pool=SC.filter(s=>s.st===st&&!s.first&&!s.after&&!G.used.includes(s.id)&&(!s.need||G.flags[s.need]));
+    const gen=SC.filter(s=>s.st==='*'&&!s.special&&!G.used.includes(s.id));
+    const p=pool.length?(Math.random()<.85?pool:pool.concat(gen)):gen;if(p.length)id=pick(p).id}
+  if(!id)id='familia';
+  G.scene=id;G.used.push(id);
+}
+function choose(i){
+  const G=S.g,s=SCN(G.scene),o=s.o[i];
+  const before={com:G.com,eq:G.eq,pol:G.pol,imp:G.imp,integ:G.integ,stress:G.stress},ib=Object.assign({},G.idx);
+  applyFx(o.fx||{});
+  if(o.set){G.flags[o.set]=1;SC.filter(x=>x.after===s.id&&x.need===o.set).forEach(x=>G.queue.push({id:x.id,at:G.w+RI(1,2)}))}
+  G.diary.unshift({s:G.sem,t:`${fill(s.t)} — ${o.t}.`});
+  UI.out={i,r:o.r,before,ib};UI.sel=null;
+  if(G.exon){endStory('exon');return}
   save();render();top();
 }
-const PC=()=>POSTS[S.g.post];
-function newCase(initial){
-  const G=S.g,w=PC().cases;let t=0;for(const k in w)t+=w[k];let x=Math.random()*t,tipo='furto';for(const k in w){x-=w[k];if(x<=0){tipo=k;break}}
-  const c=CR[tipo],b=pick(BAIRROS),ano=2027+Math.floor((G.sem-1)/52);
-  const cs={id:G.nid++,num:String(G.nid*7+130).padStart(4,'0')+'/'+ano,tipo,t:pick(TIT[tipo]).replace('{b}',b),g:c.g,d:c.d,open:G.sem,due:G.sem+c.p+(initial?RI(-2,1):0),prog:initial?RI(0,35):0,team:[],dil:{},preso:false,log:[{s:G.sem,t:initial?'Procedimento herdado da gestão anterior.':'Portaria de instauração expedida.'}],st:'andamento',cams:Math.random()<(G.post>0?.75:.35)};
-  G.cases.push(cs);return cs;
-}
-const open=()=>S.g.cases.filter(c=>c.st==='andamento');
-const agentOf=id=>S.g.team.find(a=>a.id===id);
-const caseOf=id=>S.g.cases.find(c=>c.id===id);
-const freeAgents=()=>S.g.team.filter(a=>!a.al);
-function esclar(){const G=S.g,t=G.solved+G.unsolved;return t?G.solved/t*100:0}
-function relAdj(k,v){S.g.rel[k]=clamp(S.g.rel[k]+v,0,100)}
-
-/* diligências */
-const DIL={
-  oitiva:{n:'Oitivas (vítimas e testemunhas)',atos:1,cost:0},
-  cameras:{n:'Análise de imagens de câmeras',atos:1,cost:0},
-  pericia:{n:'Requisição de perícia',atos:1,cost:1},
-  quebra:{n:'Representação por quebra de sigilo',atos:1,cost:0},
-  intercep:{n:'Representação por interceptação telefônica',atos:2,cost:3},
-  busca:{n:'Mandado de busca e apreensão / prisão',atos:2,cost:2},
-  relatar:{n:'Relatório final ao Ministério Público',atos:1,cost:0},
-  arquivar:{n:'Relatório sem autoria definida',atos:1,cost:0},
-};
-function canDil(cs,k){
-  const G=S.g,D=DIL[k];
-  if(G.atos<D.atos)return 'sem atos disponíveis';if(D.cost>G.orc)return 'orçamento insuficiente';
-  if(k==='cameras'&&(!cs.cams||cs.dil.cameras))return cs.cams?'já realizada':'sem câmeras na área';
-  if(k==='pericia'&&cs.dil.pericia)return 'já requisitada';
-  if(k==='intercep'&&(cs.g<3||cs.dil.intercep))return cs.g<3?'incabível (pena de detenção/baixa gravidade)':'já deferida';
-  if(k==='quebra'&&(cs.dil.quebra||0)>=2)return 'pedidos esgotados';
-  if(k==='busca'&&(cs.prog<55||cs.preso))return cs.preso?'investigado já preso':'requer 55% de andamento';
-  if(k==='relatar'&&cs.prog<75)return 'requer 75% de andamento';
-  return '';
-}
-function doDil(id,k){
-  const G=S.g,cs=caseOf(id),D=DIL[k],why=canDil(cs,k);if(why)return toast('Indisponível: '+why);
-  G.atos-=D.atos;G.orc-=D.cost;cs.dil[k]=(cs.dil[k]||0)+1;
-  const tp=cs.team.reduce((a,i)=>a+((agentOf(i)||{}).sk||0),0),inv=1+(G.bonus.inv||0);let m='';
-  switch(k){
-    case 'oitiva':{const g=(10+tp*1.5)*Math.pow(.7,cs.dil.oitiva-1)*inv/Math.sqrt(cs.d);cs.prog=clamp(cs.prog+g,0,100);m=`Termos de depoimento juntados (+${f0(g)}%).`;break}
-    case 'cameras':{const ok=Math.random()<.7,g=ok?R(14,22)*inv:4;cs.prog=clamp(cs.prog+g,0,100);m=ok?`Imagens identificam o suspeito (+${f0(g)}%).`:'Imagens de baixa qualidade.';break}
-    case 'pericia':{G.pend=G.pend||[];G.pend.push({at:G.sem+2,id,g:R(18,26),t:'Laudo pericial'});m='Requisição enviada ao Instituto de Criminalística. Prazo: 2 semanas.';break}
-    case 'quebra':if(Math.random()<.42+G.rel.jud/250+(G.bonus.int||0)){const g=R(20,30)*inv;cs.prog=clamp(cs.prog+g,0,100);relAdj('jud',1);m=`Quebra de sigilo deferida (+${f0(g)}%).`}else{relAdj('jud',-2);m='Pedido indeferido por insuficiência de fundamentação.'}break;
-    case 'intercep':if(Math.random()<.4+G.rel.jud/250+(G.bonus.int||0)){G.pend=G.pend||[];G.pend.push({at:G.sem+2,id,g:R(30,42),t:'Relatório de interceptação'});m='Interceptação deferida por 15 dias.'}else{relAdj('jud',-2);m='Interceptação indeferida.'}break;
-    case 'busca':if(Math.random()<clamp(.3+cs.prog/200+cs.team.length*.06+(G.bonus.ges||0)/2,.2,.92)){cs.preso=true;const g=R(18,28);cs.prog=clamp(cs.prog+g,0,100);relAdj('imp',cs.g>=3?2:0);m=`Mandado cumprido. Investigado preso (+${f0(g)}%).`}else{cs.prog=clamp(cs.prog-10,0,100);m='Investigado não localizado no endereço.'}break;
-    case 'relatar':if(Math.random()<clamp(.45+(cs.prog-75)/45+G.rel.mp/400,.3,.97)){cs.st='relatado';G.solved++;release(cs);relAdj('mp',1.5);if(cs.g>=4)relAdj('imp',3);m='Relatório final aceito. Denúncia oferecida pelo MP.'}else{cs.prog=65;relAdj('mp',-2);m='Autos devolvidos pelo MP com requisição de novas diligências.'}break;
-    case 'arquivar':cs.st='sem autoria';G.unsolved++;release(cs);if(cs.g>=4){relAdj('imp',-4);relAdj('com',-3)}m='Relatório sem autoria encaminhado.';break;
-  }
-  cs.log.unshift({s:G.sem,t:m});save();render();toast(m);
-}
-function release(cs){cs.team.forEach(i=>{const a=agentOf(i);if(a&&a.al==='c'+cs.id)a.al=null});cs.team=[]}
-function toggleAgent(cid,aid){const cs=caseOf(cid),a=agentOf(aid);if(!cs||!a)return;
-  if(cs.team.includes(aid)){cs.team=cs.team.filter(x=>x!==aid);a.al=null}
-  else{if(a.al&&a.al.startsWith('p'))return toast('Servidor alocado em ação estratégica.');if(cs.team.length>=3)return toast('Máximo de 3 servidores por inquérito.');if(a.al){const o=caseOf(+a.al.slice(1));if(o)o.team=o.team.filter(x=>x!==aid)}a.al='c'+cid;cs.team.push(aid)}
-  save();render()}
-
-/* plano de ação */
-function polStatus(id){const G=S.g,P=POL[id],a=G.pol[id];if(a&&a.on)return 'ativa';for(const k in (P.req||{}))if(G.rel[k]<P.req[k])return 'req';return 'disp'}
-function togglePol(id){
-  const G=S.g,P=POL[id],a=G.pol[id];
-  if(a&&a.on){a.on=false;G.team.forEach(x=>{if(x.al==='p'+id)x.al=null});memoLog(`Ação encerrada: ${P.n}.`);save();render();return}
-  for(const k in (P.req||{}))if(G.rel[k]<P.req[k])return toast(`Requer relação com ${relName(k)} acima de ${P.req[k]}.`);
-  if(G.orc<P.once+P.c)return toast('Orçamento insuficiente para implantar.');
-  const fr=G.team.filter(x=>!x.al||x.al.startsWith('c'));
-  const free=G.team.filter(x=>!x.al);
-  if(fr.length<P.ef)return toast('Efetivo insuficiente.');
-  // aloca: primeiro livres, depois retira de inquéritos
-  let need=P.ef;for(const x of free.concat(fr.filter(y=>y.al))){if(!need)break;if(x.al&&x.al.startsWith('c')){const cs=caseOf(+x.al.slice(1));if(cs)cs.team=cs.team.filter(z=>z!==x.id)}x.al='p'+id;need--}
-  G.orc-=P.once;G.pol[id]={on:true,ramp:a?a.ramp:0,since:G.sem};
-  for(const k in (P.fx||{}))if(k in G.rel)relAdj(k,P.fx[k]);
-  memoLog(`Ação implantada: ${P.n}.`);save();render();toast('Ação estratégica implantada.');
-}
-function memoLog(t){S.g.news.unshift({s:S.g.sem,t});S.g.news=S.g.news.slice(0,40)}
-
-/* gestão */
-const GEST={
-  reuniao:{n:'Reunião de alinhamento com a equipe',d:'Eleva a moral do efetivo.',atos:1,cost:0},
-  reforco:{n:'Solicitar reforço de efetivo',d:'Ofício à Delegacia Geral pedindo servidores.',atos:1,cost:0},
-  coletiva:{n:'Entrevista coletiva',d:'Rende se houver resultados; arriscada sem eles.',atos:1,cost:0},
-  articula:{n:'Reunião com a PM e o Ministério Público',d:'Melhora a integração entre as instituições.',atos:1,cost:0},
-  folga:{n:'Afastar-se no fim de semana',d:'Reduz o estresse do titular. Usa 2 atos.',atos:2,cost:0},
-};
-function doGest(k){
-  const G=S.g,A=GEST[k];if(G.atos<A.atos)return toast('Sem atos disponíveis.');G.did=G.did||{};if(G.did[k])return toast('Já realizado nesta semana.');
-  G.atos-=A.atos;G.did[k]=1;let m='';
-  switch(k){
-    case 'reuniao':G.team.forEach(a=>a.mor=clamp(a.mor+7+(G.bonus.ges||0)*30,0,100));m='Moral do efetivo elevada.';break;
-    case 'reforco':if(Math.random()<.22+G.rel.gov/400+(G.post?.1:0)){const a=mkAgent(G.post);G.team.push(a);m=`Reforço aprovado: ${a.nome}.`}else m='Pedido indeferido por falta de efetivo no estado.';break;
-    case 'coletiva':{const r=G.cases.filter(c=>c.st==='relatado'&&G.sem-c.open<8).length;if(r||Math.random()<.4){relAdj('imp',5);m='Coletiva bem repercutida.'}else{relAdj('imp',-5);m='Sem resultados a apresentar, a coletiva repercutiu mal.'}break}
-    case 'articula':relAdj('pm',5);relAdj('mp',4);m='Integração com PM e MP fortalecida.';break;
-    case 'folga':G.stress=clamp(G.stress-22,0,100);m='Fim de semana de descanso.';break;
-  }
-  save();render();toast(m);
-}
-
-/* ---------- expediente (dilemas reais do Brasil) ---------- */
-const MEMOS={
-  posse:{p:[0,1,2],tipo:'PORTARIA',de:'Delegacia Geral de Polícia',ass:'Designação de titular',dyn:1},
-  custodia:{p:[0],tipo:'OFÍCIO',de:'Associação Comercial e Empresarial',ass:'Soltura de autor de furtos em audiência de custódia',
-    b:['Senhor(a) Delegado(a),','O autor de ao menos 12 furtos a lojas do centro, preso em flagrante na última semana, foi colocado em liberdade na audiência de custódia, com medidas cautelares. Os comerciantes estão revoltados e falam em "contratar segurança por conta própria".','Solicitamos providências.'],
-    o:[{t:'Reunir novos elementos e representar pela prisão preventiva',s:'Caminho técnico; depende da relação com o Judiciário.',fx:{jud:2,com:2,temp:[['furto',-.05,4]]}},
-       {t:'Criticar a decisão do juiz na rádio local',s:'A comunidade aplaude; o Judiciário não esquece.',fx:{jud:-10,com:4,imp:2}},
-       {t:'Explicar publicamente as regras da audiência de custódia',s:'Didático, mas não acalma ninguém.',fx:{com:-3,imp:2,jud:3}}]},
-  justica:{p:[0,1],tipo:'COMUNICAÇÃO',de:'Plantão da Polícia Militar',ass:'Suspeito de furto amarrado a poste por moradores',
-    b:['Guarnição da PM informa que um adolescente suspeito de furtar uma bicicleta foi agredido e amarrado a um poste por moradores. Há vídeos circulando nas redes.','Os envolvidos foram identificados.'],
-    o:[{t:'Autuar os agressores e apurar o furto separadamente',s:'Cumpre a lei; parte da população reclama.',fx:{integ:5,com:-3,imp:3}},
-       {t:'Registrar apenas o furto',s:'Omissão diante de um crime.',fx:{integ:-10,com:3}},
-       {t:'Instaurar inquérito sobre todos os fatos e ir à imprensa condenar o justiçamento',s:'Posição firme; expõe você.',fx:{integ:4,imp:4,com:-5,stress:5}}]},
-  plantao:{p:[0],tipo:'MEMORANDO',de:'Escrivania da delegacia',ass:'Ausência de plantão noturno no município',
-    b:['O plantão regional fecha às 22h e a delegacia não funciona de madrugada. Na última sexta-feira, uma vítima de estupro precisou viajar 80 km para registrar a ocorrência e fazer o exame de corpo de delito.'],
-    o:[{t:'Criar escala de sobreaviso local com a equipe',s:'Equipe sobrecarregada, comunidade atendida.',fx:{com:7,moral:-6,temp:[['domestica',-.05,8]]}},
-       {t:'Oficiar a Seccional pedindo plantão 24 horas',s:'Correto, mas demorado.',fx:{gov:2,com:1}},
-       {t:'Manter como está',s:'Nada muda.',fx:{com:-6,imp:-2}}]},
-  feminicidio:{p:[0,1],tipo:'NOTÍCIA',de:'Assessoria de Imprensa',ass:'Feminicídio de mulher com medida protetiva',
-    b:['Uma mulher com medida protetiva deferida foi morta pelo ex-companheiro. Ela havia registrado dois descumprimentos na delegacia nas últimas semanas.','A imprensa pergunta o que a polícia fez com os registros.'],
-    o:[{t:'Revisar todas as medidas protetivas ativas em força-tarefa',s:'Atos e estresse; reduz a violência doméstica.',fx:{stress:10,atos:-2,temp:[['domestica',-.15,8]],imp:2}},
-       {t:'Nota oficial lamentando o caso',s:'Burocrático.',fx:{imp:-5,com:-4}},
-       {t:'Pedir prisão preventiva em todos os descumprimentos pendentes',s:'Firme; o Judiciário avalia caso a caso.',fx:{jud:-2,temp:[['domestica',-.1,6]],com:3}}]},
-  festa:{p:[0],tipo:'CONVITE',de:'Comissão organizadora da Festa do Município',ass:'Convite para o palanque oficial',
-    b:['A festa da cidade deste ano é patrocinada por um empresário conhecido por emprestar dinheiro a juros e cobrar com ameaças. Ele faz questão da presença do(a) delegado(a) no palanque.'],
-    o:[{t:'Recusar e abrir investigação sobre agiotagem',s:'Integridade em alta; política local em baixa.',fx:{integ:5,gov:-6}},
-       {t:'Comparecer ao palanque',s:'Boa relação com a política local; foto comprometedora.',fx:{integ:-7,gov:5}}]},
-  guarda:{p:[0],tipo:'OFÍCIO',de:'Gabinete do Prefeito',ass:'Retirada de usuários de drogas da praça central',
-    b:['O prefeito pretende usar a Guarda Municipal para "limpar" a praça central, retirando à força pessoas em situação de rua e usuários de drogas, e pede apoio da Polícia Civil.'],
-    o:[{t:'Recusar remoção forçada e propor ação com o CAPS e a assistência social',s:'Legal e humano; o prefeito se irrita.',fx:{gov:-6,com:3,integ:3}},
-       {t:'Apoiar a ação',s:'Furtos caem por pouco tempo e voltam em outro lugar.',fx:{gov:6,integ:-6,com:-4,temp:[['furto',-.1,3],['roubo',.05,6]]}}]},
-  cracolandia:{p:[1],tipo:'OFÍCIO',de:'Secretaria da Segurança Pública',ass:'Operação de dispersão da cena de uso no centro',
-    b:['O governo planeja uma grande operação para dispersar a concentração de usuários de drogas no centro. A Seccional deve apoiar com equipes de investigação.','Especialistas alertam que a dispersão espalha os usuários por bairros vizinhos.'],
-    o:[{t:'Apoiar só ações contra o tráfico, com saúde para os usuários',s:'Desagrada o governo; evita espalhar o problema.',fx:{gov:-5,com:4}},
-       {t:'Apoiar a dispersão',s:'Governo satisfeito; furtos se espalham.',fx:{gov:6,temp:[['furto',.15,6],['celular',.08,6]],com:-4}},
-       {t:'Pedir um plano integrado antes de qualquer operação',s:'Prudente; atrasa a decisão.',fx:{gov:-2,mp:3}}]},
-  bancos:{p:[1],tipo:'PROPOSTA',de:'Federação de bancos',ass:'Convênio para golpes com celulares roubados',
-    b:['Os bancos propõem um convênio: compartilham dados de contas que recebem PIX de celulares roubados e financiam equipamentos para a delegacia de crimes cibernéticos.'],
-    o:[{t:'Assinar o convênio, com supervisão do Ministério Público',s:'Mais dados e recursos.',fx:{orc:6,mp:2,temp:[['golpe',-.12,10]]}},
-       {t:'Recusar',s:'Sem conflito de interesses; sem recursos.',fx:{integ:2}}]},
-  influencer:{p:[1],tipo:'NOTÍCIA',de:'Assessoria de Imprensa',ass:'Vídeo de furto viraliza com 5 milhões de visualizações',
-    b:['Um influenciador filmou o furto do próprio celular perto de uma estação de metrô e marcou a Polícia Civil: "Cadê a polícia?". O vídeo está entre os mais vistos do país.'],
-    o:[{t:'Responder com dados e anunciar operação na região',s:'Ganha a narrativa; exige resultado.',fx:{imp:5,stress:6,temp:[['celular',-.04,3]]}},
-       {t:'Ignorar',s:'A crítica se espalha.',fx:{imp:-6,com:-3}}]},
-  salve:{p:[1],tipo:'INFORME RESERVADO',de:'Departamento de Inteligência',ass:'Ordem de facção contra agentes públicos',
-    b:['Monitoramento indica ordem de uma facção criminosa paulista para atacar agentes de segurança em retaliação à transferência de lideranças para presídios federais.'],
-    o:[{t:'Reforçar a segurança das equipes e a inteligência prisional',s:'Custo alto, risco controlado.',fx:{orc:-6,stress:6,moral:4}},
-       {t:'Divulgar o alerta à imprensa',s:'Transparência; gera medo na população.',fx:{imp:3,com:-4,moral:2}}]},
-  cameras_pm:{p:[1,2],tipo:'CONSULTA',de:'Imprensa nacional',ass:'Câmeras corporais da Polícia Militar',
-    b:['O governo cogita reduzir o uso de câmeras corporais pela PM, citando custos e queixas da tropa. Jornalistas pedem a opinião do(a) titular.'],
-    o:[{t:'Defender as câmeras com base em resultados',s:'Imprensa e comunidade apoiam; governo e PM não gostam.',fx:{gov:-5,pm:-4,imp:5,com:3}},
-       {t:'Apoiar a posição do governo',s:'Governo satisfeito; críticas na imprensa.',fx:{gov:5,pm:4,imp:-5}},
-       {t:'Não comentar',s:'Neutro.',fx:{}}]},
-  bike:{p:[1],tipo:'COMUNICAÇÃO',de:'Plantão da Seccional',ass:'Grupo de roubo de celulares solto pela quinta vez',
-    b:['Integrantes de um grupo que rouba celulares de bicicleta, presos pela quinta vez, foram soltos novamente. O vídeo da prisão anterior circula com a legenda "prende e solta".'],
-    o:[{t:'Mirar a rede de receptadores que compra os aparelhos',s:'Ataca a causa.',fx:{temp:[['celular',-.06,6]],mp:2}},
-       {t:'Criticar publicamente o Judiciário',s:'Populariza você; desgasta a relação com juízes.',fx:{jud:-8,com:3,imp:2}}]},
-  adpf:{p:[2],tipo:'OFÍCIO',de:'Ministério Público do Estado',ass:'Justificativa de operação em comunidade (ADPF 635)',
-    b:['Uma operação contra o tráfico está planejada para a próxima semana. Por decisão do STF, operações em comunidades devem ser excepcionais, justificadas e comunicadas ao Ministério Público.'],
-    o:[{t:'Fundamentar, comunicar ao MP e operar com câmeras e ambulância',s:'Dentro da lei, com risco controlado.',fx:{mp:4,temp:[['rua',-.05,3],['letalpol',.15,2]]}},
-       {t:'Cancelar e priorizar inteligência',s:'Sem confronto; o governo cobra.',fx:{gov:-4,com:4}},
-       {t:'Operar sem comunicar',s:'Ilegal e arriscado.',fx:{integ:-12,mp:-10,temp:[['letalpol',.6,3],['rua',-.06,3]]}}]},
-  policial:{p:[1,2],tipo:'COMUNICAÇÃO',de:'Gabinete',ass:'Policial morto em serviço',
-    b:['Um policial foi morto durante patrulhamento. Nos grupos de mensagens da tropa, circula a convocação para uma "resposta à altura" nas próximas noites.'],
-    o:[{t:'Investigação técnica pela DH e proibição de represálias',s:'Correto; parte da tropa se revolta.',fx:{pm:-6,integ:6,moral:-4}},
-       {t:'Liberar uma ofensiva na região',s:'Tropa satisfeita; mortes disparam.',fx:{pm:8,integ:-12,com:-8,temp:[['letalpol',.8,3],['letal',.1,3]]}}]},
-  deputado:{p:[2],tipo:'AGENDA',de:'Assembleia Legislativa',ass:'Reunião com deputado estadual',
-    b:['Um deputado estadual, apontado em inquéritos antigos como ligado a uma milícia da Zona Oeste, oferece apoio ao orçamento da Polícia Civil na Assembleia. Pede "sensibilidade" em investigações na sua base eleitoral.'],
-    o:[{t:'Recusar e encaminhar o caso à inteligência',s:'Integridade em alta; inimigo poderoso.',fx:{integ:6,gov:-4,temp:[['milicia',-.05,6]]}},
-       {t:'Aceitar o apoio',s:'Mais orçamento; a milícia agradece.',fx:{integ:-15,orc:15,temp:[['milicia',.12,10]]}}]},
-  bala:{p:[2],tipo:'NOTÍCIA',de:'Assessoria de Imprensa',ass:'Criança morta por bala perdida',
-    b:['Uma criança de 9 anos foi morta por um tiro durante confronto entre policiais e criminosos. A família afirma que não havia tiroteio antes da chegada da polícia.'],
-    o:[{t:'Perícia independente, afastamento dos envolvidos e apoio à família',s:'Transparência; tropa insatisfeita.',fx:{pm:-5,com:5,integ:5,imp:3}},
-       {t:'Sustentar a versão inicial da corporação',s:'Desgaste enorme se a perícia contradisser.',fx:{com:-10,imp:-8,integ:-8}}]},
-  fuzis:{p:[2],tipo:'INFORME RESERVADO',de:'Corregedoria',ass:'Desvio de fuzis de unidade policial',
-    b:['A Corregedoria identificou que fuzis apreendidos sumiram do depósito de uma unidade. Há suspeita de venda para facções.'],
-    o:[{t:'Investigação conjunta com a Corregedoria e o MP',s:'Expõe a instituição, mas estanca o desvio.',fx:{pm:-4,integ:5,temp:[['letal',-.04,8]]}},
-       {t:'Resolver internamente, sem divulgação',s:'Se vazar, o estrago é grande.',fx:{integ:-12}}]},
-  carnaval:{p:[2],tipo:'PLANO OPERACIONAL',de:'Gabinete do Governador',ass:'Carnaval: segurança dos blocos de rua',
-    b:['Milhões de pessoas devem ocupar as ruas nos dias de Carnaval. O governo pede um plano para roubos e furtos de celulares durante os blocos.'],
-    o:[{t:'Plano integrado: delegacias móveis, câmeras e agentes à paisana',s:'Custo alto, roubos sob controle.',fx:{orc:-8,gov:3,temp:[['rua',-.12,2]]}},
-       {t:'Efetivo de rotina',s:'Economiza; roubos explodem nos blocos.',fx:{temp:[['rua',.18,2]],imp:-4}}]},
-  bico:{p:[2],tipo:'PROPOSTA',de:'Sindicato das transportadoras',ass:'Escolta de cargas por policiais de folga',
-    b:['Transportadoras querem contratar policiais de folga para escoltar caminhões, prática conhecida como "bico". Prometem financiar viaturas em troca.'],
-    o:[{t:'Proibir o bico e reforçar a delegacia de cargas',s:'Legal; empresários contrariados.',fx:{integ:3,gov:-2,temp:[['carga',-.04,6]]}},
-       {t:'Fazer vista grossa',s:'Cargas mais protegidas; risco de milícia privada.',fx:{integ:-8,temp:[['carga',-.1,6]]}}]},
-  propina:{p:[0,1,2],tipo:'COMUNICAÇÃO RESERVADA',de:'Comerciante da região',ass:'Oferta de "apoio" à delegacia',
-    b:['Um empresário oferece uma contribuição mensal "para melhorar a estrutura da delegacia". Em troca, pede atenção especial à rua do seu estabelecimento e que denúncias de funcionários contra ele "não andem".'],
-    o:[{t:'Recusar e registrar formalmente a oferta',s:'Integridade em alta.',fx:{integ:6}},
-       {t:'Recusar educadamente',s:'Sem efeitos.',fx:{}},
-       {t:'Aceitar',s:'Mais recursos; a Corregedoria pode saber.',fx:{orc:6,integ:-25}}]},
-  greve:{p:[0,1,2],tipo:'COMUNICADO',de:'Sindicato dos Policiais Civis',ass:'Indicativo de greve',
-    b:['A assembleia da categoria aprovou greve por reajuste salarial a partir da próxima semana.'],
-    o:[{t:'Manter apenas serviços essenciais',s:'Moral preservada; inquéritos atrasam.',fx:{due:1,mp:-3}},
-       {t:'Exigir trabalho normal',s:'Moral despenca.',fx:{moral:-12}}]},
-  pad:{p:[0,1,2],tipo:'NOTIFICAÇÃO',de:'Corregedoria Geral da Polícia Civil',ass:'Instauração de processo administrativo disciplinar',special:1,
-    b:['Fica V.Sa. notificado(a) da instauração de processo administrativo disciplinar para apurar condutas incompatíveis com o cargo durante sua gestão.'],
-    o:[{t:'Apresentar defesa e colaborar com a comissão',s:'O resultado depende da sua integridade.',fx:{pad:1}}]},
-};
-function memo(id){
-  const G=S.g,M=MEMOS[id];const n=String(RI(100,980)).padStart(4,'0')+'/'+(2027+Math.floor((G.sem-1)/52));
-  G.memos.push({id,n,s:G.sem,done:false});
-}
-function memoBody(m){
-  const M=MEMOS[m.id],G=S.g;
-  if(m.id==='posse'){const P=PC();return {tipo:M.tipo,de:M.de,ass:M.ass,b:[`Designo ${S.sexo==='f'?'a Delegada':'o Delegado'} de Polícia ${S.nome}, matrícula ${S.mat}, para responder pela ${G.P.unidade}${G.post===0?', '+G.P.cidade:''}.`,G.P.d,`Metas pactuadas para as próximas ${P.semanas} semanas: ${P.metas.map(metaLabel).join('; ')}.`,'Publique-se. Cumpra-se.'],o:[{t:'Ciente. Assumir a unidade.',s:'',fx:{}}]}}
-  return M;
-}
-function despachar(i,oi){
-  const G=S.g,m=G.memos[i],M=memoBody(m),o=M.o[oi],fx=o.fx||{};
+function applyFx(fx){
+  const G=S.g;
   for(const k in fx){
-    if(k in G.rel)relAdj(k,fx[k]);
-    else if(k==='integ')G.integ=clamp(G.integ+fx[k],0,100);
-    else if(k==='stress')G.stress=clamp(G.stress+fx[k],0,100);
-    else if(k==='orc')G.orc+=fx[k];
-    else if(k==='atos')G.atos=Math.max(0,G.atos+fx[k]);
-    else if(k==='moral')G.team.forEach(a=>a.mor=clamp(a.mor+fx[k],0,100));
-    else if(k==='temp')fx.temp.forEach(([c,v,w])=>{if(G.crimes[c])G.temp.push({k:c,v,w})});
-    else if(k==='due')open().forEach(c=>c.due+=fx[k]);
-    else if(k==='pad'){if(Math.random()<.25+G.integ/100){G.integ=clamp(G.integ+10,0,100);memoLog('PAD concluído com advertência.')}else{G.exon=true}}
+    const v=fx[k];
+    if(['com','eq','pol','imp','integ','stress'].includes(k))G[k]=clamp(G[k]+v,0,100);
+    else if(k==='pad'){if(Math.random()<.25+G.integ/100){G.integ=clamp(G.integ+10,0,100);UI.padOk=1}else G.exon=true}
+    else if(k in G.idx)G.idx[k]=clamp(G.idx[k]+v*(v<0?(.75+G.eq/200):1),20,160);
   }
-  m.done=true;m.r=o.t;memoLog(`Despacho em "${M.ass}": ${o.t}.`);UI.memo=null;UI.sel=null;
-  if(G.exon){endGame('exon');return}
-  save();render();top();toast('Despacho assinado.');
 }
-const pendMemos=()=>S.g.memos.filter(m=>!m.done);
-
-/* ---------- semana ---------- */
-const lateN=()=>open().filter(c=>S.g.sem>c.due).length;
-function metaOk(m){return m.k==='venc'?lateN()<=m.max:reduction(m.k)>=m.r}
-function metaLabel(m){return m.k==='venc'?`no máximo ${m.max} inquéritos fora do prazo`:`reduzir ${PC().crimes[m.k].n.toLowerCase()} em ${Math.round(m.r*100)}%`}
-function crimeNow(k){const h=S.g.crimes[k].hist;return h[h.length-1]}
-function avgLast(k,n){const h=S.g.crimes[k].hist,s=h.slice(-n);return s.reduce((a,b)=>a+b,0)/s.length}
-function reduction(k){const G=S.g;return 1-avgLast(k,4)/G.crimes[k].base}
 function endWeek(){
-  const G=S.g;if(pendMemos().length)return toast('Há despachos pendentes no Expediente.');
-  const B={sem:G.sem,res:[],newC:[],before:{}};
-  for(const k in G.crimes)B.before[k]=crimeNow(k);
-  // resultados de perícia/interceptação
-  G.pend=(G.pend||[]).filter(p=>{if(G.sem+1>=p.at){const cs=caseOf(p.id);if(cs&&cs.st==='andamento'){cs.prog=clamp(cs.prog+p.g,0,100);cs.log.unshift({s:G.sem+1,t:`${p.t} juntado aos autos (+${f0(p.g)}%).`});B.res.push(`${p.t} — IP ${cs.num}`)}return false}return true});
-  // equipe nos inquéritos
-  open().forEach(cs=>{let g=0;cs.team.forEach(i=>{const a=agentOf(i);if(a)g+=(5+a.sk*3)*(.5+a.mor/200)});g=g*(1+(G.bonus.inv||0))/cs.d;cs.prog=clamp(cs.prog+g,0,cs.preso?100:92)});
-  // ações estratégicas: maturação
-  for(const id in G.pol){const a=G.pol[id];a.ramp=a.on?Math.min(1,a.ramp+1/POL[id].mat):Math.max(0,a.ramp-.25)}
-  // custos semanais
-  let cost=0;for(const id in G.pol)if(G.pol[id].on)cost+=POL[id].c;G.orc+=PC().orc-cost;B.cost=cost;
-  if(G.orc<0){for(const id in G.pol)if(G.pol[id].on){G.pol[id].on=false;G.team.forEach(x=>{if(x.al==='p'+id)x.al=null});memoLog(`Ação suspensa por falta de orçamento: ${POL[id].n}.`);break}}
-  // criminalidade
-  const relF=k=>(G.rel[k]-50)/400;
-  const det=1-clamp((esclar()-40)/600,-.05,.08);
-  for(const k in G.crimes){
-    let m=1;for(const id in G.pol){const P=POL[id],a=G.pol[id];if(!a.ramp)continue;const q=1+relF('com')+(P.req&&P.req.pm?relF('pm'):0);if(P.e[k])m*=1-P.e[k]*.75*a.ramp*q;if(P.disp&&P.disp[k])m*=1+P.disp[k]*a.ramp}
-    G.temp.filter(t=>t.k===k).forEach(t=>m*=1+t.v);
-    if(['homicidio','letal','roubo','rua','transeunte'].includes(k))m*=det;
-    const season=1+.05*Math.sin((G.sem+k.length)/4);
-    G.crimes[k].hist.push(Math.max(0,G.crimes[k].base*m*season*R(.92,1.08)));
-  }
-  G.temp.forEach(t=>t.w--);G.temp=G.temp.filter(t=>t.w>0);
-  // prazos
-  let late=0;open().forEach(cs=>{if(G.sem>cs.due){late++;relAdj('mp',-.4)}});
-  // efetivo e titular
-  const load=open().length/Math.max(1,G.team.filter(a=>!a.al||a.al.startsWith('c')).length);
-  G.team.forEach(a=>a.mor=clamp(a.mor+(load>2.2?-2:load<1.2?1:0)+R(-1,1),0,100));
-  const used=5-G.atos;G.stress=clamp(G.stress+used*.8+Math.min(late,6)*.45+(load>2.5?1.2:0)-3.2,0,100);
-  for(const k in G.rel)G.rel[k]=clamp(G.rel[k]+(50-G.rel[k])*.02,0,100);
-  // novos inquéritos
-  const [a,b]=PC().nCases;const n=a+(Math.random()<.5?b-a:0);for(let i=0;i<n;i++)B.newC.push(newCase(false));
-  G.sem++;G.w++;G.atos=5;G.did={};
-  if(G.stress>=100){G.burn++;G.stress=55;G.atos=1;memoLog('Titular afastado(a) por licença médica (esgotamento).');B.burn=true;if(G.burn>=3){endGame('burn');return}}
-  // expediente
-  if(G.integ<38&&!G.padDone&&Math.random()<.35){memo('pad');G.padDone=true}
-  else if(Math.random()<.6){G.used=G.used||[];const pool=Object.keys(MEMOS).filter(id=>!MEMOS[id].special&&id!=='posse'&&MEMOS[id].p.includes(G.post)&&!G.used.includes(id));if(pool.length){const id=pick(pool);G.used.push(id);memo(id)}}
-  G.hist.push({sem:G.sem,esc:esclar()});
-  // avaliação de desempenho
-  if(G.w>=G.dl){evaluate();return}
-  G.rep=B;UI.mod='rel';save();render();top();
+  const G=S.g,st=STAGES[G.stage];if(!UI.out)return;
+  const f=st.focos.find(x=>x.id===G.focus);if(!f)return toast('Escolha o foco da equipe para a semana.');
+  G.streak=G.focus===G.lastFocus?G.streak+1:0;G.lastFocus=G.focus;
+  const div=Math.max(.55,1-.15*G.streak),fx={};
+  for(const k in f.fx)fx[k]=(k in G.idx&&f.fx[k]<0)?f.fx[k]*div:f.fx[k];
+  applyFx(fx);
+  for(const k in G.idx)G.idx[k]=clamp(G.idx[k]+R(.4,1.2),20,160);
+  G.stress=clamp(G.stress+3+(G.focus==='folga'?0:1),0,100);
+  G.eq=clamp(G.eq+(G.focus==='folga'?0:-1.5),0,100);
+  G.hist.push(Object.assign({},G.idx));
+  G.sem++;G.w++;G.focus=null;UI.out=null;
+  if(G.stress>=100){endStory('burn');return}
+  if(G.integ<35&&!G.padDone){G.padDone=1;G.scene='corregedoria';G.used.push('corregedoria');save();render();top();return}
+  if(G.w>=G.dl){evalStage();return}
+  nextScene();save();render();top();
 }
-function evaluate(){
-  const G=S.g,P=PC(),res=P.metas.map(m=>m.k==='venc'?{k:m.k,n:'Inquéritos fora do prazo',venc:1,alvo:m.max,atual:lateN(),ok:metaOk(m)}:{k:m.k,n:P.crimes[m.k].n,alvo:m.r,atual:reduction(m.k),ok:metaOk(m)});
-  const ok=res.every(r=>r.ok);G.eval={res,ok,ext:G.ext};UI.mod='aval';save();render();top();
-}
+function metaRes(){const G=S.g;return STAGES[G.stage].metas.map(m=>{const red=(100-G.idx[m.k])/100;return {n:m.n,k:m.k,alvo:m.r,red,ok:red>=m.r}})}
+function evalStage(){const G=S.g;G.eval={res:metaRes(),ok:metaRes().every(r=>r.ok),ext:G.ext};G.scene=null;save();render();top()}
 function afterEval(){
-  const G=S.g,E=G.eval;
-  if(E.ok){if(G.post===2){endGame('win');return}const np=G.post+1;G.eval=null;startPost(np);return}
-  if(!G.ext){G.ext=true;G.dl+=12;G.eval=null;memoLog('Prazo de avaliação prorrogado por 12 semanas.');UI.mod='painel';save();render();top();return}
-  endGame(G.post===2?'exon_gov':'estag');
+  const G=S.g,E=G.eval;G.eval=null;
+  if(E.ok){
+    if(G.stage===2){endStory('win');return}
+    G.stage++;G.w=0;G.dl=STAGES[G.stage].weeks;G.ext=false;G.queue=[];G.streak=0;G.lastFocus=null;
+    G.com=50;G.pol=50;G.eq=Math.max(G.eq,45);G.stress=Math.min(G.stress,40);
+    initIdx();nextScene();save();render();top();return}
+  if(!G.ext){G.ext=true;G.dl+=4;nextScene();save();render();top();return}
+  endStory(G.stage===2?'exon_gov':'estag');
 }
-function endGame(kind){
-  const G=S.g;S.fim={kind,sem:G.sem,post:G.post,solved:G.solved,esc:esclar(),integ:G.integ};
-  S.fim.score=Math.round(G.solved*2+esclar()*.5+G.post*120+(kind==='win'?200:0)-(kind==='exon'?80:0));
+function endStory(kind){
+  const G=S.g;S.fim={kind,stage:G.stage,sem:G.sem,integ:G.integ};
+  S.fim.score=Math.round(G.stage*150+(kind==='win'?250:0)+G.integ+G.com-(kind==='exon'?100:0));
   const b=+store.get(BEST)||0;if(S.fim.score>b)store.set(BEST,String(S.fim.score));
   S.phase='fim';save();render();top();
+}
+
+/* ---------- ilustrações das cenas (SVG próprio) ---------- */
+function art(loc,seed){
+  const r=rng(hashS(loc+seed));const W=400,H=225;
+  const sky=(a,b,c)=>`<defs><linearGradient id="sk_${loc}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".6" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient><radialGradient id="gl_${loc}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFD58A" stop-opacity=".55"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient><radialGradient id="rd_${loc}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#E5484D" stop-opacity=".8"/><stop offset="1" stop-color="#E5484D" stop-opacity="0"/></radialGradient><radialGradient id="bl_${loc}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#3E7BFA" stop-opacity=".8"/><stop offset="1" stop-color="#3E7BFA" stop-opacity="0"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#sk_${loc})"/>`;
+  const stars=n=>{let s='';for(let i=0;i<n;i++)s+=`<circle cx="${(r()*W).toFixed(0)}" cy="${(r()*90).toFixed(0)}" r="${(r()*.9+.2).toFixed(1)}" fill="#fff" opacity="${(r()*.5+.2).toFixed(2)}"/>`;return s};
+  const bld=(y0,minH,maxH,col,win)=>{let x=-5,s='';while(x<W){const w=16+r()*30,h=minH+r()*(maxH-minH);s+=`<rect x="${x.toFixed(0)}" y="${(y0-h).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}" fill="${col}"/>`;if(win)for(let yy=y0-h+6;yy<y0-6;yy+=8)for(let xx=x+4;xx<x+w-4;xx+=6)if(r()<win)s+=`<rect x="${xx.toFixed(0)}" y="${yy.toFixed(0)}" width="3" height="4" fill="#F3C36B" opacity="${(r()*.5+.4).toFixed(2)}"/>`;x+=w+1}return s};
+  const siren=(x,y)=>`<ellipse cx="${x-14}" cy="${y}" rx="60" ry="26" fill="url(#rd_${loc})" class="sirR"/><ellipse cx="${x+14}" cy="${y}" rx="60" ry="26" fill="url(#bl_${loc})" class="sirB"/>`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice">`;
+  switch(loc){
+    case 'delegacia':
+      s+=sky('#1B1F2A','#1F2431','#252B38')+`<rect x="0" y="0" width="${W}" height="${H}" fill="#2A2F3B"/><rect x="0" y="150" width="${W}" height="75" fill="#1C2029"/>`;
+      s+=`<rect x="240" y="26" width="130" height="92" fill="#0E1626" stroke="#3A4152" stroke-width="5"/>`+`<g>${bld(118,20,70,'#18233A',.2).replace(/x="(-?\d+)"/g,(m,a)=>`x="${240+(+a)*.32}"`).replace(/width="(\d+)"/g,(m,a)=>`width="${(+a)*.32}"`)}</g><rect x="240" y="26" width="130" height="92" fill="none" stroke="#3A4152" stroke-width="5"/><line x1="305" y1="26" x2="305" y2="118" stroke="#3A4152" stroke-width="3"/>`;
+      s+=`<circle cx="110" cy="96" r="70" fill="url(#gl_${loc})"/><path d="M96 70 L124 70 L132 90 L88 90Z" fill="#C9A54C"/><rect x="108" y="90" width="4" height="40" fill="#555"/><rect x="40" y="128" width="230" height="10" fill="#4A3B2A"/><rect x="46" y="138" width="10" height="60" fill="#3A2E21"/><rect x="254" y="138" width="10" height="60" fill="#3A2E21"/>`;
+      s+=`<rect x="70" y="108" width="34" height="20" fill="#E8E2D2"/><rect x="72" y="104" width="34" height="20" fill="#F2ECDC"/><rect x="74" y="100" width="34" height="20" fill="#FAF6EA"/><rect x="150" y="96" width="56" height="32" rx="2" fill="#20242E"/><rect x="153" y="99" width="50" height="24" fill="#3B6EA8" opacity=".7"/><rect x="200" y="112" width="18" height="16" rx="3" fill="#8C6B4A"/><rect x="24" y="40" width="40" height="28" fill="#009C3B" opacity=".85"/><path d="M44 43 L60 54 L44 65 L28 54Z" fill="#FFDF00" opacity=".85"/><circle cx="44" cy="54" r="5" fill="#1F4FBF"/><line x1="24" y1="40" x2="24" y2="150" stroke="#777" stroke-width="2"/>`;
+      break;
+    case 'praca':case 'rua':
+      s+=sky('#0F1730','#2B2950','#7A4A5A')+stars(26)+bld(170,30,80,'#141A2E',.12);
+      if(loc==='praca'){s+=`<rect x="170" y="70" width="60" height="100" fill="#1C2236"/><path d="M165 70 L200 40 L235 70Z" fill="#1C2236"/><rect x="194" y="22" width="12" height="22" fill="#1C2236"/><rect x="198" y="16" width="4" height="10" fill="#1C2236"/><rect x="193" y="20" width="14" height="3" fill="#1C2236"/><circle cx="200" cy="95" r="8" fill="#F3C36B" opacity=".75"/><rect x="194" y="130" width="12" height="40" fill="#F3C36B" opacity=".35"/>`;
+        for(let i=0;i<3;i++){const x=40+i*130+r()*20;s+=`<rect x="${x}" y="140" width="5" height="34" fill="#2A2232"/><circle cx="${x+2}" cy="132" r="18" fill="#1E2A26"/><circle cx="${x-10}" cy="140" r="12" fill="#1E2A26"/><circle cx="${x+14}" cy="140" r="12" fill="#1E2A26"/>`}}
+      s+=`<rect x="0" y="170" width="${W}" height="55" fill="#0B0F1A"/><rect x="0" y="186" width="${W}" height="2" fill="#2A3150"/>`;
+      for(let i=0;i<3;i++){const x=60+i*140;s+=`<circle cx="${x}" cy="118" r="34" fill="url(#gl_${loc})"/><rect x="${x-1.5}" y="118" width="3" height="54" fill="#3A3F52"/><rect x="${x-6}" y="114" width="12" height="5" fill="#F3C36B"/>`}
+      if(loc==='rua')s+=siren(320,190)+`<path d="M286 196 L290 186 L302 184 L310 176 L330 176 L338 184 L346 186 L348 196Z" fill="#E9EDF3"/><rect x="314" y="172" width="5" height="3" fill="#E5484D" class="sirR"/><rect x="319" y="172" width="5" height="3" fill="#3E7BFA" class="sirB"/><circle cx="300" cy="196" r="5" fill="#111"/><circle cx="334" cy="196" r="5" fill="#111"/>`;
+      break;
+    case 'casa':
+      s+=sky('#0B1124','#1A2140','#2D2C4A')+stars(30)+`<rect x="0" y="168" width="${W}" height="57" fill="#0C0F18"/><rect x="110" y="96" width="170" height="74" fill="#2B2A3A"/><path d="M100 98 L195 52 L290 98Z" fill="#3A2F35"/><rect x="134" y="118" width="34" height="28" fill="#F3C36B" opacity=".8"/><line x1="151" y1="118" x2="151" y2="146" stroke="#2B2A3A" stroke-width="2"/><rect x="214" y="122" width="24" height="48" fill="#1B1A26"/><circle cx="226" cy="112" r="20" fill="url(#gl_${loc})"/><circle cx="226" cy="114" r="3" fill="#FFE2A0"/><rect x="40" y="150" width="60" height="20" fill="#2A2F3E"/>`+siren(340,182);
+      break;
+    case 'loja':
+      s+=sky('#10151F','#161C29','#1E2533')+`<rect x="0" y="40" width="${W}" height="140" fill="#1E2330"/>`;
+      ['CELULARES','ASSISTÊNCIA','COMPRA E VENDA'].forEach((t,i)=>{const x=12+i*130;s+=`<rect x="${x}" y="64" width="122" height="22" fill="#0B0F17"/><text x="${x+61}" y="80" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="${['#4FD1C5','#F6AD55','#FC8181'][i]}" text-anchor="middle" letter-spacing="1">${t}</text><rect x="${x}" y="92" width="122" height="88" fill="#141925"/><rect x="${x+6}" y="98" width="110" height="60" fill="#2A3346" opacity=".8"/>`;for(let j=0;j<8;j++)s+=`<rect x="${x+10+j*13}" y="${110+(j%2)*18}" width="8" height="14" rx="1.5" fill="#9FB3CF" opacity=".7"/>`});
+      s+=`<rect x="0" y="180" width="${W}" height="45" fill="#0E1118"/>`;
+      break;
+    case 'centro':
+      s+=sky('#2B1E3F','#7A3E52','#E0875A')+bld(185,60,150,'#1A1530',.05)+bld(185,30,110,'#0F0D1E',.18);
+      s+=`<rect x="0" y="185" width="${W}" height="40" fill="#0B0A14"/><rect x="290" y="150" width="70" height="35" fill="#1B1830"/><rect x="306" y="134" width="38" height="20" rx="2" fill="#E5484D"/><text x="325" y="149" font-family="Arial,sans-serif" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">M</text>`;
+      for(let i=0;i<14;i++){const x=20+r()*360,hh=14+r()*6;s+=`<rect x="${x}" y="${200-hh}" width="5" height="${hh}" rx="2.5" fill="#05040A"/><circle cx="${x+2.5}" cy="${198-hh}" r="3" fill="#05040A"/>`}
+      break;
+    case 'estudio':
+      s+=sky('#0D0F16','#141826','#1A1F30')+`<rect x="0" y="0" width="${W}" height="${H}" fill="#121624"/><rect x="0" y="0" width="${W}" height="225" fill="url(#gl_${loc})" opacity=".5"/>`;
+      for(let i=0;i<10;i++)s+=`<rect x="${i*40+4}" y="20" width="32" height="110" fill="#1A2238" opacity=".8"/>`;
+      s+=`<rect x="250" y="30" width="110" height="26" rx="3" fill="#E5484D"/><text x="305" y="48" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#fff" text-anchor="middle" letter-spacing="2">NO AR</text><rect x="60" y="150" width="280" height="75" fill="#2A2F40"/><rect x="186" y="96" width="10" height="56" fill="#888"/><rect x="178" y="70" width="26" height="34" rx="13" fill="#3A3F4F"/><path d="M182 76 h18 M182 84 h18 M182 92 h18" stroke="#555" stroke-width="2"/>`;
+      break;
+    case 'gabinete':case 'palacio':
+      s+=sky('#7DB3E0','#B7D6EE','#E9F1F8');
+      if(loc==='palacio'){s+=`<rect x="0" y="170" width="${W}" height="55" fill="#6B8F5A"/><rect x="80" y="70" width="240" height="100" fill="#EDE6D6"/><path d="M70 72 L200 30 L330 72Z" fill="#E2D8C3"/>`;for(let i=0;i<8;i++)s+=`<rect x="${96+i*29}" y="80" width="10" height="90" fill="#D6CBB2"/>`;s+=`<rect x="185" y="130" width="30" height="40" fill="#5A4636"/>`;[40,360].forEach(x=>{s+=`<rect x="${x-2}" y="90" width="4" height="82" fill="#5A4636"/>`;for(let k=0;k<6;k++)s+=`<path d="M${x} 92 q${(k-2.5)*12} -16 ${(k-2.5)*26} -4" stroke="#2F6B3A" stroke-width="5" fill="none"/>`})}
+      else{s+=`<rect x="0" y="0" width="${W}" height="${H}" fill="#3A3F4A"/><rect x="30" y="20" width="200" height="130" fill="url(#sk_${loc})"/>${bld(150,20,90,'#7C8FA6',0).replace(/x="(-?\d+)"/g,(m,a)=>`x="${30+(+a)*.5}"`).replace(/width="(\d+)"/g,(m,a)=>`width="${(+a)*.5}"`)}<rect x="30" y="20" width="200" height="130" fill="none" stroke="#2A2E36" stroke-width="6"/><line x1="130" y1="20" x2="130" y2="150" stroke="#2A2E36" stroke-width="4"/><rect x="0" y="160" width="${W}" height="65" fill="#2A2E36"/><rect x="200" y="150" width="190" height="14" fill="#5A4030"/><rect x="290" y="96" width="44" height="56" rx="4" fill="#20232B"/><rect x="250" y="40" width="40" height="28" fill="#009C3B" opacity=".9"/><path d="M270 43 L286 54 L270 65 L254 54Z" fill="#FFDF00"/><circle cx="270" cy="54" r="5" fill="#1F4FBF"/><line x1="250" y1="40" x2="250" y2="150" stroke="#999" stroke-width="2"/>`}
+      break;
+    case 'comunidade':
+      s+=sky('#F2B279','#E07B5F','#5A3B5C');
+      s+=`<path d="M0 120 Q120 40 220 70 T400 60 V225 H0Z" fill="#3F2E44"/>`;
+      for(let y=70;y<225;y+=13)for(let x=-10;x<W;x+=14+r()*8){if(y<70+(Math.abs(x-200)/4))continue;const c=['#C9826B','#B87563','#D8A07A','#9E6656','#E1B48E'][Math.floor(r()*5)];s+=`<rect x="${x.toFixed(0)}" y="${(y+r()*4).toFixed(0)}" width="${(12+r()*6).toFixed(0)}" height="11" fill="${c}"/>`;if(r()<.4)s+=`<rect x="${(x+3).toFixed(0)}" y="${(y+3).toFixed(0)}" width="3" height="3" fill="#2B2030"/>`}
+      s+=`<path d="M0 30 L400 22" stroke="#2B2030" stroke-width=".6"/><path d="M0 44 L400 38" stroke="#2B2030" stroke-width=".6"/>`;
+      break;
+    case 'orla':
+      s+=sky('#F6B26B','#F08A6B','#6A5B8C')+`<path d="M0 120 L40 92 L70 104 L110 60 L130 66 L150 100 L200 112 L250 96 L280 50 L300 44 L318 70 L360 98 L400 104 V140 H0Z" fill="#3A3355"/><rect x="0" y="130" width="${W}" height="40" fill="#3F6E9E"/><rect x="0" y="168" width="${W}" height="18" fill="#E9D3A6"/><rect x="0" y="186" width="${W}" height="39" fill="#F1F1F1"/>`;
+      for(let x=-20;x<W;x+=24)s+=`<path d="M${x} 196 q12 -10 24 0 t24 0" stroke="#1A1A1A" stroke-width="4" fill="none"/><path d="M${x} 214 q12 -10 24 0 t24 0" stroke="#1A1A1A" stroke-width="4" fill="none"/>`;
+      for(let i=0;i<22;i++){const x=r()*W;s+=`<rect x="${x}" y="${150+r()*16}" width="4" height="12" rx="2" fill="#1A1430"/>`}
+      break;
+    case 'velorio':
+      s+=sky('#3A4250','#5A6270','#7A8290');for(let i=0;i<60;i++){const x=r()*W,y=r()*H;s+=`<line x1="${x}" y1="${y}" x2="${x-4}" y2="${y+12}" stroke="#C9D2DE" stroke-width=".7" opacity=".5"/>`}
+      s+=`<rect x="0" y="160" width="${W}" height="65" fill="#2F3A33"/>`;for(let i=0;i<7;i++){const x=30+i*55;s+=`<rect x="${x}" y="${132+r()*10}" width="24" height="34" rx="10" fill="#8E949C"/>`}
+      for(let i=0;i<9;i++){const x=110+i*22;s+=`<path d="M${x-14} 150 Q${x} 128 ${x+14} 150Z" fill="#14171C"/><rect x="${x-1}" y="150" width="2" height="22" fill="#14171C"/><rect x="${x-5}" y="160" width="10" height="26" rx="4" fill="#1C2026"/>`}
+      break;
+    case 'operacao':
+      s+=sky('#1B2A44','#4C5D7A','#C9A27A')+bld(170,40,100,'#1D2538',.06);
+      s+=`<rect x="0" y="170" width="${W}" height="55" fill="#141820"/>`+siren(110,186)+`<rect x="40" y="150" width="120" height="36" rx="6" fill="#2F3540"/><rect x="128" y="138" width="34" height="30" rx="4" fill="#3A414E"/><rect x="132" y="142" width="26" height="12" fill="#6F8FB8" opacity=".6"/><circle cx="64" cy="188" r="9" fill="#0B0D12"/><circle cx="136" cy="188" r="9" fill="#0B0D12"/><text x="90" y="174" font-family="Arial,sans-serif" font-size="11" font-weight="800" fill="#C9D2DE" text-anchor="middle">POLÍCIA</text>`;
+      for(let i=0;i<5;i++){const x=220+i*30;s+=`<rect x="${x}" y="160" width="12" height="26" rx="4" fill="#0E1116"/><circle cx="${x+6}" cy="155" r="6" fill="#0E1116"/><rect x="${x-3}" y="166" width="18" height="10" rx="2" fill="#0E1116"/>`}
+      s+=`<rect x="0" y="0" width="${W}" height="${H}" fill="#9AA7BA" opacity=".08"/>`;
+      break;
+  }
+  return s+'</svg>';
 }
 
 /* ================================================================
@@ -787,150 +827,83 @@ function vLot(){
   <div class="pn"><div class="tw"><table><tr><th>Unidade</th><th>População</th><th></th></tr>${av.map((c,i)=>`<tr><td><div class="b">DP de ${c.cidade} (SP)</div><div class="xs mu">${c.d}</div></td><td class="mono sm">${c.pop}</td><td><button class="btn sm" data-a="lot" data-v="${i}">Escolher</button></td></tr>`).join('')}</table></div></div></div>`;
 }
 
-/* ---------- carreira ---------- */
-function carBar(){const G=S.g,P=PC();return sysbar(`<b>${esc(G.P.unidade)}</b>`,`Semana ${G.sem} · ${dateOf(G.sem)}`)}
-function mods(){
-  const G=S.g,pm=pendMemos().length,late=open().filter(c=>G.sem>c.due).length;
-  const M=[['painel','Painel'],['ind','Indicadores'],['plano','Plano de ação'],['exp','Expediente',pm],['ips','Inquéritos',late],['efe','Efetivo'],['car','Carreira']];
-  return `<nav class="mods">${M.map(([k,l,n])=>`<button class="mod ${UI.mod===k?'on':''}" data-a="mod" data-v="${k}">${l}${n?`<i>${n}</i>`:''}</button>`).join('')}</nav>`;
+/* ---------- carreira: telas da história ---------- */
+const STAT=[['com','Comunidade'],['eq','Equipe'],['pol','Política'],['imp','Imprensa'],['integ','Integridade'],['stress','Estresse']];
+function hud(){
+  const G=S.g,si=stageInfo();
+  return `<header class="hud"><div class="hl"><span class="hseal">${SEAL_S}</span><div><b>Distintivo</b><span>${esc(si.cidade)} (${si.uf}) · semana ${G.w+1} de ${G.dl}</span></div></div><button class="hbtn" data-a="panel">Painel</button></header>`;
 }
-function foot(){
-  const G=S.g,act=Object.keys(G.pol).filter(id=>G.pol[id].on);let cost=0;act.forEach(id=>cost+=POL[id].c);
-  return `<div class="foot"><div><div class="inf">Atos: <b>${G.atos}/5</b> · Orçamento: <b class="${G.orc<0?'er':''}">${money(G.orc)}</b><br>Repasse ${money(PC().orc)}/sem · ações ${money(cost)}/sem</div><button class="btn" data-a="week" ${pendMemos().length?'disabled':''}>Consolidar semana</button></div></div>`;
+function person(id){
+  if(!id)return '';const p=PEOPLE[id];
+  return `<div class="pers"><span class="pface">${face(p.n,!!p.f)}</span><div><b>${esc(p.n)}</b><span>${esc(p.r)}</span></div></div>`;
 }
-function metaRows(){
-  const G=S.g,P=PC();
-  return P.metas.map(m=>{if(m.k==='venc'){const n=lateN(),ok=n<=m.max;return `<tr><td class="b">Inquéritos fora do prazo</td><td class="n">≤ ${m.max}</td><td class="n ${ok?'ok':'er'}">${n}</td><td style="width:90px"><div class="bar"><div style="width:${clamp(n/m.max*100,0,100)}%;background:${ok?'var(--ok)':'var(--er)'}"></div></div></td><td>${ok?'<span class="bd ok">Dentro</span>':'<span class="bd er">Acima</span>'}</td></tr>`}const r=reduction(m.k),ok=r>=m.r,w=clamp(r/m.r*100,0,100);return `<tr><td class="b">${P.crimes[m.k].n}</td><td class="n">−${Math.round(m.r*100)}%</td><td class="n ${r>0?'ok':'er'}">${pct(-r).replace('+','+')}</td><td style="width:90px"><div class="bar"><div style="width:${Math.max(0,w)}%;background:${ok?'var(--ok)':'var(--pr)'}"></div></div></td><td>${ok?'<span class="bd ok">Atingida</span>':'<span class="bd wa">Em curso</span>'}</td></tr>`}).join('');
+function metaBars(){
+  const G=S.g;return metaRes().map(m=>{const pr=clamp(m.red/m.alvo*100,0,100);return `<div class="mb"><div class="mbh"><span>${m.n}</span><b class="${m.ok?'ok':''}">${m.red>=0?'−':'+'}${f1(Math.abs(m.red*100))}% <i>/ meta −${Math.round(m.alvo*100)}%</i></b></div><div class="mbb"><div style="width:${pr}%;background:${m.ok?'#3FB27F':'#E0A33A'}"></div></div></div>`}).join('');
 }
-function vPainel(){
-  const G=S.g,P=PC(),oc=open(),late=oc.filter(c=>G.sem>c.due).length,pm=pendMemos();
-  let h=`<div class="ttl"><div><h1>Painel da unidade</h1><div class="sub">${esc(G.P.cidade)} (${P.uf}) · ${esc(G.P.pop)}</div></div><span class="bd pr">${P.cargo.split(' — ')[0]}</span></div>`;
-  if(pm.length)h+=`<div class="alert"><div><b>${pm.length} despacho(s) pendente(s)</b>Assine os documentos do Expediente para consolidar a semana. <button class="btn sm sec" style="margin-top:6px" data-a="mod" data-v="exp">Abrir Expediente</button></div></div>`;
-  if(G.stress>75)h+=`<div class="alert er"><div><b>Nível de estresse crítico (${f0(G.stress)})</b>Reduza a carga ou afaste-se no fim de semana para evitar licença médica.</div></div>`;
-  h+=`<div class="pn"><h3>Dados da unidade</h3><div class="kv k4"><div><label>Titular</label><b>${esc(S.nome)}</b></div><div><label>Cargo</label><b>${P.cargo}</b></div><div><label>Período de avaliação</label><b>sem. ${G.w}/${G.dl}${G.ext?' (prorrogado)':''}</b></div><div><label>Efetivo</label><b>${G.team.length} servidores</b></div><div><label>Inquéritos em andamento</label><b>${oc.length}</b></div><div><label>Fora do prazo</label><b class="${late?'er':''}">${late}</b></div><div><label>Esclarecimento</label><b>${f0(esclar())}%</b></div><div><label>Estresse do titular</label><b class="${G.stress>75?'er':''}">${f0(G.stress)}/100</b></div></div></div>`;
-  h+=`<div class="pn"><h3>Metas pactuadas <span>vs. média das 4 semanas anteriores à posse</span></h3><div class="tw"><table><tr><th>Indicador</th><th class="n">Meta</th><th class="n">Atual</th><th></th><th>Status</th></tr>${metaRows()}</table></div></div>`;
-  h+=`<div class="pn"><h3>Ocorrências da última semana</h3><div class="tw"><table><tr><th>Natureza</th><th class="n">Semana</th><th class="n">Média 4 sem.</th><th class="n">Var. base</th></tr>${Object.keys(G.crimes).map(k=>{const r=reduction(k);return `<tr class="ck" data-a="mod" data-v="ind"><td>${P.crimes[k].n}</td><td class="n">${f0(crimeNow(k))}</td><td class="n">${f0(avgLast(k,4))}</td><td class="n ${r>0?'ok':r<-.02?'er':''}">${pct(-r)}</td></tr>`}).join('')}</table></div></div>`;
-  h+=`<div class="pn"><h3>Relações institucionais</h3><div class="tw"><table>${Object.keys(G.rel).map(k=>`<tr><td style="width:44%">${relName(k)}</td><td><div class="bar"><div style="width:${G.rel[k]}%;background:${G.rel[k]<35?'var(--er)':G.rel[k]<55?'#B7791F':'var(--ok)'}"></div></div></td><td class="n">${f0(G.rel[k])}</td></tr>`).join('')}<tr><td>Integridade (Corregedoria)</td><td><div class="bar"><div style="width:${G.integ}%;background:${G.integ<40?'var(--er)':'var(--pr)'}"></div></div></td><td class="n">${f0(G.integ)}</td></tr></table></div></div>`;
-  h+=`<div class="pn"><h3>Gestão do titular <span>${G.atos} ato(s) disponível(is)</span></h3><div class="tw"><table>${Object.keys(GEST).map(k=>{const A=GEST[k],dis=G.atos<A.atos||(G.did&&G.did[k]);return `<tr><td><div class="b sm">${A.n}</div><div class="xs mu">${A.d}</div></td><td class="n xs">${A.atos} ato${A.atos>1?'s':''}</td><td><button class="btn sm sec" data-a="gest" data-v="${k}" ${dis?'disabled':''}>Executar</button></td></tr>`}).join('')}</table></div></div>`;
-  return h;
+function deltas(before,ib){
+  const G=S.g,out=[];
+  STAT.forEach(([k,n])=>{const d=G[k]-before[k];if(Math.abs(d)>=.5){const good=k==='stress'?d<0:d>0;out.push(`<span class="dt ${good?'up':'dn'}">${n} ${d>0?'+':'−'}${f0(Math.abs(d))}</span>`)}});
+  for(const k in G.idx){const d=G.idx[k]-ib[k];if(Math.abs(d)>=.5){const m=STAGES[G.stage].metas.find(x=>x.k===k);out.push(`<span class="dt ${d<0?'up':'dn'}">${m.n} ${d<0?'↓':'↑'}${f0(Math.abs(d))}%</span>`)}}
+  return out.join('')||'<span class="dt">Sem efeito imediato</span>';
 }
-function chart(k){
-  const G=S.g,P=PC(),h=G.crimes[k].hist,base=G.crimes[k].base,meta=(P.metas.find(m=>m.k===k&&m.r)||{}).r;
-  const W=600,H=170,pl=44,pr=10,pt=12,pb=22,mx=Math.max(...h,base)*1.12,mn=0,n=h.length;
-  const x=i=>pl+(W-pl-pr)*(n<=1?0:i/(n-1)),y=v=>pt+(H-pt-pb)*(1-(v-mn)/(mx-mn));
-  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Série semanal de ${P.crimes[k].n}">`;
-  for(let i=0;i<=4;i++){const v=mn+(mx-mn)*i/4;s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="#E6EAF0"/><text x="${pl-6}" y="${y(v)+4}" font-size="10" fill="#8A95A3" text-anchor="end" font-family="IBM Plex Mono">${mx<10?f1(v):f0(v)}</text>`}
-  s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(base)}" y2="${y(base)}" stroke="#8A95A3" stroke-dasharray="4 4"/>`;
-  if(meta)s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(base*(1-meta))}" y2="${y(base*(1-meta))}" stroke="#1E7B4D" stroke-dasharray="6 3"/>`;
-  s+=`<line x1="${x(3)}" x2="${x(3)}" y1="${pt}" y2="${H-pb}" stroke="#BFD2EA"/><text x="${x(3)+4}" y="${pt+10}" font-size="10" fill="#1D4E89" font-family="IBM Plex Sans">posse</text>`;
-  s+=`<polyline points="${h.map((v,i)=>x(i)+','+y(v)).join(' ')}" fill="none" stroke="#1D4E89" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
-  return s+'</svg>';
-}
-function vInd(){
-  const G=S.g,P=PC();
-  let h=`<div class="ttl"><div><h1>Indicadores criminais</h1><div class="sub">Registros semanais · ${esc(G.P.cidade)}</div></div></div>`;
-  for(const k in G.crimes){const r=reduction(k),meta=P.metas.find(m=>m.k===k&&m.r);
-    h+=`<div class="pn"><h3>${P.crimes[k].n} <span>${meta?`meta −${Math.round(meta.r*100)}% · `:''}var. ${pct(-r)}</span></h3>${chart(k)}<div class="leg"><span><i style="background:#1D4E89"></i>registros/semana</span><span><i style="background:#8A95A3"></i>linha de base</span>${meta?'<span><i style="background:#1E7B4D"></i>meta</span>':''}</div></div>`}
-  h+=`<p class="note">Dados simulados pelo jogo, inspirados em padrões reais de criminalidade. Não são estatística oficial.</p>`;
-  return h;
-}
-function effTxt(P){const C=PC().crimes,t=[];for(const k in P.e)if(C[k])t.push(`${C[k].n} −${Math.round(P.e[k]*75)}%`);for(const k in (P.disp||{}))if(C[k])t.push(`<span class="er">${C[k].n} +${Math.round(P.disp[k]*100)}%</span>`);return t.join(' · ')}
-function vPlano(){
-  const G=S.g,P=PC(),free=G.team.filter(a=>!a.al).length;
-  let h=`<div class="ttl"><div><h1>Plano de ação</h1><div class="sub">Medidas estratégicas de redução da criminalidade</div></div></div>`;
-  h+=`<div class="pn"><div class="kv k4"><div><label>Orçamento disponível</label><b>${money(G.orc)}</b></div><div><label>Repasse semanal</label><b>${money(P.orc)}</b></div><div><label>Efetivo livre</label><b>${free} de ${G.team.length}</b></div><div><label>Ações ativas</label><b>${Object.keys(G.pol).filter(i=>G.pol[i].on).length}</b></div></div></div>`;
-  h+=`<div class="pn"><h3>Ações disponíveis para a unidade</h3>${P.pol.map(id=>{const A=POL[id],st=polStatus(id),a=G.pol[id];
-    const req=Object.keys(A.req||{}).map(k=>`${relName(k)} ≥ ${A.req[k]}`).join(', ');
-    return `<div class="pol"><div class="h"><b>${A.n}</b>${st==='ativa'?'<span class="bd ok">Ativa</span>':st==='req'?'<span class="bd er">Bloqueada</span>':'<span class="bd">Disponível</span>'}</div><p>${A.d}</p>
-    <div class="spec"><span>Implantação <b>${money(A.once)}</b></span><span>Custo <b>${money(A.c)}/sem</b></span><span>Efetivo <b>${A.ef}</b></span><span>Maturação <b>${A.mat} sem.</b></span>${req?`<span>Requer <b>${req}</b></span>`:''}</div>
-    <div class="spec"><span>Efeito esperado: ${effTxt(A)}</span></div>
-    ${a&&a.ramp>0?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="xs mu">Maturação</span><div class="bar" style="flex:1"><div style="width:${a.ramp*100}%;background:var(--ok)"></div></div><span class="xs mono">${f0(a.ramp*100)}%</span></div>`:''}
-    <button class="btn sm ${st==='ativa'?'er':''}" data-a="pol" data-v="${id}" ${st==='req'?'disabled':''}>${st==='ativa'?'Encerrar ação':'Implantar'}</button></div>`}).join('')}</div>`;
-  h+=`<p class="note">O efeito cresce até a maturação e depende da confiança da comunidade e, quando houver integração, da relação com a PM. Ações que deslocam o crime estão sinalizadas em vermelho.</p>`;
-  return h;
-}
-function vExp(){
-  const G=S.g;
-  if(UI.memo!==null&&G.memos[UI.memo]){
-    const m=G.memos[UI.memo],M=memoBody(m);
-    let h=`<button class="btn sm sec" data-a="memox" style="margin-bottom:10px">← Expediente</button><div class="memo"><div class="mh"><b>${M.tipo} Nº ${m.n}</b><span class="xs mu mono">${dateOf(m.s)}</span></div><div class="mb"><div class="meta">De: <b>${esc(M.de)}</b><br>Para: <b>${esc(S.nome)}</b> — ${esc(G.P.unidade)}<br>Assunto: <b>${esc(M.ass)}</b></div>${M.b.map(p=>`<p>${esc(p)}</p>`).join('')}</div>`;
-    if(m.done)return h+`<div class="desp"><label>Despacho</label><div class="sm">${esc(m.r)}</div></div></div>`;
-    h+=`<div class="desp"><label>Despacho do(a) titular</label>${M.o.map((o,i)=>`<button class="ro ${UI.sel===i?'on':''}" data-a="osel" data-v="${i}"><i></i><div><b>${esc(o.t)}</b>${o.s?`<span>${esc(o.s)}</span>`:''}</div></button>`).join('')}<button class="btn full" style="margin-top:6px" data-a="assina" ${UI.sel===null?'disabled':''}>Assinar despacho</button></div></div>`;
+function vScene(){
+  const G=S.g,s=SCN(G.scene);
+  let h=hud()+`<article class="scene"><figure class="art">${art(s.loc,G.sem)}<figcaption>${esc(fill(s.time||''))}</figcaption></figure><div class="sb">`;
+  h+=`<div class="kick">${esc(s.kick)}</div><h1 class="stt">${esc(fill(s.t))}</h1>${person(s.who)}`;
+  if(UI.out){
+    const o=s.o[UI.out.i];
+    h+=`<div class="chosen">Sua decisão: <b>${esc(o.t)}</b></div><div class="txt">${s.id==='corregedoria'?`<p>${UI.padOk?'A comissão conclui pela aplicação de advertência. Você segue no cargo, mas agora todos sabem que estão de olho.':''}</p>`:`<p>${esc(fill(UI.out.r))}</p>`}</div>`;
+    h+=`<div class="dts">${deltas(UI.out.before,UI.out.ib)}</div>`;
+    const st=STAGES[G.stage];
+    h+=`<div class="focus"><div class="kick" style="color:#9AA3B2">Foco da equipe nesta semana</div><div class="fg">${st.focos.map(f=>`<button class="fc ${G.focus===f.id?'on':''}" data-a="foco" data-v="${f.id}"><b>${f.n}</b><span>${f.d}</span>${G.lastFocus===f.id&&f.id!=='folga'?'<em>repetir rende menos</em>':''}</button>`).join('')}</div></div>`;
+    h+=`</div></article><div class="sfoot"><button class="sbtn" data-a="week" ${G.focus?'':'disabled'}>${G.focus?'Encerrar a semana':'Escolha o foco da semana'}</button></div>`;
     return h;
   }
-  const L=G.memos.map((m,i)=>[m,i]).reverse();
-  return `<div class="ttl"><div><h1>Expediente</h1><div class="sub">Documentos recebidos pela unidade</div></div></div><div class="pn"><div class="tw"><table><tr><th>Documento</th><th>Assunto</th><th>Situação</th></tr>${L.map(([m,i])=>{const M=memoBody(m);return `<tr class="ck" data-a="memo" data-v="${i}"><td class="mono xs" style="white-space:nowrap">${M.tipo}<br>${m.n}</td><td class="sm"><b>${esc(M.ass)}</b><div class="xs mu">${esc(M.de)} · ${dateOf(m.s)}</div></td><td>${m.done?'<span class="bd ok">Despachado</span>':'<span class="bd er">Pendente</span>'}</td></tr>`}).join('')}</table></div></div>`;
-}
-function vIps(){
-  const G=S.g;
-  if(UI.ip!==null){const c=caseOf(UI.ip);if(c)return vIp(c)}
-  const oc=open().sort((a,b)=>(a.due-G.sem)-(b.due-G.sem)||b.g-a.g),done=G.cases.filter(c=>c.st!=='andamento').slice(-10).reverse();
-  let h=`<div class="ttl"><div><h1>Inquéritos policiais</h1><div class="sub">${oc.length} em andamento · esclarecimento ${f0(esclar())}%</div></div></div>`;
-  h+=`<div class="pn"><div class="tw"><table><tr><th>IP nº</th><th>Natureza / Fato</th><th class="n">Andamento</th><th>Prazo</th></tr>${oc.map(c=>{const late=G.sem>c.due,l=c.due-G.sem;return `<tr class="ck" data-a="ip" data-v="${c.id}"><td class="mono xs">${c.num}</td><td class="sm"><b>${CR[c.tipo].n}</b>${c.g>=4?' <span class="bd er">grave</span>':''}<div class="xs mu">${esc(c.t)} · ${c.team.length?c.team.length+' servidor(es)':'<span class="er">sem equipe</span>'}</div></td><td class="n">${f0(c.prog)}%</td><td>${late?`<span class="bd er">Vencido ${G.sem-c.due} sem.</span>`:l<=1?'<span class="bd wa">Vence</span>':`<span class="bd">${l} sem.</span>`}</td></tr>`}).join('')||'<tr><td colspan="4" class="sm mu">Nenhum inquérito em andamento.</td></tr>'}</table></div></div>`;
-  if(done.length)h+=`<div class="pn"><h3>Concluídos recentemente</h3><div class="tw"><table>${done.map(c=>`<tr><td class="mono xs">${c.num}</td><td class="sm">${esc(c.t)}</td><td><span class="bd ${c.st==='relatado'?'ok':''}">${c.st}</span></td></tr>`).join('')}</table></div></div>`;
+  h+=`<div class="txt">${s.p.map(p=>`<p>${esc(fill(p))}</p>`).join('')}</div><div class="chs">${s.o.map((o,i)=>`<button class="ch" data-a="pick" data-v="${i}"><b>${esc(fill(o.t))}</b>${o.s?`<span>${esc(o.s)}</span>`:''}</button>`).join('')}</div></div></article>`;
   return h;
 }
-function vIp(c){
-  const G=S.g,late=G.sem>c.due;
-  let h=`<button class="btn sm sec" data-a="ipx" style="margin-bottom:10px">← Inquéritos</button>`;
-  h+=`<div class="pn"><h3>Inquérito Policial nº ${c.num} <span>${c.st==='andamento'?'em andamento':c.st}</span></h3><div class="kv k4"><div><label>Natureza</label><b>${CR[c.tipo].n}</b></div><div><label>Gravidade</label><b>${c.g}/5</b></div><div><label>Instauração</label><b>${dateOf(c.open)}</b></div><div><label>Prazo</label><b class="${late?'er':''}">${dateOf(c.due)}</b></div></div><div class="pb"><div class="b">${esc(c.t)}</div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span class="xs mu">Andamento</span><div class="bar" style="flex:1;height:8px"><div style="width:${c.prog}%;background:${c.prog>=75?'var(--ok)':'var(--pr)'}"></div></div><b class="mono sm">${f0(c.prog)}%</b></div>${c.preso?'<div style="margin-top:8px"><span class="bd ok">Investigado preso</span></div>':''}</div></div>`;
-  if(c.st==='andamento'){
-    h+=`<div class="pn"><h3>Equipe designada <span>${c.team.length}/3</span></h3><div class="pb">${G.team.map(a=>{const on=c.team.includes(a.id),busy=a.al&&a.al!=='c'+c.id;return `<button class="chk ${on?'on':''} ${busy?'busy':''}" data-a="ag" data-v="${a.id}"><span class="face" style="width:22px;height:22px">${face(a.nome,a.fem)}</span>${esc(a.nome.split(' ')[0])} · N${a.sk}</button>`}).join('')}<div class="xs mu">A equipe avança o inquérito semanalmente. Sem prisão do investigado, o andamento automático para em 92%.</div></div></div>`;
-    h+=`<div class="pn"><h3>Diligências <span>${G.atos} ato(s) · ${money(G.orc)}</span></h3><div class="tw"><table>${Object.keys(DIL).map(k=>{const D=DIL[k],why=canDil(c,k);return `<tr><td><div class="b sm">${D.n}</div><div class="xs ${why?'mu2':'mu'}">${why||'Disponível'}</div></td><td class="n xs">${D.atos} ato${D.atos>1?'s':''}${D.cost?'<br>'+money(D.cost):''}</td><td><button class="btn sm sec" data-a="dil" data-v="${k}" ${why?'disabled':''}>Executar</button></td></tr>`}).join('')}</table></div></div>`;
-  }
-  h+=`<div class="pn"><h3>Andamento processual</h3><div class="tw"><table>${c.log.slice(0,10).map(l=>`<tr><td class="mono xs" style="white-space:nowrap">${dateOf(l.s)}</td><td class="sm">${esc(l.t)}</td></tr>`).join('')}</table></div></div>`;
+function vPanel(){
+  const G=S.g,si=stageInfo(),st=STAGES[G.stage];
+  let h=`<div class="panelw"><div class="ph"><div><div class="kick">${esc(st.cargo)}</div><h2>${esc(si.nome)}</h2><span>${esc(si.cidade)} (${si.uf}) · semana ${G.w} de ${G.dl}${G.ext?' · prazo prorrogado':''}</span></div><button class="hbtn" data-a="panel">Fechar</button></div>`;
+  h+=`<div class="psec"><div class="kick">Metas da etapa</div>${metaBars()}</div>`;
+  h+=`<div class="psec"><div class="kick">Situação</div>${STAT.map(([k,n])=>`<div class="mb"><div class="mbh"><span>${n}</span><b>${f0(G[k])}</b></div><div class="mbb"><div style="width:${G[k]}%;background:${k==='stress'?(G[k]>75?'#E5484D':'#E0A33A'):k==='integ'&&G[k]<40?'#E5484D':'#6F8FD6'}"></div></div></div>`).join('')}<p class="pn2">Equipe forte rende mais nas ações. Estresse em 100 encerra a carreira. Integridade baixa chama a Corregedoria.</p></div>`;
+  h+=`<div class="psec"><div class="kick">Diário</div>${G.diary.slice(0,10).map(d=>`<div class="dd"><span>S${d.s}</span>${esc(d.t)}</div>`).join('')||'<div class="pn2">Ainda vazio.</div>'}</div>`;
+  h+=`<p class="pn2" style="padding:0 18px 30px">Índices simulados pelo jogo, inspirados em problemas reais da segurança pública. Pessoas e casos são fictícios.</p></div>`;
   return h;
 }
-function vEfe(){
-  const G=S.g;
-  return `<div class="ttl"><div><h1>Efetivo</h1><div class="sub">${G.team.length} servidores lotados</div></div></div><div class="pn"><div class="tw"><table><tr><th>Servidor</th><th>Nível</th><th class="n">Moral</th><th>Alocação</th></tr>${G.team.map(a=>{const al=!a.al?'<span class="bd">Disponível</span>':a.al[0]==='p'?`<span class="bd pr">Ação estratégica</span>`:`<span class="bd ok">IP ${(caseOf(+a.al.slice(1))||{}).num||''}</span>`;return `<tr><td><div class="who"><span class="face">${face(a.nome,a.fem)}</span><div><div class="b sm">${esc(a.nome)}</div><div class="xs mu">${a.cargo} · Mat. ${a.mat}</div></div></div></td><td class="mono sm">N${a.sk}</td><td class="n ${a.mor<40?'er':''}">${f0(a.mor)}</td><td>${al}</td></tr>`}).join('')}</table></div></div>`;
-}
-function vCar(){
-  const G=S.g;
-  const stg=[['Delegado(a) de 3ª Classe','Delegacia no interior paulista','Reduzir furtos e violência doméstica'],['Delegado(a) Seccional','Centro de São Paulo','Reduzir furto e roubo de celular em 20%'],['Secretário(a) de Polícia Civil','Rio de Janeiro','Reduzir letalidade violenta e roubo de rua']];
-  return `<div class="ttl"><div><h1>Carreira</h1><div class="sub">${esc(S.nome)} · matrícula ${S.mat}</div></div></div>
-  <div class="pn"><h3>Trajetória</h3><div class="pb"><div class="tl">${stg.map((s,i)=>`<div class="${i<G.post?'d':i===G.post?'n':''}"><div class="b sm">${s[0]}</div><div class="xs mu">${s[1]} · ${s[2]}</div></div>`).join('')}</div></div></div>
-  <div class="pn"><h3>Histórico funcional</h3><div class="tw"><table><tr><th>Unidade</th><th>Desde</th></tr>${G.posts.map(p=>`<tr><td class="sm">${esc(p.nome)}</td><td class="mono xs">${dateOf(p.from)}</td></tr>`).join('')}</table></div></div>
-  <div class="pn"><div class="kv"><div><label>Inquéritos relatados</label><b>${G.solved}</b></div><div><label>Esclarecimento</label><b>${f0(esclar())}%</b></div><div><label>Licenças por esgotamento</label><b>${G.burn}</b></div><div><label>Integridade</label><b>${f0(G.integ)}/100</b></div></div></div>
-  <div class="pn"><h3>Registro de atos</h3><div class="tw"><table>${G.news.slice(0,12).map(n=>`<tr><td class="mono xs" style="white-space:nowrap">${dateOf(n.s)}</td><td class="sm">${esc(n.t)}</td></tr>`).join('')}</table></div></div>`;
-}
-function vRel(){
-  const G=S.g,B=G.rep,P=PC();
-  let h=`<div class="ttl"><div><h1>Relatório semanal</h1><div class="sub">Semana ${B.sem} · consolidado em ${dateOf(G.sem)}</div></div></div>`;
-  if(B.burn)h+=`<div class="alert er"><div><b>Licença médica</b>O(a) titular foi afastado(a) por esgotamento. Atos reduzidos nesta semana.</div></div>`;
-  h+=`<div class="pn"><h3>Ocorrências</h3><div class="tw"><table><tr><th>Natureza</th><th class="n">Anterior</th><th class="n">Semana</th><th class="n">Var.</th></tr>${Object.keys(G.crimes).map(k=>{const a=B.before[k],v=crimeNow(k),d=a?v/a-1:0;return `<tr><td>${P.crimes[k].n}</td><td class="n">${f0(a)}</td><td class="n">${f0(v)}</td><td class="n ${d<-.01?'ok':d>.01?'er':''}">${pct(d)}</td></tr>`}).join('')}</table></div></div>`;
-  h+=`<div class="pn"><h3>Metas</h3><div class="tw"><table><tr><th>Indicador</th><th class="n">Meta</th><th class="n">Atual</th><th></th><th>Status</th></tr>${metaRows()}</table></div></div>`;
-  h+=`<div class="pn"><div class="kv"><div><label>Novos inquéritos</label><b>${B.newC.length}</b></div><div><label>Laudos e relatórios</label><b>${B.res.length}</b></div><div><label>Custo das ações</label><b>${money(B.cost)}</b></div><div><label>Novos documentos</label><b>${pendMemos().length}</b></div></div></div>`;
-  return h;
-}
-function vAval(){
-  const G=S.g,E=G.eval;
-  let h=`<div class="ttl"><div><h1>Avaliação de desempenho</h1><div class="sub">${esc(G.P.unidade)}</div></div></div><div class="pn"><div class="tw"><table><tr><th>Meta</th><th class="n">Alvo</th><th class="n">Resultado</th><th>Situação</th></tr>${E.res.map(r=>`<tr><td class="b sm">${r.n}</td><td class="n">${r.venc?'≤ '+r.alvo:'−'+Math.round(r.alvo*100)+'%'}</td><td class="n ${r.ok?'ok':'er'}">${r.venc?r.atual:pct(-r.atual)}</td><td><span class="bd ${r.ok?'ok':'er'}">${r.ok?'Atingida':'Não atingida'}</span></td></tr>`).join('')}</table></div></div>`;
-  const nx=['','Promoção e remoção para a 1ª Delegacia Seccional — Centro de São Paulo.','Convite do governador do Rio de Janeiro para assumir a Secretaria de Estado de Polícia Civil.',''];
-  h+=E.ok?`<div class="alert ok" style="margin-top:12px"><div><b>Metas cumpridas</b>${G.post===2?'Missão cumprida no Rio de Janeiro.':nx[G.post+1]}</div></div>`:!E.ext?`<div class="alert" style="margin-top:12px"><div><b>Metas não atingidas</b>A chefia concedeu prorrogação de 12 semanas para recuperar os indicadores.</div></div>`:`<div class="alert er" style="margin-top:12px"><div><b>Metas não atingidas após prorrogação</b>${G.post===2?'O governador decide trocar o comando da Polícia Civil.':'Sua carreira fica estagnada nesta unidade.'}</div></div>`;
+function vEval(){
+  const G=S.g,E=G.eval,si=stageInfo();
+  const nxt=['Promoção a Delegado(a) Seccional e remoção para o centro de São Paulo, onde o furto e o roubo de celular viraram a principal queixa da cidade.','O governador do Rio de Janeiro quer você no comando da Polícia Civil fluminense.',''];
+  let h=hud()+`<article class="scene"><figure class="art">${art(G.stage===2?'palacio':'gabinete',7)}<figcaption>Avaliação de desempenho</figcaption></figure><div class="sb"><div class="kick">Fim da etapa</div><h1 class="stt">${E.ok?'Metas cumpridas':!E.ext?'Ainda não':'O prazo acabou'}</h1>`;
+  h+=`<div class="evm">${E.res.map(r=>`<div class="mb"><div class="mbh"><span>${r.n}</span><b class="${r.ok?'ok':'bad'}">${r.red>=0?'−':'+'}${f1(Math.abs(r.red*100))}% <i>/ meta −${Math.round(r.alvo*100)}%</i></b></div><div class="mbb"><div style="width:${clamp(r.red/r.alvo*100,0,100)}%;background:${r.ok?'#3FB27F':'#E5484D'}"></div></div></div>`).join('')}</div>`;
+  h+=`<div class="txt"><p>${E.ok?(G.stage===2?'Os números do Rio caíram sob o seu comando.':nxt[G.stage]):!E.ext?`A chefia concede mais 4 semanas em ${esc(si.cidade)} para você recuperar os indicadores.`:G.stage===2?'O governador decide trocar o comando da Polícia Civil.':'Sua carreira fica parada nesta unidade.'}</p></div></div></article><div class="sfoot"><button class="sbtn" data-a="aval">${E.ok?(G.stage===2?'Ver o desfecho':'Seguir em frente'):!E.ext?'Voltar ao trabalho':'Ver o desfecho'}</button></div>`;
   return h;
 }
 function vFim(){
-  const F=S.fim,T={win:['Missão cumprida','Os indicadores do Rio de Janeiro caíram sob o seu comando. Seu nome entra para a história da segurança pública.'],exon:['Demissão','A Corregedoria concluiu o processo disciplinar pela sua demissão.'],burn:['Aposentadoria precoce','Três licenças por esgotamento encerraram a carreira.'],estag:['Carreira estagnada','As metas não foram atingidas e você permanece na unidade sem novas promoções.'],exon_gov:['Exoneração do cargo','O governador troca o comando da Polícia Civil.']}[F.kind];
-  return sysbar('Encerramento de sessão',dateOf(F.sem))+`<div class="wrap"><div class="pn"><h3>Resultado da carreira</h3><div class="pb"><div style="font-size:20px;font-weight:700">${T[0]}</div><p class="sm" style="color:var(--tx2);margin:6px 0 0">${T[1]}</p></div><div class="kv"><div><label>Pontuação</label><b class="pr">${F.score}</b></div><div><label>Estágio alcançado</label><b>${['Interior','São Paulo','Rio de Janeiro'][F.post]}</b></div><div><label>Inquéritos relatados</label><b>${F.solved}</b></div><div><label>Esclarecimento</label><b>${f0(F.esc)}%</b></div></div></div><div style="margin-top:12px;display:flex;gap:8px"><button class="btn" data-a="new">Nova carreira</button><button class="btn sec" data-a="cover">Início</button></div></div>`;
+  const F=S.fim,T={win:['Missão cumprida','Do casarão alugado ao lado da rodoviária ao comando da Polícia Civil do Rio. A letalidade caiu, a polícia matou menos e prendeu melhor. Seu nome vira referência.','orla'],
+    exon:['Demissão','A Corregedoria conclui o processo pela sua demissão. As escolhas que pareciam pequenas cobraram o preço.','gabinete'],
+    burn:['Afastamento','O corpo cobrou a conta. Licença médica por esgotamento, e a carreira não volta a ser a mesma.','casa'],
+    estag:['Carreira parada','As metas não vieram. Você segue na mesma unidade, sem promoção, vendo outros nomes subirem.','delegacia'],
+    exon_gov:['Exoneração','O governador troca o comando da Polícia Civil. Você volta para São Paulo com a sensação de que faltou pouco.','palacio']}[F.kind];
+  return `<header class="hud"><div class="hl"><span class="hseal">${SEAL_S}</span><div><b>Distintivo</b><span>Fim da carreira</span></div></div></header><article class="scene"><figure class="art">${art(T[2],3)}<figcaption>${esc(S.nome)}</figcaption></figure><div class="sb"><div class="kick">Desfecho</div><h1 class="stt">${T[0]}</h1><div class="txt"><p>${T[1]}</p></div><div class="evm"><div class="mb"><div class="mbh"><span>Pontuação</span><b>${F.score}</b></div></div><div class="mb"><div class="mbh"><span>Etapa alcançada</span><b>${['Interior','São Paulo','Rio de Janeiro'][F.stage]}</b></div></div><div class="mb"><div class="mbh"><span>Integridade</span><b>${f0(F.integ)}</b></div></div></div><div class="chs"><button class="ch" data-a="new"><b>Nova carreira</b></button><button class="ch" data-a="cover"><b>Início</b></button></div></div></article>`;
 }
-function vCareer(){
+function vStory(){
   const G=S.g;
-  if(UI.mod==='aval'&&G.eval)return carBar()+'<div class="wrap">'+vAval()+'</div>'+`<div class="foot"><div><div class="inf"></div><button class="btn" data-a="aval">${G.eval.ok?(G.post===2?'Encerrar':'Assumir nova função'):!G.eval.ext?'Continuar':'Encerrar'}</button></div></div>`;
-  if(UI.mod==='rel'&&G.rep)return carBar()+mods()+'<div class="wrap">'+vRel()+'</div>'+`<div class="foot"><div><div class="inf">${pendMemos().length?`<b>${pendMemos().length}</b> documento(s) novo(s) no Expediente`:''}</div><button class="btn" data-a="relok">Ir para o painel</button></div></div>`;
-  const body=UI.mod==='ind'?vInd():UI.mod==='plano'?vPlano():UI.mod==='exp'?vExp():UI.mod==='ips'?vIps():UI.mod==='efe'?vEfe():UI.mod==='car'?vCar():vPainel();
-  return carBar()+mods()+'<div class="wrap">'+body+'</div>'+foot();
+  if(UI.panel)return vPanel();
+  if(G.eval)return vEval();
+  return vScene();
 }
+
 function render(){
   let h='';
   if(UI.screen==='cover')h=vCover();else if(UI.screen==='setup')h=vSetup();
   else switch(S.phase){
     case 'estudo':h=vEstudo();break;case 'objetiva':h=vObj();break;case 'objres':h=vObjRes();break;case 'disc':h=vDisc();break;
     case 'taf':h=vTaf();break;case 'oral':h=vOral();break;case 'resultado':h=vResultado();break;case 'acad':h=vAcad();break;case 'lot':h=vLot();break;
-    case 'car':h=vCareer();break;case 'fim':h=vFim();break;
+    case 'car':h=vStory();break;case 'fim':h=vFim();break;
   }
   if(UI.toast)h+=`<div class="toast">${esc(UI.toast)}</div>`;
-  $.innerHTML=h;
+  $.innerHTML=h;document.body.classList.toggle('dark',!!(S&&UI.screen!=='cover'&&UI.screen!=='setup'&&(S.phase==='car'||S.phase==='fim')));
 }
 setInterval(()=>{
   if(!S)return;let dl,tot;
@@ -944,7 +917,7 @@ function act(a,v){
   switch(a){
     case 'new':UI.screen='setup';UI.setup.nome='';render();top();break;
     case 'cover':UI.screen='cover';render();top();break;
-    case 'continue':S=load();if(S){UI.screen='game';UI.mod='painel';render()}break;
+    case 'continue':S=load();if(S){UI.screen='game';UI.out=null;UI.panel=false;if(S.phase==='car'&&S.g&&S.g.focus===undefined)S.g.focus=null;render()}break;
     case 'sx':UI.setup.sexo=v;render();break;
     case 'fd':UI.setup.fundo=v;render();break;
     case 'inscr':{const n=(UI.setup.nome||'').trim();if(n.length<3)return toast('Informe o nome completo.');newStudy(n,UI.setup.fundo,UI.setup.sexo);UI.screen='game';save();render();top();break}
@@ -962,26 +935,17 @@ function act(a,v){
     case 'retry':{const C=S.c;C.mes=1;C.meses=6;C.tent++;C.en=Math.max(C.en,70);C.log.unshift(`Novo edital publicado. Tentativa ${C.tent}.`);S.phase='estudo';autoAlloc();delete S.ex;delete S.notas;save();render();top();break}
     case 'toacad':S.phase='acad';save();render();top();break;
     case 'ac':S.bonus={inv:v==='inv'?.12:0,int:v==='int'?.08:0,ges:v==='ges'?.1:0};S.phase='lot';save();render();top();break;
-    case 'lot':startPost(0,S.lotOpts[+v]);break;
-    case 'mod':UI.mod=v;UI.ip=null;UI.memo=null;UI.sel=null;render();top();break;
-    case 'ip':UI.ip=+v;render();top();break;
-    case 'ipx':UI.ip=null;render();break;
-    case 'ag':toggleAgent(UI.ip,v);break;
-    case 'dil':doDil(UI.ip,v);break;
-    case 'gest':doGest(v);break;
-    case 'pol':togglePol(v);break;
-    case 'memo':UI.memo=+v;UI.sel=null;render();top();break;
-    case 'memox':UI.memo=null;render();break;
-    case 'osel':UI.sel=+v;render();break;
-    case 'assina':if(UI.sel!==null)despachar(UI.memo,UI.sel);break;
+    case 'lot':startStory(S.lotOpts[+v]);break;
+    case 'pick':choose(+v);break;
+    case 'foco':S.g.focus=v;save();render();break;
     case 'week':endWeek();break;
-    case 'relok':S.g.rep=null;UI.mod=pendMemos().length?'exp':'painel';save();render();top();break;
+    case 'panel':UI.panel=!UI.panel;render();top();break;
     case 'aval':afterEval();break;
   }
 }
 $.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;act(b.dataset.a,b.dataset.v)});
 $.addEventListener('input',e=>{if(e.target.id==='nm')UI.setup.nome=e.target.value;if(e.target.id==='ans')UI.ans=e.target.value});
-window.__dist={get S(){return S},UI,act,QB,POL,POSTS};
+window.__dist={get S(){return S},UI,act,QB,STAGES,SC};
 render();
 })();
 </script>
