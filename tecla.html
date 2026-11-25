@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="Tecla — aprenda a digitar com os 10 dedos: 45 etapas em 3 fases no teclado brasileiro (ABNT2), plano diário baseado em como o cérebro aprende, guia de acentos, teste de velocidade e treino das teclas em que você mais erra.">
+<title>Tecla — Treino de Digitação</title>
+<link rel="icon" href="./bnf-favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000; --panel:#0a0d10; --panel2:#0d1216; --panel3:#121a1f;
+  --line:#171e22; --line2:#22303a;
+  --cyan:#12c8f0; --cyan-soft:#0b3b48; --cyan-dim:#6ea8b8;
+  --white:#eef7fa; --text2:#b8c4ca; --grey:#6f7880; --grey2:#4a535a;
+  --ok:#3ddc84; --err:#ff5470; --warn:#f5b041;
+  --f-pinky:#e86a92; --f-ring:#f0a54a; --f-middle:#d9cf4a; --f-index:#4fd18b; --f-thumb:#8a97a3;
+  --ph1:#4fd18b; --ph2:#f5b041; --ph3:#12c8f0;
+  --disp:'Rajdhani',sans-serif; --mono:'Share Tech Mono',monospace; --type:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;overflow-x:hidden}
+button{font-family:inherit;color:inherit;font-size:inherit;cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+::selection{background:var(--cyan);color:#001318}
+a{color:var(--cyan)}
+kbd{font-family:var(--type);font-size:.88em;border:1px solid var(--line2);border-bottom-width:2px;padding:1px 7px;color:var(--white);background:var(--panel2);border-radius:3px;white-space:nowrap}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(18,200,240,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(18,200,240,.05) 1px,transparent 1px);
+  background-size:46px 46px;-webkit-mask-image:radial-gradient(ellipse 900px 500px at 50% 0%,#000,transparent 70%);mask-image:radial-gradient(ellipse 900px 500px at 50% 0%,#000,transparent 70%)}
+.app{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:20px 16px 60px}
+.scr{display:none}
+.scr.on{display:block}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.top .grp{display:flex;gap:8px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white)}
+.badge{width:14px;height:22px;background:var(--cyan);clip-path:polygon(45% 0,100% 0,55% 100%,0 100%);box-shadow:0 0 12px rgba(18,200,240,.5)}
+.brand span{font-family:var(--disp);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:15px}
+.pill{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan-dim);border:1px solid var(--line2);padding:7px 12px;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,color .2s}
+button.pill:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.hero{text-align:center;padding:22px 0 4px}
+.hero h1{margin:0;font-family:var(--disp);font-weight:700;font-size:clamp(46px,11vw,84px);letter-spacing:.06em;line-height:1;color:var(--cyan);text-shadow:0 0 46px rgba(18,200,240,.35)}
+.hero p{margin:10px auto 0;color:var(--grey);font-size:15px;max-width:560px;line-height:1.6}
+.kbd-note{display:none;margin:14px auto 0;max-width:520px;font-family:var(--mono);font-size:12px;color:var(--warn);border:1px solid #3a2c10;padding:8px 12px}
+@media (hover:none) and (pointer:coarse){.kbd-note{display:block}}
+
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey)}
+.val{font-family:var(--disp);font-weight:700;font-size:28px;line-height:1.1;margin-top:3px}
+.val small{font-size:14px;color:var(--grey);font-weight:600;margin-left:3px}
+
+/* today */
+.today{margin:26px 0 14px;border:1px solid var(--cyan-soft);background:linear-gradient(160deg,#071419,var(--panel2));padding:20px;display:grid;grid-template-columns:1.3fr 1fr;gap:22px}
+@media (max-width:760px){.today{grid-template-columns:1fr}}
+.today h2{margin:2px 0 6px;font-family:var(--disp);font-size:28px;letter-spacing:.04em;text-transform:uppercase}
+.today p{margin:0 0 14px;color:var(--text2);font-size:14px;line-height:1.55}
+.today .lbl{color:var(--cyan)}
+.qlist{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:6px}
+.qlist li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2)}
+.qlist li i{width:18px;height:18px;border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;flex-shrink:0;color:var(--grey)}
+.qlist li.done{color:var(--grey)}
+.qlist li.done i{border-color:var(--ok);color:var(--ok)}
+.qlist li.cur{color:var(--white)}
+.qlist li.cur i{border-color:var(--cyan);color:var(--cyan)}
+.qlist li span.m{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--grey2)}
+.tside{display:flex;flex-direction:column;gap:14px}
+.meter{height:8px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.streak{display:flex;gap:4px;margin-top:6px}
+.streak b{flex:1;height:22px;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9.5px;color:var(--grey2);font-weight:400}
+.streak b.y{background:rgba(18,200,240,.14);border-color:var(--cyan-soft);color:var(--cyan)}
+.phasebar{display:flex;gap:4px}
+.phasebar div{flex:1}
+.phasebar .bar{height:6px;background:var(--line)}
+.phasebar .bar i{display:block;height:100%}
+.phasebar span{display:block;font-family:var(--mono);font-size:10px;color:var(--grey);margin-top:5px;letter-spacing:.06em}
+
+.sumrow{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin:0 0 22px;background:var(--panel)}
+.sumrow>div{padding:12px 14px;border-right:1px solid var(--line);min-width:0}
+.sumrow>div:last-child{border-right:0}
+@media (max-width:600px){.sumrow{grid-template-columns:repeat(2,1fr)}.sumrow>div:nth-child(2){border-right:0}.sumrow>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:820px){.modes{grid-template-columns:1fr}}
+.mode{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left;transition:border-color .2s}
+.mode:hover{border-color:var(--cyan-soft)}
+.mode h3{margin:0;font-family:var(--disp);font-size:24px;letter-spacing:.04em;text-transform:uppercase}
+.mode p{margin:0;color:var(--grey);font-size:13.5px;line-height:1.55}
+.mode .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+.mode .go{margin-top:auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--mono);font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#001318;background:var(--cyan);padding:11px 18px;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);transition:filter .2s}
+.btn:hover{filter:brightness(1.15)}
+.btn.ghost{background:transparent;color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan-soft);clip-path:none}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--cyan)}
+.btn.big{font-size:14px;padding:14px 24px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font-family:var(--mono);font-size:11.5px;padding:6px 10px;border:1px solid var(--line2);color:var(--grey)}
+.seg button.on{border-color:var(--cyan);color:var(--cyan);background:rgba(18,200,240,.06)}
+.weak{display:flex;gap:6px;flex-wrap:wrap;min-height:30px}
+.weak b{font-family:var(--type);font-size:14px;min-width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #4a1d28;color:var(--err);background:rgba(255,84,112,.07);padding:0 6px}
+.weak b.slow{border-color:#4a3a14;color:var(--warn);background:rgba(245,176,65,.07)}
+.weak em{font-style:normal;color:var(--grey2);font-size:12.5px;align-self:center}
+
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:34px 0 12px;flex-wrap:wrap}
+.sec-h h2{margin:0;font-family:var(--disp);font-size:22px;letter-spacing:.08em;text-transform:uppercase}
+.sec-h span{font-family:var(--mono);font-size:11px;color:var(--grey)}
+
+.phase{margin-top:18px}
+.phase-h{display:flex;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.phase-h b{font-family:var(--disp);font-size:18px;letter-spacing:.06em;text-transform:uppercase;color:var(--pc)}
+.phase-h span{color:var(--grey);font-size:13px}
+.lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.les{position:relative;text-align:left;background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--pc);padding:12px 14px 12px;display:flex;flex-direction:column;gap:4px;transition:border-color .2s,background .2s}
+.les:hover{background:var(--panel2)}
+.les .n{font-family:var(--mono);font-size:10.5px;color:var(--grey);letter-spacing:.12em;padding-right:52px}
+.les .t{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.03em;line-height:1.15}
+.les .k{font-family:var(--type);font-size:12px;color:var(--cyan-dim)}
+.les .st{position:absolute;top:10px;right:12px;font-size:13px;letter-spacing:1px;color:var(--grey2)}
+.les .st .y{color:var(--warn)}
+.les.next{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset}
+.les.next .n{color:var(--cyan)}
+
+.tips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:700px){.tips{grid-template-columns:1fr}}
+.tip{background:var(--panel);border:1px solid var(--line);padding:14px 16px;font-size:13.5px;line-height:1.6;color:var(--text2)}
+.tip b{display:block;color:var(--white);font-family:var(--disp);font-size:17px;letter-spacing:.03em;margin-bottom:2px}
+
+.settings{display:flex;flex-wrap:wrap;gap:10px}
+.tog{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);padding:10px 14px;font-size:13.5px;cursor:pointer;user-select:none}
+.tog .sw{width:34px;height:18px;border:1px solid var(--line2);position:relative;flex-shrink:0;transition:background .2s,border-color .2s}
+.tog .sw::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;background:var(--grey);transition:transform .2s,background .2s}
+.tog.on .sw{border-color:var(--cyan);background:rgba(18,200,240,.1)}
+.tog.on .sw::after{transform:translateX(16px);background:var(--cyan)}
+.tog small{display:block;color:var(--grey);font-size:11.5px}
+.setbox{background:var(--panel);border:1px solid var(--line);padding:10px 14px;font-size:13.5px;display:flex;flex-direction:column;gap:8px}
+.setbox small{color:var(--grey);font-size:11.5px}
+
+/* intro */
+.intro{max-width:820px;margin:10px auto 0}
+.intro .ph{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--pc)}
+.intro h2{margin:6px 0 4px;font-family:var(--disp);font-size:clamp(32px,6vw,46px);letter-spacing:.03em;text-transform:uppercase;line-height:1.05}
+.intro .lead{color:var(--text2);font-size:16px;line-height:1.6;margin:8px 0 18px;max-width:640px}
+.icols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+@media (max-width:700px){.icols{grid-template-columns:1fr}}
+.ibox{background:var(--panel);border:1px solid var(--line);padding:16px 18px}
+.ibox h4{margin:0 0 10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);font-weight:400}
+.ibox ol,.ibox ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.55;color:var(--text2)}
+.ibox.why{border-color:#1c2a20;background:linear-gradient(160deg,#08110c,var(--panel))}
+.ibox.why h4{color:var(--ph1)}
+.ibox.why p{margin:0;font-size:14px;line-height:1.6;color:var(--text2)}
+.try{margin:0 0 18px;background:var(--panel);border:1px dashed var(--line2);padding:16px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.try .lbl{color:var(--warn)}
+.try .chips{display:flex;gap:8px;flex-wrap:wrap}
+.try .chips b{font-family:var(--type);font-size:22px;min-width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line2);color:var(--grey);font-weight:500}
+.try .chips b.cur{border-color:var(--warn);color:var(--white);box-shadow:0 0 12px rgba(245,176,65,.3)}
+.try .chips b.ok{border-color:var(--ok);color:var(--ok)}
+.try .got{font-family:var(--mono);font-size:12px;color:var(--grey);min-height:16px;flex-basis:100%}
+.try .got.bad{color:var(--err)}
+.intro .acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.intro .acts small{color:var(--grey);font-family:var(--mono);font-size:11px}
+.ikb{margin-top:6px}
+
+/* typing screen */
+.tbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 14px}
+.tbar .ttl{flex:1;min-width:180px}
+.tbar .ttl .lbl{color:var(--cyan)}
+.tbar .ttl h2{margin:2px 0 0;font-family:var(--disp);font-size:26px;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
+.live{display:flex;border:1px solid var(--line);background:var(--panel)}
+.live>div{padding:8px 14px;border-right:1px solid var(--line);min-width:86px}
+.live>div:last-child{border-right:0}
+.live .val{font-size:24px}
+.prog{height:3px;background:var(--line);margin-bottom:18px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width .15s}
+.lesson-tip{font-size:13.5px;color:var(--cyan-dim);margin:-6px 0 14px;line-height:1.5}
+.tbox{position:relative;background:var(--panel);border:1px solid var(--line);padding:22px 24px 30px;cursor:text}
+.tview{height:calc(3 * 1.75em);overflow:hidden;font-family:var(--type);font-size:clamp(19px,2.6vw,26px);line-height:1.75em}
+.tinner{position:relative;transition:transform .15s ease;overflow-wrap:break-word}
+.ch{position:relative;color:var(--grey2);transition:color .06s}
+.ch.ok{color:var(--white)}
+.ch.fix{color:var(--warn)}
+.ch.err{color:var(--err);background:rgba(255,84,112,.14);border-radius:2px}
+.ch.err.sp{background:rgba(255,84,112,.38)}
+.ch.cur::before{content:"";position:absolute;left:-1px;top:.18em;bottom:.18em;width:2px;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:blink 1s steps(1) infinite}
+.typing .ch.cur::before{animation:none}
+.ch.cur{color:#c9d6dc}
+.ch.miss{animation:shake .18s}
+.ch.miss.sp{background:rgba(255,84,112,.38)}
+@keyframes blink{50%{opacity:0}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.startmsg{position:absolute;right:14px;bottom:8px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey)}
+.typing .startmsg{display:none}
+.dead{position:absolute;left:14px;bottom:8px;font-family:var(--mono);font-size:11px;color:var(--warn);display:none}
+.dead.on{display:block}
+
+.guide{transition:opacity .35s}
+.guide.ghost{opacity:.05}
+.ghostnote{text-align:center;font-family:var(--mono);font-size:11px;color:var(--grey2);margin-top:6px;letter-spacing:.06em;min-height:14px}
+.hint{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;min-height:34px;margin:16px 0 10px;font-size:14px;color:var(--text2);text-align:center}
+.hint .fdot{width:10px;height:10px;display:inline-block;border-radius:50%}
+
+/* keyboard */
+.kb{max-width:820px;margin:0 auto;user-select:none}
+.kb .row{display:flex;gap:4px;margin-bottom:4px}
+.key{flex:var(--w,1) 1 0;min-width:0;height:clamp(30px,5.4vw,46px);display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1.05;background:var(--panel2);border:1px solid var(--line);border-bottom:3px solid var(--fc,var(--line2));font-family:var(--type);font-size:clamp(10px,1.6vw,14px);color:#a9b6bc;border-radius:4px;transition:background .08s,color .08s,box-shadow .08s,transform .08s;position:relative}
+.key .s{font-size:.72em;color:var(--grey2)}
+.key.sm{font-family:var(--mono);font-size:clamp(8px,1.2vw,11px);letter-spacing:.06em;color:var(--grey)}
+.key.spacer{visibility:hidden}
+.key.bump::after{content:"";position:absolute;bottom:5px;left:50%;width:10px;height:2px;margin-left:-5px;background:var(--grey)}
+.key.target{background:var(--fc);color:#05090b;border-color:var(--fc);box-shadow:0 0 18px var(--fc);transform:translateY(-1px)}
+.key.target .s{color:#05090b99}
+.key.tshift{background:color-mix(in srgb,var(--fc) 45%,var(--panel2));color:#05090b;border-color:var(--fc)}
+.key.nextk{box-shadow:inset 0 0 0 2px var(--fc)}
+.key.home{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--fc) 40%,transparent)}
+.key.p-ok{background:#123a26 !important;box-shadow:none !important}
+.key.p-err{background:#4a1522 !important;box-shadow:none !important}
+.kb .badge-n{position:absolute;top:-8px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--warn);color:#000;font-family:var(--mono);font-size:10px;display:flex;align-items:center;justify-content:center}
+.legend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--grey)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.keys-help{text-align:center;margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--grey2);letter-spacing:.08em}
+.keys-help kbd{font-family:var(--mono);font-size:11px;color:var(--grey)}
+
+/* results */
+.res{max-width:720px;margin:20px auto 0;text-align:center}
+.res .lbl.c{color:var(--cyan)}
+.res h2{margin:6px 0 4px;font-family:var(--disp);font-size:clamp(30px,6vw,44px);letter-spacing:.04em;text-transform:uppercase}
+.res .stars{font-size:34px;letter-spacing:6px;color:var(--grey2);margin:4px 0}
+.res .stars .y{color:var(--warn);text-shadow:0 0 18px rgba(245,176,65,.5)}
+.res .msg{color:var(--text2);font-size:15px;line-height:1.6;margin:6px auto 22px;max-width:540px}
+.bigstats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);background:var(--panel);text-align:left}
+.bigstats>div{padding:16px;border-right:1px solid var(--line)}
+.bigstats>div:last-child{border-right:0}
+.bigstats .val{font-size:40px}
+.bigstats .val.c{color:var(--cyan)}
+@media (max-width:600px){.bigstats{grid-template-columns:repeat(2,1fr)}.bigstats>div:nth-child(2){border-right:0}.bigstats>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+.res .weak{justify-content:center;margin:10px 0 0}
+.res .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.res .rec{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--warn);letter-spacing:.1em;text-transform:uppercase}
+.res .brain{margin:22px auto 0;max-width:560px;text-align:left;border:1px solid #1c2a20;background:linear-gradient(160deg,#08110c,var(--panel));padding:14px 16px;font-size:13.5px;line-height:1.6;color:var(--text2)}
+.res .brain b{color:var(--ph1);font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;display:block;margin-bottom:4px}
+
+/* stats */
+.panel{background:var(--panel);border:1px solid var(--line);padding:16px}
+.chart svg{display:block;width:100%;height:auto}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--cyan);stroke-width:2;stroke-linejoin:round}
+.chart .ln2{fill:none;stroke:var(--ok);stroke-width:1.5;stroke-dasharray:4 4;opacity:.7}
+.chart .dt{fill:var(--cyan)}
+.chart text{fill:var(--grey);font-family:'Share Tech Mono',monospace;font-size:11px}
+.empty{color:var(--grey);font-size:14px;text-align:center;padding:30px 10px}
+.heat .key{border-bottom-color:var(--line2)}
+.hist{width:100%;border-collapse:collapse;font-size:13.5px}
+.hist th{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);text-align:left;font-weight:400;padding:8px 10px;border-bottom:1px solid var(--line)}
+.hist td{padding:8px 10px;border-bottom:1px solid var(--line);font-family:var(--type);font-size:13px}
+.hist td:first-child{font-family:'Inter',sans-serif;color:var(--text2)}
+.tblwrap{overflow-x:auto}
+
+/* article pages (plano / acentos) */
+.doc{max-width:780px;margin:0 auto}
+.doc h1{font-family:var(--disp);font-size:clamp(34px,6vw,52px);letter-spacing:.04em;text-transform:uppercase;margin:14px 0 6px;line-height:1.05}
+.doc .lead{color:var(--text2);font-size:16px;line-height:1.65;margin:0 0 10px}
+.doc h2{font-family:var(--disp);font-size:24px;letter-spacing:.06em;text-transform:uppercase;margin:38px 0 12px}
+.doc p,.doc li{color:var(--text2);font-size:15px;line-height:1.7}
+.doc ul,.doc ol{padding-left:22px}
+.sci{display:flex;flex-direction:column;gap:12px}
+.sci .card{background:var(--panel);border:1px solid var(--line);padding:16px 18px;display:grid;grid-template-columns:1fr;gap:8px}
+.sci .card h3{margin:0;font-family:var(--disp);font-size:20px;letter-spacing:.03em}
+.sci .card p{margin:0;font-size:14.5px}
+.sci .card .inapp{font-size:13.5px;color:var(--cyan-dim);border-top:1px solid var(--line);padding-top:8px}
+.sci .card .inapp b{font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-right:6px}
+.weeks{width:100%;border-collapse:collapse}
+.weeks th,.weeks td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+.weeks th{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);font-weight:400}
+.weeks td:first-child{font-family:var(--disp);font-weight:700;font-size:17px;white-space:nowrap}
+.weeks td{color:var(--text2)}
+.weeks td.m{font-family:var(--type);color:var(--cyan);white-space:nowrap}
+.routine{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:700px){.routine{grid-template-columns:repeat(2,1fr)}}
+.routine div{background:var(--panel);border:1px solid var(--line);padding:12px 14px}
+.routine b{display:block;font-family:var(--disp);font-size:26px;color:var(--cyan)}
+.routine span{font-size:13px;color:var(--text2);line-height:1.45;display:block}
+.src{font-size:13px !important}
+.src a{color:var(--cyan-dim)}
+.acc-tbl{width:100%;border-collapse:collapse}
+.acc-tbl th,.acc-tbl td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+.acc-tbl th{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);font-weight:400}
+.acc-tbl td:first-child{font-family:var(--type);font-size:19px;color:var(--white);white-space:nowrap}
+.acc-tbl td{color:var(--text2)}
+.lab{background:var(--panel);border:1px dashed var(--line2);padding:16px 18px}
+.lab .out{font-family:var(--type);font-size:28px;min-height:44px;margin:8px 0;word-break:break-all}
+.lab .log{font-family:var(--mono);font-size:12px;color:var(--grey);min-height:18px}
+.note{border-left:2px solid var(--warn);padding:8px 14px;background:rgba(245,176,65,.05);color:var(--text2);font-size:14px;line-height:1.6;margin:12px 0}
+
+footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(--mono);font-size:11.5px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="grid-bg" aria-hidden="true"></div>
+<div class="app">
+
+<!-- ================= HOME ================= -->
+<section class="scr on" id="s-home">
+  <div class="top">
+    <a class="brand" href="./index.html"><span class="badge"></span><span>BNF Games</span></a>
+    <div class="grp">
+      <button class="pill" data-go="plan">Plano e ciência</button>
+      <button class="pill" data-go="acc">Guia de acentos</button>
+      <button class="pill" data-go="stats">Estatísticas</button>
+    </div>
+  </div>
+  <div class="hero">
+    <h1>TECLA</h1>
+    <p>Aprenda a digitar com os 10 dedos, sem olhar pro teclado. 45 etapas em 3 fases no teclado brasileiro, com um plano diário montado a partir de como o cérebro aprende movimentos.</p>
+    <div class="kbd-note">Este treino é feito para teclado físico. Abra no computador.</div>
+  </div>
+
+  <div class="today">
+    <div>
+      <div class="lbl" id="td-lbl">Treino de hoje</div>
+      <h2 id="td-title">15 minutos</h2>
+      <p id="td-desc"></p>
+      <ul class="qlist" id="td-list"></ul>
+      <button class="btn big" id="btn-today">Começar treino de hoje</button>
+    </div>
+    <div class="tside">
+      <div>
+        <div class="lbl">Prática hoje</div>
+        <div class="val" id="td-min">0<small>/ 15 min</small></div>
+        <div class="meter"><i id="td-meter" style="width:0"></i></div>
+      </div>
+      <div>
+        <div class="lbl">Últimos 7 dias · <span id="td-streak">0 dias seguidos</span></div>
+        <div class="streak" id="td-week"></div>
+      </div>
+      <div>
+        <div class="lbl">Sua fase</div>
+        <div class="phasebar" id="td-phases" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sumrow">
+    <div><div class="lbl">Melhor velocidade</div><div class="val" id="sum-best">0<small>ppm</small></div></div>
+    <div><div class="lbl">Média recente</div><div class="val" id="sum-avg">0<small>ppm</small></div></div>
+    <div><div class="lbl">Precisão média</div><div class="val" id="sum-acc">–<small>%</small></div></div>
+    <div><div class="lbl">Etapas concluídas</div><div class="val" id="sum-les">0<small>/0</small></div></div>
+  </div>
+
+  <div class="modes">
+    <div class="mode">
+      <span class="tag">Passo a passo</span>
+      <h3>Etapas</h3>
+      <p>Cada etapa explica o que é novo antes de começar. Errou, a tecla espera você corrigir.</p>
+      <div class="go"><button class="btn" id="btn-continue">Começar</button></div>
+    </div>
+    <div class="mode">
+      <span class="tag">Quanto você digita?</span>
+      <h3>Teste de velocidade</h3>
+      <p>Digite o máximo que conseguir no tempo. Backspace corrige.</p>
+      <div class="seg" id="seg-time"><button data-v="30">30s</button><button data-v="60">1 min</button><button data-v="120">2 min</button></div>
+      <div class="seg" id="seg-src"><button data-v="palavras">Palavras</button><button data-v="frases">Frases</button></div>
+      <div class="go"><button class="btn" id="btn-test">Iniciar teste</button></div>
+    </div>
+    <div class="mode">
+      <span class="tag">Sob medida</span>
+      <h3>Pontos fracos</h3>
+      <p>Treino com as teclas em que você mais erra (vermelho) ou demora (amarelo):</p>
+      <div class="weak" id="weak-home"></div>
+      <div class="go"><button class="btn" id="btn-weak">Treinar</button></div>
+    </div>
+  </div>
+
+  <div class="sec-h"><h2>Etapas</h2><span id="les-count"></span></div>
+  <div id="lessons"></div>
+
+  <div class="sec-h"><h2>Regras de ouro</h2><button class="pill" data-go="plan">Por que funciona →</button></div>
+  <div class="tips">
+    <div class="tip"><b>Posição de descanso</b>Indicadores no F e no J (sentem os pontinhos em relevo). Os outros dedos ao lado: A S D F · J K L Ç. Polegares no espaço. Depois de cada tecla, o dedo volta pra casa.</div>
+    <div class="tip"><b>Não olhe pro teclado</b>Olhar ensina o olho, não o dedo. Use o teclado desenhado na tela; ele vai sumindo conforme você avança.</div>
+    <div class="tip"><b>Precisão antes de velocidade</b>Mire em 95% ou mais. Cada erro repetido também é treinado pelo cérebro. A velocidade vem depois, sozinha.</div>
+    <div class="tip"><b>Pouco, todo dia, e durma</b>15 a 20 minutos por dia rendem mais que 2 horas no domingo. Boa parte da fixação acontece no sono.</div>
+  </div>
+
+  <div class="sec-h"><h2>Ajustes</h2></div>
+  <div class="settings">
+    <div class="setbox">
+      <div>Teclado na tela<br><small>Automático: some aos poucos conforme a fase, e volta se você hesitar</small></div>
+      <div class="seg" id="seg-kb"><button data-v="auto">Automático</button><button data-v="always">Sempre</button><button data-v="never">Nunca</button></div>
+    </div>
+    <div class="tog" data-set="sound" role="switch" tabindex="0"><span class="sw"></span><div>Som de erro<small>Um bip curto quando errar</small></div></div>
+    <div class="tog" data-set="noAccents" role="switch" tabindex="0"><span class="sw"></span><div>Sem acentos e Ç<small>Para teclado americano (sem Ç)</small></div></div>
+    <div class="tog" data-set="stopTest" role="switch" tabindex="0"><span class="sw"></span><div>Parar no erro também no teste<small>O teste espera a tecla certa</small></div></div>
+  </div>
+
+  <footer>TECLA · BNF GAMES — seu progresso fica salvo neste navegador</footer>
+</section>
+
+<!-- ================= INTRO ================= -->
+<section class="scr" id="s-intro">
+  <div class="top">
+    <button class="pill" data-go="home">← Voltar</button>
+  </div>
+  <div class="intro" id="intro"></div>
+</section>
+
+<!-- ================= TYPE ================= -->
+<section class="scr" id="s-type">
+  <div class="top">
+    <button class="pill" id="btn-back">← Voltar</button>
+    <button class="pill" id="btn-restart">Reiniciar</button>
+  </div>
+  <div class="tbar">
+    <div class="ttl"><div class="lbl" id="t-kind">Etapa</div><h2 id="t-name">—</h2></div>
+    <div class="live">
+      <div><div class="lbl">PPM</div><div class="val" id="lv-ppm">0</div></div>
+      <div><div class="lbl">Precisão</div><div class="val" id="lv-acc">100<small>%</small></div></div>
+      <div><div class="lbl" id="lv-tlbl">Tempo</div><div class="val" id="lv-time">0:00</div></div>
+    </div>
+  </div>
+  <div class="prog"><i id="t-prog"></i></div>
+  <div class="lesson-tip" id="t-tip"></div>
+  <div class="tbox" id="tbox">
+    <div class="tview"><div class="tinner" id="tinner"></div></div>
+    <div class="dead" id="t-dead">acento pressionado, agora a letra</div>
+    <div class="startmsg">Comece a digitar</div>
+  </div>
+  <div class="guide" id="guide">
+    <div class="hint" id="hint"></div>
+    <div class="kb" id="kb"></div>
+    <div class="legend">
+      <span><i style="background:var(--f-pinky)"></i>Mindinho</span>
+      <span><i style="background:var(--f-ring)"></i>Anelar</span>
+      <span><i style="background:var(--f-middle)"></i>Médio</span>
+      <span><i style="background:var(--f-index)"></i>Indicador</span>
+      <span><i style="background:var(--f-thumb)"></i>Polegar</span>
+    </div>
+  </div>
+  <div class="ghostnote" id="ghostnote"></div>
+  <div class="keys-help"><kbd>Tab</kbd> reinicia · <kbd>Esc</kbd> volta ao menu</div>
+</section>
+
+<!-- ================= RESULT ================= -->
+<section class="scr" id="s-res">
+  <div class="res">
+    <div class="lbl c" id="r-kind">Resultado</div>
+    <h2 id="r-title">—</h2>
+    <div class="stars" id="r-stars"></div>
+    <div class="rec" id="r-rec"></div>
+    <p class="msg" id="r-msg"></p>
+    <div class="bigstats">
+      <div><div class="lbl">Velocidade</div><div class="val c" id="r-ppm">0<small>ppm</small></div></div>
+      <div><div class="lbl">Precisão</div><div class="val" id="r-acc">0<small>%</small></div></div>
+      <div><div class="lbl">Tempo</div><div class="val" id="r-time">0:00</div></div>
+      <div><div class="lbl">Erros</div><div class="val" id="r-err">0</div></div>
+    </div>
+    <div id="r-weakwrap" style="margin-top:22px">
+      <div class="lbl">Teclas em que você errou</div>
+      <div class="weak" id="r-weak"></div>
+    </div>
+    <div class="brain" id="r-brain"></div>
+    <div class="acts">
+      <button class="btn ghost" id="r-menu">Menu <span style="opacity:.6">(Esc)</span></button>
+      <button class="btn ghost" id="r-again">Repetir <span style="opacity:.6">(Tab)</span></button>
+      <button class="btn" id="r-next">Próxima <span style="opacity:.6">(Enter)</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section class="scr" id="s-stats">
+  <div class="top">
+    <button class="pill" data-go="home">← Voltar</button>
+    <button class="pill" id="st-reset">Apagar progresso</button>
+  </div>
+  <div class="sec-h" style="margin-top:14px"><h2>Evolução</h2><span>últimas 40 sessões · linha = ppm · tracejado = precisão</span></div>
+  <div class="panel chart" id="chart"></div>
+  <div class="sec-h"><h2>Mapa de erros</h2><span>quanto mais vermelho, mais você erra a tecla</span></div>
+  <div class="panel"><div class="kb heat" id="heat"></div></div>
+  <div class="sec-h"><h2>Histórico</h2></div>
+  <div class="panel tblwrap" id="histtbl"></div>
+</section>
+
+<!-- ================= PLAN / SCIENCE ================= -->
+<section class="scr" id="s-plan">
+  <div class="top"><button class="pill" data-go="home">← Voltar</button></div>
+  <div class="doc">
+    <div class="lbl" style="color:var(--cyan);margin-top:10px">Plano de estudo</div>
+    <h1>Como o cérebro aprende a digitar</h1>
+    <p class="lead">Digitar é uma habilidade motora, como tocar violão ou andar de bicicleta. A ciência do aprendizado motor explica por que algumas formas de treinar funcionam muito melhor que outras. O Tecla foi montado em cima disso.</p>
+
+    <h2>As 3 fases do aprendizado</h2>
+    <p>Os psicólogos Paul Fitts e Michael Posner descreveram, em 1967, que todo aprendizado de movimento passa por três fases. Cada fase do Tecla corresponde a uma delas.</p>
+    <div class="sci">
+      <div class="card" style="border-left:2px solid var(--ph1)"><h3 style="color:var(--ph1)">Fase 1 · Cognitiva — "onde fica?"</h3><p>Você pensa em cada tecla. É lento, cansativo e cheio de erros. Normal: o cérebro está montando o mapa do teclado.</p><div class="inapp"><b>No Tecla</b>Etapas 1 a 19: duas letras novas por vez, revisões a cada poucas etapas, teclado colorido sempre visível e o texto espera você acertar.</div></div>
+      <div class="card" style="border-left:2px solid var(--ph2)"><h3 style="color:var(--ph2)">Fase 2 · Associativa — "letras viram blocos"</h3><p>Você para de pensar letra por letra e começa a digitar sílabas e palavras inteiras como um movimento só. Os erros caem bastante.</p><div class="inapp"><b>No Tecla</b>Etapas 20 a 38: sílabas, dígrafos (ch, lh, nh), terminações, acentos, pontuação e números. O teclado na tela fica apagado e só aparece se você hesitar.</div></div>
+      <div class="card" style="border-left:2px solid var(--ph3)"><h3 style="color:var(--ph3)">Fase 3 · Autônoma — "sai sozinho"</h3><p>Os dedos vão no automático e a atenção fica no que você está escrevendo, não em como.</p><div class="inapp"><b>No Tecla</b>Etapas 39 a 45: textos reais, mensagens do dia a dia e frases longas, sem teclado na tela.</div></div>
+    </div>
+
+    <h2>O que a pesquisa mostra</h2>
+    <div class="sci">
+      <div class="card"><h3>O sono fixa o que você treinou</h3><p>Em estudos com sequências de dedos, quem dormiu depois de treinar ficou mais rápido e preciso no dia seguinte, sem treinar mais. O mesmo tempo acordado não deu esse ganho. Parte do aprendizado acontece depois que você para.</p><div class="inapp"><b>No Tecla</b>O treino de hoje tem cerca de 15 minutos e avisa quando é hora de parar. Treinar até a exaustão não adianta: o ganho vem na noite seguinte.</div></div>
+      <div class="card"><h3>Espalhar vence concentrar</h3><p>Num estudo clássico de 1978, carteiros britânicos aprenderam a digitar com o mesmo total de horas, divididas de formas diferentes. Quem treinou 1 hora por dia aprendeu mais rápido por hora de treino e reteve melhor do que quem treinou 4 horas por dia.</p><div class="inapp"><b>No Tecla</b>Meta diária de 15 minutos e contador de dias seguidos. Melhor 15 minutos por 7 dias do que 2 horas num dia só.</div></div>
+      <div class="card"><h3>Repetição seguida forma blocos</h3><p>Digitadores rápidos não pensam em letras: o cérebro junta letras frequentes em "blocos" que saem de uma vez. Pesquisas sobre digitação mostram que esses blocos se formam quando o mesmo material é repetido várias vezes seguidas na mesma sessão.</p><div class="inapp"><b>No Tecla</b>As etapas repetem palavras e sílabas em sequência ("que que que", "casa casa") e a Fase 2 treina os blocos mais comuns do português: que, ão, ção, nh, lh, ch, mente, ndo.</div></div>
+      <div class="card"><h3>Ajuda demais vira muleta</h3><p>Pela "hipótese da orientação", quando a dica está sempre disponível, o aprendiz passa a depender dela e não desenvolve a sensação interna do movimento. A solução é dar bastante ajuda no começo e ir retirando aos poucos.</p><div class="inapp"><b>No Tecla</b>O teclado na tela fica aceso na Fase 1, apagado com retorno após 1,5 s de hesitação na Fase 2, e só aparece depois de 3 s na Fase 3.</div></div>
+      <div class="card"><h3>Lembrar é treinar</h3><p>Puxar uma informação da memória fortalece mais do que revê-la. Revisar conteúdo antigo intercalado com o novo ajuda a não esquecer o que já foi aprendido.</p><div class="inapp"><b>No Tecla</b>O aquecimento do treino de hoje revisa as teclas que você já aprendeu e não pratica há mais tempo, ou que erra mais. Etapas de revisão (↻) aparecem a cada 2 ou 3 etapas novas.</div></div>
+      <div class="card"><h3>Prática deliberada</h3><p>Repetir o que já é fácil não leva ninguém adiante. A melhora vem de treinar logo acima do seu nível, focando nas fraquezas e com retorno imediato.</p><div class="inapp"><b>No Tecla</b>O modo Pontos fracos mede erro e demora de cada tecla e monta um texto só com elas. O texto treme no erro e a tecla certa acende na hora.</div></div>
+    </div>
+
+    <h2>Plano de 6 semanas</h2>
+    <p>Com 15 a 20 minutos por dia. Se uma semana ficar difícil, repita: o ritmo é seu.</p>
+    <div class="tblwrap"><table class="weeks">
+      <thead><tr><th>Semana</th><th>O que treinar</th><th>Meta</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Etapas 1–7: fileira do meio (A S D F G H J K L Ç). Postura e não olhar.</td><td class="m">95% · 10 ppm</td></tr>
+        <tr><td>2</td><td>Etapas 8–19: fileiras de cima e de baixo até o alfabeto completo.</td><td class="m">95% · 15 ppm</td></tr>
+        <tr><td>3</td><td>Etapas 20–25: sílabas, dígrafos, palavras comuns, maiúsculas e vírgula.</td><td class="m">95% · 20 ppm</td></tr>
+        <tr><td>4</td><td>Etapas 26–32: todos os acentos (´ ~ ^ `), ção, e acento em maiúscula.</td><td class="m">94% · 25 ppm</td></tr>
+        <tr><td>5</td><td>Etapas 33–38: pontuação, aspas, números e símbolos.</td><td class="m">94% · 30 ppm</td></tr>
+        <tr><td>6+</td><td>Etapas 39–45 e testes de velocidade. Depois, só o treino de hoje.</td><td class="m">95% · 35–50 ppm</td></tr>
+      </tbody>
+    </table></div>
+    <p>Para comparar: quem cata milho costuma ficar entre 15 e 30 ppm. Quem digita no dia a dia, perto de 40. Acima de 60 já é velocidade profissional.</p>
+
+    <h2>A rotina de cada dia</h2>
+    <div class="routine">
+      <div><b>1</b><span>Aquecimento: revisão das teclas antigas (1–2 min)</span></div>
+      <div><b>2</b><span>Etapa nova, ou repetir a última se ficou abaixo de 2 estrelas</span></div>
+      <div><b>3</b><span>Pontos fracos: as teclas que você mais erra ou demora</span></div>
+      <div><b>4</b><span>Teste de 1 minuto, a partir da Fase 2, pra ver a evolução</span></div>
+    </div>
+    <p>Depois disso, pare. Treinar mais no mesmo dia rende pouco; amanhã você vai estar melhor.</p>
+
+    <h2>Quando travar num platô</h2>
+    <ul>
+      <li>Volte a velocidade um pouco e mire em 98% de precisão por alguns dias.</li>
+      <li>Treine os pontos fracos: geralmente 3 ou 4 teclas seguram tudo.</li>
+      <li>Faça testes curtos de 30 segundos forçando um pouco acima do seu ritmo, depois volte ao normal.</li>
+      <li>Escreva coisas reais (mensagens, trabalhos) sem olhar pro teclado. É a prática que mais conta.</li>
+    </ul>
+
+    <h2>Fontes</h2>
+    <ul class="src">
+      <li>Fitts, P. M. & Posner, M. I. (1967). <i>Human Performance</i>. Modelo das três fases do aprendizado motor.</li>
+      <li>Walker, M. P. et al. (2002). Practice with sleep makes perfect. <i>Neuron</i>. <a href="https://walkerlab.berkeley.edu/reprints/Walker%20et%20al._Neuron_2002.pdf" target="_blank" rel="noopener">PDF</a></li>
+      <li>Fischer, S. et al. (2002). Sleep forms memory for finger skills. <i>PNAS</i>. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC129381" target="_blank" rel="noopener">Artigo</a></li>
+      <li>Baddeley, A. & Longman, D. (1978). The influence of length and frequency of training session on the rate of learning to type. <i>Ergonomics</i>. <a href="https://www.gwern.net/doc/psychology/spaced-repetition/1978-baddeley.pdf" target="_blank" rel="noopener">PDF</a></li>
+      <li>Yamaguchi, M. & Logan, G. D. (2016). Pushing typists back on the learning curve: memory chunking in the hierarchical control of skilled typewriting. <a href="https://repository.essex.ac.uk/26184/" target="_blank" rel="noopener">Artigo</a></li>
+      <li>Salmoni, A., Schmidt, R. & Walter, C. (1984). Knowledge of results and motor learning. <i>Psychological Bulletin</i>. Hipótese da orientação.</li>
+      <li>Ericsson, K. A. et al. (1993). The role of deliberate practice in the acquisition of expert performance. <i>Psychological Review</i>.</li>
+    </ul>
+    <p class="src">Nem toda pesquisa concorda em tudo. Alguns estudos acham que o sono estabiliza mais do que melhora, e o efeito do treino espaçado varia com a tarefa. As recomendações acima são as que têm mais apoio para aprender a digitar.</p>
+    <div style="margin-top:26px"><button class="btn" data-go="home">Voltar e treinar</button></div>
+  </div>
+</section>
+
+<!-- ================= ACCENTS GUIDE ================= -->
+<section class="scr" id="s-acc">
+  <div class="top"><button class="pill" data-go="home">← Voltar</button></div>
+  <div class="doc">
+    <div class="lbl" style="color:var(--cyan);margin-top:10px">Guia</div>
+    <h1>Como colocar acento</h1>
+    <p class="lead">No teclado brasileiro (ABNT2), os acentos são "teclas mortas": você aperta o acento, <b>nada aparece</b>, e quando aperta a letra ela sai acentuada. São duas teclas em sequência, não ao mesmo tempo.</p>
+
+    <h2>Onde ficam</h2>
+    <div class="kb" id="acc-kb" style="margin:10px 0 8px"></div>
+    <p class="src" style="text-align:center">1 = tecla do acento · 2 = Shift (só para ^ e `)</p>
+
+    <h2>Todas as combinações</h2>
+    <div class="tblwrap"><table class="acc-tbl">
+      <thead><tr><th>Sai</th><th>Aperte</th><th>Exemplos</th></tr></thead>
+      <tbody>
+        <tr><td>á é í ó ú</td><td><kbd>´</kbd> depois a letra</td><td>café, já, até, música, último</td></tr>
+        <tr><td>ã õ</td><td><kbd>~</kbd> depois a letra</td><td>mão, não, limões, coração</td></tr>
+        <tr><td>â ê ô</td><td><kbd>Shift</kbd> + <kbd>~</kbd> (vira ^), solta, depois a letra</td><td>você, três, avô, ônibus</td></tr>
+        <tr><td>à</td><td><kbd>Shift</kbd> + <kbd>´</kbd> (vira `), solta, depois <kbd>a</kbd></td><td>à noite, às vezes</td></tr>
+        <tr><td>ç</td><td>tecla própria, ao lado do <kbd>L</kbd></td><td>açúcar, lição</td></tr>
+        <tr><td>É Á Ô</td><td>acento primeiro, depois <kbd>Shift</kbd> + letra</td><td>É, Água, Ônibus</td></tr>
+        <tr><td>´ ~ ^</td><td>o acento, depois <kbd>Espaço</kbd></td><td>pra o acento aparecer sozinho</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note">Dedos: <kbd>´</kbd> e <kbd>~</kbd> são do <b>mindinho direito</b>. O Shift, nesses casos, é o <b>Shift esquerdo</b> (mão oposta). A letra depois vai com o dedo normal dela.</div>
+
+    <h2>Teste o seu teclado</h2>
+    <div class="lab">
+      <div class="lbl">Clique aqui e digite á, ã, ê, à, ç</div>
+      <div class="out" id="lab-out" tabindex="0"></div>
+      <div class="log" id="lab-log">Esperando você digitar…</div>
+    </div>
+    <p>Se apareceu certinho, está tudo pronto. Se saiu <b>´a</b>, <b>'a</b>, ou o Ç não existe, seu computador está com o layout errado.</p>
+
+    <h2>Se não funcionar</h2>
+    <ul>
+      <li><b>Windows:</b> Configurações › Hora e idioma › Idioma e região › Português (Brasil) › Opções › Adicionar teclado › <b>Português (Brasil ABNT2)</b>. Troque entre teclados com <kbd>Win</kbd> + <kbd>Espaço</kbd>.</li>
+      <li><b>Mac:</b> Ajustes do Sistema › Teclado › Fontes de entrada › Editar › + › Português › <b>Brasileiro</b>.</li>
+      <li><b>Linux:</b> Configurações › Teclado › Fontes de entrada › + › Português (Brasil).</li>
+    </ul>
+
+    <h2>Teclado americano (sem Ç)</h2>
+    <p>Muitos notebooks vêm com teclado americano. Instale o layout <b>Estados Unidos-Internacional</b> e os acentos funcionam assim:</p>
+    <div class="tblwrap"><table class="acc-tbl">
+      <thead><tr><th>Sai</th><th>Aperte</th></tr></thead>
+      <tbody>
+        <tr><td>á é</td><td><kbd>'</kbd> depois a letra</td></tr>
+        <tr><td>ã õ</td><td><kbd>Shift</kbd> + <kbd>`</kbd> (vira ~), depois a letra</td></tr>
+        <tr><td>â ê ô</td><td><kbd>Shift</kbd> + <kbd>6</kbd> (vira ^), depois a letra</td></tr>
+        <tr><td>à</td><td><kbd>`</kbd> depois <kbd>a</kbd></td></tr>
+        <tr><td>ç</td><td><kbd>'</kbd> depois <kbd>c</kbd></td></tr>
+        <tr><td>'</td><td><kbd>'</kbd> depois <kbd>Espaço</kbd> (apóstrofo sozinho)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note">O teclado desenhado no Tecla é o ABNT2. Com teclado americano, ative <b>Sem acentos e Ç</b> nos Ajustes para treinar as letras, ou use o US-Internacional seguindo a tabela acima.</div>
+    <div style="margin-top:26px"><button class="btn" data-go="home">Voltar e treinar</button></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* ---------------- storage ---------------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('tecla_' + k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('tecla_' + k, JSON.stringify(v)); }catch(e){} }
+};
+const settings = Object.assign({kbMode:'auto', sound:true, noAccents:false, stopTest:false, testTime:60, testSrc:'frases'}, store.get('settings', {}));
+let progress = store.get('progress2', {});
+let history = store.get('history', []);
+let keyStats = store.get('keys', {});   // key -> [hits, misses, sumMs, nMs, lastTs]
+let days = store.get('days', {});       // 'YYYY-MM-DD' -> ms practiced
+let daily = store.get('daily', null);   // {date, items:[...], done}
+const saveSettings = () => store.set('settings', settings);
+
+/* ---------------- helpers ---------------- */
+const rnd = n => Math.floor(Math.random() * n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const strip = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const hasAccent = w => strip(w) !== w;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dkey = d => { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const fmtTime = sec => { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); };
+
+/* ---------------- content ---------------- */
+const WORDS = ('a o e de que do da em um para com não uma os no se na por mais as dos como mas foi ao ele das tem à seu sua ou ser quando muito há nos já está eu também só pelo pela até isso ela entre era depois sem mesmo aos ter seus quem nas me esse eles estão você tinha foram essa num nem suas meu às minha têm numa pelos elas havia seja qual será nós tenho lhe deles essas esses pelas este fosse dele tu te vocês meus minhas teu tua nosso nossa nossos nossas dela delas esta estes estas aquele aquela aqueles aquelas isto aquilo estou estamos estava ' +
+ 'casa vida tempo dia ano vez coisa homem mulher parte mundo lugar trabalho forma caso ponto governo empresa grupo problema fato mão olho noite pessoa história lado cidade país água nome palavra família momento hora razão terra filho mãe pai amigo escola livro mesa porta janela carro rua rio mar céu sol lua chuva vento fogo luz cor som jogo time bola campo festa comida pão leite café arroz feijão carne fruta doce sal açúcar ' +
+ 'fazer dizer poder ir ver dar saber querer ficar chegar passar deixar levar começar seguir encontrar chamar voltar falar pensar sair entrar viver sentir conhecer olhar ouvir correr andar pedir abrir fechar ganhar perder jogar ler escrever comer beber dormir acordar estudar aprender ensinar morar pagar comprar vender gostar precisar tentar mudar ajudar mostrar lembrar esquecer esperar achar usar digitar treinar ' +
+ 'bom boa grande pequeno novo velho alto baixo longo curto certo errado fácil difícil rápido devagar forte fraco feliz triste bonito feio claro escuro quente frio cheio vazio primeiro último melhor pior próximo simples junto sempre nunca hoje ontem amanhã agora antes logo cedo tarde aqui ali lá perto longe pouco bem mal ainda talvez sim ' +
+ 'sala fala asa salsa alfa gala dada fada falha galha ilha fila filha sede sela seis seja dia dias lei leis idade sei fase ideia fiel saia lado lago saga ' +
+ 'rosa roda sorte porta resto torre ritmo regra fruta ouro outro tudo todo toda dedo dado lodo fogo gato rato pato saudade sorriso futuro estrada hotel tarefa ' +
+ 'menina menino mente cama mata nuvem linha tema ' +
+ 'cachorro casaco cinema cinco vaca voto volta vale cavalo cebola ' +
+ 'pedra pente prato papel bebida banco barco bolo bolsa pipoca sapato ' +
+ 'quase queijo quarto quatro quinta zona zero azul prazo dez doze ' +
+ 'texto taxi exame xadrez peixe caixa ' +
+ 'site web show wifi yoga').split(/\s+/).filter(Boolean);
+const COMMON = WORDS.slice(0, 220);
+const NAMES = ['Brasil','Rio','Bahia','Recife','Salvador','Manaus','Curitiba','Natal','Belém','Goiânia','Fortaleza','Porto Alegre','Ana','Pedro','Maria','Lucas','Julia','Rafael','Bruna','Carlos','Paulo','Laura','Gabriel','Sofia','Amazonas','Minas','Santos','Copa','Janeiro','Março','Domingo','Segunda'];
+const SYL = ['de','que','se','ra','ta','co','do','ma','pa','ca','te','ri','na','to','ro','la','li','me','ne','ti','sa','po','mo','vi','ve','re','ga','go','fa','fi','ba','bo','lo','no','mi','di','em','en','an','os','es','ar','er','or','al','ou','ei','ai'];
+const DIGRAPH = 'chave chuva chegar chefe acho bicho achar fechar filho folha velho olho trabalho molho mulher ninho banho sonho vinho caminho linha carro terra correr ferro barro cachorro torre passo massa nosso isso assim pessoa passar queijo quero quente aquele pequeno quinta guerra guia sangue foguete seguir'.split(' ');
+const ENDINGS = 'fazendo correndo falando andando vendo sendo tendo quando mundo segundo jogando estudando realmente finalmente somente mente simplesmente claramente passado cansado lado obrigado sentido partido vestido comido cuidado estado chegar mudar voltar comer viver beber abrir partir sair'.split(' ');
+const ACUTE = 'água café já lá até é está só pé avó sofá médico música rápido fácil difícil último público número país saída também história máquina ótimo lápis sábado matéria família polícia notícia próximo período céu véu herói chapéu'.split(' ');
+const TIL = 'mão pão não irmão cão são então mãe alemão limões leões põe pães maçã amanhã lã irmã manhã avião cidadão opiniões botão feijão capitão'.split(' ');
+const CAO = 'canção ação nação atenção educação informação situação coração lição estação opção posição função ligação eleição lições ações opções nações estações funções canções'.split(' ');
+const CIRC = 'você três mês português avô ônibus ângulo câmera pêssego lâmpada têm vêm pôr metrô robô bebê ipê francês inglês cômodo tênis ciência'.split(' ');
+const CRASE = ['à noite','às vezes','à tarde','vou à praia','fui à feira','às duas horas','à direita','à esquerda','à vista','às pressas','chegou à escola','feito à mão','às oito','à toa'];
+const ACCCAPS = ['É agora.','Às vezes chove.','Água gelada.','Ônibus lotado.','Último dia.','Óculos novos.','À noite saímos.','Árvore alta.','Ética importa.','Época boa.','É verdade.','Ângulo reto.','Índio.','Às sete.'];
+const PUNCT2 = ['Tudo bem?','Que legal!','Atenção: prova amanhã.','Comprei frutas; esqueci o pão.','Quem chegou?','Vamos!','Nota: leia tudo.','Sim; claro.','Onde fica?','Que susto!','Lista: arroz, feijão e ovo.','Será?','Pronto!','Hora: oito e meia.'];
+const QUOTES = ['Ele disse "oi" e saiu.','(entre parênteses)','guarda-chuva','bem-vindo','"Tecla" ajuda.','segunda-feira (hoje)','beija-flor','"Calma", falei.','(veja abaixo)','arco-íris','pé-de-meia','"sim" ou "não"?','(opcional)'];
+const SYMBOLS = ['R$ 10','R$ 25,90','50%','ana@email.com','#tbt','A & B','2 * 3','(11) 98765-4321','100%','R$ 3,50','pedro@site.com.br','#vamos','5 + 5 = 10','10/12','*nota*','_teste_'];
+const SENTENCES = [
+ 'O segredo para digitar rápido é não olhar para o teclado.',
+ 'Mantenha os indicadores sobre as teclas F e J.',
+ 'Devagar se vai ao longe, e com prática se chega lá.',
+ 'A precisão vem primeiro; a velocidade aparece depois.',
+ 'Hoje choveu o dia inteiro, mas a tarde terminou com sol.',
+ 'Você já reparou como o café fica melhor numa manhã fria?',
+ 'O ônibus atrasou de novo e a fila dobrou a esquina.',
+ 'Minha avó guarda receitas antigas numa caixa de lata.',
+ 'No sábado, o time jogou mal no primeiro tempo e virou no segundo.',
+ 'Quem treina um pouco todo dia evolui mais do que quem treina muito de vez em quando.',
+ 'A cidade acordou cedo para ver o desfile passar.',
+ 'Ele esqueceu a senha, tentou três vezes e bloqueou a conta.',
+ 'Comprei pão, leite, ovos e uma dúzia de bananas.',
+ 'O cachorro do vizinho late sempre que o carteiro chega.',
+ 'Leia o enunciado inteiro antes de começar a responder.',
+ 'Ninguém nasce sabendo; todo mundo começa do zero.',
+ 'As estrelas pareciam mais brilhantes longe das luzes da cidade.',
+ 'Será que amanhã vai fazer calor ou frio?',
+ 'O professor pediu silêncio e começou a explicar a matéria.',
+ 'Respire fundo, relaxe os ombros e deixe os dedos leves.',
+ 'A geladeira estava vazia, então pedimos uma pizza.',
+ 'O trem partiu pontualmente às oito e meia da manhã.',
+ 'Escrever bem é reescrever: o primeiro rascunho nunca é o final.',
+ 'Ela abriu a janela e sentiu o cheiro da chuva na terra.',
+ 'Faltavam dois minutos quando a bola entrou no ângulo.',
+ 'Na feira, o pastel de queijo acabou antes do meio-dia.',
+ 'Não tenha pressa: errar menos é o caminho mais curto.',
+ 'Meu irmão aprendeu a andar de bicicleta sem rodinhas.',
+ 'O mapa estava errado, mas a aventura valeu a pena.',
+ 'Cada tecla tem um dedo certo; confie na memória das mãos.',
+ 'A biblioteca fecha às seis, então chegue antes disso.',
+ 'O sol se pôs atrás das montanhas e o céu ficou laranja.',
+ 'Ontem à noite assistimos a um filme muito engraçado.',
+ 'Que dia lindo para um passeio na praia!',
+ 'Guarde o celular e concentre-se em uma coisa de cada vez.',
+ 'O computador travou bem na hora de salvar o trabalho.',
+ 'Uma xícara de chá quente ajuda a pensar com calma.',
+ 'A professora corrigiu as provas e devolveu na sexta-feira.',
+ 'Os pássaros voltaram a cantar depois da tempestade.',
+ 'Quanto mais você pratica, mais natural tudo fica.'
+];
+const LONG = [
+ 'Quando a gente aprende algo novo, o cérebro reorganiza as conexões entre os neurônios, e cada repetição bem feita deixa esse caminho um pouco mais rápido.',
+ 'Durante o sono, o cérebro revisa o que foi praticado durante o dia, e por isso é comum acordar digitando melhor do que na noite anterior.',
+ 'Os primeiros dias são os mais difíceis: os dedos parecem lentos e desajeitados, mas é justamente nessa fase que a base está sendo construída.',
+ 'Em vez de treinar duas horas seguidas no fim de semana, vale mais a pena praticar quinze minutos todos os dias, com calma e atenção.',
+ 'O time entrou em campo sob vaias, segurou o empate no primeiro tempo e virou o jogo nos acréscimos, para delírio da torcida.',
+ 'A padaria da esquina abre às seis da manhã, e o cheiro de pão quente atravessa a rua inteira antes mesmo de o sol aparecer.',
+ 'Se você errar uma letra, não se irrite: respire, corrija com calma e siga em frente, porque o ritmo importa mais do que a pressa.',
+ 'Na viagem de ônibus até o litoral, contamos as placas, dormimos um pouco e acordamos com a vista do mar pela janela.',
+ 'Cada palavra que você digita sem olhar para o teclado é um pequeno voto de confiança na memória das suas mãos.',
+ 'A professora explicou que a crase aparece quando a preposição a encontra o artigo a, como em vou à escola ou às vezes.'
+];
+const MSGS = [
+ 'Oi! Tudo bem? Chego em 10 minutos.',
+ 'Bom dia, pessoal. A reunião foi para as 15h.',
+ 'Valeu pela ajuda ontem, de verdade!',
+ 'Pode me mandar o arquivo por e-mail?',
+ 'Já saí de casa; o trânsito está parado.',
+ 'Prezado professor, segue em anexo o trabalho.',
+ 'Hoje não vai dar, podemos marcar sábado?',
+ 'Comprei os ingressos: fila C, cadeiras 12 e 13.',
+ 'Lembra de levar o carregador do notebook.',
+ 'Parabéns pelo aniversário! Muita saúde e sucesso.',
+ 'O pedido 4521 chega até sexta-feira.',
+ 'Fechado, então. Te vejo às 19h30 na entrada.',
+ 'Esqueci a senha do Wi-Fi, qual é mesmo?',
+ 'Obrigado pelo retorno. Fico no aguardo.',
+ 'A conta deu R$ 87,50; dividimos por 3?'
+];
+
+/* ---------------- lessons ---------------- */
+const P1 = 'Fase 1 · Posição', P2 = 'Fase 2 · Blocos', P3 = 'Fase 3 · Fluência';
+const WHY = {
+  1: 'Nesta fase o cérebro está montando o mapa do teclado. Ir devagar e acertar é o que grava o caminho certo; cada erro repetido também é gravado.',
+  2: 'Agora o objetivo é juntar letras em blocos que saem de uma vez, como "que" ou "ção". Repetir o mesmo bloco várias vezes seguidas é o que forma esses atalhos.',
+  3: 'Nesta fase os movimentos já são automáticos. O teclado na tela some para você confiar no tato. Foque no texto, não nos dedos.'
+};
+const LESSONS = [
+ // ---------- FASE 1 ----------
+ {ph:1, add:'fj', name:'F e J', keys:'fj', lead:'O ponto de partida. Os indicadores ficam sobre o F e o J; esses são os únicos dedos que você nunca perde de vista.', how:['Apoie os dedos levemente: esquerda em A S D F, direita em J K L Ç.','Sinta os pontinhos em relevo no F e no J sem olhar.','Aperte F com o indicador esquerdo e J com o direito. Espaço com o polegar.'], why:'Os pontinhos em relevo existem para o tato substituir a visão. Treinar sem olhar desde o primeiro minuto evita criar um hábito que depois precisa ser desaprendido.'},
+ {ph:1, add:'dk', name:'D e K', keys:'dk', lead:'Os dedos médios entram em ação.', how:['D com o médio esquerdo, K com o médio direito.','Só o dedo da tecla se mexe. Os indicadores não saem do F e do J.']},
+ {ph:1, add:'sl', name:'S e L', keys:'sl', lead:'Agora os anelares.', how:['S com o anelar esquerdo, L com o anelar direito.','Se o dedo errado se mexer junto, vá mais devagar: o anelar é naturalmente o dedo menos independente.']},
+ {ph:1, add:'aç', name:'A e Ç', keys:'aç', lead:'Os mindinhos completam a fileira do meio. No teclado brasileiro o Ç tem tecla própria, logo depois do L.', how:['A com o mindinho esquerdo.','Ç com o mindinho direito, na tecla ao lado do L.']},
+ {ph:1, rev:true, name:'Revisão: fileira do meio', focus:'asdfjklç', lead:'Revisão sem teclas novas. Lembrar sem ajuda é o que fixa.', how:['Tente olhar o menos possível para o teclado da tela.','Mire em 95% de precisão.'], why:'Puxar da memória o que você aprendeu fortalece mais do que ver de novo. Por isso o Tecla intercala revisões entre as etapas novas.'},
+ {ph:1, add:'gh', name:'G e H', keys:'gh', lead:'O centro do teclado.', how:['G: o indicador esquerdo estica para a direita e volta pro F.','H: o indicador direito estica para a esquerda e volta pro J.']},
+ {ph:1, rev:true, name:'Revisão: palavras da fileira do meio', focus:'gh', lead:'Primeiras palavras de verdade só com a fileira do meio.', how:['Sala, fala, asa, gala: palavras inteiras com 10 teclas.']},
+ {ph:1, add:'ei', name:'E e I', keys:'ei', lead:'Subindo para a fileira de cima com as vogais mais usadas.', how:['E: o médio esquerdo sobe um pouco (sai do D).','I: o médio direito sobe (sai do K).','Depois de cada tecla, o dedo volta para a fileira do meio.']},
+ {ph:1, add:'ru', name:'R e U', keys:'ru', lead:'Indicadores na fileira de cima.', how:['R: indicador esquerdo sobe do F.','U: indicador direito sobe do J.']},
+ {ph:1, rev:true, name:'Revisão: E I R U', focus:'eiru', lead:'Misturando fileira do meio e de cima.', how:['Repare na volta: subiu, voltou pra casa.']},
+ {ph:1, add:'ot', name:'O e T', keys:'ot', lead:'Mais duas letras muito frequentes no português.', how:['O: anelar direito sobe do L.','T: indicador esquerdo sobe e estica para a direita (acima do G).']},
+ {ph:1, rev:true, name:'Revisão: fileira de cima', focus:'eirout', lead:'Já dá para escrever muita coisa: roda, terra, tudo, ritmo.', how:['Leia a palavra inteira antes de começar a digitá-la.']},
+ {ph:1, add:'nm', name:'N e M', keys:'nm', lead:'Descendo para a fileira de baixo.', how:['N e M: o indicador direito desce do J (N fica à esquerda, M embaixo).']},
+ {ph:1, add:'cv', name:'C e V', keys:'cv', lead:'Fileira de baixo, lado esquerdo.', how:['C: médio esquerdo desce do D.','V: indicador esquerdo desce do F.']},
+ {ph:1, rev:true, name:'Revisão: fileira de baixo', focus:'nmcv', lead:'As três fileiras juntas.', how:['Cuidado para não usar o mesmo dedo em teclas de mãos diferentes.']},
+ {ph:1, add:'pb', name:'P e B', keys:'pb', lead:'Duas letras de alcance mais longo.', how:['P: mindinho direito sobe do Ç.','B: indicador esquerdo desce e estica para a direita (abaixo do G).']},
+ {ph:1, add:'qz', name:'Q e Z', keys:'qz', lead:'O mindinho esquerdo sobe e desce.', how:['Q: mindinho esquerdo sobe do A.','Z: mindinho esquerdo desce do A.']},
+ {ph:1, add:'xwy', name:'X, W e Y', keys:'xwy', lead:'As últimas letras do alfabeto!', how:['X: anelar esquerdo desce do S.','W: anelar esquerdo sobe do S.','Y: indicador direito sobe e estica para a esquerda (acima do H).']},
+ {ph:1, rev:true, name:'Revisão: alfabeto completo', focus:'', lead:'Todas as letras. Fim da Fase 1.', how:['Aqui vale ter 95% de precisão antes de seguir.'], why:'Terminar a Fase 1 com precisão alta faz o resto ser muito mais fácil. Se ficou abaixo de 2 estrelas, vale repetir amanhã: depois de uma noite de sono você costuma render melhor.'},
+ // ---------- FASE 2 ----------
+ {ph:2, gen:'syl', name:'Sílabas comuns', keys:'', lead:'Começa a fase dos blocos: as sílabas que mais aparecem no português.', how:['Pense na sílaba inteira ("que", "de"), não em cada letra.','As sílabas se repetem em sequência de propósito.'], why:'Digitadores rápidos não pensam letra por letra. O cérebro junta sequências frequentes em blocos que saem como um movimento só, e esses blocos se formam com repetição seguida.'},
+ {ph:2, gen:'digraph', name:'CH, LH, NH, RR, SS, QU', keys:'', lead:'Pares de letras que andam sempre juntos.', how:['Trate cada par como uma unidade: "lh", "nh", "qu".']},
+ {ph:2, gen:'endings', name:'Terminações', keys:'', lead:'-ndo, -mente, -ado, -ido, -ar, -er, -ir: finais que aparecem o tempo todo.', how:['Ganhar velocidade nos finais acelera quase toda palavra.']},
+ {ph:2, gen:'top', name:'Palavras mais usadas', keys:'', lead:'As palavras mais comuns do português, sem acento ainda.', how:['de, que, para, com, não... Essas devem sair sem pensar.']},
+ {ph:2, gen:'caps', name:'Maiúsculas', keys:'', lead:'O Shift é da mão oposta à letra.', how:['Letra da mão esquerda (A, S, E...)? Segure o Shift direito com o mindinho direito.','Letra da mão direita (J, L, P...)? Shift esquerdo com o mindinho esquerdo.','Segure o Shift, aperte a letra, solte os dois.'], why:'Usar sempre o Shift do mesmo lado obriga a mão a se deslocar. Com o Shift oposto, uma mão segura e a outra digita, sem sair da posição.'},
+ {ph:2, gen:'punct1', name:'Vírgula e ponto', keys:',.', lead:'Frases curtas com vírgula e ponto final.', how:[', é do médio direito (desce do K).','. é do anelar direito (desce do L).','Depois da vírgula e do ponto vem um espaço.']},
+ {ph:2, gen:'acute', accent:true, name:'Acento agudo ´', keys:'´', lead:'Primeiro acento: á é í ó ú. No ABNT2 o acento é uma "tecla morta": você aperta, nada aparece, e ele entra na próxima letra.', how:['Aperte ´ com o mindinho direito (tecla à direita do P) e solte.','Não aparece nada na tela. É normal.','Aperte a vogal. Sai á, é, í, ó, ú.'], tryC:['á','é','ó'], why:'Aprender o acento cedo, separado, evita o vício de digitar sem acento e corrigir depois. Duas teclas em sequência viram um bloco só com a prática.'},
+ {ph:2, gen:'til', accent:true, name:'Til ~ (ã, õ)', keys:'~', lead:'O til fica no mindinho direito, na tecla ao lado do Ç.', how:['Aperte ~ e solte (nada aparece).','Aperte a ou o: sai ã ou õ.','"-ão" é um dos blocos mais comuns do português: mão, não, então.'], tryC:['ã','õ']},
+ {ph:2, gen:'cao', accent:true, name:'-ção e -ções', keys:'ç~', lead:'Junta o Ç e o til no bloco mais famoso do português.', how:['ç (mindinho direito) → ~ (mindinho direito) → a → o.','Repita "ção" até sair num gesto só.'], tryC:['ç','ã']},
+ {ph:2, gen:'circ', accent:true, name:'Circunflexo ^ (â, ê, ô)', keys:'~', lead:'O ^ é a mesma tecla do ~, com Shift.', how:['Segure Shift esquerdo (mão oposta) e aperte ~. Solte os dois.','Aperte a vogal: sai â, ê, ô.','você, três, avô, ônibus.'], tryC:['ê','ô','â']},
+ {ph:2, gen:'crase', accent:true, name:'Crase ` (à, às)', keys:'´', lead:'A crase é a mesma tecla do ´, com Shift.', how:['Segure Shift esquerdo e aperte ´. Solte.','Aperte a: sai à.','Use em "à noite", "às vezes", "vou à praia".'], tryC:['à']},
+ {ph:2, gen:'acccaps', accent:true, name:'Acento em maiúscula', keys:'´', lead:'É, Á, Ô no começo da frase.', how:['Primeiro o acento (´ ou Shift + ~), solto.','Depois Shift + letra: sai É, Á, Ô.'], tryC:['É','Á']},
+ {ph:2, gen:'accrev', accent:true, rev:true, name:'Revisão: todos os acentos', keys:'', lead:'Todos os acentos misturados em palavras reais.', how:['´ agudo · ~ til · Shift+~ circunflexo · Shift+´ crase.']},
+ {ph:2, gen:'punct2', name:'? ! : ;', keys:'/;', lead:'Pontuação com Shift.', how:['? é Shift esquerdo + / (mindinho direito, última tecla da fileira de baixo).','! é Shift direito + 1 (mindinho esquerdo).','; tem tecla própria, logo à esquerda do / (mindinho direito). : é Shift + ;.']},
+ {ph:2, gen:'quotes', name:'Aspas, parênteses e hífen', keys:'\'90-', lead:'"aspas", (parênteses) e palavras-com-hífen.', how:['" é Shift + \' (mindinho esquerdo, tecla à esquerda do 1).','( é Shift + 9 e ) é Shift + 0.','- fica à direita do 0 (mindinho direito).']},
+ {ph:2, gen:'num1', name:'Números 1 a 5', keys:'12345', lead:'A fileira de números, lado esquerdo.', how:['Cada dedo sobe duas fileiras a partir da tecla de casa.','1 mindinho, 2 anelar, 3 médio, 4 e 5 indicador esquerdo.']},
+ {ph:2, gen:'num2', name:'Números 6 a 0', keys:'67890', lead:'A fileira de números, lado direito.', how:['6 e 7 indicador direito, 8 médio, 9 anelar, 0 mindinho direito.']},
+ {ph:2, gen:'symbols', name:'Símbolos: R$ @ % #', keys:'2345', lead:'Os símbolos do dia a dia: dinheiro, e-mail, porcentagem.', how:['@ = Shift + 2 · # = Shift + 3 · $ = Shift + 4 · % = Shift + 5.','R$ = Shift + R, depois Shift + 4.']},
+ {ph:2, gen:'p2rev', rev:true, name:'Revisão da Fase 2', keys:'', lead:'Tudo da Fase 2 junto: acentos, maiúsculas, pontuação e números.', how:['Mire em 94% ou mais.']},
+ // ---------- FASE 3 ----------
+ {ph:3, gen:'fastwords', name:'Palavras frequentes', keys:'', lead:'Começa a fluência. As palavras mais usadas, agora com acentos.', how:['Tente manter um ritmo constante, como um metrônomo.'], why:WHY[3]},
+ {ph:3, gen:'short', name:'Frases curtas', keys:'', lead:'Frases completas e curtas.', how:['Leia um pouco à frente do cursor: os olhos vão antes dos dedos.']},
+ {ph:3, gen:'msgs', name:'Mensagens do dia a dia', keys:'', lead:'O tipo de texto que você mais vai escrever na vida real.', how:['Mensagens, e-mails, horários e valores.']},
+ {ph:3, gen:'long', name:'Frases longas', keys:'', lead:'Frases maiores, que pedem fôlego e ritmo.', how:['Não acelere no fim: ritmo igual do começo ao fim.']},
+ {ph:3, gen:'numtext', name:'Texto com números', keys:'', lead:'Números e pontuação no meio de texto corrido.', how:['Volte para a fileira do meio depois de cada número.']},
+ {ph:3, gen:'long', kb:'never', name:'Sem teclado na tela', keys:'', lead:'O teclado da tela fica desligado nesta etapa. Só você e o tato.', how:['Se travar, sinta os pontinhos do F e do J e recomece dali.']},
+ {ph:3, gen:'final', name:'Desafio final', keys:'', lead:'Um texto completo com tudo o que você aprendeu.', how:['Meta: 95% de precisão.'], why:'Daqui em diante o que mais faz você evoluir é usar: escrever de verdade, sem olhar, um pouco todo dia. O treino de hoje continua montando revisões das suas teclas mais fracas.'}
+];
+LESSONS.forEach((l, i) => { l.id = 'E' + (i + 1); l.idx = i; });
+const PHASES = {1:{name:P1, short:'Posição', desc:'aprender onde cada tecla fica', color:'var(--ph1)'}, 2:{name:P2, short:'Blocos', desc:'sílabas, acentos, pontuação e números', color:'var(--ph2)'}, 3:{name:P3, short:'Fluência', desc:'textos reais, sem teclado na tela', color:'var(--ph3)'}};
+
+function addFor(L){ return L.add ? (settings.noAccents ? L.add.replace('ç', '') : L.add) : ''; }
+function allowedUpTo(idx){
+  const s = new Set();
+  for(let i = 0; i <= idx && i < LESSONS.length; i++) for(const c of addFor(LESSONS[i])) s.add(c);
+  return s;
+}
+function lastLetterIdx(idx){ let j = -1; for(let i = 0; i <= idx; i++) if(LESSONS[i].add) j = i; return j; }
+
+/* ---------------- text generators ---------------- */
+function drill(newL, allowed, len){
+  const pool = Array.from(allowed);
+  let s = '';
+  for(let i = 0; i < len; i++) s += Math.random() < .6 ? pick(newL) : pick(pool);
+  if(!newL.some(c => s.includes(c))) s = s.slice(0, -1) + pick(newL);
+  return s;
+}
+// tokens are pushed in small repeated runs so chunks can form
+function runs(src, n, rep){
+  const out = [];
+  while(out.length < n){
+    const t = typeof src === 'function' ? src() : pick(src);
+    const r = Math.min(rep ? 1 + rnd(rep) : 1, n - out.length);
+    for(let k = 0; k < r; k++) out.push(t);
+  }
+  return out.join(' ');
+}
+function wordsWithin(allowed){ return WORDS.filter(w => [...w].every(c => allowed.has(c))); }
+function genLetters(idx){
+  const L = LESSONS[idx], newL = [...addFor(L)], allowed = allowedUpTo(idx);
+  if(!newL.length) return genReview(idx);
+  if(idx === 0) return runs(['fff','jjj','fj','jf','ffj','jjf','fjf','jfj','ff','jj','fjj','jff'], 26, 0);
+  const words = wordsWithin(allowed);
+  const withNew = words.filter(w => newL.some(c => w.includes(c)));
+  const warm = newL.map(c => c + c + c).join(' ') + ' ' + newL.join('') + ' ' + newL.join('');
+  const body = runs(() => {
+    const r = Math.random();
+    if(withNew.length >= 3 && r < .5) return pick(withNew);
+    if(words.length >= 8 && r < .7) return pick(words);
+    return drill(newL, allowed, 2 + rnd(3));
+  }, 22, 2);
+  return warm + ' ' + body;
+}
+function genReview(idx){
+  const L = LESSONS[idx], allowed = allowedUpTo(idx);
+  const focus = [...(L.focus || '')].filter(c => allowed.has(c));
+  const words = wordsWithin(allowed);
+  const fw = focus.length ? words.filter(w => focus.some(c => w.includes(c))) : words;
+  return runs(() => {
+    const r = Math.random();
+    if(fw.length >= 3 && r < .55) return pick(fw);
+    if(words.length >= 6 && r < .8) return pick(words);
+    return drill(focus.length ? focus : [...allowed], allowed, 3 + rnd(3));
+  }, 26, 2);
+}
+const plain = () => WORDS.filter(w => !hasAccent(w) && w.length > 2);
+function phrase(src, n){ // capitalized short phrase with period
+  const ws = Array.from({length: n}, () => pick(src));
+  let s = ws.join(' ');
+  if(Math.random() < .5 && n > 3){ const k = 1 + rnd(n - 2); const a = ws.slice(0, k).join(' '), b = ws.slice(k).join(' '); s = a + ', ' + b; }
+  return s[0].toUpperCase() + s.slice(1) + '.';
+}
+const GEN = {
+  syl: () => runs(() => Math.random() < .6 ? pick(SYL) : pick(SYL) + pick(SYL), 30, 3),
+  digraph: () => runs(() => Math.random() < .25 ? pick(['ch','lh','nh','rr','ss','qu','gu']) : pick(DIGRAPH), 24, 2),
+  endings: () => runs(ENDINGS, 24, 2),
+  top: () => runs(COMMON.filter(w => !hasAccent(w)).slice(0, 120), 28, 2),
+  caps: () => runs(() => { const r = Math.random(); if(r < .4) return pick(NAMES.filter(n => !hasAccent(n))); const w = pick(plain()); return r < .85 ? w[0].toUpperCase() + w.slice(1) : w; }, 20, 1),
+  punct1: () => Array.from({length: 5}, () => phrase(plain().slice(0, 300), 3 + rnd(4))).join(' '),
+  acute: () => 'á é í ó ú á é í ó ú ' + runs(() => Math.random() < .8 ? pick(ACUTE) : pick(plain()), 20, 2),
+  til: () => 'ã õ ã õ ão ão ões ' + runs(() => Math.random() < .8 ? pick(TIL) : pick(plain()), 20, 2),
+  cao: () => 'ção ção ção ções ções ' + runs(CAO, 20, 2),
+  circ: () => 'â ê ô â ê ô ' + runs(() => Math.random() < .8 ? pick(CIRC) : pick(plain()), 20, 2),
+  crase: () => 'à à às às ' + shuffle(CRASE).slice(0, 10).join(' '),
+  acccaps: () => shuffle(ACCCAPS).slice(0, 10).join(' '),
+  accrev: () => runs(() => pick(pick([ACUTE, TIL, CAO, CIRC])), 24, 1) + ' ' + pick(CRASE),
+  punct2: () => shuffle(PUNCT2).slice(0, 10).join(' '),
+  quotes: () => shuffle(QUOTES).slice(0, 9).join(' '),
+  num1: () => runs(() => Math.random() < .65 ? Array.from({length: 1 + rnd(3)}, () => 1 + rnd(5)).join('') : pick(plain()), 26, 2),
+  num2: () => runs(() => Math.random() < .65 ? Array.from({length: 1 + rnd(3)}, () => pick([6,7,8,9,0])).join('') : pick(plain()), 26, 2),
+  symbols: () => shuffle(SYMBOLS).slice(0, 12).join(' '),
+  p2rev: () => [pick(ACCCAPS), pick(MSGS), pick(PUNCT2), pick(SYMBOLS), pick(QUOTES), pick(SENTENCES)].join(' '),
+  fastwords: () => runs(COMMON, 34, 1),
+  short: () => shuffle(SENTENCES).slice(0, 4).join(' '),
+  msgs: () => shuffle(MSGS).slice(0, 5).join(' '),
+  long: () => shuffle(LONG).slice(0, 2).join(' '),
+  numtext: () => shuffle(MSGS.filter(m => /\d/.test(m))).slice(0, 4).join(' ') + ' ' + pick(SYMBOLS),
+  final: () => [pick(LONG), pick(SENTENCES), pick(MSGS), pick(LONG)].join(' ')
+};
+function lessonText(idx){
+  const L = LESSONS[idx];
+  if(L.gen) return GEN[L.gen]();
+  if(L.rev) return genReview(idx);
+  return genLetters(idx);
+}
+function testChunk(){
+  if(settings.testSrc === 'palavras') return runs(COMMON, 30, 1);
+  return shuffle(SENTENCES.concat(MSGS)).slice(0, 4).join(' ');
+}
+
+/* ---------------- key memory: errors, speed, last seen ---------------- */
+function keyInfo(){
+  const rows = [];
+  let tMs = 0, tN = 0;
+  for(const [k, v] of Object.entries(keyStats)){ if(v[3]){ tMs += v[2]; tN += v[3]; } }
+  const gAvg = tN ? tMs / tN : 0;
+  for(const [k, v] of Object.entries(keyStats)){
+    if(!/^[a-zçáéíóúãõâêôà]$/.test(k)) continue;
+    const n = v[0] + v[1];
+    if(n < 15) continue;
+    const miss = v[1] / n;
+    const avg = v[3] >= 8 ? v[2] / v[3] : gAvg;
+    const slow = gAvg ? Math.max(0, avg / gAvg - 1) : 0;
+    const daysAgo = v[4] ? (Date.now() - v[4]) / 864e5 : 30;
+    rows.push({k, miss, slow, daysAgo, score: miss * 6 + slow * 0.6});
+  }
+  return rows;
+}
+function weakKeys(n){
+  let rows = keyInfo().filter(r => r.miss > 0.02 || r.slow > 0.25);
+  if(settings.noAccents) rows = rows.filter(r => !hasAccent(r.k) && r.k !== 'ç');
+  return rows.sort((a, b) => b.score - a.score).slice(0, n).map(r => ({k: r.k, slow: r.slow > 0.25 && r.miss < 0.05}));
+}
+function weakText(){
+  let keys = weakKeys(5).map(x => x.k);
+  if(!keys.length) keys = shuffle([...'qwertyuiopasdfghjklzxcvbnm']).slice(0, 4);
+  const ws = WORDS.filter(w => keys.some(k => w.includes(k)) && w.length > 2);
+  const base = keys.filter(k => /^[a-zç]$/.test(k));
+  const text = runs(() => (Math.random() < .78 && ws.length) || !base.length ? pick(ws) : pick(base) + pick(base) + pick(base), 28, 2);
+  return {text, keys};
+}
+// spaced review: learned keys, prioritised by errors + time since last practice
+function learnedIdx(){
+  let j = -1;
+  LESSONS.forEach((L, i) => { if(progress[L.id] && L.add) j = i; });
+  return j;
+}
+function warmText(){
+  const li = learnedIdx();
+  const allowed = li >= 0 ? allowedUpTo(li) : new Set('fj');
+  const info = keyInfo().filter(r => allowed.has(r.k));
+  const due = info.map(r => ({k: r.k, p: r.miss * 6 + Math.min(r.daysAgo / 3, 1.5) + r.slow * .5})).sort((a, b) => b.p - a.p).slice(0, 5).map(r => r.k);
+  const focus = due.length ? due : shuffle([...allowed]).slice(0, 4);
+  const words = wordsWithin(allowed);
+  const fw = words.filter(w => focus.some(c => w.includes(c)));
+  const fullAlpha = allowed.size >= 25;
+  if(fullAlpha && progress[LESSONS[24].id]){
+    // past the basics: review with real phrases mixed in
+    return runs(() => Math.random() < .7 && fw.length ? pick(fw) : pick(COMMON), 18, 2) + ' ' + pick(SENTENCES);
+  }
+  return runs(() => Math.random() < .65 && fw.length >= 3 ? pick(fw) : words.length >= 6 && Math.random() < .7 ? pick(words) : drill(focus, allowed, 3 + rnd(2)), 22, 2);
+}
+
+/* ---------------- keyboard (ABNT2) ---------------- */
+const KB = [
+ [["'",'"'],['1','!'],['2','@'],['3','#'],['4','$'],['5','%'],['6','¨'],['7','&'],['8','*'],['9','('],['0',')'],['-','_'],['=','+'],{id:'bksp',label:'⌫',w:2}],
+ [{id:'tab',label:'Tab',w:1.5},['q'],['w'],['e'],['r'],['t'],['y'],['u'],['i'],['o'],['p'],['´','`'],['[','{'],{id:'enter1',label:'',w:1.5}],
+ [{id:'caps',label:'Caps',w:1.75},['a'],['s'],['d'],['f'],['g'],['h'],['j'],['k'],['l'],['ç'],['~','^'],[']','}'],{id:'enter',label:'Enter',w:1.25}],
+ [{id:'lshift',label:'Shift',w:1.25},['\\','|'],['z'],['x'],['c'],['v'],['b'],['n'],['m'],[',','<'],['.','>'],[';',':'],['/','?'],{id:'rshift',label:'Shift',w:1.75}],
+ [{id:'sp1',w:4,spacer:true},{id:'space',label:'',w:7},{id:'sp2',w:4,spacer:true}]
+];
+const FINGER = {};
+const assign = (f, chars, ids) => { for(const c of chars) FINGER[c] = f; (ids || []).forEach(i => FINGER[i] = f); };
+assign('lp', "'1qaz\\", ['tab','caps','lshift']);
+assign('lr', '2wsx'); assign('lm', '3edc'); assign('li', '45rtfgvb');
+assign('ri', '67yuhjnm'); assign('rm', '8ik,'); assign('rr', '9ol.');
+assign('rp', "0-=p´[ç~];/", ['bksp','enter','enter1','rshift']);
+FINGER.space = 'th';
+const FCOLOR = {lp:'var(--f-pinky)', rp:'var(--f-pinky)', lr:'var(--f-ring)', rr:'var(--f-ring)', lm:'var(--f-middle)', rm:'var(--f-middle)', li:'var(--f-index)', ri:'var(--f-index)', th:'var(--f-thumb)'};
+const FNAME = {lp:'mindinho esquerdo', lr:'anelar esquerdo', lm:'médio esquerdo', li:'indicador esquerdo', ri:'indicador direito', rm:'médio direito', rr:'anelar direito', rp:'mindinho direito', th:'polegar'};
+const HOME = new Set([...'asdfjklç']);
+const BASE = {}, SHIFT = {};
+KB.flat().forEach(k => { if(Array.isArray(k)){ BASE[k[0]] = k[0]; if(k[1]) SHIFT[k[1]] = k[0]; } });
+
+function renderKeyboard(el){
+  el.innerHTML = '';
+  const map = {};
+  KB.forEach(row => {
+    const r = document.createElement('div'); r.className = 'row';
+    row.forEach(k => {
+      const d = document.createElement('div');
+      let id;
+      if(Array.isArray(k)){
+        id = k[0];
+        d.className = 'key';
+        const isLetter = /^[a-zç]$/.test(k[0]);
+        d.innerHTML = isLetter ? k[0].toUpperCase() : (k[1] ? '<span class="s">' + esc(k[1]) + '</span>' : '') + esc(k[0]);
+        if(k[0] === 'f' || k[0] === 'j') d.classList.add('bump');
+      } else {
+        id = k.id;
+        d.className = 'key sm' + (k.spacer ? ' spacer' : '');
+        d.textContent = k.label || '';
+        d.style.setProperty('--w', k.w);
+      }
+      const f = FINGER[id];
+      if(f) d.style.setProperty('--fc', FCOLOR[f]);
+      map[id] = d;
+      r.appendChild(d);
+    });
+    el.appendChild(r);
+  });
+  return map;
+}
+
+const ACC = {'á':['´','a'],'é':['´','e'],'í':['´','i'],'ó':['´','o'],'ú':['´','u'],'à':['`','a'],'â':['^','a'],'ê':['^','e'],'ô':['^','o'],'ã':['~','a'],'õ':['~','o'],'ü':['¨','u']};
+function single(c){
+  let id = null, sh = false;
+  if(c === ' ') id = 'space';
+  else if(BASE[c]) id = c;
+  else if(SHIFT[c]){ id = SHIFT[c]; sh = true; }
+  else { const lo = c.toLowerCase(); if(lo !== c && BASE[lo]){ id = lo; sh = true; } }
+  if(!id) return null;
+  const keys = [id];
+  if(sh) keys.push(FINGER[id] && FINGER[id][0] === 'l' ? 'rshift' : 'lshift');
+  return {main: id, shift: sh, keys, char: c};
+}
+function stepsFor(ch){
+  if(ch == null) return [];
+  const lo = ch.toLowerCase(), up = lo !== ch;
+  if(ACC[lo]){
+    const [d, l] = ACC[lo];
+    return [single(d), single(up ? l.toUpperCase() : l)].filter(Boolean);
+  }
+  const s = single(ch);
+  return s ? [s] : [];
+}
+function keyLabel(id){
+  if(id === 'space') return 'Espaço';
+  if(id === 'lshift') return 'Shift esq.';
+  if(id === 'rshift') return 'Shift dir.';
+  return /^[a-zç]$/.test(id) ? id.toUpperCase() : id;
+}
+function stepsHtml(ch){
+  return stepsFor(ch).map(s => (s.shift ? '<kbd>' + keyLabel(s.keys[1]) + '</kbd> + ' : '') + '<kbd>' + esc(keyLabel(s.main)) + '</kbd>').join(' depois ');
+}
+
+/* ---------------- sound ---------------- */
+let actx = null;
+function beep(){
+  if(!settings.sound) return;
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'square'; o.frequency.value = 180;
+    g.gain.setValueAtTime(0.05, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.09);
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + 0.1);
+  }catch(e){}
+}
+
+/* ---------------- screens ---------------- */
+let screen = 'home';
+function show(name){
+  screen = name;
+  $$('.scr').forEach(s => s.classList.toggle('on', s.id === 's-' + name));
+  window.scrollTo(0, 0);
+}
+function go(name){
+  if(name === 'home'){ goHome(); return; }
+  if(name === 'stats'){ renderStats(); return; }
+  if(name === 'acc'){ renderAccGuide(); show('acc'); return; }
+  show(name);
+}
+
+/* ---------------- phase / progress ---------------- */
+function visibleLessons(){ return LESSONS.map((l, i) => i).filter(i => !(settings.noAccents && LESSONS[i].accent)); }
+function nextLessonIdx(){
+  for(const i of visibleLessons()) if(!progress[LESSONS[i].id]) return i;
+  return -1;
+}
+function currentPhase(){
+  const n = nextLessonIdx();
+  return n < 0 ? 3 : LESSONS[n].ph;
+}
+
+/* ---------------- intro ---------------- */
+let introIdx = -1, introTry = null;
+let introCfg = null;
+function showIntro(idx, extra){
+  const L = LESSONS[idx];
+  introIdx = idx;
+  introCfg = extra || {};
+  const ph = PHASES[L.ph];
+  const tryC = settings.noAccents ? null : L.tryC;
+  introTry = tryC ? {list: tryC, i: 0} : null;
+  const el = $('#intro');
+  el.style.setProperty('--pc', ph.color);
+  const newKeys = L.add ? [...addFor(L)] : [...(L.keys || '')];
+  el.innerHTML =
+    '<div class="ph">' + ph.name + ' · Etapa ' + (idx + 1) + ' de ' + LESSONS.length + (L.rev ? ' · revisão' : '') + '</div>' +
+    '<h2>' + esc(L.name) + '</h2>' +
+    '<p class="lead">' + esc(L.lead || '') + '</p>' +
+    '<div class="icols">' +
+      '<div class="ibox"><h4>Como fazer</h4><ol>' + (L.how || []).map(h => '<li>' + fmtHow(h) + '</li>').join('') + '</ol></div>' +
+      '<div class="ibox why"><h4>Por que assim</h4><p>' + esc(L.why || WHY[L.ph]) + '</p></div>' +
+    '</div>' +
+    (introTry ? '<div class="try" id="try"><div><div class="lbl">Teste antes de começar</div><div style="font-size:13.5px;color:var(--text2);margin-top:4px">Digite cada caractere abaixo:</div></div><div class="chips" id="try-chips">' + tryC.map((c, i) => '<b class="' + (i === 0 ? 'cur' : '') + '">' + esc(c) + '</b>').join('') + '</div><div class="got" id="try-got">' + stepsHtml(tryC[0]) + '</div></div>' : '') +
+    '<div class="kb ikb" id="ikb"></div>' +
+    '<div class="acts"><button class="btn big" id="intro-go">Começar <span style="opacity:.6">(Enter)</span></button><small>dica: <kbd>Enter</kbd> pula esta tela</small></div>';
+  const m = renderKeyboard($('#ikb'));
+  Object.entries(m).forEach(([id, k]) => { if(HOME.has(id)) k.classList.add('home'); });
+  newKeys.forEach(c => { const s = single(c) || single(c.toLowerCase()); if(s && m[s.main]) m[s.main].classList.add('target'); });
+  if(L.gen === 'circ' || L.gen === 'crase'){ m.lshift.classList.add('tshift'); }
+  if(L.gen === 'caps'){ m.lshift.classList.add('tshift'); m.rshift.classList.add('tshift'); }
+  $('#intro-go').addEventListener('click', () => startLesson(idx, introCfg));
+  show('intro');
+}
+function fmtHow(h){
+  // turn single symbols into <kbd>
+  return esc(h).replace(/(^|[\s(])([´~^`?!:;,.@#$%"\-()çÇ]|Shift|Espaço)(?=[\s,.)]|$)/g, (m, a, b) => a + '<kbd>' + b + '</kbd>');
+}
+function introKey(e){
+  if(e.key === 'Enter'){ e.preventDefault(); startLesson(introIdx, introCfg); return; }
+  if(e.key === 'Escape'){ e.preventDefault(); goHome(); return; }
+  if(!introTry || e.key === 'Dead' || e.key.length !== 1) return;
+  e.preventDefault();
+  const want = introTry.list[introTry.i];
+  const got = $('#try-got'), chips = $$('#try-chips b');
+  if(e.key === want){
+    chips[introTry.i].className = 'ok';
+    introTry.i++;
+    if(introTry.i < introTry.list.length){
+      chips[introTry.i].className = 'cur';
+      got.className = 'got'; got.innerHTML = 'Isso! Agora: ' + stepsHtml(introTry.list[introTry.i]);
+    } else {
+      got.className = 'got'; got.innerHTML = '<span style="color:var(--ok)">Perfeito, seu teclado está funcionando. Aperte Enter para começar.</span>';
+      introTry = null;
+    }
+  } else {
+    got.className = 'got bad';
+    got.innerHTML = 'Saiu "' + esc(e.key) + '". Para "' + esc(want) + '": ' + stepsHtml(want) + '. Se não sair de jeito nenhum, veja o <a href="#" id="try-help">Guia de acentos</a>.';
+    const h = $('#try-help'); if(h) h.addEventListener('click', ev => { ev.preventDefault(); go('acc'); });
+  }
+}
+
+/* ---------------- typing engine ---------------- */
+const kbMap = renderKeyboard($('#kb'));
+Object.entries(kbMap).forEach(([id, k]) => { if(HOME.has(id)) k.classList.add('home'); });
+const S = {};
+let tick = null, revealT = null;
+
+function kbPolicy(cfg){
+  const m = settings.kbMode;
+  if(m === 'always') return {show: true};
+  if(m === 'never') return {show: false, reveal: null};
+  if(cfg.kb === 'never') return {show: false, reveal: null};
+  if(cfg.accent && cfg.kind === 'lesson') return {show: true};
+  const ph = cfg.ph || currentPhase();
+  if(ph === 1) return {show: true};
+  if(ph === 2) return {show: false, reveal: 1500};
+  return {show: false, reveal: 3000};
+}
+function startSession(cfg){
+  clearInterval(tick); clearTimeout(revealT);
+  let text = cfg.text.replace(/\s+/g, ' ').trim();
+  if(settings.noAccents) text = strip(text);
+  Object.assign(S, {
+    cfg, text, pos: 0, typed: [], errAt: {}, keystrokes: 0, correctKeys: 0, correctChars: 0,
+    errors: 0, start: 0, end: 0, done: false, dead: false, miss: {}, lastT: 0, policy: kbPolicy(cfg)
+  });
+  const kinds = {lesson: 'Etapa ' + (cfg.idx + 1) + ' de ' + LESSONS.length, test: 'Teste de velocidade', weak: 'Pontos fracos', warm: 'Aquecimento · revisão espaçada'};
+  $('#t-kind').textContent = (cfg.plan ? 'Treino de hoje · ' : '') + kinds[cfg.kind];
+  $('#t-name').textContent = cfg.title;
+  $('#t-tip').textContent = cfg.tip || '';
+  $('#t-tip').style.display = cfg.tip ? '' : 'none';
+  $('#lv-tlbl').textContent = cfg.duration ? 'Restante' : 'Tempo';
+  $('#lv-time').textContent = cfg.duration ? fmtTime(cfg.duration) : '0:00';
+  $('#lv-ppm').textContent = '0';
+  $('#lv-acc').innerHTML = '100<small>%</small>';
+  $('#t-prog').style.width = '0%';
+  const p = S.policy;
+  $('#guide').classList.toggle('ghost', !p.show);
+  $('#ghostnote').textContent = p.show ? '' : p.reveal ? 'Teclado apagado para treinar o tato. Ele aparece se você hesitar.' : 'Teclado desligado nesta etapa.';
+  $('#tbox').classList.remove('typing');
+  $('#t-dead').classList.remove('on');
+  const inner = $('#tinner');
+  inner.innerHTML = '';
+  inner.style.transform = 'translateY(0)';
+  S.spans = [];
+  appendSpans(text);
+  show('type');
+  render();
+  armReveal();
+}
+function armReveal(){
+  clearTimeout(revealT);
+  const p = S.policy;
+  if(p.show) return;
+  $('#guide').classList.add('ghost');
+  if(p.reveal) revealT = setTimeout(() => { if(!S.done) $('#guide').classList.remove('ghost'); }, p.reveal);
+}
+function appendSpans(str){
+  const inner = $('#tinner'), frag = document.createDocumentFragment();
+  for(const c of str){
+    const sp = document.createElement('span');
+    sp.className = 'ch' + (c === ' ' ? ' sp' : '');
+    sp.textContent = c;
+    frag.appendChild(sp);
+    S.spans.push(sp);
+  }
+  inner.appendChild(frag);
+}
+function same(a, b){ return settings.noAccents ? strip(a) === strip(b) : a === b; }
+function recordKey(exp, ok, ms){
+  if(exp == null) return;
+  const k = exp.toLowerCase();
+  const v = keyStats[k] || (keyStats[k] = [0, 0, 0, 0, 0]);
+  while(v.length < 5) v.push(0);
+  v[ok ? 0 : 1]++;
+  if(ok && ms > 0 && ms < 2500){ v[2] += ms; v[3]++; }
+  v[4] = Date.now();
+  if(!ok) S.miss[k] = (S.miss[k] || 0) + 1;
+}
+function typeChar(ch){
+  if(S.done) return;
+  const now = performance.now();
+  if(!S.start){
+    S.start = now;
+    $('#tbox').classList.add('typing');
+    tick = setInterval(liveUpdate, 200);
+  }
+  const ms = S.lastT ? now - S.lastT : 0;
+  S.lastT = now;
+  const exp = S.text[S.pos];
+  const ok = same(ch, exp);
+  S.keystrokes++;
+  if(ok) S.correctKeys++;
+  if(S.cfg.stop){
+    recordKey(exp, ok, ms);
+    if(ok){
+      S.typed.push(ch);
+      S.spans[S.pos].className = 'ch' + (exp === ' ' ? ' sp' : '') + (S.errAt[S.pos] ? ' fix' : ' ok');
+      S.pos++; S.correctChars++;
+    } else {
+      S.errors++;
+      S.errAt[S.pos] = true;
+      const sp = S.spans[S.pos];
+      sp.classList.remove('miss'); void sp.offsetWidth; sp.classList.add('miss');
+      beep();
+    }
+  } else {
+    const aligned = S.typed.every((t, i) => same(t, S.text[i]));
+    if(aligned) recordKey(exp, ok, ms);
+    S.typed.push(ch);
+    S.spans[S.pos].className = 'ch' + (exp === ' ' ? ' sp' : '') + (ok ? ' ok' : ' err');
+    if(ok) S.correctChars++; else { S.errors++; beep(); }
+    S.pos++;
+  }
+  flashKey(ch, ok);
+  if(S.cfg.duration && S.text.length - S.pos < 160){
+    let more = ' ' + testChunk();
+    if(settings.noAccents) more = strip(more);
+    S.text += more; appendSpans(more);
+  }
+  if(!S.cfg.duration && S.pos >= S.text.length){ finish(); return; }
+  render();
+  armReveal();
+}
+function backspace(ctrl){
+  if(S.done || S.cfg.stop || S.pos === 0) return;
+  do {
+    S.pos--;
+    const t = S.typed.pop();
+    if(same(t, S.text[S.pos])) S.correctChars--;
+    const exp = S.text[S.pos];
+    S.spans[S.pos].className = 'ch' + (exp === ' ' ? ' sp' : '');
+  } while(ctrl && S.pos > 0 && S.text[S.pos - 1] !== ' ');
+  render();
+}
+function flashKey(ch, ok){
+  const st = stepsFor(ch);
+  const s = st[st.length - 1];
+  if(!s) return;
+  const el = kbMap[s.main]; if(!el) return;
+  const cls = ok ? 'p-ok' : 'p-err';
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), 130);
+}
+let lastHL = [];
+function render(){
+  const {spans, pos} = S;
+  $$('#tinner .cur').forEach(e => e.classList.remove('cur'));
+  const cur = spans[pos];
+  if(cur) cur.classList.add('cur');
+  const ref = cur || spans[spans.length - 1];
+  if(ref){
+    const lh = ref.offsetHeight || 40;
+    $('#tinner').style.transform = 'translateY(' + (-Math.max(0, ref.offsetTop - lh)) + 'px)';
+  }
+  if(!S.cfg.duration) $('#t-prog').style.width = (pos / S.text.length * 100).toFixed(1) + '%';
+  lastHL.forEach(e => e.classList.remove('target', 'tshift', 'nextk'));
+  lastHL = [];
+  const steps = stepsFor(S.text[pos]);
+  const si = S.dead && steps.length > 1 ? 1 : 0;
+  const step = steps[si];
+  const h = $('#hint');
+  if(!step){ h.innerHTML = ''; return; }
+  const m = kbMap[step.main];
+  if(m){ m.classList.add('target'); lastHL.push(m); }
+  if(step.shift){ const sh = kbMap[step.keys[1]]; if(sh){ sh.classList.add('tshift'); lastHL.push(sh); } }
+  const nx = steps[si + 1];
+  if(nx){ const n = kbMap[nx.main]; if(n){ n.classList.add('nextk'); lastHL.push(n); } }
+  const parts = steps.map((s, i) => (i < si ? '<span style="opacity:.4">' : '<span>') + (s.shift ? '<kbd>' + keyLabel(s.keys[1]) + '</kbd> + ' : '') + '<kbd>' + esc(keyLabel(s.main)) + '</kbd></span>');
+  const f = FINGER[step.main];
+  h.innerHTML = parts.join(' depois ') + '<span style="color:var(--grey)">·</span><span class="fdot" style="background:' + FCOLOR[f] + '"></span><span>' + FNAME[f] + '</span>';
+}
+function elapsed(){ return S.start ? ((S.end || performance.now()) - S.start) : 0; }
+function calc(){
+  const ms = elapsed();
+  const min = ms / 60000;
+  const ppm = min > 0.02 ? Math.round(S.correctChars / 5 / min) : 0;
+  const acc = S.keystrokes ? Math.round(S.correctKeys / S.keystrokes * 1000) / 10 : 100;
+  return {ppm, acc, ms};
+}
+function liveUpdate(){
+  if(S.done) return;
+  const {ppm, acc, ms} = calc();
+  $('#lv-ppm').textContent = ppm;
+  $('#lv-acc').innerHTML = Math.round(acc) + '<small>%</small>';
+  if(S.cfg.duration){
+    const rem = S.cfg.duration - ms / 1000;
+    $('#lv-time').textContent = fmtTime(Math.ceil(rem));
+    $('#t-prog').style.width = Math.min(100, ms / 1000 / S.cfg.duration * 100) + '%';
+    if(rem <= 0) finish();
+  } else {
+    $('#lv-time').textContent = fmtTime(ms / 1000);
+  }
+}
+
+/* ---------------- daily plan ---------------- */
+const ITEM = {
+  warm: {label: 'Aquecimento: revisão espaçada', min: 2},
+  lesson: {label: 'Etapa', min: 5},
+  weak: {label: 'Pontos fracos', min: 3},
+  test: {label: 'Teste de 1 minuto', min: 1}
+};
+function buildDaily(){
+  const items = [];
+  const hasHistory = Object.keys(progress).length > 0;
+  if(hasHistory) items.push('warm');
+  items.push('lesson', 'lesson');
+  if(weakKeys(3).length) items.push('weak');
+  if(currentPhase() >= 2) items.push('test');
+  return {date: dkey(), items, done: 0};
+}
+function ensureDaily(){
+  if(!daily || daily.date !== dkey()){ daily = buildDaily(); store.set('daily', daily); }
+  return daily;
+}
+function planLessonIdx(){
+  // repeat the most recent lesson under 2 stars, otherwise the next one
+  const n = nextLessonIdx();
+  const vis = visibleLessons();
+  const prev = vis.filter(i => n < 0 || i < n).reverse()[0];
+  if(prev != null && progress[LESSONS[prev].id] && progress[LESSONS[prev].id].stars < 2 && !daily.repeated){ return prev; }
+  return n >= 0 ? n : vis[vis.length - 1];
+}
+function runDailyItem(){
+  const d = ensureDaily();
+  if(d.done >= d.items.length){ goHome(); return; }
+  const it = d.items[d.done];
+  if(it === 'warm') startWarm(true);
+  else if(it === 'lesson'){ const i = planLessonIdx(); if(progress[LESSONS[i].id]) { daily.repeated = true; store.set('daily', daily); } showIntro(i, {plan: true}); }
+  else if(it === 'weak') startWeak(true);
+  else startTest(true, 60);
+}
+function addPractice(ms){
+  const k = dkey();
+  days[k] = (days[k] || 0) + ms;
+  store.set('days', days);
+}
+function streakCount(){
+  let n = 0;
+  const d = new Date();
+  if(!days[dkey(d)]) d.setDate(d.getDate() - 1);
+  while(days[dkey(d)]){ n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+
+/* ---------------- finishing ---------------- */
+function starTargets(ph){ return ph === 1 ? [12, 20] : ph === 2 ? [20, 30] : [30, 45]; }
+function passAcc(ph){ return ph === 1 ? 90 : ph === 2 ? 92 : 94; }
+let lastCfg = null;
+const BRAIN_TIPS = [
+  'Pare de treinar quando a precisão começar a cair. Cansado, você grava erros junto com os acertos.',
+  'O sono reorganiza o que você treinou hoje. Amanhã os dedos vão estar mais rápidos sem você ter feito nada.',
+  'Olhe pra tela, não pros dedos. O olho quer ajudar, mas é o tato que precisa aprender.',
+  'Ritmo constante é melhor que rajadas. Um digitador rápido é, antes de tudo, um digitador regular.',
+  'Revisar o que você já sabe, intercalado com o novo, é o que impede de esquecer.',
+  'Mãos relaxadas: tensão nos ombros e pulsos deixa os dedos mais lentos e cansa mais rápido.'
+];
+function finish(){
+  if(S.done) return;
+  S.done = true;
+  S.end = performance.now();
+  clearInterval(tick); clearTimeout(revealT);
+  if(S.cfg.duration) S.end = S.start + S.cfg.duration * 1000;
+  const {ppm, acc, ms} = calc();
+  lastCfg = S.cfg;
+  store.set('keys', keyStats);
+  if(S.keystrokes < 5){ goHome(); return; }
+  addPractice(ms);
+  history.push({t: Date.now(), kind: S.cfg.kind, name: S.cfg.title, ppm, acc, sec: Math.round(ms / 1000)});
+  if(history.length > 400) history = history.slice(-400);
+  store.set('history', history);
+
+  const c = S.cfg;
+  let msg = '', starsHtml = '', rec = '', nextLabel = 'Próxima', act = 'again', passed = true;
+  const labels = {lesson: 'Etapa ' + (c.idx + 1), test: 'Teste de ' + fmtTime(c.duration || 0), weak: 'Pontos fracos', warm: 'Aquecimento'};
+  $('#r-kind').textContent = (c.plan ? 'Treino de hoje · ' : '') + labels[c.kind];
+  $('#r-title').textContent = c.title;
+  $('#r-ppm').innerHTML = ppm + '<small>ppm</small>';
+  $('#r-acc').innerHTML = acc.toFixed(acc % 1 ? 1 : 0) + '<small>%</small>';
+  $('#r-acc').style.color = acc >= 95 ? 'var(--ok)' : acc >= 90 ? 'var(--white)' : 'var(--err)';
+  $('#r-time').textContent = fmtTime(ms / 1000);
+  $('#r-err').textContent = S.errors;
+  const ws = Object.entries(S.miss).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  $('#r-weakwrap').style.display = ws.length ? '' : 'none';
+  $('#r-weak').innerHTML = ws.map(([k, n]) => '<b title="' + n + ' erro(s)">' + esc(k === ' ' ? '␣' : k.toUpperCase()) + '</b>').join('');
+
+  if(c.kind === 'lesson'){
+    const L = LESSONS[c.idx];
+    const [t2, t3] = starTargets(L.ph);
+    const need = passAcc(L.ph);
+    passed = acc >= need;
+    const stars = passed ? 1 + (ppm >= t2 ? 1 : 0) + (ppm >= t3 ? 1 : 0) : 0;
+    const prev = progress[L.id];
+    if(passed && (!prev || stars > prev.stars || (stars === prev.stars && ppm > prev.ppm))){
+      progress[L.id] = {stars, ppm, acc};
+      store.set('progress2', progress);
+    }
+    starsHtml = [0, 1, 2].map(i => '<span class="' + (i < stars ? 'y' : '') + '">★</span>').join('');
+    if(!passed) msg = 'Precisão abaixo de ' + need + '%. Vá mais devagar e repita: é aqui que o dedo aprende o caminho certo.';
+    else if(stars === 1) msg = 'Passou! 2 estrelas com ' + t2 + ' ppm, 3 com ' + t3 + ' ppm. Pode seguir; se ficar abaixo de 2 estrelas, o treino de amanhã repete esta etapa.';
+    else if(stars === 2) msg = 'Muito bem. ' + t3 + ' ppm dá 3 estrelas.';
+    else msg = 'Perfeito. Essas teclas já estão na memória dos dedos.';
+    if(passed && LESSONS[c.idx + 1] && LESSONS[c.idx + 1].ph !== L.ph) msg += ' Você terminou a ' + PHASES[L.ph].name + '!';
+    if(!c.plan){ nextLabel = passed ? (c.idx + 1 < LESSONS.length ? 'Próxima etapa' : 'Teste de velocidade') : 'Tentar de novo'; act = passed ? 'next' : 'again'; }
+  } else {
+    const best = Math.max(0, ...history.slice(0, -1).filter(h => h.kind === 'test').map(h => h.ppm));
+    if(c.kind === 'test' && ppm > best && best > 0) rec = 'Novo recorde! Antes: ' + best + ' ppm';
+    if(c.kind === 'test'){
+      msg = ppm < 20 ? 'Começo de caminho. As etapas vão te dar a base.' :
+            ppm < 35 ? 'Bom ritmo. Quem digita no dia a dia fica por volta de 35 a 40 ppm.' :
+            ppm < 55 ? 'Acima da média! Agora é polir a precisão.' :
+            ppm < 75 ? 'Rápido de verdade. Isso é velocidade de profissional.' : 'Nível elite. Poucos chegam aqui.';
+    } else if(c.kind === 'warm') msg = 'Revisão feita. Lembrar o que já sabe é o que impede de esquecer.';
+    else msg = 'Pontos fracos treinados. Eles vão mudando conforme você melhora.';
+    if(acc < 92) msg += ' Sua precisão ficou em ' + Math.round(acc) + '%: mire em 95% antes de acelerar.';
+    nextLabel = c.kind === 'test' ? 'Novo teste' : 'Treinar de novo';
+  }
+
+  // daily plan advance
+  if(c.plan){
+    ensureDaily();
+    if(!(c.kind === 'lesson' && !passed)) { daily.done = Math.min(daily.items.length, daily.done + 1); store.set('daily', daily); }
+    if(daily.done >= daily.items.length){
+      nextLabel = 'Voltar ao início'; act = 'home';
+      msg += ' Treino de hoje completo. Pare por aqui: o cérebro termina o trabalho durante o sono. Até amanhã!';
+    } else {
+      nextLabel = (c.kind === 'lesson' && !passed) ? 'Tentar de novo' : 'Continuar treino (' + (daily.done + 1) + '/' + daily.items.length + ')';
+      act = (c.kind === 'lesson' && !passed) ? 'again' : 'plan';
+    }
+  }
+  $('#r-next').dataset.act = act;
+  $('#r-stars').innerHTML = starsHtml;
+  $('#r-stars').style.display = starsHtml ? '' : 'none';
+  $('#r-rec').textContent = rec;
+  $('#r-msg').textContent = msg;
+  $('#r-brain').innerHTML = '<b>Cérebro</b>' + esc(acc < 90 ? BRAIN_TIPS[0] : pick(BRAIN_TIPS.slice(1)));
+  $('#r-next').innerHTML = esc(nextLabel) + ' <span style="opacity:.6">(Enter)</span>';
+  show('res');
+}
+
+/* ---------------- starters ---------------- */
+function startLesson(idx, extra){
+  const L = LESSONS[idx];
+  startSession(Object.assign({kind: 'lesson', idx, ph: L.ph, accent: !!L.accent, kb: L.kb, title: L.name, tip: (L.how || [])[0] || '', text: lessonText(idx), stop: true}, extra || {}));
+}
+function startTest(plan, dur){
+  const d = dur || settings.testTime;
+  startSession({kind: 'test', plan: !!plan, title: (settings.testSrc === 'palavras' ? 'Palavras' : 'Frases') + ' · ' + fmtTime(d), text: testChunk() + ' ' + testChunk(), duration: d, stop: settings.stopTest});
+}
+function startWeak(plan){
+  const w = weakText();
+  startSession({kind: 'weak', plan: !!plan, title: 'Teclas ' + w.keys.map(k => k.toUpperCase()).join(' '), tip: 'Texto montado com as teclas em que você mais erra ou demora. Vá com calma.', text: w.text, stop: true});
+}
+function startWarm(plan){
+  startSession({kind: 'warm', plan: !!plan, title: 'Revisão das teclas aprendidas', tip: 'Prioriza as teclas que você não pratica há mais tempo ou erra mais.', text: warmText(), stop: true});
+}
+function restart(){
+  const c = S.cfg || lastCfg;
+  if(!c) return;
+  if(c.kind === 'lesson') startLesson(c.idx, {plan: c.plan});
+  else if(c.kind === 'test') startTest(c.plan, c.duration);
+  else if(c.kind === 'warm') startWarm(c.plan);
+  else startWeak(c.plan);
+}
+function goHome(){
+  clearInterval(tick); clearTimeout(revealT);
+  S.done = true;
+  renderHome();
+  show('home');
+}
+
+/* ---------------- home ---------------- */
+function renderHome(){
+  const all = history;
+  const best = Math.max(0, ...all.map(h => h.ppm));
+  const recent = all.slice(-10);
+  $('#sum-best').innerHTML = best + '<small>ppm</small>';
+  $('#sum-avg').innerHTML = (recent.length ? Math.round(recent.reduce((a, h) => a + h.ppm, 0) / recent.length) : 0) + '<small>ppm</small>';
+  $('#sum-acc').innerHTML = (recent.length ? Math.round(recent.reduce((a, h) => a + h.acc, 0) / recent.length) : '–') + '<small>%</small>';
+  const vis = visibleLessons();
+  const done = vis.filter(i => progress[LESSONS[i].id]).length;
+  $('#sum-les').innerHTML = done + '<small>/' + vis.length + '</small>';
+  $('#les-count').textContent = done + ' de ' + vis.length + ' concluídas';
+  const nx = nextLessonIdx();
+  $('#btn-continue').textContent = done === 0 ? 'Começar pela etapa 1' : nx >= 0 ? 'Continuar: etapa ' + (nx + 1) : 'Desafio final';
+
+  // today
+  const d = ensureDaily();
+  const todayMin = Math.round((days[dkey()] || 0) / 60000);
+  $('#td-min').innerHTML = todayMin + '<small>/ 15 min</small>';
+  $('#td-meter').style.width = Math.min(100, todayMin / 15 * 100) + '%';
+  const finished = d.done >= d.items.length;
+  $('#td-title').textContent = finished ? 'Feito por hoje' : done === 0 ? 'Primeiro dia' : 'Treino de hoje';
+  $('#td-desc').textContent = finished ? 'Você completou o treino de hoje. Pode treinar mais se quiser, mas o maior ganho agora vem do descanso e do sono.' :
+    done === 0 ? 'Comece pela posição das mãos. Cerca de 15 minutos; depois, pare e volte amanhã.' :
+    'Uma sequência curta que mistura revisão, conteúdo novo e seus pontos fracos. Cerca de 15 minutos.';
+  let lessonCount = 0;
+  $('#td-list').innerHTML = d.items.map((it, i) => {
+    let lab = ITEM[it].label;
+    if(it === 'lesson'){
+      const n = nextLessonIdx();
+      lab = lessonCount++ === 0 ? 'Etapa ' + (n >= 0 ? n + 1 : '') + (n >= 0 ? ': ' + LESSONS[n].name : '') : 'Mais uma etapa';
+      if(i < d.done) lab = 'Etapa concluída';
+    }
+    const st = i < d.done ? 'done' : i === d.done ? 'cur' : '';
+    return '<li class="' + st + '"><i>' + (i < d.done ? '✓' : i + 1) + '</i>' + esc(lab) + '<span class="m">~' + ITEM[it].min + ' min</span></li>';
+  }).join('');
+  $('#btn-today').textContent = finished ? 'Treinar mais um pouco' : d.done ? 'Continuar treino (' + (d.done + 1) + '/' + d.items.length + ')' : 'Começar treino de hoje';
+  const sc = streakCount();
+  $('#td-streak').textContent = sc + (sc === 1 ? ' dia seguido' : ' dias seguidos');
+  const wk = [];
+  const names = ['D','S','T','Q','Q','S','S'];
+  for(let i = 6; i >= 0; i--){ const x = new Date(); x.setDate(x.getDate() - i); wk.push('<b class="' + (days[dkey(x)] ? 'y' : '') + '" title="' + dkey(x) + '">' + names[x.getDay()] + '</b>'); }
+  $('#td-week').innerHTML = wk.join('');
+  const cp = currentPhase();
+  $('#td-phases').innerHTML = [1, 2, 3].map(p => {
+    const ls = vis.filter(i => LESSONS[i].ph === p);
+    const dn = ls.filter(i => progress[LESSONS[i].id]).length;
+    return '<div><div class="bar"><i style="width:' + (dn / ls.length * 100) + '%;background:' + PHASES[p].color + '"></i></div><span style="' + (p === cp ? 'color:' + PHASES[p].color : '') + '">' + p + '. ' + PHASES[p].short + ' ' + dn + '/' + ls.length + '</span></div>';
+  }).join('');
+
+  // lessons by phase
+  const box = $('#lessons'); box.innerHTML = '';
+  [1, 2, 3].forEach(p => {
+    const wrap = document.createElement('div');
+    wrap.className = 'phase';
+    wrap.style.setProperty('--pc', PHASES[p].color);
+    wrap.innerHTML = '<div class="phase-h"><b>' + PHASES[p].name + '</b><span>' + PHASES[p].desc + '</span></div>';
+    const grid = document.createElement('div'); grid.className = 'lessons';
+    LESSONS.forEach((L, i) => {
+      if(L.ph !== p || !vis.includes(i)) return;
+      const pr = progress[L.id];
+      const b = document.createElement('button');
+      b.className = 'les' + (pr ? ' done' : '') + (i === nx ? ' next' : '') + (L.rev ? ' rev' : '');
+      const keys = L.add ? [...addFor(L)].map(c => c.toUpperCase()).join(' ') : (L.keys && L.accent ? L.keys.split('').join(' ') : L.rev ? 'revisão' : '');
+      b.innerHTML = '<span class="n">' + (i === nx ? 'PRÓXIMA · ' : '') + 'ETAPA ' + (i + 1) + '</span>' +
+        '<span class="t">' + esc(L.name) + '</span>' + (keys ? '<span class="k">' + esc(keys) + '</span>' : '') +
+        '<span class="st">' + [0, 1, 2].map(s => '<span class="' + (pr && s < pr.stars ? 'y' : '') + '">★</span>').join('') + '</span>';
+      b.addEventListener('click', () => showIntro(i));
+      grid.appendChild(b);
+    });
+    wrap.appendChild(grid);
+    box.appendChild(wrap);
+  });
+  const wkk = weakKeys(6);
+  $('#weak-home').innerHTML = wkk.length ? wkk.map(x => '<b class="' + (x.slow ? 'slow' : '') + '">' + esc(x.k.toUpperCase()) + '</b>').join('') : '<em>Faça algumas etapas para descobrir.</em>';
+  $$('#seg-time button').forEach(b => b.classList.toggle('on', +b.dataset.v === settings.testTime));
+  $$('#seg-src button').forEach(b => b.classList.toggle('on', b.dataset.v === settings.testSrc));
+  $$('#seg-kb button').forEach(b => b.classList.toggle('on', b.dataset.v === settings.kbMode));
+  $$('.tog').forEach(t => { const on = !!settings[t.dataset.set]; t.classList.toggle('on', on); t.setAttribute('aria-checked', on); });
+}
+
+/* ---------------- stats ---------------- */
+function renderStats(){
+  const h = history.slice(-40);
+  const ch = $('#chart');
+  if(h.length < 2){ ch.innerHTML = '<div class="empty">Complete pelo menos duas sessões para ver sua evolução.</div>'; }
+  else {
+    const W = 900, H = 260, pl = 36, pr = 40, pt = 14, pb = 26;
+    const maxP = Math.max(20, Math.ceil(Math.max(...h.map(x => x.ppm)) / 20) * 20);
+    const x = i => pl + i * (W - pl - pr) / (h.length - 1);
+    const y = v => pt + (1 - v / maxP) * (H - pt - pb);
+    const ya = v => pt + (1 - (v - 50) / 50) * (H - pt - pb);
+    let g = '';
+    for(let v = 0; v <= maxP; v += maxP / 4){ g += '<line class="gl" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text x="' + (pl - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + Math.round(v) + '</text>'; }
+    [50, 75, 100].forEach(v => g += '<text x="' + (W - pr + 6) + '" y="' + (ya(v) + 4) + '">' + v + '%</text>');
+    const pts = h.map((p, i) => x(i).toFixed(1) + ',' + y(p.ppm).toFixed(1)).join(' ');
+    const pts2 = h.map((p, i) => x(i).toFixed(1) + ',' + ya(Math.max(50, p.acc)).toFixed(1)).join(' ');
+    const dots = h.map((p, i) => '<circle class="dt" r="3" cx="' + x(i).toFixed(1) + '" cy="' + y(p.ppm).toFixed(1) + '"><title>' + esc(p.name) + ': ' + p.ppm + ' ppm, ' + p.acc + '%</title></circle>').join('');
+    ch.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Evolução de velocidade">' + g +
+      '<text x="' + pl + '" y="' + (H - 6) + '">mais antiga</text><text x="' + (W - pr) + '" y="' + (H - 6) + '" text-anchor="end">mais recente</text>' +
+      '<polyline class="ln2" points="' + pts2 + '"/><polyline class="ln" points="' + pts + '"/>' + dots + '</svg>';
+  }
+  const hm = renderKeyboard($('#heat'));
+  Object.entries(hm).forEach(([id, el]) => {
+    el.style.setProperty('--fc', 'var(--line2)');
+    const v = keyStats[id === 'space' ? ' ' : id];
+    if(!v || v[0] + v[1] < 5){ el.style.opacity = .45; el.title = 'Poucos dados'; return; }
+    const r = v[1] / (v[0] + v[1]);
+    const a = Math.min(1, r / 0.15);
+    el.style.background = 'color-mix(in srgb, var(--err) ' + Math.round(a * 85) + '%, var(--panel2))';
+    if(a > .5) el.style.color = '#fff';
+    el.title = Math.round(r * 1000) / 10 + '% de erro (' + (v[0] + v[1]) + ' toques)' + (v[3] ? ' · ' + Math.round(v[2] / v[3]) + ' ms em média' : '');
+  });
+  const rows = history.slice(-25).reverse();
+  $('#histtbl').innerHTML = rows.length ? '<table class="hist"><thead><tr><th>Sessão</th><th>PPM</th><th>Precisão</th><th>Tempo</th><th>Quando</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td>' + esc(r.name) + '</td><td>' + r.ppm + '</td><td>' + r.acc + '%</td><td>' + fmtTime(r.sec) + '</td><td>' + new Date(r.t).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}) + ' ' + new Date(r.t).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) + '</td></tr>').join('') +
+    '</tbody></table>' : '<div class="empty">Nenhuma sessão ainda.</div>';
+  show('stats');
+}
+
+/* ---------------- accents guide ---------------- */
+let accKbDone = false;
+function renderAccGuide(){
+  if(accKbDone) return;
+  accKbDone = true;
+  const m = renderKeyboard($('#acc-kb'));
+  ['´', '~'].forEach(id => { m[id].classList.add('target'); const b = document.createElement('span'); b.className = 'badge-n'; b.textContent = '1'; m[id].appendChild(b); });
+  m.lshift.classList.add('tshift');
+  const b2 = document.createElement('span'); b2.className = 'badge-n'; b2.textContent = '2'; m.lshift.appendChild(b2);
+  m['ç'].classList.add('nextk');
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener('keydown', e => {
+  if(screen === 'type'){
+    if(e.key === 'Escape'){ e.preventDefault(); goHome(); return; }
+    if(e.key === 'Tab'){ e.preventDefault(); restart(); return; }
+    if(e.isComposing) return;
+    if(e.key === 'Dead'){ S.dead = true; $('#t-dead').classList.add('on'); render(); return; }
+    if(e.key === 'Backspace'){ e.preventDefault(); backspace(e.ctrlKey || e.altKey); return; }
+    if((e.ctrlKey && !e.altKey) || e.metaKey) return;
+    if(e.key.length !== 1) return;
+    e.preventDefault();
+    S.dead = false; $('#t-dead').classList.remove('on');
+    typeChar(e.key);
+  } else if(screen === 'intro'){
+    introKey(e);
+  } else if(screen === 'res'){
+    if(e.key === 'Enter'){ e.preventDefault(); $('#r-next').click(); }
+    else if(e.key === 'Tab'){ e.preventDefault(); $('#r-again').click(); }
+    else if(e.key === 'Escape'){ e.preventDefault(); goHome(); }
+  } else if(screen === 'acc'){
+    if(e.key === 'Escape'){ goHome(); return; }
+    if(e.key === 'Dead'){ $('#lab-log').textContent = 'Tecla morta detectada (' + e.code + '). Agora aperte a letra.'; return; }
+    if(e.key.length === 1 && !e.ctrlKey && !e.metaKey){
+      e.preventDefault();
+      const out = $('#lab-out');
+      out.textContent = (out.textContent + e.key).slice(-24);
+      const okAcc = /[áéíóúãõâêôàç]/i.test(e.key);
+      $('#lab-log').innerHTML = 'Recebido: <b style="color:' + (okAcc ? 'var(--ok)' : 'var(--white)') + '">' + esc(e.key) + '</b>' + (okAcc ? ' — acento funcionando!' : '');
+    } else if(e.key === 'Backspace'){ const out = $('#lab-out'); out.textContent = out.textContent.slice(0, -1); }
+  } else if(e.key === 'Escape' && screen !== 'home'){ goHome(); }
+});
+$$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+$('#btn-back').addEventListener('click', goHome);
+$('#btn-restart').addEventListener('click', e => { e.currentTarget.blur(); restart(); });
+$('#btn-continue').addEventListener('click', () => { const n = nextLessonIdx(); showIntro(n >= 0 ? n : LESSONS.length - 1); });
+$('#btn-today').addEventListener('click', () => {
+  const d = ensureDaily();
+  if(d.done >= d.items.length){ startWeak(false); return; }
+  runDailyItem();
+});
+$('#btn-test').addEventListener('click', () => startTest(false));
+$('#btn-weak').addEventListener('click', () => startWeak(false));
+let resetArmed = 0;
+$('#st-reset').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if(Date.now() - resetArmed > 4000){
+    resetArmed = Date.now();
+    b.textContent = 'Clique de novo para apagar';
+    setTimeout(() => { b.textContent = 'Apagar progresso'; }, 4000);
+    return;
+  }
+  resetArmed = 0; b.textContent = 'Apagar progresso';
+  progress = {}; history = []; keyStats = {}; days = {}; daily = null;
+  store.set('progress2', progress); store.set('history', history); store.set('keys', keyStats); store.set('days', days); store.set('daily', null);
+  renderStats();
+});
+$('#r-menu').addEventListener('click', goHome);
+$('#r-again').addEventListener('click', restart);
+$('#r-next').addEventListener('click', () => {
+  const c = lastCfg, act = $('#r-next').dataset.act;
+  if(act === 'home') goHome();
+  else if(act === 'plan') runDailyItem();
+  else if(act === 'next' && c && c.kind === 'lesson'){
+    const nxt = visibleLessons().find(i => i > c.idx);
+    if(nxt != null) showIntro(nxt); else startTest(false);
+  } else restart();
+});
+$$('#seg-time button').forEach(b => b.addEventListener('click', () => { settings.testTime = +b.dataset.v; saveSettings(); renderHome(); }));
+$$('#seg-src button').forEach(b => b.addEventListener('click', () => { settings.testSrc = b.dataset.v; saveSettings(); renderHome(); }));
+$$('#seg-kb button').forEach(b => b.addEventListener('click', () => { settings.kbMode = b.dataset.v; saveSettings(); renderHome(); }));
+$$('.tog').forEach(t => {
+  const flip = () => { settings[t.dataset.set] = !settings[t.dataset.set]; saveSettings(); renderHome(); };
+  t.addEventListener('click', flip);
+  t.addEventListener('keydown', e => { if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); flip(); } });
+});
+window.addEventListener('resize', () => { if(screen === 'type') render(); });
+
+renderHome();
+})();
+</script>
+<script src="./bnf-config.js"></script>
+<script src="./bnf-analytics.js" data-page="Tecla"></script>
+</body>
+</html>
