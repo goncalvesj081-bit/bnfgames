@@ -1023,8 +1023,16 @@ $('#btn-test').addEventListener('click', startTest);
 $('#btn-weak').addEventListener('click', startWeak);
 $('#btn-stats').addEventListener('click', renderStats);
 $('#st-back').addEventListener('click', goHome);
-$('#st-reset').addEventListener('click', () => {
-  if(!confirm('Apagar todo o progresso, histórico e mapa de erros?')) return;
+let resetArmed = 0;
+$('#st-reset').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if(Date.now() - resetArmed > 4000){
+    resetArmed = Date.now();
+    b.textContent = 'Clique de novo para apagar';
+    setTimeout(() => { b.textContent = 'Apagar progresso'; }, 4000);
+    return;
+  }
+  resetArmed = 0; b.textContent = 'Apagar progresso';
   progress = {}; history = []; keyStats = {};
   store.set('progress', progress); store.set('history', history); store.set('keys', keyStats);
   renderStats();
