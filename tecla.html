@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
-<meta name="description" content="Tecla — aprenda a digitar com os 10 dedos: 45 etapas em 3 fases no teclado brasileiro (ABNT2), plano diário baseado em como o cérebro aprende, guia de acentos, teste de velocidade e treino das teclas em que você mais erra.">
+<meta name="description" content="Tecla — aprenda a digitar com os 10 dedos: 51 etapas em 3 fases no teclado brasileiro (ABNT2), avanço por domínio, plano diário, prática livre, XP, conquistas e ranking.">
 <title>Tecla — Treino de Digitação</title>
 <link rel="icon" href="./bnf-favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -299,10 +299,155 @@ button.pill:hover{border-color:var(--cyan);color:var(--cyan)}
 
 footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(--mono);font-size:11.5px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- v3: profile / gamification ---------- */
+.profile{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:14px 18px;margin:0 0 14px;text-align:left;width:100%;transition:border-color .2s}
+.profile:hover{border-color:var(--cyan-soft)}
+.lvl{width:54px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid var(--cyan);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:rgba(18,200,240,.08)}
+.lvl b{font-family:var(--disp);font-size:24px;line-height:1;color:var(--cyan)}
+.lvl span{font-family:var(--mono);font-size:8px;letter-spacing:.14em;color:var(--cyan-dim)}
+.profile .who b{font-family:var(--disp);font-size:20px;letter-spacing:.04em;text-transform:uppercase}
+.profile .who small{display:block;color:var(--grey);font-size:12.5px;margin:2px 0 7px}
+.xpbar{height:6px;background:var(--line);overflow:hidden}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),#7be7ff);box-shadow:0 0 10px var(--cyan);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.profile .side{text-align:right;font-family:var(--mono);font-size:11px;color:var(--grey);line-height:1.7}
+.profile .side b{color:var(--white);font-weight:400}
+@media (max-width:560px){.profile{grid-template-columns:auto 1fr}.profile .side{display:none}}
+
+.combo{position:absolute;right:14px;top:10px;text-align:right;font-family:var(--disp);line-height:1;opacity:0;transition:opacity .2s;pointer-events:none;color:var(--cyan)}
+.combo.on{opacity:1}
+.combo b{display:block;font-size:30px;font-weight:700}
+.combo span{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em}
+.combo.t2{color:var(--warn)}
+.combo.t3{color:var(--f-pinky)}
+.combo.boom b{animation:boom .5s}
+.combo.broke{animation:broke .35s}
+@keyframes boom{0%{transform:scale(1)}35%{transform:scale(1.7);text-shadow:0 0 24px currentColor}100%{transform:scale(1)}}
+@keyframes broke{0%{opacity:1;color:var(--err)}100%{opacity:0}}
+.spark{position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;background:var(--c,var(--cyan));animation:spark .7s ease-out forwards}
+@keyframes spark{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+
+#toasts{position:fixed;right:16px;bottom:16px;z-index:50;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none}
+.toast{background:var(--panel2);border:1px solid var(--cyan-soft);border-left:3px solid var(--cyan);padding:10px 14px;min-width:220px;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:tin .35s cubic-bezier(.2,.9,.3,1.2) both}
+.toast.out{animation:tout .3s forwards}
+.toast .lbl{color:var(--cyan)}
+.toast b{display:block;font-family:var(--disp);font-size:18px;letter-spacing:.03em;margin-top:2px}
+.toast small{color:var(--text2);font-size:12.5px}
+.toast.gold{border-left-color:var(--warn);border-color:#4a3a14}
+.toast.gold .lbl{color:var(--warn)}
+@keyframes tin{from{transform:translateX(120%);opacity:0}to{transform:none;opacity:1}}
+@keyframes tout{to{transform:translateX(120%);opacity:0}}
+
+/* readiness */
+.ready{margin:22px auto 0;max-width:560px;text-align:left;background:var(--panel);border:1px solid var(--line);padding:16px 18px}
+.ready .top2{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.ready .top2 b{font-family:var(--disp);font-size:20px;letter-spacing:.04em}
+.ready .top2 span{font-family:var(--disp);font-weight:700;font-size:26px;color:var(--cyan)}
+.ready.ok{border-color:#1c3a2a}
+.ready.ok .top2 span{color:var(--ok)}
+.rbar{height:10px;background:var(--line);overflow:hidden;margin-bottom:12px}
+.rbar i{display:block;height:100%;width:0;background:var(--cyan);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.ready.ok .rbar i{background:var(--ok)}
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+@media (max-width:560px){.checks{grid-template-columns:1fr}}
+.checks li{font-size:13.5px;color:var(--text2);display:flex;gap:8px;align-items:baseline}
+.checks li i{font-style:normal;width:14px;flex-shrink:0;color:var(--err)}
+.checks li.y i{color:var(--ok)}
+.checks li em{font-style:normal;margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--grey)}
+.ready .verdict{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--text2)}
+.xpgain{margin:18px auto 0;max-width:560px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.xpgain span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line2);padding:4px 9px;color:var(--grey);animation:pop .4s both}
+.xpgain span b{color:var(--cyan);font-weight:400}
+.xpgain .tot{border-color:var(--cyan);color:var(--cyan)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.skip{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--grey);text-decoration:underline;cursor:pointer;background:none}
+
+.les .rb{height:3px;background:var(--line);margin-top:6px}
+.les .rb i{display:block;height:100%;background:var(--pc)}
+.les .rd{font-family:var(--mono);font-size:10.5px;color:var(--grey)}
+
+/* achievements */
+.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ach{background:var(--panel);border:1px solid var(--line);padding:12px;display:flex;gap:10px;align-items:center;opacity:.38}
+.ach.y{opacity:1;border-color:#4a3a14;background:linear-gradient(160deg,#120e05,var(--panel))}
+.ach .ic{width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:13px;border:1px solid var(--line2);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);color:var(--grey)}
+.ach.y .ic{border-color:var(--warn);color:var(--warn);background:rgba(245,176,65,.1)}
+.ach b{display:block;font-size:13px}
+.ach small{display:block;font-size:11.5px;color:var(--grey);line-height:1.35}
+
+/* ranking */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:8px 12px;border:1px solid var(--line2);color:var(--grey)}
+.tabs button.on{border-color:var(--cyan);color:var(--cyan);background:rgba(18,200,240,.06)}
+.rank{width:100%;border-collapse:collapse}
+.rank td{padding:9px 10px;border-bottom:1px solid var(--line);font-size:14px}
+.rank td.p{font-family:var(--disp);font-weight:700;font-size:18px;width:44px;color:var(--grey)}
+.rank tr:nth-child(1) td.p{color:var(--warn)}
+.rank tr:nth-child(2) td.p{color:#c9d6dc}
+.rank tr:nth-child(3) td.p{color:#d08a50}
+.rank td.v{font-family:var(--type);text-align:right;color:var(--cyan)}
+.rank td.a{font-family:var(--mono);font-size:11.5px;color:var(--grey);text-align:right;width:80px}
+.rank tr.me td{background:rgba(18,200,240,.07)}
+.rank tr{animation:rise .35s both}
+.field{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.field input,.field textarea{background:var(--panel2);border:1px solid var(--line2);color:var(--white);padding:10px 12px;font-family:inherit;font-size:14px;min-width:0;flex:1}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--cyan)}
+.msgline{font-size:13px;color:var(--grey);min-height:18px;margin-top:8px}
+.msgline.bad{color:var(--err)}
+.msgline.good{color:var(--ok)}
+.code{font-family:var(--type);font-size:12px;word-break:break-all;background:var(--panel2);border:1px solid var(--line2);padding:8px 10px;color:var(--cyan-dim);user-select:all}
+
+/* practice */
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.opt{text-align:left;background:var(--panel);border:1px solid var(--line);padding:12px 14px;transition:border-color .2s}
+.opt b{display:block;font-family:var(--disp);font-size:17px;letter-spacing:.03em}
+.opt small{color:var(--grey);font-size:12px;line-height:1.4;display:block;margin-top:2px}
+.opt.on{border-color:var(--cyan);background:rgba(18,200,240,.05)}
+.opt.on b{color:var(--cyan)}
+.pick .key{cursor:pointer}
+.pick .key.sel{background:var(--fc);color:#05090b;box-shadow:0 0 12px var(--fc)}
+.prow{display:flex;gap:26px;flex-wrap:wrap;margin-top:18px}
+.prow>div{display:flex;flex-direction:column;gap:8px}
+
+/* animated demo */
+.demo{position:relative;margin-top:6px}
+.demo .stage{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.demo-out{font-family:var(--type);font-size:26px;min-height:40px;padding:4px 12px;border-bottom:1px solid var(--line2);min-width:200px;color:var(--white)}
+.demo-out::after{content:"";display:inline-block;width:2px;height:1em;background:var(--cyan);margin-left:2px;vertical-align:-.12em;animation:blink 1s steps(1) infinite}
+.demo-cap{font-family:var(--mono);font-size:12px;color:var(--warn);min-height:16px}
+.fingers{position:absolute;inset:0;pointer-events:none}
+.fd{position:absolute;left:0;top:0;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--c);border:2px solid #05090b;box-shadow:0 0 12px var(--c);transition:transform .26s cubic-bezier(.3,.7,.3,1),opacity .4s;opacity:0}
+.fd.on{opacity:.95}
+.fd.down{box-shadow:0 0 22px var(--c),0 0 0 6px color-mix(in srgb,var(--c) 30%,transparent)}
+.key.press{transform:translateY(2px) scale(.95);background:var(--fc);color:#05090b;box-shadow:0 0 22px var(--fc)}
+
+/* intro entrance */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.intro>*{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.intro>*:nth-child(2){animation-delay:.06s}
+.intro>*:nth-child(3){animation-delay:.12s}
+.intro>*:nth-child(4){animation-delay:.2s}
+.intro>*:nth-child(5){animation-delay:.28s}
+.intro>*:nth-child(6){animation-delay:.36s}
+.intro>*:nth-child(7){animation-delay:.44s}
+.intro .ibox ol li{animation:rise .45s both}
+.intro .ibox ol li:nth-child(1){animation-delay:.35s}
+.intro .ibox ol li:nth-child(2){animation-delay:.55s}
+.intro .ibox ol li:nth-child(3){animation-delay:.75s}
+.intro .ibox ol li:nth-child(4){animation-delay:.95s}
+.lvlup{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);animation:fadein .3s both}
+.lvlup>div{text-align:center;animation:boom2 .7s cubic-bezier(.2,.9,.3,1.3) both}
+.lvlup .lbl{color:var(--cyan);font-size:12px}
+.lvlup b{display:block;font-family:var(--disp);font-size:clamp(60px,14vw,120px);line-height:1;color:var(--cyan);text-shadow:0 0 40px var(--cyan)}
+.lvlup span{display:block;font-family:var(--disp);font-size:26px;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+.lvlup small{display:block;color:var(--grey);font-family:var(--mono);font-size:11px;margin-top:14px}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes boom2{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
 </style>
 </head>
 <body>
 <div class="grid-bg" aria-hidden="true"></div>
+<div id="toasts" aria-live="polite"></div>
 <div class="app">
 
 <!-- ================= HOME ================= -->
@@ -310,6 +455,7 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
   <div class="top">
     <a class="brand" href="./index.html"><span class="badge"></span><span>BNF Games</span></a>
     <div class="grp">
+      <button class="pill" data-go="rank">Ranking</button>
       <button class="pill" data-go="plan">Plano e ciência</button>
       <button class="pill" data-go="acc">Guia de acentos</button>
       <button class="pill" data-go="stats">Estatísticas</button>
@@ -317,9 +463,15 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
   </div>
   <div class="hero">
     <h1>TECLA</h1>
-    <p>Aprenda a digitar com os 10 dedos, sem olhar pro teclado. 45 etapas em 3 fases no teclado brasileiro, com um plano diário montado a partir de como o cérebro aprende movimentos.</p>
+    <p>Aprenda a digitar com os 10 dedos, sem olhar pro teclado. 51 etapas em 3 fases no teclado brasileiro. Você só avança quando o Tecla vê que você está pronto.</p>
     <div class="kbd-note">Este treino é feito para teclado físico. Abra no computador.</div>
   </div>
+
+  <button class="profile" data-go="rank" id="profile">
+    <div class="lvl"><b id="pf-lvl">1</b><span>NÍVEL</span></div>
+    <div class="who"><b id="pf-title">Catador de milho</b><small id="pf-sub">0 / 80 XP para o próximo nível</small><div class="xpbar"><i id="pf-xp" style="width:0"></i></div></div>
+    <div class="side"><b id="pf-ach">0</b> conquistas<br><b id="pf-combo">0</b> maior combo<br><span id="pf-nick">sem apelido no ranking</span></div>
+  </button>
 
   <div class="today">
     <div>
@@ -350,40 +502,47 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
     <div><div class="lbl">Melhor velocidade</div><div class="val" id="sum-best">0<small>ppm</small></div></div>
     <div><div class="lbl">Média recente</div><div class="val" id="sum-avg">0<small>ppm</small></div></div>
     <div><div class="lbl">Precisão média</div><div class="val" id="sum-acc">–<small>%</small></div></div>
-    <div><div class="lbl">Etapas concluídas</div><div class="val" id="sum-les">0<small>/0</small></div></div>
+    <div><div class="lbl">Etapas dominadas</div><div class="val" id="sum-les">0<small>/0</small></div></div>
   </div>
 
   <div class="modes">
     <div class="mode">
       <span class="tag">Passo a passo</span>
       <h3>Etapas</h3>
-      <p>Cada etapa explica o que é novo antes de começar. Errou, a tecla espera você corrigir.</p>
+      <p>Cada etapa tem quantas rodadas você precisar. O Tecla mede precisão, velocidade e ritmo e só libera a próxima quando você estiver pronto.</p>
       <div class="go"><button class="btn" id="btn-continue">Começar</button></div>
+    </div>
+    <div class="mode">
+      <span class="tag">Do seu jeito</span>
+      <h3>Prática livre</h3>
+      <p>Escolha o que treinar: as teclas que já aprendeu, letras específicas, frases, números, acentos ou um texto seu.</p>
+      <div class="go"><button class="btn" data-go="practice">Praticar</button></div>
     </div>
     <div class="mode">
       <span class="tag">Quanto você digita?</span>
       <h3>Teste de velocidade</h3>
-      <p>Digite o máximo que conseguir no tempo. Backspace corrige.</p>
       <div class="seg" id="seg-time"><button data-v="30">30s</button><button data-v="60">1 min</button><button data-v="120">2 min</button></div>
       <div class="seg" id="seg-src"><button data-v="palavras">Palavras</button><button data-v="frases">Frases</button></div>
+      <p>Testes de 1 minuto ou mais com 90% de precisão entram no ranking.</p>
       <div class="go"><button class="btn" id="btn-test">Iniciar teste</button></div>
     </div>
-    <div class="mode">
-      <span class="tag">Sob medida</span>
-      <h3>Pontos fracos</h3>
-      <p>Treino com as teclas em que você mais erra (vermelho) ou demora (amarelo):</p>
-      <div class="weak" id="weak-home"></div>
-      <div class="go"><button class="btn" id="btn-weak">Treinar</button></div>
-    </div>
+  </div>
+  <div class="mode" style="margin-top:14px;flex-direction:row;align-items:center;flex-wrap:wrap;gap:16px">
+    <div style="flex:1;min-width:220px"><span class="tag">Sob medida</span><h3 style="margin-top:4px">Pontos fracos</h3><p>Teclas em que você mais erra (vermelho) ou demora (amarelo):</p></div>
+    <div class="weak" id="weak-home"></div>
+    <button class="btn" id="btn-weak">Treinar</button>
   </div>
 
   <div class="sec-h"><h2>Etapas</h2><span id="les-count"></span></div>
   <div id="lessons"></div>
 
+  <div class="sec-h"><h2>Conquistas</h2><span id="ach-count"></span></div>
+  <div class="achs" id="achs"></div>
+
   <div class="sec-h"><h2>Regras de ouro</h2><button class="pill" data-go="plan">Por que funciona →</button></div>
   <div class="tips">
     <div class="tip"><b>Posição de descanso</b>Indicadores no F e no J (sentem os pontinhos em relevo). Os outros dedos ao lado: A S D F · J K L Ç. Polegares no espaço. Depois de cada tecla, o dedo volta pra casa.</div>
-    <div class="tip"><b>Não olhe pro teclado</b>Olhar ensina o olho, não o dedo. Use o teclado desenhado na tela; ele vai sumindo conforme você avança.</div>
+    <div class="tip"><b>Esqueça o "catar milho"</b>Se você digita só com os indicadores, os primeiros dias vão parecer mais lentos. É normal: cada dedo novo precisa de algumas rodadas para aprender o caminho. O Tecla espera você.</div>
     <div class="tip"><b>Precisão antes de velocidade</b>Mire em 95% ou mais. Cada erro repetido também é treinado pelo cérebro. A velocidade vem depois, sozinha.</div>
     <div class="tip"><b>Pouco, todo dia, e durma</b>15 a 20 minutos por dia rendem mais que 2 horas no domingo. Boa parte da fixação acontece no sono.</div>
   </div>
@@ -394,7 +553,7 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
       <div>Teclado na tela<br><small>Automático: some aos poucos conforme a fase, e volta se você hesitar</small></div>
       <div class="seg" id="seg-kb"><button data-v="auto">Automático</button><button data-v="always">Sempre</button><button data-v="never">Nunca</button></div>
     </div>
-    <div class="tog" data-set="sound" role="switch" tabindex="0"><span class="sw"></span><div>Som de erro<small>Um bip curto quando errar</small></div></div>
+    <div class="tog" data-set="sound" role="switch" tabindex="0"><span class="sw"></span><div>Sons<small>Bip no erro e sinal nos combos</small></div></div>
     <div class="tog" data-set="noAccents" role="switch" tabindex="0"><span class="sw"></span><div>Sem acentos e Ç<small>Para teclado americano (sem Ç)</small></div></div>
     <div class="tog" data-set="stopTest" role="switch" tabindex="0"><span class="sw"></span><div>Parar no erro também no teste<small>O teste espera a tecla certa</small></div></div>
   </div>
@@ -427,6 +586,7 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
   <div class="prog"><i id="t-prog"></i></div>
   <div class="lesson-tip" id="t-tip"></div>
   <div class="tbox" id="tbox">
+    <div class="combo" id="combo"><b>0</b><span>COMBO</span></div>
     <div class="tview"><div class="tinner" id="tinner"></div></div>
     <div class="dead" id="t-dead">acento pressionado, agora a letra</div>
     <div class="startmsg">Comece a digitar</div>
@@ -458,8 +618,10 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
       <div><div class="lbl">Velocidade</div><div class="val c" id="r-ppm">0<small>ppm</small></div></div>
       <div><div class="lbl">Precisão</div><div class="val" id="r-acc">0<small>%</small></div></div>
       <div><div class="lbl">Tempo</div><div class="val" id="r-time">0:00</div></div>
-      <div><div class="lbl">Erros</div><div class="val" id="r-err">0</div></div>
+      <div><div class="lbl">Maior combo</div><div class="val" id="r-combo">0</div></div>
     </div>
+    <div id="r-ready"></div>
+    <div class="xpgain" id="r-xp"></div>
     <div id="r-weakwrap" style="margin-top:22px">
       <div class="lbl">Teclas em que você errou</div>
       <div class="weak" id="r-weak"></div>
@@ -470,6 +632,57 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
       <button class="btn ghost" id="r-again">Repetir <span style="opacity:.6">(Tab)</span></button>
       <button class="btn" id="r-next">Próxima <span style="opacity:.6">(Enter)</span></button>
     </div>
+    <button class="skip" id="r-skip" hidden>Já domino isso: pular para a próxima etapa</button>
+  </div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section class="scr" id="s-practice">
+  <div class="top"><button class="pill" data-go="home">← Voltar</button></div>
+  <div class="doc" style="max-width:900px">
+    <div class="lbl" style="color:var(--cyan);margin-top:10px">Modo livre</div>
+    <h1>Prática livre</h1>
+    <p class="lead">Treine o que quiser, pelo tempo que quiser. Conta XP e entra nas estatísticas, mas não muda o andamento das etapas.</p>
+    <h2>O que treinar</h2>
+    <div class="opts" id="pr-src">
+      <button class="opt" data-v="known"><b>Teclas que já aprendi</b><small>Só as letras das etapas que você já dominou</small></button>
+      <button class="opt" data-v="keys"><b>Escolher teclas</b><small>Clique nas teclas que quer treinar</small></button>
+      <button class="opt" data-v="words"><b>Palavras comuns</b><small>As mais usadas do português</small></button>
+      <button class="opt" data-v="sentences"><b>Frases</b><small>Frases curtas e longas</small></button>
+      <button class="opt" data-v="msgs"><b>Mensagens</b><small>Textos do dia a dia, e-mails, horários</small></button>
+      <button class="opt" data-v="accents"><b>Acentos</b><small>á ã â à ç em palavras reais</small></button>
+      <button class="opt" data-v="numbers"><b>Números e símbolos</b><small>R$, %, @, telefones, datas</small></button>
+      <button class="opt" data-v="custom"><b>Meu texto</b><small>Cole um texto seu</small></button>
+    </div>
+    <div id="pr-keys-wrap" hidden style="margin-top:14px">
+      <p style="margin:0 0 8px;font-size:13.5px">Clique para escolher as letras (<span id="pr-keys-n">0</span> escolhidas):</p>
+      <div class="kb pick" id="pr-kb"></div>
+    </div>
+    <div id="pr-custom-wrap" hidden style="margin-top:14px">
+      <div class="field"><textarea id="pr-custom" rows="5" placeholder="Cole aqui o texto que você quer digitar"></textarea></div>
+    </div>
+    <div class="prow">
+      <div><div class="lbl">Duração</div><div class="seg" id="pr-dur"><button data-v="60">1 min</button><button data-v="180">3 min</button><button data-v="300">5 min</button><button data-v="0">Sem tempo</button></div></div>
+      <div><div class="lbl">Quando errar</div><div class="seg" id="pr-stop"><button data-v="1">Parar no erro</button><button data-v="0">Seguir e corrigir</button></div></div>
+    </div>
+    <div class="msgline bad" id="pr-msg"></div>
+    <div style="margin-top:18px"><button class="btn big" id="pr-go">Começar prática</button></div>
+  </div>
+</section>
+
+<!-- ================= RANK / PROFILE ================= -->
+<section class="scr" id="s-rank">
+  <div class="top"><button class="pill" data-go="home">← Voltar</button></div>
+  <div class="doc" style="max-width:820px">
+    <div class="lbl" style="color:var(--cyan);margin-top:10px">Perfil e ranking</div>
+    <h1>Ranking</h1>
+    <div id="rk-profile"></div>
+    <h2>Quem digita mais rápido</h2>
+    <div class="tabs" id="rk-tabs"><button data-v="week">Velocidade · 7 dias</button><button data-v="all">Velocidade · geral</button><button data-v="xp">XP</button></div>
+    <div class="panel tblwrap" id="rk-table"><div class="empty">Carregando…</div></div>
+    <p class="src">Velocidade: melhor teste ou prática de 30 segundos ou mais, com 90% de precisão ou mais.</p>
+    <h2>Levar para outro computador</h2>
+    <div id="rk-transfer"></div>
   </div>
 </section>
 
@@ -498,9 +711,9 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
     <h2>As 3 fases do aprendizado</h2>
     <p>Os psicólogos Paul Fitts e Michael Posner descreveram, em 1967, que todo aprendizado de movimento passa por três fases. Cada fase do Tecla corresponde a uma delas.</p>
     <div class="sci">
-      <div class="card" style="border-left:2px solid var(--ph1)"><h3 style="color:var(--ph1)">Fase 1 · Cognitiva — "onde fica?"</h3><p>Você pensa em cada tecla. É lento, cansativo e cheio de erros. Normal: o cérebro está montando o mapa do teclado.</p><div class="inapp"><b>No Tecla</b>Etapas 1 a 19: duas letras novas por vez, revisões a cada poucas etapas, teclado colorido sempre visível e o texto espera você acertar.</div></div>
-      <div class="card" style="border-left:2px solid var(--ph2)"><h3 style="color:var(--ph2)">Fase 2 · Associativa — "letras viram blocos"</h3><p>Você para de pensar letra por letra e começa a digitar sílabas e palavras inteiras como um movimento só. Os erros caem bastante.</p><div class="inapp"><b>No Tecla</b>Etapas 20 a 38: sílabas, dígrafos (ch, lh, nh), terminações, acentos, pontuação e números. O teclado na tela fica apagado e só aparece se você hesitar.</div></div>
-      <div class="card" style="border-left:2px solid var(--ph3)"><h3 style="color:var(--ph3)">Fase 3 · Autônoma — "sai sozinho"</h3><p>Os dedos vão no automático e a atenção fica no que você está escrevendo, não em como.</p><div class="inapp"><b>No Tecla</b>Etapas 39 a 45: textos reais, mensagens do dia a dia e frases longas, sem teclado na tela.</div></div>
+      <div class="card" style="border-left:2px solid var(--ph1)"><h3 style="color:var(--ph1)">Fase 1 · Cognitiva — "onde fica?"</h3><p>Você pensa em cada tecla. É lento, cansativo e cheio de erros. Normal: o cérebro está montando o mapa do teclado.</p><div class="inapp"><b>No Tecla</b>Etapas 1 a 25: poucas teclas novas por vez, uma mão de cada vez na fileira do meio, revisões frequentes, teclado colorido sempre visível e o texto espera você acertar.</div></div>
+      <div class="card" style="border-left:2px solid var(--ph2)"><h3 style="color:var(--ph2)">Fase 2 · Associativa — "letras viram blocos"</h3><p>Você para de pensar letra por letra e começa a digitar sílabas e palavras inteiras como um movimento só. Os erros caem bastante.</p><div class="inapp"><b>No Tecla</b>Etapas 26 a 44: sílabas, dígrafos (ch, lh, nh), terminações, acentos, pontuação e números. O teclado na tela fica apagado e só aparece se você hesitar.</div></div>
+      <div class="card" style="border-left:2px solid var(--ph3)"><h3 style="color:var(--ph3)">Fase 3 · Autônoma — "sai sozinho"</h3><p>Os dedos vão no automático e a atenção fica no que você está escrevendo, não em como.</p><div class="inapp"><b>No Tecla</b>Etapas 45 a 51: textos reais, mensagens do dia a dia e frases longas, sem teclado na tela.</div></div>
     </div>
 
     <h2>O que a pesquisa mostra</h2>
@@ -513,17 +726,22 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
       <div class="card"><h3>Prática deliberada</h3><p>Repetir o que já é fácil não leva ninguém adiante. A melhora vem de treinar logo acima do seu nível, focando nas fraquezas e com retorno imediato.</p><div class="inapp"><b>No Tecla</b>O modo Pontos fracos mede erro e demora de cada tecla e monta um texto só com elas. O texto treme no erro e a tecla certa acende na hora.</div></div>
     </div>
 
+    <h2>Avançar quando estiver pronto</h2>
+    <div class="sci">
+      <div class="card"><h3>Aprendizagem por domínio</h3><p>O educador Benjamin Bloom mostrou que quase todo aluno aprende bem quando só passa para o conteúdo seguinte depois de dominar o atual. O que muda de pessoa para pessoa é o tempo. Quem hoje digita só com os indicadores precisa de mais rodadas nas primeiras etapas, e isso é esperado.</p><div class="inapp"><b>No Tecla</b>Cada rodada mede precisão, velocidade, ritmo (o quanto varia o intervalo entre as teclas), acerto nas teclas novas e hesitações de mais de 2 segundos. A etapa só libera quando o índice de prontidão passa de 80% com rodadas boas seguidas. Se a precisão cai em relação às rodadas anteriores do dia, o Tecla sugere pausa em vez de mais treino.</div></div>
+    </div>
+
     <h2>Plano de 6 semanas</h2>
     <p>Com 15 a 20 minutos por dia. Se uma semana ficar difícil, repita: o ritmo é seu.</p>
     <div class="tblwrap"><table class="weeks">
       <thead><tr><th>Semana</th><th>O que treinar</th><th>Meta</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Etapas 1–7: fileira do meio (A S D F G H J K L Ç). Postura e não olhar.</td><td class="m">95% · 10 ppm</td></tr>
-        <tr><td>2</td><td>Etapas 8–19: fileiras de cima e de baixo até o alfabeto completo.</td><td class="m">95% · 15 ppm</td></tr>
-        <tr><td>3</td><td>Etapas 20–25: sílabas, dígrafos, palavras comuns, maiúsculas e vírgula.</td><td class="m">95% · 20 ppm</td></tr>
-        <tr><td>4</td><td>Etapas 26–32: todos os acentos (´ ~ ^ `), ção, e acento em maiúscula.</td><td class="m">94% · 25 ppm</td></tr>
-        <tr><td>5</td><td>Etapas 33–38: pontuação, aspas, números e símbolos.</td><td class="m">94% · 30 ppm</td></tr>
-        <tr><td>6+</td><td>Etapas 39–45 e testes de velocidade. Depois, só o treino de hoje.</td><td class="m">95% · 35–50 ppm</td></tr>
+        <tr><td>1</td><td>Etapas 1–12: fileira do meio, um dedo e uma mão de cada vez. Postura e não olhar. Quem cata milho pode precisar da semana toda aqui, e tudo bem.</td><td class="m">95% · 10 ppm</td></tr>
+        <tr><td>2</td><td>Etapas 13–25: fileiras de cima e de baixo até o alfabeto completo.</td><td class="m">95% · 15 ppm</td></tr>
+        <tr><td>3</td><td>Etapas 26–31: sílabas, dígrafos, palavras comuns, maiúsculas e vírgula.</td><td class="m">95% · 20 ppm</td></tr>
+        <tr><td>4</td><td>Etapas 32–38: todos os acentos (´ ~ ^ `), ção, e acento em maiúscula.</td><td class="m">94% · 25 ppm</td></tr>
+        <tr><td>5</td><td>Etapas 39–44: pontuação, aspas, números e símbolos.</td><td class="m">94% · 30 ppm</td></tr>
+        <tr><td>6+</td><td>Etapas 45–51 e testes de velocidade. Depois, só o treino de hoje.</td><td class="m">95% · 35–50 ppm</td></tr>
       </tbody>
     </table></div>
     <p>Para comparar: quem cata milho costuma ficar entre 15 e 30 ppm. Quem digita no dia a dia, perto de 40. Acima de 60 já é velocidade profissional.</p>
@@ -531,7 +749,7 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
     <h2>A rotina de cada dia</h2>
     <div class="routine">
       <div><b>1</b><span>Aquecimento: revisão das teclas antigas (1–2 min)</span></div>
-      <div><b>2</b><span>Etapa nova, ou repetir a última se ficou abaixo de 2 estrelas</span></div>
+      <div><b>2</b><span>Três rodadas da etapa atual; ela só avança quando você estiver pronto</span></div>
       <div><b>3</b><span>Pontos fracos: as teclas que você mais erra ou demora</span></div>
       <div><b>4</b><span>Teste de 1 minuto, a partir da Fase 2, pra ver a evolução</span></div>
     </div>
@@ -553,6 +771,7 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
       <li>Baddeley, A. & Longman, D. (1978). The influence of length and frequency of training session on the rate of learning to type. <i>Ergonomics</i>. <a href="https://www.gwern.net/doc/psychology/spaced-repetition/1978-baddeley.pdf" target="_blank" rel="noopener">PDF</a></li>
       <li>Yamaguchi, M. & Logan, G. D. (2016). Pushing typists back on the learning curve: memory chunking in the hierarchical control of skilled typewriting. <a href="https://repository.essex.ac.uk/26184/" target="_blank" rel="noopener">Artigo</a></li>
       <li>Salmoni, A., Schmidt, R. & Walter, C. (1984). Knowledge of results and motor learning. <i>Psychological Bulletin</i>. Hipótese da orientação.</li>
+      <li>Bloom, B. S. (1968). Learning for mastery. <i>Evaluation Comment</i>, 1(2). Aprendizagem por domínio.</li>
       <li>Ericsson, K. A. et al. (1993). The role of deliberate practice in the acquisition of expert performance. <i>Psychological Review</i>.</li>
     </ul>
     <p class="src">Nem toda pesquisa concorda em tudo. Alguns estudos acham que o sono estabiliza mais do que melhora, e o efeito do treino espaçado varia com a tarefa. As recomendações acima são as que têm mais apoio para aprender a digitar.</p>
@@ -628,28 +847,38 @@ footer{text-align:center;padding:40px 0 10px;color:var(--grey);font-family:var(-
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 
+/* ---------------- ranking backend (Supabase) ---------------- */
+const SB_URL = 'https://clsyncrukbnlicooehae.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsc3luY3J1a2JubGljb29laGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NzkzODAsImV4cCI6MjEwOTA1NTM4MH0.4DqzEBKZvVEYEv9Q5LKRMWQiG_1m99dozCrKX_AJ_c4';
+
 /* ---------------- storage ---------------- */
 const store = {
   get(k, d){ try{ const v = localStorage.getItem('tecla_' + k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
   set(k, v){ try{ localStorage.setItem('tecla_' + k, JSON.stringify(v)); }catch(e){} }
 };
-const settings = Object.assign({kbMode:'auto', sound:true, noAccents:false, stopTest:false, testTime:60, testSrc:'frases'}, store.get('settings', {}));
-let progress = store.get('progress2', {});
+const settings = Object.assign({kbMode:'auto', sound:true, noAccents:false, stopTest:false, testTime:60, testSrc:'frases', prSrc:'known', prDur:60, prStop:1, prKeys:''}, store.get('settings', {}));
+let progress = store.get('progress3', {});   // lessonId -> {rounds, ready, stars, best, hist:[]}
 let history = store.get('history', []);
-let keyStats = store.get('keys', {});   // key -> [hits, misses, sumMs, nMs, lastTs]
-let days = store.get('days', {});       // 'YYYY-MM-DD' -> ms practiced
-let daily = store.get('daily', null);   // {date, items:[...], done}
+let keyStats = store.get('keys', {});        // key -> [hits, misses, sumMs, nMs, lastTs]
+let days = store.get('days', {});            // 'YYYY-MM-DD' -> ms practiced
+let daily = store.get('daily', null);
+let game = Object.assign({xp: 0, ach: {}, bestCombo: 0, rounds: 0}, store.get('game', {}));
+let profile = store.get('profile', null);    // {id, secret, nick}
 const saveSettings = () => store.set('settings', settings);
+const saveGame = () => store.set('game', game);
 
 /* ---------------- helpers ---------------- */
 const rnd = n => Math.floor(Math.random() * n);
 const pick = a => a[rnd(a.length)];
 const shuffle = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const strip = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const strip = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 const hasAccent = w => strip(w) !== w;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dkey = d => { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const fmtTime = sec => { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); };
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------------- content ---------------- */
 const WORDS = ('a o e de que do da em um para com não uma os no se na por mais as dos como mas foi ao ele das tem à seu sua ou ser quando muito há nos já está eu também só pelo pela até isso ela entre era depois sem mesmo aos ter seus quem nas me esse eles estão você tinha foram essa num nem suas meu às minha têm numa pelos elas havia seja qual será nós tenho lhe deles essas esses pelas este fosse dele tu te vocês meus minhas teu tua nosso nossa nossos nossas dela delas esta estes estas aquele aquela aqueles aquelas isto aquilo estou estamos estava ' +
@@ -753,62 +982,68 @@ const MSGS = [
 /* ---------------- lessons ---------------- */
 const P1 = 'Fase 1 · Posição', P2 = 'Fase 2 · Blocos', P3 = 'Fase 3 · Fluência';
 const WHY = {
-  1: 'Nesta fase o cérebro está montando o mapa do teclado. Ir devagar e acertar é o que grava o caminho certo; cada erro repetido também é gravado.',
+  1: 'Nesta fase o cérebro está montando o mapa do teclado. Ir devagar e acertar é o que grava o caminho certo; cada erro repetido também é gravado. Por isso cada etapa tem quantas rodadas você precisar.',
   2: 'Agora o objetivo é juntar letras em blocos que saem de uma vez, como "que" ou "ção". Repetir o mesmo bloco várias vezes seguidas é o que forma esses atalhos.',
   3: 'Nesta fase os movimentos já são automáticos. O teclado na tela some para você confiar no tato. Foque no texto, não nos dedos.'
 };
 const LESSONS = [
  // ---------- FASE 1 ----------
- {ph:1, add:'fj', name:'F e J', keys:'fj', lead:'O ponto de partida. Os indicadores ficam sobre o F e o J; esses são os únicos dedos que você nunca perde de vista.', how:['Apoie os dedos levemente: esquerda em A S D F, direita em J K L Ç.','Sinta os pontinhos em relevo no F e no J sem olhar.','Aperte F com o indicador esquerdo e J com o direito. Espaço com o polegar.'], why:'Os pontinhos em relevo existem para o tato substituir a visão. Treinar sem olhar desde o primeiro minuto evita criar um hábito que depois precisa ser desaprendido.'},
- {ph:1, add:'dk', name:'D e K', keys:'dk', lead:'Os dedos médios entram em ação.', how:['D com o médio esquerdo, K com o médio direito.','Só o dedo da tecla se mexe. Os indicadores não saem do F e do J.']},
- {ph:1, add:'sl', name:'S e L', keys:'sl', lead:'Agora os anelares.', how:['S com o anelar esquerdo, L com o anelar direito.','Se o dedo errado se mexer junto, vá mais devagar: o anelar é naturalmente o dedo menos independente.']},
- {ph:1, add:'aç', name:'A e Ç', keys:'aç', lead:'Os mindinhos completam a fileira do meio. No teclado brasileiro o Ç tem tecla própria, logo depois do L.', how:['A com o mindinho esquerdo.','Ç com o mindinho direito, na tecla ao lado do L.']},
- {ph:1, rev:true, name:'Revisão: fileira do meio', focus:'asdfjklç', lead:'Revisão sem teclas novas. Lembrar sem ajuda é o que fixa.', how:['Tente olhar o menos possível para o teclado da tela.','Mire em 95% de precisão.'], why:'Puxar da memória o que você aprendeu fortalece mais do que ver de novo. Por isso o Tecla intercala revisões entre as etapas novas.'},
- {ph:1, add:'gh', name:'G e H', keys:'gh', lead:'O centro do teclado.', how:['G: o indicador esquerdo estica para a direita e volta pro F.','H: o indicador direito estica para a esquerda e volta pro J.']},
- {ph:1, rev:true, name:'Revisão: palavras da fileira do meio', focus:'gh', lead:'Primeiras palavras de verdade só com a fileira do meio.', how:['Sala, fala, asa, gala: palavras inteiras com 10 teclas.']},
- {ph:1, add:'ei', name:'E e I', keys:'ei', lead:'Subindo para a fileira de cima com as vogais mais usadas.', how:['E: o médio esquerdo sobe um pouco (sai do D).','I: o médio direito sobe (sai do K).','Depois de cada tecla, o dedo volta para a fileira do meio.']},
- {ph:1, add:'ru', name:'R e U', keys:'ru', lead:'Indicadores na fileira de cima.', how:['R: indicador esquerdo sobe do F.','U: indicador direito sobe do J.']},
- {ph:1, rev:true, name:'Revisão: E I R U', focus:'eiru', lead:'Misturando fileira do meio e de cima.', how:['Repare na volta: subiu, voltou pra casa.']},
- {ph:1, add:'ot', name:'O e T', keys:'ot', lead:'Mais duas letras muito frequentes no português.', how:['O: anelar direito sobe do L.','T: indicador esquerdo sobe e estica para a direita (acima do G).']},
- {ph:1, rev:true, name:'Revisão: fileira de cima', focus:'eirout', lead:'Já dá para escrever muita coisa: roda, terra, tudo, ritmo.', how:['Leia a palavra inteira antes de começar a digitá-la.']},
- {ph:1, add:'nm', name:'N e M', keys:'nm', lead:'Descendo para a fileira de baixo.', how:['N e M: o indicador direito desce do J (N fica à esquerda, M embaixo).']},
- {ph:1, add:'cv', name:'C e V', keys:'cv', lead:'Fileira de baixo, lado esquerdo.', how:['C: médio esquerdo desce do D.','V: indicador esquerdo desce do F.']},
- {ph:1, rev:true, name:'Revisão: fileira de baixo', focus:'nmcv', lead:'As três fileiras juntas.', how:['Cuidado para não usar o mesmo dedo em teclas de mãos diferentes.']},
- {ph:1, add:'pb', name:'P e B', keys:'pb', lead:'Duas letras de alcance mais longo.', how:['P: mindinho direito sobe do Ç.','B: indicador esquerdo desce e estica para a direita (abaixo do G).']},
- {ph:1, add:'qz', name:'Q e Z', keys:'qz', lead:'O mindinho esquerdo sobe e desce.', how:['Q: mindinho esquerdo sobe do A.','Z: mindinho esquerdo desce do A.']},
- {ph:1, add:'xwy', name:'X, W e Y', keys:'xwy', lead:'As últimas letras do alfabeto!', how:['X: anelar esquerdo desce do S.','W: anelar esquerdo sobe do S.','Y: indicador direito sobe e estica para a esquerda (acima do H).']},
- {ph:1, rev:true, name:'Revisão: alfabeto completo', focus:'', lead:'Todas as letras. Fim da Fase 1.', how:['Aqui vale ter 95% de precisão antes de seguir.'], why:'Terminar a Fase 1 com precisão alta faz o resto ser muito mais fácil. Se ficou abaixo de 2 estrelas, vale repetir amanhã: depois de uma noite de sono você costuma render melhor.'},
+ {ph:1, add:'fj', name:'F e J', demo:'fj fj', lead:'O ponto de partida. Se hoje você digita só com os indicadores, é aqui que começa a mudança: cada dedo vai ganhar a sua parte do teclado.', how:['Apoie os dedos levemente: esquerda em A S D F, direita em J K L Ç.','Sinta os pontinhos em relevo no F e no J sem olhar.','Aperte F com o indicador esquerdo e J com o direito. Espaço com o polegar.'], why:'Os pontinhos em relevo existem para o tato substituir a visão. Treinar sem olhar desde o primeiro minuto evita criar um hábito que depois precisa ser desaprendido.'},
+ {ph:1, gen:'rhythm', focus:'fj', name:'F e J no ritmo', demo:'f j f j', lead:'Mesmas teclas, agora com ritmo. Antes de ir rápido, os dedos precisam ir regulares.', how:['Bata as teclas num ritmo igual, como um relógio: tic, tac, tic, tac.','Se errar, não acelere para compensar. Volte ao ritmo.'], why:'Digitadores rápidos são, antes de tudo, regulares. O Tecla mede o intervalo entre cada tecla e só libera a próxima etapa quando o seu ritmo estiver firme.'},
+ {ph:1, add:'dk', name:'D e K', demo:'dk fd jk', lead:'Os dedos médios entram em ação.', how:['D com o médio esquerdo, K com o médio direito.','Só o dedo da tecla se mexe. Os indicadores não saem do F e do J.']},
+ {ph:1, rev:true, focus:'dk', name:'F D J K misturados', demo:'fdjk', lead:'Quatro dedos trabalhando juntos.', how:['Leia o bloco inteiro antes de digitar.','Se perceber o indicador indo até o D ou o K, pare e corrija: cada dedo na sua tecla.'], why:'Quem cata milho com o indicador tende a mandar ele para todas as teclas. Misturar D e K com F e J obriga cada dedo a fazer o seu trabalho.'},
+ {ph:1, add:'sl', name:'S e L', demo:'sl ls', lead:'Agora os anelares.', how:['S com o anelar esquerdo, L com o anelar direito.','Se o dedo errado se mexer junto, vá mais devagar: o anelar é naturalmente o dedo menos independente.']},
+ {ph:1, rev:true, focus:'sl', name:'Revisão: S D F · J K L', demo:'sdf jkl', lead:'Seis dedos. Revisão sem teclas novas.', how:['Tente olhar o menos possível para o teclado da tela.']},
+ {ph:1, add:'aç', name:'A e Ç', demo:'aç asa', lead:'Os mindinhos completam a fileira do meio. No teclado brasileiro o Ç tem tecla própria, logo depois do L.', how:['A com o mindinho esquerdo.','Ç com o mindinho direito, na tecla ao lado do L.']},
+ {ph:1, gen:'hand', focus:'asdf', name:'Mão esquerda: A S D F', demo:'asdf', lead:'Só a mão esquerda. A direita descansa no J K L Ç.', how:['Mindinho no A, anelar no S, médio no D, indicador no F.','Cada dedo só aperta a sua tecla.'], why:'Treinar uma mão por vez deixa o cérebro focar em menos movimentos, o que acelera a separação entre os dedos.'},
+ {ph:1, gen:'hand', focus:'jklç', name:'Mão direita: J K L Ç', demo:'jklç', lead:'Agora só a mão direita.', how:['Indicador no J, médio no K, anelar no L, mindinho no Ç.']},
+ {ph:1, rev:true, focus:'asdfjklç', name:'Fileira do meio: duas mãos', demo:'fala', lead:'As 8 teclas de casa, alternando as mãos.', how:['Mire em 95% de precisão.','Alternar mãos é o que mais acelera a digitação: uma mão se prepara enquanto a outra aperta.'], why:'Puxar da memória o que você aprendeu fortalece mais do que ver de novo. Por isso o Tecla intercala revisões entre as etapas novas.'},
+ {ph:1, add:'gh', name:'G e H', demo:'gh gala', lead:'O centro do teclado.', how:['G: o indicador esquerdo estica para a direita e volta pro F.','H: o indicador direito estica para a esquerda e volta pro J.']},
+ {ph:1, rev:true, focus:'gh', name:'Primeiras palavras', demo:'sala', lead:'Palavras de verdade só com a fileira do meio.', how:['Sala, fala, asa, gala: palavras inteiras com 10 teclas.']},
+ {ph:1, add:'ei', name:'E e I', demo:'ei dia', lead:'Subindo para a fileira de cima com as vogais mais usadas.', how:['E: o médio esquerdo sobe um pouco (sai do D).','I: o médio direito sobe (sai do K).','Depois de cada tecla, o dedo volta para a fileira do meio.']},
+ {ph:1, rev:true, focus:'ei', name:'Revisão: E e I', demo:'fiel', lead:'Fixando a primeira subida.', how:['Subiu, voltou pra casa.']},
+ {ph:1, add:'ru', name:'R e U', demo:'ru rua', lead:'Indicadores na fileira de cima.', how:['R: indicador esquerdo sobe do F.','U: indicador direito sobe do J.']},
+ {ph:1, rev:true, focus:'eiru', name:'Revisão: E I R U', demo:'rir', lead:'Misturando fileira do meio e de cima.', how:['Repare na volta: subiu, voltou pra casa.']},
+ {ph:1, add:'ot', name:'O e T', demo:'ot todo', lead:'Mais duas letras muito frequentes no português.', how:['O: anelar direito sobe do L.','T: indicador esquerdo sobe e estica para a direita (acima do G).']},
+ {ph:1, rev:true, focus:'eirout', name:'Revisão: fileira de cima', demo:'terra', lead:'Já dá para escrever muita coisa: roda, terra, tudo, ritmo.', how:['Leia a palavra inteira antes de começar a digitá-la.']},
+ {ph:1, add:'nm', name:'N e M', demo:'nm mundo', lead:'Descendo para a fileira de baixo.', how:['N e M: o indicador direito desce do J (N fica à esquerda, M embaixo).']},
+ {ph:1, add:'cv', name:'C e V', demo:'cv vaca', lead:'Fileira de baixo, lado esquerdo.', how:['C: médio esquerdo desce do D.','V: indicador esquerdo desce do F.']},
+ {ph:1, rev:true, focus:'nmcv', name:'Revisão: fileira de baixo', demo:'cinema', lead:'As três fileiras juntas.', how:['Cuidado para não usar o mesmo dedo em teclas de mãos diferentes.']},
+ {ph:1, add:'pb', name:'P e B', demo:'pb bolo', lead:'Duas letras de alcance mais longo.', how:['P: mindinho direito sobe do Ç.','B: indicador esquerdo desce e estica para a direita (abaixo do G).']},
+ {ph:1, add:'qz', name:'Q e Z', demo:'qz zero', lead:'O mindinho esquerdo sobe e desce.', how:['Q: mindinho esquerdo sobe do A.','Z: mindinho esquerdo desce do A.']},
+ {ph:1, add:'xwy', name:'X, W e Y', demo:'xwy', lead:'As últimas letras do alfabeto!', how:['X: anelar esquerdo desce do S.','W: anelar esquerdo sobe do S.','Y: indicador direito sobe e estica para a esquerda (acima do H).']},
+ {ph:1, rev:true, focus:'', name:'Revisão: alfabeto completo', demo:'teclado', lead:'Todas as letras. Fim da Fase 1.', how:['Aqui vale ter 95% de precisão antes de seguir.'], why:'Terminar a Fase 1 com precisão alta faz o resto ser muito mais fácil. Se não ficar pronto hoje, volte amanhã: depois de uma noite de sono você costuma render melhor.'},
  // ---------- FASE 2 ----------
- {ph:2, gen:'syl', name:'Sílabas comuns', keys:'', lead:'Começa a fase dos blocos: as sílabas que mais aparecem no português.', how:['Pense na sílaba inteira ("que", "de"), não em cada letra.','As sílabas se repetem em sequência de propósito.'], why:'Digitadores rápidos não pensam letra por letra. O cérebro junta sequências frequentes em blocos que saem como um movimento só, e esses blocos se formam com repetição seguida.'},
- {ph:2, gen:'digraph', name:'CH, LH, NH, RR, SS, QU', keys:'', lead:'Pares de letras que andam sempre juntos.', how:['Trate cada par como uma unidade: "lh", "nh", "qu".']},
- {ph:2, gen:'endings', name:'Terminações', keys:'', lead:'-ndo, -mente, -ado, -ido, -ar, -er, -ir: finais que aparecem o tempo todo.', how:['Ganhar velocidade nos finais acelera quase toda palavra.']},
- {ph:2, gen:'top', name:'Palavras mais usadas', keys:'', lead:'As palavras mais comuns do português, sem acento ainda.', how:['de, que, para, com, não... Essas devem sair sem pensar.']},
- {ph:2, gen:'caps', name:'Maiúsculas', keys:'', lead:'O Shift é da mão oposta à letra.', how:['Letra da mão esquerda (A, S, E...)? Segure o Shift direito com o mindinho direito.','Letra da mão direita (J, L, P...)? Shift esquerdo com o mindinho esquerdo.','Segure o Shift, aperte a letra, solte os dois.'], why:'Usar sempre o Shift do mesmo lado obriga a mão a se deslocar. Com o Shift oposto, uma mão segura e a outra digita, sem sair da posição.'},
- {ph:2, gen:'punct1', name:'Vírgula e ponto', keys:',.', lead:'Frases curtas com vírgula e ponto final.', how:[', é do médio direito (desce do K).','. é do anelar direito (desce do L).','Depois da vírgula e do ponto vem um espaço.']},
- {ph:2, gen:'acute', accent:true, name:'Acento agudo ´', keys:'´', lead:'Primeiro acento: á é í ó ú. No ABNT2 o acento é uma "tecla morta": você aperta, nada aparece, e ele entra na próxima letra.', how:['Aperte ´ com o mindinho direito (tecla à direita do P) e solte.','Não aparece nada na tela. É normal.','Aperte a vogal. Sai á, é, í, ó, ú.'], tryC:['á','é','ó'], why:'Aprender o acento cedo, separado, evita o vício de digitar sem acento e corrigir depois. Duas teclas em sequência viram um bloco só com a prática.'},
- {ph:2, gen:'til', accent:true, name:'Til ~ (ã, õ)', keys:'~', lead:'O til fica no mindinho direito, na tecla ao lado do Ç.', how:['Aperte ~ e solte (nada aparece).','Aperte a ou o: sai ã ou õ.','"-ão" é um dos blocos mais comuns do português: mão, não, então.'], tryC:['ã','õ']},
- {ph:2, gen:'cao', accent:true, name:'-ção e -ções', keys:'ç~', lead:'Junta o Ç e o til no bloco mais famoso do português.', how:['ç (mindinho direito) → ~ (mindinho direito) → a → o.','Repita "ção" até sair num gesto só.'], tryC:['ç','ã']},
- {ph:2, gen:'circ', accent:true, name:'Circunflexo ^ (â, ê, ô)', keys:'~', lead:'O ^ é a mesma tecla do ~, com Shift.', how:['Segure Shift esquerdo (mão oposta) e aperte ~. Solte os dois.','Aperte a vogal: sai â, ê, ô.','você, três, avô, ônibus.'], tryC:['ê','ô','â']},
- {ph:2, gen:'crase', accent:true, name:'Crase ` (à, às)', keys:'´', lead:'A crase é a mesma tecla do ´, com Shift.', how:['Segure Shift esquerdo e aperte ´. Solte.','Aperte a: sai à.','Use em "à noite", "às vezes", "vou à praia".'], tryC:['à']},
- {ph:2, gen:'acccaps', accent:true, name:'Acento em maiúscula', keys:'´', lead:'É, Á, Ô no começo da frase.', how:['Primeiro o acento (´ ou Shift + ~), solto.','Depois Shift + letra: sai É, Á, Ô.'], tryC:['É','Á']},
- {ph:2, gen:'accrev', accent:true, rev:true, name:'Revisão: todos os acentos', keys:'', lead:'Todos os acentos misturados em palavras reais.', how:['´ agudo · ~ til · Shift+~ circunflexo · Shift+´ crase.']},
- {ph:2, gen:'punct2', name:'? ! : ;', keys:'/;', lead:'Pontuação com Shift.', how:['? é Shift esquerdo + / (mindinho direito, última tecla da fileira de baixo).','! é Shift direito + 1 (mindinho esquerdo).','; tem tecla própria, logo à esquerda do / (mindinho direito). : é Shift + ;.']},
- {ph:2, gen:'quotes', name:'Aspas, parênteses e hífen', keys:'\'90-', lead:'"aspas", (parênteses) e palavras-com-hífen.', how:['" é Shift + \' (mindinho esquerdo, tecla à esquerda do 1).','( é Shift + 9 e ) é Shift + 0.','- fica à direita do 0 (mindinho direito).']},
- {ph:2, gen:'num1', name:'Números 1 a 5', keys:'12345', lead:'A fileira de números, lado esquerdo.', how:['Cada dedo sobe duas fileiras a partir da tecla de casa.','1 mindinho, 2 anelar, 3 médio, 4 e 5 indicador esquerdo.']},
- {ph:2, gen:'num2', name:'Números 6 a 0', keys:'67890', lead:'A fileira de números, lado direito.', how:['6 e 7 indicador direito, 8 médio, 9 anelar, 0 mindinho direito.']},
- {ph:2, gen:'symbols', name:'Símbolos: R$ @ % #', keys:'2345', lead:'Os símbolos do dia a dia: dinheiro, e-mail, porcentagem.', how:['@ = Shift + 2 · # = Shift + 3 · $ = Shift + 4 · % = Shift + 5.','R$ = Shift + R, depois Shift + 4.']},
- {ph:2, gen:'p2rev', rev:true, name:'Revisão da Fase 2', keys:'', lead:'Tudo da Fase 2 junto: acentos, maiúsculas, pontuação e números.', how:['Mire em 94% ou mais.']},
+ {ph:2, gen:'syl', name:'Sílabas comuns', demo:'que de', lead:'Começa a fase dos blocos: as sílabas que mais aparecem no português.', how:['Pense na sílaba inteira ("que", "de"), não em cada letra.','As sílabas se repetem em sequência de propósito.'], why:'Digitadores rápidos não pensam letra por letra. O cérebro junta sequências frequentes em blocos que saem como um movimento só, e esses blocos se formam com repetição seguida.'},
+ {ph:2, gen:'digraph', name:'CH, LH, NH, RR, SS, QU', demo:'chave', lead:'Pares de letras que andam sempre juntos.', how:['Trate cada par como uma unidade: "lh", "nh", "qu".']},
+ {ph:2, gen:'endings', name:'Terminações', demo:'fazendo', lead:'-ndo, -mente, -ado, -ido, -ar, -er, -ir: finais que aparecem o tempo todo.', how:['Ganhar velocidade nos finais acelera quase toda palavra.']},
+ {ph:2, gen:'top', name:'Palavras mais usadas', demo:'para', lead:'As palavras mais comuns do português, sem acento ainda.', how:['de, que, para, com, não... Essas devem sair sem pensar.']},
+ {ph:2, gen:'caps', name:'Maiúsculas', demo:'Ana Lia', lead:'O Shift é da mão oposta à letra.', how:['Letra da mão esquerda (A, S, E...)? Segure o Shift direito com o mindinho direito.','Letra da mão direita (J, L, P...)? Shift esquerdo com o mindinho esquerdo.','Segure o Shift, aperte a letra, solte os dois.'], why:'Usar sempre o Shift do mesmo lado obriga a mão a se deslocar. Com o Shift oposto, uma mão segura e a outra digita, sem sair da posição.'},
+ {ph:2, gen:'punct1', nk:',.', name:'Vírgula e ponto', demo:'sim, ok.', lead:'Frases curtas com vírgula e ponto final.', how:[', é do médio direito (desce do K).','. é do anelar direito (desce do L).','Depois da vírgula e do ponto vem um espaço.']},
+ {ph:2, gen:'acute', nk:'áéíóú', accent:true, ppm:15, name:'Acento agudo ´', demo:'café', lead:'Primeiro acento: á é í ó ú. No ABNT2 o acento é uma "tecla morta": você aperta, nada aparece, e ele entra na próxima letra.', how:['Aperte ´ com o mindinho direito (tecla à direita do P) e solte.','Não aparece nada na tela. É normal.','Aperte a vogal. Sai á, é, í, ó, ú.'], tryC:['á','é','ó'], why:'Aprender o acento cedo, separado, evita o vício de digitar sem acento e corrigir depois. Duas teclas em sequência viram um bloco só com a prática.'},
+ {ph:2, gen:'til', nk:'ãõ', accent:true, ppm:15, name:'Til ~ (ã, õ)', demo:'mão', lead:'O til fica no mindinho direito, na tecla ao lado do Ç.', how:['Aperte ~ e solte (nada aparece).','Aperte a ou o: sai ã ou õ.','"-ão" é um dos blocos mais comuns do português: mão, não, então.'], tryC:['ã','õ']},
+ {ph:2, gen:'cao', nk:'çã', accent:true, ppm:15, name:'-ção e -ções', demo:'ação', lead:'Junta o Ç e o til no bloco mais famoso do português.', how:['ç (mindinho direito) → ~ (mindinho direito) → a → o.','Repita "ção" até sair num gesto só.'], tryC:['ç','ã']},
+ {ph:2, gen:'circ', nk:'âêô', accent:true, ppm:15, name:'Circunflexo ^ (â, ê, ô)', demo:'você', lead:'O ^ é a mesma tecla do ~, com Shift.', how:['Segure Shift esquerdo (mão oposta) e aperte ~. Solte os dois.','Aperte a vogal: sai â, ê, ô.','você, três, avô, ônibus.'], tryC:['ê','ô','â']},
+ {ph:2, gen:'crase', nk:'à', accent:true, ppm:15, name:'Crase ` (à, às)', demo:'à noite', lead:'A crase é a mesma tecla do ´, com Shift.', how:['Segure Shift esquerdo e aperte ´. Solte.','Aperte a: sai à.','Use em "à noite", "às vezes", "vou à praia".'], tryC:['à']},
+ {ph:2, gen:'acccaps', nk:'éáàôóú', accent:true, ppm:14, name:'Acento em maiúscula', demo:'É', lead:'É, Á, Ô no começo da frase.', how:['Primeiro o acento (´ ou Shift + ~), solto.','Depois Shift + letra: sai É, Á, Ô.'], tryC:['É','Á']},
+ {ph:2, gen:'accrev', nk:'áéíóúãõâêôàç', accent:true, rev:true, ppm:16, name:'Revisão: todos os acentos', demo:'você é', lead:'Todos os acentos misturados em palavras reais.', how:['´ agudo · ~ til · Shift+~ circunflexo · Shift+´ crase.']},
+ {ph:2, gen:'punct2', nk:'?!:;', name:'? ! : ;', demo:'ok?', lead:'Pontuação com Shift.', how:['? é Shift esquerdo + / (mindinho direito, última tecla da fileira de baixo).','! é Shift direito + 1 (mindinho esquerdo).','; tem tecla própria, logo à esquerda do / (mindinho direito). : é Shift + ;.']},
+ {ph:2, gen:'quotes', nk:'"()-', ppm:15, name:'Aspas, parênteses e hífen', demo:'"oi"', lead:'"aspas", (parênteses) e palavras-com-hífen.', how:['" é Shift + \' (mindinho esquerdo, tecla à esquerda do 1).','( é Shift + 9 e ) é Shift + 0.','- fica à direita do 0 (mindinho direito).']},
+ {ph:2, gen:'num1', nk:'12345', ppm:14, name:'Números 1 a 5', demo:'135', lead:'A fileira de números, lado esquerdo.', how:['Cada dedo sobe duas fileiras a partir da tecla de casa.','1 mindinho, 2 anelar, 3 médio, 4 e 5 indicador esquerdo.']},
+ {ph:2, gen:'num2', nk:'67890', ppm:14, name:'Números 6 a 0', demo:'680', lead:'A fileira de números, lado direito.', how:['6 e 7 indicador direito, 8 médio, 9 anelar, 0 mindinho direito.']},
+ {ph:2, gen:'symbols', nk:'@#$%', ppm:12, name:'Símbolos: R$ @ % #', demo:'R$ 5', lead:'Os símbolos do dia a dia: dinheiro, e-mail, porcentagem.', how:['@ = Shift + 2 · # = Shift + 3 · $ = Shift + 4 · % = Shift + 5.','R$ = Shift + R, depois Shift + 4.']},
+ {ph:2, gen:'p2rev', rev:true, ppm:18, name:'Revisão da Fase 2', demo:'Até já!', lead:'Tudo da Fase 2 junto: acentos, maiúsculas, pontuação e números.', how:['Mire em 94% ou mais.']},
  // ---------- FASE 3 ----------
- {ph:3, gen:'fastwords', name:'Palavras frequentes', keys:'', lead:'Começa a fluência. As palavras mais usadas, agora com acentos.', how:['Tente manter um ritmo constante, como um metrônomo.'], why:WHY[3]},
- {ph:3, gen:'short', name:'Frases curtas', keys:'', lead:'Frases completas e curtas.', how:['Leia um pouco à frente do cursor: os olhos vão antes dos dedos.']},
- {ph:3, gen:'msgs', name:'Mensagens do dia a dia', keys:'', lead:'O tipo de texto que você mais vai escrever na vida real.', how:['Mensagens, e-mails, horários e valores.']},
- {ph:3, gen:'long', name:'Frases longas', keys:'', lead:'Frases maiores, que pedem fôlego e ritmo.', how:['Não acelere no fim: ritmo igual do começo ao fim.']},
- {ph:3, gen:'numtext', name:'Texto com números', keys:'', lead:'Números e pontuação no meio de texto corrido.', how:['Volte para a fileira do meio depois de cada número.']},
- {ph:3, gen:'long', kb:'never', name:'Sem teclado na tela', keys:'', lead:'O teclado da tela fica desligado nesta etapa. Só você e o tato.', how:['Se travar, sinta os pontinhos do F e do J e recomece dali.']},
- {ph:3, gen:'final', name:'Desafio final', keys:'', lead:'Um texto completo com tudo o que você aprendeu.', how:['Meta: 95% de precisão.'], why:'Daqui em diante o que mais faz você evoluir é usar: escrever de verdade, sem olhar, um pouco todo dia. O treino de hoje continua montando revisões das suas teclas mais fracas.'}
+ {ph:3, gen:'fastwords', name:'Palavras frequentes', demo:'então', lead:'Começa a fluência. As palavras mais usadas, agora com acentos.', how:['Tente manter um ritmo constante, como um metrônomo.'], why:WHY[3]},
+ {ph:3, gen:'short', name:'Frases curtas', demo:'Oi!', lead:'Frases completas e curtas.', how:['Leia um pouco à frente do cursor: os olhos vão antes dos dedos.']},
+ {ph:3, gen:'msgs', name:'Mensagens do dia a dia', demo:'Valeu!', lead:'O tipo de texto que você mais vai escrever na vida real.', how:['Mensagens, e-mails, horários e valores.']},
+ {ph:3, gen:'long', name:'Frases longas', demo:'calma', lead:'Frases maiores, que pedem fôlego e ritmo.', how:['Não acelere no fim: ritmo igual do começo ao fim.']},
+ {ph:3, gen:'numtext', name:'Texto com números', demo:'R$ 10', lead:'Números e pontuação no meio de texto corrido.', how:['Volte para a fileira do meio depois de cada número.']},
+ {ph:3, gen:'long', kb:'never', name:'Sem teclado na tela', demo:'tato', lead:'O teclado da tela fica desligado nesta etapa. Só você e o tato.', how:['Se travar, sinta os pontinhos do F e do J e recomece dali.']},
+ {ph:3, gen:'final', ppm:28, name:'Desafio final', demo:'pronto', lead:'Um texto completo com tudo o que você aprendeu.', how:['Meta: 95% de precisão.'], why:'Daqui em diante o que mais faz você evoluir é usar: escrever de verdade, sem olhar, um pouco todo dia. O treino de hoje continua montando revisões das suas teclas mais fracas.'}
 ];
-LESSONS.forEach((l, i) => { l.id = 'E' + (i + 1); l.idx = i; });
-const PHASES = {1:{name:P1, short:'Posição', desc:'aprender onde cada tecla fica', color:'var(--ph1)'}, 2:{name:P2, short:'Blocos', desc:'sílabas, acentos, pontuação e números', color:'var(--ph2)'}, 3:{name:P3, short:'Fluência', desc:'textos reais, sem teclado na tela', color:'var(--ph3)'}};
+LESSONS.forEach((l, i) => { l.id = 'T' + (i + 1); l.idx = i; });
+const PHASES = {1:{name:P1, short:'Posição', desc:'aprender onde cada tecla fica, um dedo de cada vez', color:'var(--ph1)'}, 2:{name:P2, short:'Blocos', desc:'sílabas, acentos, pontuação e números', color:'var(--ph2)'}, 3:{name:P3, short:'Fluência', desc:'textos reais, sem teclado na tela', color:'var(--ph3)'}};
 
 function addFor(L){ return L.add ? (settings.noAccents ? L.add.replace('ç', '') : L.add) : ''; }
 function allowedUpTo(idx){
@@ -816,7 +1051,11 @@ function allowedUpTo(idx){
   for(let i = 0; i <= idx && i < LESSONS.length; i++) for(const c of addFor(LESSONS[i])) s.add(c);
   return s;
 }
-function lastLetterIdx(idx){ let j = -1; for(let i = 0; i <= idx; i++) if(LESSONS[i].add) j = i; return j; }
+function newKeysOf(L){
+  let k = L.add ? addFor(L) : L.nk || L.focus || '';
+  if(settings.noAccents) k = strip(k).replace(/ç/g, '');
+  return k;
+}
 
 /* ---------------- text generators ---------------- */
 function drill(newL, allowed, len){
@@ -826,7 +1065,6 @@ function drill(newL, allowed, len){
   if(!newL.some(c => s.includes(c))) s = s.slice(0, -1) + pick(newL);
   return s;
 }
-// tokens are pushed in small repeated runs so chunks can form
 function runs(src, n, rep){
   const out = [];
   while(out.length < n){
@@ -864,11 +1102,21 @@ function genReview(idx){
     return drill(focus.length ? focus : [...allowed], allowed, 3 + rnd(3));
   }, 26, 2);
 }
+function genHand(idx){
+  const L = LESSONS[idx];
+  const keys = [...L.focus].filter(c => !(settings.noAccents && c === 'ç'));
+  const set = new Set(keys);
+  const words = wordsWithin(set);
+  return keys.join('') + ' ' + keys.join('') + ' ' + runs(() => words.length && Math.random() < .3 ? pick(words) : drill(keys, set, 2 + rnd(3)), 24, 2);
+}
+function genRhythm(){
+  return runs(['f j','j f','ff jj','fj fj','jf jf','fff jjj','f f j j','fjfj'], 18, 1);
+}
 const plain = () => WORDS.filter(w => !hasAccent(w) && w.length > 2);
-function phrase(src, n){ // capitalized short phrase with period
+function phrase(src, n){
   const ws = Array.from({length: n}, () => pick(src));
   let s = ws.join(' ');
-  if(Math.random() < .5 && n > 3){ const k = 1 + rnd(n - 2); const a = ws.slice(0, k).join(' '), b = ws.slice(k).join(' '); s = a + ', ' + b; }
+  if(Math.random() < .5 && n > 3){ const k = 1 + rnd(n - 2); s = ws.slice(0, k).join(' ') + ', ' + ws.slice(k).join(' '); }
   return s[0].toUpperCase() + s.slice(1) + '.';
 }
 const GEN = {
@@ -900,6 +1148,8 @@ const GEN = {
 };
 function lessonText(idx){
   const L = LESSONS[idx];
+  if(L.gen === 'hand') return genHand(idx);
+  if(L.gen === 'rhythm') return genRhythm();
   if(L.gen) return GEN[L.gen]();
   if(L.rev) return genReview(idx);
   return genLetters(idx);
@@ -909,11 +1159,50 @@ function testChunk(){
   return shuffle(SENTENCES.concat(MSGS)).slice(0, 4).join(' ');
 }
 
+/* ---------------- readiness: is the learner ready for the next step? ---------------- */
+const TGT = {1: {acc: 94, min: 3, minRev: 2}, 2: {acc: 93, min: 2, minRev: 2}, 3: {acc: 94, min: 2, minRev: 2}};
+function ppmTarget(L){
+  if(L.ppm) return L.ppm;
+  if(L.ph === 1) return Math.round(5 + L.idx * 0.45);
+  if(L.ph === 2) return 18;
+  return 25;
+}
+function minRounds(L){ const T = TGT[L.ph]; return (L.rev || L.gen === 'hand' || L.gen === 'rhythm') ? T.minRev : T.min; }
+function roundScore(m, L){
+  const T = TGT[L.ph], tp = ppmTarget(L);
+  const accS = clamp01((m.acc - 85) / (T.acc - 85));
+  const spdS = clamp01(m.ppm / tp);
+  const rhyS = m.cv == null ? accS : clamp01((1 - m.cv) / 0.5);
+  const newS = m.nacc == null ? accS : clamp01((m.nacc - 85) / (T.acc - 85));
+  const hesS = clamp01(1 - (m.hes || 0) / Math.max(1, m.chars) * 8);
+  return Math.round(100 * (.35 * accS + .25 * spdS + .15 * rhyS + .15 * newS + .10 * hesS));
+}
+function readiness(L){
+  const p = progress[L.id];
+  const T = TGT[L.ph], tp = ppmTarget(L), need = minRounds(L);
+  if(!p || !p.hist || !p.hist.length) return {pct: 0, ready: false, checks: [], need, good: 0, score: 0};
+  const last3 = p.hist.slice(-3), last = p.hist[p.hist.length - 1];
+  const score = Math.round(last3.reduce((a, h) => a + h.score, 0) / last3.length);
+  const good = p.hist.slice(-4).filter(h => h.acc >= T.acc && h.ppm >= tp * 0.85).length;
+  const cvLim = L.ph === 1 ? 0.75 : 0.65;
+  const checks = [
+    {ok: last.acc >= T.acc, label: 'Precisão de ' + T.acc + '% ou mais', val: Math.round(last.acc) + '%', key: 'acc'},
+    {ok: last.ppm >= tp, label: 'Velocidade de ' + tp + ' ppm ou mais', val: last.ppm + ' ppm', key: 'ppm'},
+    {ok: last.cv == null || last.cv <= cvLim, label: 'Ritmo constante', val: last.cv == null ? '–' : last.cv <= cvLim * .75 ? 'firme' : last.cv <= cvLim ? 'bom' : 'irregular', key: 'cv'},
+    {ok: last.nacc == null || last.nacc >= T.acc, label: 'Teclas novas firmes', val: last.nacc == null ? '–' : Math.round(last.nacc) + '%', key: 'nacc'},
+    {ok: good >= need, label: 'Rodadas boas seguidas', val: Math.min(good, need) + ' de ' + need, key: 'rounds'}
+  ];
+  const ready = !!p.ready || (score >= 80 && good >= need && last.acc >= T.acc - 1);
+  const pct = ready ? 100 : Math.min(95, Math.round(score * (0.55 + 0.45 * Math.min(1, good / need))));
+  return {pct, ready, checks, need, good, score};
+}
+function isDone(L){ const p = progress[L.id]; return !!(p && p.ready); }
+
 /* ---------------- key memory: errors, speed, last seen ---------------- */
 function keyInfo(){
   const rows = [];
   let tMs = 0, tN = 0;
-  for(const [k, v] of Object.entries(keyStats)){ if(v[3]){ tMs += v[2]; tN += v[3]; } }
+  for(const v of Object.values(keyStats)){ if(v[3]){ tMs += v[2]; tN += v[3]; } }
   const gAvg = tN ? tMs / tN : 0;
   for(const [k, v] of Object.entries(keyStats)){
     if(!/^[a-zçáéíóúãõâêôà]$/.test(k)) continue;
@@ -940,23 +1229,20 @@ function weakText(){
   const text = runs(() => (Math.random() < .78 && ws.length) || !base.length ? pick(ws) : pick(base) + pick(base) + pick(base), 28, 2);
   return {text, keys};
 }
-// spaced review: learned keys, prioritised by errors + time since last practice
 function learnedIdx(){
   let j = -1;
-  LESSONS.forEach((L, i) => { if(progress[L.id] && L.add) j = i; });
+  LESSONS.forEach((L, i) => { if(isDone(L) && L.add) j = i; });
   return j;
 }
+function knownSet(){ const li = learnedIdx(); return li >= 0 ? allowedUpTo(li) : new Set('fj'); }
 function warmText(){
-  const li = learnedIdx();
-  const allowed = li >= 0 ? allowedUpTo(li) : new Set('fj');
+  const allowed = knownSet();
   const info = keyInfo().filter(r => allowed.has(r.k));
   const due = info.map(r => ({k: r.k, p: r.miss * 6 + Math.min(r.daysAgo / 3, 1.5) + r.slow * .5})).sort((a, b) => b.p - a.p).slice(0, 5).map(r => r.k);
   const focus = due.length ? due : shuffle([...allowed]).slice(0, 4);
   const words = wordsWithin(allowed);
   const fw = words.filter(w => focus.some(c => w.includes(c)));
-  const fullAlpha = allowed.size >= 25;
-  if(fullAlpha && progress[LESSONS[24].id]){
-    // past the basics: review with real phrases mixed in
+  if(allowed.size >= 25 && isDone(LESSONS[30])){
     return runs(() => Math.random() < .7 && fw.length ? pick(fw) : pick(COMMON), 18, 2) + ' ' + pick(SENTENCES);
   }
   return runs(() => Math.random() < .65 && fw.length >= 3 ? pick(fw) : words.length >= 6 && Math.random() < .7 ? pick(words) : drill(focus, allowed, 3 + rnd(2)), 22, 2);
@@ -979,6 +1265,7 @@ assign('rp', "0-=p´[ç~];/", ['bksp','enter','enter1','rshift']);
 FINGER.space = 'th';
 const FCOLOR = {lp:'var(--f-pinky)', rp:'var(--f-pinky)', lr:'var(--f-ring)', rr:'var(--f-ring)', lm:'var(--f-middle)', rm:'var(--f-middle)', li:'var(--f-index)', ri:'var(--f-index)', th:'var(--f-thumb)'};
 const FNAME = {lp:'mindinho esquerdo', lr:'anelar esquerdo', lm:'médio esquerdo', li:'indicador esquerdo', ri:'indicador direito', rm:'médio direito', rr:'anelar direito', rp:'mindinho direito', th:'polegar'};
+const FHOME = {lp:'a', lr:'s', lm:'d', li:'f', ri:'j', rm:'k', rr:'l', rp:'ç', th:'space'};
 const HOME = new Set([...'asdfjklç']);
 const BASE = {}, SHIFT = {};
 KB.flat().forEach(k => { if(Array.isArray(k)){ BASE[k[0]] = k[0]; if(k[1]) SHIFT[k[1]] = k[0]; } });
@@ -1005,6 +1292,7 @@ function renderKeyboard(el){
       }
       const f = FINGER[id];
       if(f) d.style.setProperty('--fc', FCOLOR[f]);
+      d.dataset.k = id;
       map[id] = d;
       r.appendChild(d);
     });
@@ -1047,23 +1335,27 @@ function stepsHtml(ch){
 
 /* ---------------- sound ---------------- */
 let actx = null;
-function beep(){
+function tone(freq, dur, type, vol, when){
   if(!settings.sound) return;
   try{
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = actx.currentTime + (when || 0);
     const o = actx.createOscillator(), g = actx.createGain();
-    o.type = 'square'; o.frequency.value = 180;
-    g.gain.setValueAtTime(0.05, actx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.09);
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.05, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     o.connect(g); g.connect(actx.destination);
-    o.start(); o.stop(actx.currentTime + 0.1);
+    o.start(t0); o.stop(t0 + dur + 0.02);
   }catch(e){}
 }
+const beep = () => tone(180, 0.09, 'square', 0.05);
+const chime = (n) => { [660, 880, 1320].slice(0, n || 2).forEach((f, i) => tone(f, 0.18, 'triangle', 0.05, i * 0.08)); };
 
 /* ---------------- screens ---------------- */
 let screen = 'home';
 function show(name){
   screen = name;
+  if(name !== 'intro') demoToken++;
   $$('.scr').forEach(s => s.classList.toggle('on', s.id === 's-' + name));
   window.scrollTo(0, 0);
 }
@@ -1071,13 +1363,138 @@ function go(name){
   if(name === 'home'){ goHome(); return; }
   if(name === 'stats'){ renderStats(); return; }
   if(name === 'acc'){ renderAccGuide(); show('acc'); return; }
+  if(name === 'practice'){ renderPractice(); show('practice'); return; }
+  if(name === 'rank'){ renderRank(); show('rank'); return; }
   show(name);
+}
+
+/* ---------------- toasts & level ---------------- */
+function toast(label, title, sub, gold){
+  const t = document.createElement('div');
+  t.className = 'toast' + (gold ? ' gold' : '');
+  t.innerHTML = '<div class="lbl">' + esc(label) + '</div><b>' + esc(title) + '</b>' + (sub ? '<small>' + esc(sub) + '</small>' : '');
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 320); }, 3800);
+}
+const TITLES = [[1,'Catador de milho'],[3,'Aprendiz'],[6,'Datilógrafo'],[10,'Digitador'],[15,'Veloz'],[20,'Relâmpago'],[30,'Lenda do teclado']];
+function levelInfo(xp){
+  let lvl = 1, need = 80, rest = xp;
+  while(rest >= need){ rest -= need; lvl++; need = 80 + lvl * 40; }
+  let title = TITLES[0][1];
+  TITLES.forEach(([l, t]) => { if(lvl >= l) title = t; });
+  return {lvl, into: rest, need, title};
+}
+function showLevelUp(li){
+  chime(3);
+  const o = document.createElement('div');
+  o.className = 'lvlup';
+  o.innerHTML = '<div><div class="lbl">Subiu de nível</div><b>' + li.lvl + '</b><span>' + esc(li.title) + '</span><small>clique ou aperte qualquer tecla</small></div>';
+  const close = () => { o.remove(); document.removeEventListener('keydown', close, true); };
+  o.addEventListener('click', close);
+  setTimeout(() => document.addEventListener('keydown', close, true), 400);
+  document.body.appendChild(o);
+  setTimeout(close, 3500);
+}
+
+/* ---------------- achievements ---------------- */
+const ACHS = [
+  {id:'r1', ic:'1', name:'Primeira rodada', desc:'Complete uma rodada'},
+  {id:'e1', ic:'FJ', name:'Mãos na posição', desc:'Domine a etapa 1'},
+  {id:'home', ic:'ASD', name:'Fileira do meio', desc:'Domine as etapas 1 a 12'},
+  {id:'alpha', ic:'A-Z', name:'Alfabeto completo', desc:'Termine a Fase 1'},
+  {id:'acc', ic:'á', name:'Acentuador', desc:'Domine a revisão de acentos'},
+  {id:'ph2', ic:'II', name:'Blocos', desc:'Termine a Fase 2'},
+  {id:'grad', ic:'★', name:'Formado', desc:'Domine todas as etapas'},
+  {id:'c50', ic:'50', name:'Combo 50', desc:'50 acertos seguidos'},
+  {id:'c100', ic:'100', name:'Combo 100', desc:'100 acertos seguidos'},
+  {id:'c250', ic:'250', name:'Combo 250', desc:'250 acertos seguidos'},
+  {id:'p20', ic:'20', name:'20 ppm', desc:'Em teste ou prática de 30 s ou mais'},
+  {id:'p35', ic:'35', name:'35 ppm', desc:'Velocidade de quem digita no dia a dia'},
+  {id:'p50', ic:'50', name:'50 ppm', desc:'Acima da média'},
+  {id:'p70', ic:'70', name:'70 ppm', desc:'Velocidade profissional'},
+  {id:'perfect', ic:'100', name:'Perfeição', desc:'100% numa rodada de 80 letras ou mais'},
+  {id:'d1', ic:'✓', name:'Dever cumprido', desc:'Complete o treino de hoje'},
+  {id:'s3', ic:'3d', name:'3 dias seguidos', desc:'Treine 3 dias sem falhar'},
+  {id:'s7', ic:'7d', name:'Uma semana', desc:'Treine 7 dias sem falhar'},
+  {id:'s30', ic:'30d', name:'Hábito formado', desc:'Treine 30 dias sem falhar'},
+  {id:'r50', ic:'50r', name:'Persistente', desc:'50 rodadas'},
+  {id:'r200', ic:'200', name:'Incansável', desc:'200 rodadas'},
+  {id:'rank', ic:'#', name:'No ranking', desc:'Entre no ranking com um apelido'}
+];
+function unlock(id){
+  if(game.ach[id]) return 0;
+  game.ach[id] = Date.now();
+  const a = ACHS.find(x => x.id === id);
+  if(a) setTimeout(() => { toast('Conquista desbloqueada', a.name, a.desc + ' · +25 XP', true); tone(988, .15, 'triangle', .05); tone(1318, .25, 'triangle', .05, .1); }, 600);
+  return 25;
+}
+function phaseDone(p){ return visibleLessons().filter(i => LESSONS[i].ph === p).every(i => isDone(LESSONS[i])); }
+function checkAchievements(ctx){
+  let xp = 0;
+  const u = id => { xp += unlock(id); };
+  if(game.rounds >= 1) u('r1');
+  if(game.rounds >= 50) u('r50');
+  if(game.rounds >= 200) u('r200');
+  if(isDone(LESSONS[0])) u('e1');
+  if(LESSONS.slice(0, 12).every(isDone)) u('home');
+  if(phaseDone(1)) u('alpha');
+  if(isDone(LESSONS[37])) u('acc');
+  if(phaseDone(2)) u('ph2');
+  if(phaseDone(1) && phaseDone(2) && phaseDone(3)) u('grad');
+  if(game.bestCombo >= 50) u('c50');
+  if(game.bestCombo >= 100) u('c100');
+  if(game.bestCombo >= 250) u('c250');
+  if(ctx && ctx.m){
+    const m = ctx.m;
+    if((ctx.kind === 'test' || ctx.kind === 'practice') && m.ms >= 30000 && m.acc >= 90){
+      if(m.ppm >= 20) u('p20');
+      if(m.ppm >= 35) u('p35');
+      if(m.ppm >= 50) u('p50');
+      if(m.ppm >= 70) u('p70');
+    }
+    if(m.acc >= 100 && m.chars >= 80) u('perfect');
+  }
+  if(ctx && ctx.dailyDone) u('d1');
+  const sc = streakCount();
+  if(sc >= 3) u('s3');
+  if(sc >= 7) u('s7');
+  if(sc >= 30) u('s30');
+  if(profile) u('rank');
+  return xp;
+}
+
+/* ---------------- backend ---------------- */
+const online = () => SB_KEY && SB_KEY.indexOf('__') !== 0;
+async function rpc(fn, args){
+  if(!online()) throw new Error('offline');
+  const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY},
+    body: JSON.stringify(args || {})
+  });
+  const t = await r.text();
+  if(!r.ok){ let m = t; try{ m = JSON.parse(t).message || t; }catch(e){} throw new Error(m); }
+  return t ? JSON.parse(t) : null;
+}
+let syncTimer = null;
+function syncProfile(){
+  if(!profile) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => {
+    const li = levelInfo(game.xp);
+    rpc('tecla_update_profile', {p_id: profile.id, p_secret: profile.secret, p_nick: profile.nick, p_xp: game.xp, p_level: li.lvl,
+      p_lessons: LESSONS.filter(isDone).length, p_streak: streakCount(), p_best_combo: game.bestCombo}).catch(() => {});
+  }, 800);
+}
+function syncRun(h){
+  if(!profile) return;
+  rpc('tecla_add_run', {p_id: profile.id, p_secret: profile.secret, p_kind: h.kind, p_lesson: h.name, p_ppm: h.ppm, p_acc: h.acc, p_duration: Math.max(1, h.sec), p_chars: h.chars || 0}).catch(() => {});
 }
 
 /* ---------------- phase / progress ---------------- */
 function visibleLessons(){ return LESSONS.map((l, i) => i).filter(i => !(settings.noAccents && LESSONS[i].accent)); }
 function nextLessonIdx(){
-  for(const i of visibleLessons()) if(!progress[LESSONS[i].id]) return i;
+  for(const i of visibleLessons()) if(!isDone(LESSONS[i])) return i;
   return -1;
 }
 function currentPhase(){
@@ -1085,9 +1502,8 @@ function currentPhase(){
   return n < 0 ? 3 : LESSONS[n].ph;
 }
 
-/* ---------------- intro ---------------- */
-let introIdx = -1, introTry = null;
-let introCfg = null;
+/* ---------------- intro + animated demo ---------------- */
+let introIdx = -1, introTry = null, introCfg = null, demoToken = 0;
 function showIntro(idx, extra){
   const L = LESSONS[idx];
   introIdx = idx;
@@ -1097,9 +1513,11 @@ function showIntro(idx, extra){
   introTry = tryC ? {list: tryC, i: 0} : null;
   const el = $('#intro');
   el.style.setProperty('--pc', ph.color);
-  const newKeys = L.add ? [...addFor(L)] : [...(L.keys || '')];
+  const p = progress[L.id];
+  const rd = readiness(L);
+  const status = p && p.rounds ? (rd.ready ? 'Etapa dominada · ' + p.rounds + ' rodadas' : 'Rodada ' + (p.rounds + 1) + ' · prontidão ' + rd.pct + '%') : 'Primeira vez nesta etapa';
   el.innerHTML =
-    '<div class="ph">' + ph.name + ' · Etapa ' + (idx + 1) + ' de ' + LESSONS.length + (L.rev ? ' · revisão' : '') + '</div>' +
+    '<div class="ph">' + ph.name + ' · Etapa ' + (idx + 1) + ' de ' + LESSONS.length + ' · ' + status + '</div>' +
     '<h2>' + esc(L.name) + '</h2>' +
     '<p class="lead">' + esc(L.lead || '') + '</p>' +
     '<div class="icols">' +
@@ -1107,19 +1525,85 @@ function showIntro(idx, extra){
       '<div class="ibox why"><h4>Por que assim</h4><p>' + esc(L.why || WHY[L.ph]) + '</p></div>' +
     '</div>' +
     (introTry ? '<div class="try" id="try"><div><div class="lbl">Teste antes de começar</div><div style="font-size:13.5px;color:var(--text2);margin-top:4px">Digite cada caractere abaixo:</div></div><div class="chips" id="try-chips">' + tryC.map((c, i) => '<b class="' + (i === 0 ? 'cur' : '') + '">' + esc(c) + '</b>').join('') + '</div><div class="got" id="try-got">' + stepsHtml(tryC[0]) + '</div></div>' : '') +
-    '<div class="kb ikb" id="ikb"></div>' +
-    '<div class="acts"><button class="btn big" id="intro-go">Começar <span style="opacity:.6">(Enter)</span></button><small>dica: <kbd>Enter</kbd> pula esta tela</small></div>';
+    '<div class="demo" id="demo"><div class="stage"><div><div class="lbl">Veja como fazer</div><div class="demo-out" id="demo-out"></div></div><div style="text-align:right"><div class="demo-cap" id="demo-cap"></div><button class="pill" id="demo-again" style="margin-top:6px">▶ Ver de novo</button></div></div><div class="kb ikb" id="ikb"></div><div class="fingers" id="fingers"></div></div>' +
+    '<div class="acts"><button class="btn big" id="intro-go">Começar <span style="opacity:.6">(Enter)</span></button><small>Os círculos coloridos são os seus dedos. Cada um tem a sua parte do teclado.</small></div>';
   const m = renderKeyboard($('#ikb'));
   Object.entries(m).forEach(([id, k]) => { if(HOME.has(id)) k.classList.add('home'); });
-  newKeys.forEach(c => { const s = single(c) || single(c.toLowerCase()); if(s && m[s.main]) m[s.main].classList.add('target'); });
-  if(L.gen === 'circ' || L.gen === 'crase'){ m.lshift.classList.add('tshift'); }
-  if(L.gen === 'caps'){ m.lshift.classList.add('tshift'); m.rshift.classList.add('tshift'); }
   $('#intro-go').addEventListener('click', () => startLesson(idx, introCfg));
+  $('#demo-again').addEventListener('click', e => { e.currentTarget.blur(); runDemo(L, m, 1); });
   show('intro');
+  setTimeout(() => runDemo(L, m, 2), reduceMotion ? 0 : 700);
 }
 function fmtHow(h){
-  // turn single symbols into <kbd>
-  return esc(h).replace(/(^|[\s(])([´~^`?!:;,.@#$%"\-()çÇ]|Shift|Espaço)(?=[\s,.)]|$)/g, (m, a, b) => a + '<kbd>' + b + '</kbd>');
+  return esc(h).replace(/(^|[\s(])([´~^`?!:;,.@#$%\-()çÇ]|Shift|Espaço)(?=[\s,.)]|$)/g, (m, a, b) => a + '<kbd>' + b + '</kbd>');
+}
+function demoText(L){
+  let t = L.demo || addFor(L) || 'fj';
+  if(settings.noAccents) t = strip(t);
+  return t;
+}
+async function runDemo(L, m, loops){
+  const token = ++demoToken;
+  const wrap = $('#demo'), layer = $('#fingers'), out = $('#demo-out'), cap = $('#demo-cap');
+  if(!wrap) return;
+  layer.innerHTML = '';
+  const dots = {};
+  const posOf = id => {
+    const k = m[id]; if(!k) return {x: 0, y: 0};
+    const r = k.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+    const fx = id === 'space' ? 0.5 : 0.5;
+    return {x: r.left - w.left + r.width * fx, y: r.top - w.top + r.height * 0.55};
+  };
+  const place = (f, id) => { const p = posOf(id); dots[f].style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)'; };
+  Object.keys(FHOME).forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'fd';
+    d.style.setProperty('--c', FCOLOR[f]);
+    layer.appendChild(d);
+    dots[f] = d;
+    const p = posOf(FHOME[f]);
+    d.style.transform = 'translate(' + p.x + 'px,' + (p.y - 60) + 'px)';
+  });
+  // fingers land on the home row, one by one
+  const order = ['li','ri','lm','rm','lr','rr','lp','rp','th'];
+  for(let i = 0; i < order.length; i++){
+    if(token !== demoToken) return;
+    const f = order[i];
+    dots[f].classList.add('on');
+    place(f, FHOME[f]);
+    await sleep(reduceMotion ? 0 : 90);
+  }
+  cap.textContent = 'Dedos na posição de casa';
+  await sleep(reduceMotion ? 200 : 700);
+  const text = demoText(L);
+  for(let loop = 0; loop < loops; loop++){
+    out.textContent = '';
+    for(const ch of text){
+      if(token !== demoToken) return;
+      const steps = stepsFor(ch);
+      for(let si = 0; si < steps.length; si++){
+        const st = steps[si];
+        const f = FINGER[st.main];
+        let sf = null;
+        if(st.shift){ sf = FINGER[st.keys[1]]; place(sf, st.keys[1]); dots[sf].classList.add('down'); m[st.keys[1]].classList.add('press'); }
+        cap.innerHTML = (st.shift ? keyLabel(st.keys[1]) + ' + ' : '') + esc(keyLabel(st.main)) + ' · ' + FNAME[f] + (steps.length > 1 && si === 0 ? ' (acento: nada aparece ainda)' : '');
+        place(f, st.main);
+        await sleep(reduceMotion ? 120 : 280);
+        if(token !== demoToken) return;
+        dots[f].classList.add('down'); m[st.main].classList.add('press');
+        tone(520 + (st.main.charCodeAt(0) % 12) * 30, .04, 'sine', .02);
+        await sleep(160);
+        dots[f].classList.remove('down'); m[st.main].classList.remove('press');
+        if(sf){ dots[sf].classList.remove('down'); m[st.keys[1]].classList.remove('press'); place(sf, FHOME[sf]); }
+        place(f, FHOME[f]);
+        if(si < steps.length - 1) await sleep(260);
+      }
+      out.textContent += ch;
+      await sleep(reduceMotion ? 120 : 260);
+    }
+    cap.textContent = 'Pronto. Agora é com você!';
+    await sleep(1300);
+  }
 }
 function introKey(e){
   if(e.key === 'Enter'){ e.preventDefault(); startLesson(introIdx, introCfg); return; }
@@ -1168,10 +1652,13 @@ function startSession(cfg){
   if(settings.noAccents) text = strip(text);
   Object.assign(S, {
     cfg, text, pos: 0, typed: [], errAt: {}, keystrokes: 0, correctKeys: 0, correctChars: 0,
-    errors: 0, start: 0, end: 0, done: false, dead: false, miss: {}, lastT: 0, policy: kbPolicy(cfg)
+    errors: 0, start: 0, end: 0, done: false, dead: false, miss: {}, lastT: 0, policy: kbPolicy(cfg),
+    iv: [], hes: 0, nk: {h: 0, t: 0}, nkSet: new Set([...(cfg.newKeys || '')]), combo: 0, maxCombo: 0
   });
-  const kinds = {lesson: 'Etapa ' + (cfg.idx + 1) + ' de ' + LESSONS.length, test: 'Teste de velocidade', weak: 'Pontos fracos', warm: 'Aquecimento · revisão espaçada'};
-  $('#t-kind').textContent = (cfg.plan ? 'Treino de hoje · ' : '') + kinds[cfg.kind];
+  const kinds = {lesson: 'Etapa ' + (cfg.idx + 1) + ' de ' + LESSONS.length, test: 'Teste de velocidade', weak: 'Pontos fracos', warm: 'Aquecimento · revisão espaçada', practice: 'Prática livre'};
+  let kindTxt = kinds[cfg.kind];
+  if(cfg.kind === 'lesson'){ const p = progress[LESSONS[cfg.idx].id]; kindTxt += ' · rodada ' + (((p && p.rounds) || 0) + 1); }
+  $('#t-kind').textContent = (cfg.plan ? 'Treino de hoje · ' : '') + kindTxt;
   $('#t-name').textContent = cfg.title;
   $('#t-tip').textContent = cfg.tip || '';
   $('#t-tip').style.display = cfg.tip ? '' : 'none';
@@ -1180,9 +1667,10 @@ function startSession(cfg){
   $('#lv-ppm').textContent = '0';
   $('#lv-acc').innerHTML = '100<small>%</small>';
   $('#t-prog').style.width = '0%';
+  $('#combo').className = 'combo';
   const p = S.policy;
   $('#guide').classList.toggle('ghost', !p.show);
-  $('#ghostnote').textContent = p.show ? '' : p.reveal ? 'Teclado apagado para treinar o tato. Ele aparece se você hesitar.' : 'Teclado desligado nesta etapa.';
+  $('#ghostnote').textContent = p.show ? '' : p.reveal ? 'Teclado apagado para treinar o tato. Ele aparece se você hesitar.' : 'Teclado desligado.';
   $('#tbox').classList.remove('typing');
   $('#t-dead').classList.remove('on');
   const inner = $('#tinner');
@@ -1222,6 +1710,46 @@ function recordKey(exp, ok, ms){
   if(ok && ms > 0 && ms < 2500){ v[2] += ms; v[3]++; }
   v[4] = Date.now();
   if(!ok) S.miss[k] = (S.miss[k] || 0) + 1;
+  if(S.nkSet.has(k)){ S.nk.t++; if(ok) S.nk.h++; }
+}
+function comboHit(ok){
+  const el = $('#combo');
+  if(ok){
+    S.combo++;
+    if(S.combo > S.maxCombo) S.maxCombo = S.combo;
+    if(S.combo >= 5){
+      el.classList.add('on');
+      el.classList.toggle('t2', S.combo >= 50 && S.combo < 100);
+      el.classList.toggle('t3', S.combo >= 100);
+      el.querySelector('b').textContent = '×' + S.combo;
+      if(S.combo % 25 === 0){
+        el.classList.remove('boom'); void el.offsetWidth; el.classList.add('boom');
+        sparks(el);
+        chime(S.combo >= 100 ? 3 : 2);
+      }
+    }
+  } else {
+    if(S.combo >= 10){ el.classList.remove('boom', 'broke'); void el.offsetWidth; el.classList.add('broke'); el.querySelector('b').textContent = '×' + S.combo; setTimeout(() => el.classList.remove('on', 'broke'), 340); }
+    else el.classList.remove('on');
+    S.combo = 0;
+  }
+}
+function sparks(el){
+  if(reduceMotion) return;
+  const box = $('#tbox'), r = el.getBoundingClientRect(), b = box.getBoundingClientRect();
+  const color = getComputedStyle(el).color;
+  for(let i = 0; i < 12; i++){
+    const s = document.createElement('span');
+    s.className = 'spark';
+    const a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 50;
+    s.style.left = (r.left - b.left + r.width / 2) + 'px';
+    s.style.top = (r.top - b.top + 16) + 'px';
+    s.style.setProperty('--dx', Math.cos(a) * d + 'px');
+    s.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    s.style.setProperty('--c', color);
+    box.appendChild(s);
+    setTimeout(() => s.remove(), 750);
+  }
 }
 function typeChar(ch){
   if(S.done) return;
@@ -1233,10 +1761,11 @@ function typeChar(ch){
   }
   const ms = S.lastT ? now - S.lastT : 0;
   S.lastT = now;
+  if(ms >= 2000) S.hes++;
   const exp = S.text[S.pos];
   const ok = same(ch, exp);
   S.keystrokes++;
-  if(ok) S.correctKeys++;
+  if(ok){ S.correctKeys++; if(ms > 60 && ms < 2000) S.iv.push(ms); }
   if(S.cfg.stop){
     recordKey(exp, ok, ms);
     if(ok){
@@ -1258,9 +1787,10 @@ function typeChar(ch){
     if(ok) S.correctChars++; else { S.errors++; beep(); }
     S.pos++;
   }
+  comboHit(ok);
   flashKey(ch, ok);
-  if(S.cfg.duration && S.text.length - S.pos < 160){
-    let more = ' ' + testChunk();
+  if(S.cfg.duration && S.cfg.more && S.text.length - S.pos < 160){
+    let more = ' ' + S.cfg.more().replace(/\s+/g, ' ').trim();
     if(settings.noAccents) more = strip(more);
     S.text += more; appendSpans(more);
   }
@@ -1324,6 +1854,13 @@ function calc(){
   const acc = S.keystrokes ? Math.round(S.correctKeys / S.keystrokes * 1000) / 10 : 100;
   return {ppm, acc, ms};
 }
+function rhythmCv(){
+  const iv = S.iv;
+  if(iv.length < 12) return null;
+  const mean = iv.reduce((a, b) => a + b, 0) / iv.length;
+  const sd = Math.sqrt(iv.reduce((a, b) => a + (b - mean) * (b - mean), 0) / iv.length);
+  return Math.round(sd / mean * 100) / 100;
+}
 function liveUpdate(){
   if(S.done) return;
   const {ppm, acc, ms} = calc();
@@ -1342,7 +1879,7 @@ function liveUpdate(){
 /* ---------------- daily plan ---------------- */
 const ITEM = {
   warm: {label: 'Aquecimento: revisão espaçada', min: 2},
-  lesson: {label: 'Etapa', min: 5},
+  lesson: {label: 'Etapa', min: 3},
   weak: {label: 'Pontos fracos', min: 3},
   test: {label: 'Teste de 1 minuto', min: 1}
 };
@@ -1350,7 +1887,7 @@ function buildDaily(){
   const items = [];
   const hasHistory = Object.keys(progress).length > 0;
   if(hasHistory) items.push('warm');
-  items.push('lesson', 'lesson');
+  items.push('lesson', 'lesson', 'lesson');
   if(weakKeys(3).length) items.push('weak');
   if(currentPhase() >= 2) items.push('test');
   return {date: dkey(), items, done: 0};
@@ -1360,11 +1897,8 @@ function ensureDaily(){
   return daily;
 }
 function planLessonIdx(){
-  // repeat the most recent lesson under 2 stars, otherwise the next one
   const n = nextLessonIdx();
   const vis = visibleLessons();
-  const prev = vis.filter(i => n < 0 || i < n).reverse()[0];
-  if(prev != null && progress[LESSONS[prev].id] && progress[LESSONS[prev].id].stars < 2 && !daily.repeated){ return prev; }
   return n >= 0 ? n : vis[vis.length - 1];
 }
 function runDailyItem(){
@@ -1372,7 +1906,11 @@ function runDailyItem(){
   if(d.done >= d.items.length){ goHome(); return; }
   const it = d.items[d.done];
   if(it === 'warm') startWarm(true);
-  else if(it === 'lesson'){ const i = planLessonIdx(); if(progress[LESSONS[i].id]) { daily.repeated = true; store.set('daily', daily); } showIntro(i, {plan: true}); }
+  else if(it === 'lesson'){
+    const i = planLessonIdx();
+    const p = progress[LESSONS[i].id];
+    if(p && p.rounds) startLesson(i, {plan: true}); else showIntro(i, {plan: true});
+  }
   else if(it === 'weak') startWeak(true);
   else startTest(true, 60);
 }
@@ -1390,8 +1928,6 @@ function streakCount(){
 }
 
 /* ---------------- finishing ---------------- */
-function starTargets(ph){ return ph === 1 ? [12, 20] : ph === 2 ? [20, 30] : [30, 45]; }
-function passAcc(ph){ return ph === 1 ? 90 : ph === 2 ? 92 : 94; }
 let lastCfg = null;
 const BRAIN_TIPS = [
   'Pare de treinar quando a precisão começar a cair. Cansado, você grava erros junto com os acertos.',
@@ -1401,6 +1937,13 @@ const BRAIN_TIPS = [
   'Revisar o que você já sabe, intercalado com o novo, é o que impede de esquecer.',
   'Mãos relaxadas: tensão nos ombros e pulsos deixa os dedos mais lentos e cansa mais rápido.'
 ];
+const ADVICE = {
+  acc: 'Vá mais devagar. Precisão primeiro: a velocidade vem sozinha depois.',
+  ppm: 'A precisão já está boa. Agora tente olhar só para a tela e confiar nos dedos para ganhar velocidade.',
+  cv: 'O ritmo está irregular: rápido em umas teclas, travando em outras. Tente bater as teclas num tempo igual, como um relógio.',
+  nacc: 'As teclas novas ainda escapam. Repare no dedo certo de cada uma (o teclado mostra a cor).',
+  rounds: 'Muito bom! Falta confirmar: o Tecla quer ver mais rodadas boas seguidas para ter certeza.'
+};
 function finish(){
   if(S.done) return;
   S.done = true;
@@ -1411,91 +1954,149 @@ function finish(){
   lastCfg = S.cfg;
   store.set('keys', keyStats);
   if(S.keystrokes < 5){ goHome(); return; }
+  const c = S.cfg;
+  const m = {ppm, acc, ms, chars: S.correctChars, cv: rhythmCv(), hes: S.hes, nacc: S.nk.t >= 5 ? Math.round(S.nk.h / S.nk.t * 1000) / 10 : null, maxCombo: S.maxCombo};
   addPractice(ms);
-  history.push({t: Date.now(), kind: S.cfg.kind, name: S.cfg.title, ppm, acc, sec: Math.round(ms / 1000)});
+  const hrec = {t: Date.now(), kind: c.kind, name: c.title, ppm, acc, sec: Math.round(ms / 1000), chars: S.correctChars};
+  history.push(hrec);
   if(history.length > 400) history = history.slice(-400);
   store.set('history', history);
+  game.rounds++;
+  if(S.maxCombo > game.bestCombo) game.bestCombo = S.maxCombo;
+  const lvlBefore = levelInfo(game.xp).lvl;
 
-  const c = S.cfg;
-  let msg = '', starsHtml = '', rec = '', nextLabel = 'Próxima', act = 'again', passed = true;
-  const labels = {lesson: 'Etapa ' + (c.idx + 1), test: 'Teste de ' + fmtTime(c.duration || 0), weak: 'Pontos fracos', warm: 'Aquecimento'};
+  // XP
+  const xp = [];
+  const mult = acc >= 98 ? 1.5 : acc >= 95 ? 1.2 : acc >= 90 ? 1 : 0.5;
+  xp.push(['Letras certas' + (mult !== 1 ? ' ×' + mult : ''), Math.round(S.correctChars * mult / 2)]);
+  if(S.maxCombo >= 10) xp.push(['Combo ×' + S.maxCombo, Math.floor(S.maxCombo / 10) * 2]);
+
+  let msg = '', starsHtml = '', rec = '', nextLabel = 'Próxima', act = 'again', readyHtml = '', showSkip = false;
+  const labels = {lesson: 'Etapa ' + (c.idx + 1), test: 'Teste de ' + fmtTime(c.duration || 0), weak: 'Pontos fracos', warm: 'Aquecimento', practice: 'Prática livre'};
   $('#r-kind').textContent = (c.plan ? 'Treino de hoje · ' : '') + labels[c.kind];
   $('#r-title').textContent = c.title;
   $('#r-ppm').innerHTML = ppm + '<small>ppm</small>';
   $('#r-acc').innerHTML = acc.toFixed(acc % 1 ? 1 : 0) + '<small>%</small>';
   $('#r-acc').style.color = acc >= 95 ? 'var(--ok)' : acc >= 90 ? 'var(--white)' : 'var(--err)';
   $('#r-time').textContent = fmtTime(ms / 1000);
-  $('#r-err').textContent = S.errors;
+  $('#r-combo').textContent = S.maxCombo;
   const ws = Object.entries(S.miss).sort((a, b) => b[1] - a[1]).slice(0, 8);
   $('#r-weakwrap').style.display = ws.length ? '' : 'none';
   $('#r-weak').innerHTML = ws.map(([k, n]) => '<b title="' + n + ' erro(s)">' + esc(k === ' ' ? '␣' : k.toUpperCase()) + '</b>').join('');
 
   if(c.kind === 'lesson'){
     const L = LESSONS[c.idx];
-    const [t2, t3] = starTargets(L.ph);
-    const need = passAcc(L.ph);
-    passed = acc >= need;
-    const stars = passed ? 1 + (ppm >= t2 ? 1 : 0) + (ppm >= t3 ? 1 : 0) : 0;
-    const prev = progress[L.id];
-    if(passed && (!prev || stars > prev.stars || (stars === prev.stars && ppm > prev.ppm))){
-      progress[L.id] = {stars, ppm, acc};
-      store.set('progress2', progress);
+    const p = progress[L.id] || (progress[L.id] = {rounds: 0, ready: false, stars: 0, best: null, hist: []});
+    const score = roundScore(m, L);
+    p.rounds++;
+    p.hist.push({acc, ppm, cv: m.cv, hes: m.hes, nacc: m.nacc, chars: m.chars, score, t: Date.now()});
+    if(p.hist.length > 8) p.hist = p.hist.slice(-8);
+    if(!p.best || ppm > p.best.ppm) p.best = {ppm, acc};
+    const wasReady = p.ready;
+    const rd = readiness(L);
+    if(rd.ready && !wasReady){ p.ready = true; xp.push(['Etapa dominada', 100]); }
+    const tp = ppmTarget(L);
+    if(p.ready){
+      const bestP = p.best.ppm;
+      p.stars = Math.max(p.stars || 0, 1 + (bestP >= tp * 1.5 ? 1 : 0) + (bestP >= tp * 2 && acc >= 97 ? 1 : 0));
     }
-    starsHtml = [0, 1, 2].map(i => '<span class="' + (i < stars ? 'y' : '') + '">★</span>').join('');
-    if(!passed) msg = 'Precisão abaixo de ' + need + '%. Vá mais devagar e repita: é aqui que o dedo aprende o caminho certo.';
-    else if(stars === 1) msg = 'Passou! 2 estrelas com ' + t2 + ' ppm, 3 com ' + t3 + ' ppm. Pode seguir; se ficar abaixo de 2 estrelas, o treino de amanhã repete esta etapa.';
-    else if(stars === 2) msg = 'Muito bem. ' + t3 + ' ppm dá 3 estrelas.';
-    else msg = 'Perfeito. Essas teclas já estão na memória dos dedos.';
-    if(passed && LESSONS[c.idx + 1] && LESSONS[c.idx + 1].ph !== L.ph) msg += ' Você terminou a ' + PHASES[L.ph].name + '!';
-    if(!c.plan){ nextLabel = passed ? (c.idx + 1 < LESSONS.length ? 'Próxima etapa' : 'Teste de velocidade') : 'Tentar de novo'; act = passed ? 'next' : 'again'; }
+    store.set('progress3', progress);
+    starsHtml = p.ready ? [0, 1, 2].map(i => '<span class="' + (i < p.stars ? 'y' : '') + '">★</span>').join('') : '';
+    // fatigue: accuracy fell well below today's best on this lesson
+    const today = p.hist.filter(h => dkey(new Date(h.t)) === dkey());
+    const tired = today.length >= 3 && acc < Math.max(...today.map(h => h.acc)) - 5;
+    const firstBad = rd.checks.find(x => !x.ok);
+    let verdict;
+    if(rd.ready && !wasReady) verdict = '<b style="color:var(--ok)">Pronto!</b> Você domina esta etapa. A próxima está liberada.';
+    else if(rd.ready) verdict = 'Etapa dominada. Pode seguir, ou continuar treinando para ganhar estrelas.';
+    else if(tired) verdict = 'Sua precisão caiu em relação às rodadas anteriores de hoje. Isso costuma ser cansaço: <b>faça uma pausa ou volte amanhã</b>. O sono vai fixar o que você treinou.';
+    else verdict = '<b>Mais uma rodada.</b> ' + esc(firstBad ? ADVICE[firstBad.key] : ADVICE.rounds);
+    readyHtml = '<div class="ready' + (rd.ready ? ' ok' : '') + '"><div class="top2"><b>Prontidão para a próxima etapa</b><span>' + rd.pct + '%</span></div>' +
+      '<div class="rbar"><i data-w="' + rd.pct + '"></i></div>' +
+      '<ul class="checks">' + rd.checks.map(x => '<li class="' + (x.ok ? 'y' : '') + '"><i>' + (x.ok ? '✓' : '✕') + '</i>' + esc(x.label) + '<em>' + esc(x.val) + '</em></li>').join('') + '</ul>' +
+      '<p class="verdict">' + verdict + '</p></div>';
+    msg = 'Rodada ' + p.rounds + ' nesta etapa.';
+    if(rd.ready && !wasReady && LESSONS[c.idx + 1] && LESSONS[c.idx + 1].ph !== L.ph) msg += ' Você terminou a ' + PHASES[L.ph].name + '!';
+    if(!c.plan){
+      if(rd.ready){ nextLabel = c.idx + 1 < LESSONS.length ? 'Próxima etapa' : 'Teste de velocidade'; act = 'next'; }
+      else { nextLabel = 'Mais uma rodada'; act = 'again'; showSkip = true; }
+    }
   } else {
-    const best = Math.max(0, ...history.slice(0, -1).filter(h => h.kind === 'test').map(h => h.ppm));
-    if(c.kind === 'test' && ppm > best && best > 0) rec = 'Novo recorde! Antes: ' + best + ' ppm';
+    const prevBest = Math.max(0, ...history.slice(0, -1).filter(h => h.kind === c.kind && h.sec >= 30).map(h => h.ppm));
+    if((c.kind === 'test' || c.kind === 'practice') && ms >= 30000 && ppm > prevBest && prevBest > 0){ rec = 'Novo recorde! Antes: ' + prevBest + ' ppm'; xp.push(['Recorde', 30]); }
     if(c.kind === 'test'){
       msg = ppm < 20 ? 'Começo de caminho. As etapas vão te dar a base.' :
             ppm < 35 ? 'Bom ritmo. Quem digita no dia a dia fica por volta de 35 a 40 ppm.' :
             ppm < 55 ? 'Acima da média! Agora é polir a precisão.' :
             ppm < 75 ? 'Rápido de verdade. Isso é velocidade de profissional.' : 'Nível elite. Poucos chegam aqui.';
     } else if(c.kind === 'warm') msg = 'Revisão feita. Lembrar o que já sabe é o que impede de esquecer.';
+    else if(c.kind === 'practice') msg = 'Prática concluída.';
     else msg = 'Pontos fracos treinados. Eles vão mudando conforme você melhora.';
     if(acc < 92) msg += ' Sua precisão ficou em ' + Math.round(acc) + '%: mire em 95% antes de acelerar.';
     nextLabel = c.kind === 'test' ? 'Novo teste' : 'Treinar de novo';
   }
 
-  // daily plan advance
+  let dailyDone = false;
   if(c.plan){
     ensureDaily();
-    if(!(c.kind === 'lesson' && !passed)) { daily.done = Math.min(daily.items.length, daily.done + 1); store.set('daily', daily); }
+    daily.done = Math.min(daily.items.length, daily.done + 1);
+    xp.push(['Treino de hoje', 15]);
+    store.set('daily', daily);
     if(daily.done >= daily.items.length){
+      dailyDone = true;
+      xp.push(['Treino de hoje completo', 50]);
       nextLabel = 'Voltar ao início'; act = 'home';
       msg += ' Treino de hoje completo. Pare por aqui: o cérebro termina o trabalho durante o sono. Até amanhã!';
     } else {
-      nextLabel = (c.kind === 'lesson' && !passed) ? 'Tentar de novo' : 'Continuar treino (' + (daily.done + 1) + '/' + daily.items.length + ')';
-      act = (c.kind === 'lesson' && !passed) ? 'again' : 'plan';
+      nextLabel = 'Continuar treino (' + (daily.done + 1) + '/' + daily.items.length + ')';
+      act = 'plan';
     }
   }
+  let gained = xp.reduce((a, x) => a + x[1], 0);
+  game.xp += gained;
+  const achXp = checkAchievements({m, kind: c.kind, dailyDone});
+  if(achXp){ xp.push(['Conquistas', achXp]); game.xp += achXp; gained += achXp; }
+  saveGame();
+  const after = levelInfo(game.xp);
+  if(after.lvl > lvlBefore) setTimeout(() => { if(screen === 'res') showLevelUp(after); else { toast('Subiu de nível', 'Nível ' + after.lvl + ' · ' + after.title, '', true); chime(3); } }, 700);
+  syncRun(hrec); syncProfile();
+
   $('#r-next').dataset.act = act;
   $('#r-stars').innerHTML = starsHtml;
   $('#r-stars').style.display = starsHtml ? '' : 'none';
   $('#r-rec').textContent = rec;
   $('#r-msg').textContent = msg;
+  $('#r-ready').innerHTML = readyHtml;
+  $('#r-xp').innerHTML = xp.map((x, i) => '<span style="animation-delay:' + (0.3 + i * 0.12) + 's">' + esc(x[0]) + ' <b>+' + x[1] + '</b></span>').join('') +
+    '<span class="tot" style="animation-delay:' + (0.3 + xp.length * 0.12) + 's">Total <b id="xp-count">+0</b> XP</span>';
+  $('#r-skip').hidden = !showSkip;
   $('#r-brain').innerHTML = '<b>Cérebro</b>' + esc(acc < 90 ? BRAIN_TIPS[0] : pick(BRAIN_TIPS.slice(1)));
   $('#r-next').innerHTML = esc(nextLabel) + ' <span style="opacity:.6">(Enter)</span>';
   show('res');
+  requestAnimationFrame(() => requestAnimationFrame(() => { $$('#r-ready .rbar i').forEach(i => i.style.width = i.dataset.w + '%'); }));
+  countUp($('#xp-count'), gained, 900, 300 + xp.length * 120);
+}
+function countUp(el, to, dur, delay){
+  if(!el) return;
+  setTimeout(() => {
+    const t0 = performance.now();
+    const step = t => { const k = Math.min(1, (t - t0) / dur); el.textContent = '+' + Math.round(to * (1 - Math.pow(1 - k, 3))); if(k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }, delay || 0);
 }
 
 /* ---------------- starters ---------------- */
 function startLesson(idx, extra){
   const L = LESSONS[idx];
-  startSession(Object.assign({kind: 'lesson', idx, ph: L.ph, accent: !!L.accent, kb: L.kb, title: L.name, tip: (L.how || [])[0] || '', text: lessonText(idx), stop: true}, extra || {}));
+  startSession(Object.assign({kind: 'lesson', idx, ph: L.ph, accent: !!L.accent, kb: L.kb, title: L.name, tip: (L.how || [])[0] || '', text: lessonText(idx), stop: true, newKeys: newKeysOf(L)}, extra || {}));
 }
 function startTest(plan, dur){
   const d = dur || settings.testTime;
-  startSession({kind: 'test', plan: !!plan, title: (settings.testSrc === 'palavras' ? 'Palavras' : 'Frases') + ' · ' + fmtTime(d), text: testChunk() + ' ' + testChunk(), duration: d, stop: settings.stopTest});
+  startSession({kind: 'test', plan: !!plan, title: (settings.testSrc === 'palavras' ? 'Palavras' : 'Frases') + ' · ' + fmtTime(d), text: testChunk() + ' ' + testChunk(), duration: d, more: testChunk, stop: settings.stopTest});
 }
 function startWeak(plan){
   const w = weakText();
-  startSession({kind: 'weak', plan: !!plan, title: 'Teclas ' + w.keys.map(k => k.toUpperCase()).join(' '), tip: 'Texto montado com as teclas em que você mais erra ou demora. Vá com calma.', text: w.text, stop: true});
+  startSession({kind: 'weak', plan: !!plan, title: 'Teclas ' + w.keys.map(k => k.toUpperCase()).join(' '), tip: 'Texto montado com as teclas em que você mais erra ou demora. Vá com calma.', text: w.text, stop: true, newKeys: w.keys.join('')});
 }
 function startWarm(plan){
   startSession({kind: 'warm', plan: !!plan, title: 'Revisão das teclas aprendidas', tip: 'Prioriza as teclas que você não pratica há mais tempo ou erra mais.', text: warmText(), stop: true});
@@ -1506,6 +2107,7 @@ function restart(){
   if(c.kind === 'lesson') startLesson(c.idx, {plan: c.plan});
   else if(c.kind === 'test') startTest(c.plan, c.duration);
   else if(c.kind === 'warm') startWarm(c.plan);
+  else if(c.kind === 'practice') startPractice();
   else startWeak(c.plan);
 }
 function goHome(){
@@ -1513,6 +2115,153 @@ function goHome(){
   S.done = true;
   renderHome();
   show('home');
+}
+
+/* ---------------- practice ---------------- */
+let prKb = null;
+function prSelected(){ return [...(settings.prKeys || '')]; }
+function renderPractice(){
+  $$('#pr-src .opt').forEach(b => b.classList.toggle('on', b.dataset.v === settings.prSrc));
+  $$('#pr-dur button').forEach(b => b.classList.toggle('on', +b.dataset.v === settings.prDur));
+  $$('#pr-stop button').forEach(b => b.classList.toggle('on', +b.dataset.v === settings.prStop));
+  $('#pr-keys-wrap').hidden = settings.prSrc !== 'keys';
+  $('#pr-custom-wrap').hidden = settings.prSrc !== 'custom';
+  $('#pr-msg').textContent = '';
+  if(!prKb){
+    prKb = renderKeyboard($('#pr-kb'));
+    Object.entries(prKb).forEach(([id, el]) => {
+      if(!/^[a-zç]$/.test(id)) { el.style.opacity = .35; return; }
+      el.addEventListener('click', () => {
+        const set = new Set(prSelected());
+        set.has(id) ? set.delete(id) : set.add(id);
+        settings.prKeys = [...set].join(''); saveSettings(); renderPractice();
+      });
+    });
+  }
+  const sel = new Set(prSelected());
+  Object.entries(prKb).forEach(([id, el]) => el.classList.toggle('sel', sel.has(id)));
+  $('#pr-keys-n').textContent = sel.size;
+}
+function practiceGen(){
+  const src = settings.prSrc;
+  if(src === 'known'){ return () => { const al = knownSet(); const ws = wordsWithin(al); return runs(() => ws.length >= 5 && Math.random() < .7 ? pick(ws) : drill([...al], al, 2 + rnd(3)), 20, 2); }; }
+  if(src === 'keys'){
+    const keys = prSelected();
+    return () => {
+      const ks = new Set(keys);
+      const only = wordsWithin(ks);
+      const some = WORDS.filter(w => keys.some(k => w.includes(k)) && w.length > 2);
+      return runs(() => { const r = Math.random(); if(only.length >= 3 && r < .4) return pick(only); if(some.length && r < .75) return pick(some); return drill(keys, ks, 2 + rnd(3)); }, 22, 2);
+    };
+  }
+  if(src === 'words') return () => runs(COMMON, 30, 1);
+  if(src === 'sentences') return () => shuffle(SENTENCES.concat(LONG)).slice(0, 3).join(' ');
+  if(src === 'msgs') return () => shuffle(MSGS).slice(0, 4).join(' ');
+  if(src === 'accents') return () => runs(() => pick(pick([ACUTE, TIL, CAO, CIRC])), 20, 1) + ' ' + pick(CRASE);
+  if(src === 'numbers') return () => shuffle(SYMBOLS).slice(0, 6).join(' ') + ' ' + runs(() => String(rnd(10000)), 8, 1);
+  const txt = ($('#pr-custom').value || '').replace(/\s+/g, ' ').trim();
+  return () => txt;
+}
+function startPractice(){
+  const src = settings.prSrc;
+  if(src === 'keys' && !prSelected().length){ $('#pr-msg').textContent = 'Escolha pelo menos uma tecla.'; show('practice'); return; }
+  if(src === 'custom' && ($('#pr-custom').value || '').trim().length < 10){ $('#pr-msg').textContent = 'Cole um texto com pelo menos 10 caracteres.'; show('practice'); return; }
+  if(src === 'accents' && settings.noAccents){ $('#pr-msg').textContent = 'Desligue "Sem acentos e Ç" nos Ajustes para treinar acentos.'; show('practice'); return; }
+  const gen = practiceGen();
+  const d = settings.prDur;
+  const names = {known: 'Teclas que já aprendi', keys: 'Teclas ' + prSelected().map(k => k.toUpperCase()).join(' '), words: 'Palavras comuns', sentences: 'Frases', msgs: 'Mensagens', accents: 'Acentos', numbers: 'Números e símbolos', custom: 'Meu texto'};
+  const text = src === 'custom' ? gen() : d ? gen() + ' ' + gen() : gen() + ' ' + gen();
+  startSession({kind: 'practice', title: names[src] + (d ? ' · ' + fmtTime(d) : ''), text, duration: d || 0, more: d ? gen : null, stop: !!settings.prStop, newKeys: src === 'keys' ? prSelected().join('') : ''});
+}
+
+/* ---------------- ranking / profile ---------------- */
+let rkBoard = 'week';
+function errMsg(e){
+  const s = String(e && e.message || e);
+  if(s.includes('apelido_em_uso')) return 'Esse apelido já existe. Escolha outro.';
+  if(s.includes('apelido_invalido')) return 'Use de 2 a 20 letras, números, espaço, ponto ou traço.';
+  if(s.includes('nao_autorizado')) return 'Código inválido.';
+  if(s.includes('offline')) return 'O ranking não está disponível nesta versão da página.';
+  return 'Não foi possível conectar ao ranking agora. Tente de novo em instantes.';
+}
+function renderRank(){
+  const li = levelInfo(game.xp);
+  const pf = $('#rk-profile');
+  if(!profile){
+    pf.innerHTML = '<p class="lead">Escolha um apelido para aparecer no ranking. Seu histórico deste navegador vai junto. Nada de nome real, se não quiser.</p>' +
+      '<div class="field"><input id="rk-nick" maxlength="20" placeholder="Seu apelido"><button class="btn" id="rk-join">Entrar no ranking</button></div><div class="msgline" id="rk-msg"></div>';
+    $('#rk-join').addEventListener('click', join);
+    $('#rk-nick').addEventListener('keydown', e => { if(e.key === 'Enter') join(); });
+  } else {
+    pf.innerHTML = '<div class="profile" style="cursor:default"><div class="lvl"><b>' + li.lvl + '</b><span>NÍVEL</span></div><div class="who"><b>' + esc(profile.nick) + '</b><small>' + esc(li.title) + ' · ' + game.xp + ' XP · ' + Object.keys(game.ach).length + ' conquistas</small><div class="xpbar"><i style="width:' + (li.into / li.need * 100) + '%"></i></div></div></div>' +
+      '<div class="field"><input id="rk-nick" maxlength="20" value="' + esc(profile.nick) + '"><button class="btn ghost" id="rk-rename">Trocar apelido</button></div><div class="msgline" id="rk-msg"></div>';
+    $('#rk-rename').addEventListener('click', async () => {
+      const nick = $('#rk-nick').value.trim(), msg = $('#rk-msg');
+      try{
+        await rpc('tecla_update_profile', {p_id: profile.id, p_secret: profile.secret, p_nick: nick, p_xp: game.xp, p_level: li.lvl, p_lessons: LESSONS.filter(isDone).length, p_streak: streakCount(), p_best_combo: game.bestCombo});
+        profile.nick = nick; store.set('profile', profile);
+        msg.className = 'msgline good'; msg.textContent = 'Apelido atualizado.';
+        loadBoard();
+      }catch(e){ msg.className = 'msgline bad'; msg.textContent = errMsg(e); }
+    });
+  }
+  const tr = $('#rk-transfer');
+  tr.innerHTML = (profile ? '<p>Para continuar em outro computador, copie este código e cole lá, nesta mesma tela. <b>Não compartilhe:</b> quem tiver o código controla o seu perfil.</p><div class="field"><div class="code" id="rk-code" style="flex:1">' + esc(profile.id + '.' + profile.secret) + '</div><button class="btn ghost" id="rk-copy">Copiar</button></div>' : '') +
+    '<p style="margin-top:14px">Já tem um código de outro computador?</p><div class="field"><input id="rk-restore" placeholder="Cole o código aqui"><button class="btn ghost" id="rk-load">Carregar perfil</button></div><div class="msgline" id="rk-rmsg"></div>';
+  const cp = $('#rk-copy');
+  if(cp) cp.addEventListener('click', () => {
+    const t = $('#rk-code').textContent;
+    const done = () => { cp.textContent = 'Copiado'; setTimeout(() => cp.textContent = 'Copiar', 1500); };
+    try{ navigator.clipboard.writeText(t).then(done, () => selectText($('#rk-code'))); }catch(e){ selectText($('#rk-code')); }
+  });
+  $('#rk-load').addEventListener('click', restoreProfile);
+  $$('#rk-tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === rkBoard));
+  loadBoard();
+}
+function selectText(el){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+async function join(){
+  const nick = $('#rk-nick').value.trim(), msg = $('#rk-msg');
+  msg.className = 'msgline'; msg.textContent = 'Criando…';
+  try{
+    const r = await rpc('tecla_register', {p_nick: nick});
+    profile = {id: r.id, secret: r.secret, nick: r.nick};
+    store.set('profile', profile);
+    const runsUp = history.slice(-200).map(h => ({t: h.t, kind: h.kind, lesson: h.name, ppm: h.ppm, acc: h.acc, dur: Math.max(1, h.sec || 1), chars: h.chars || 0}));
+    if(runsUp.length) await rpc('tecla_import', {p_id: profile.id, p_secret: profile.secret, p_runs: runsUp}).catch(() => {});
+    const x = checkAchievements(null); if(x){ game.xp += x; saveGame(); }
+    syncProfile();
+    toast('Ranking', 'Bem-vindo, ' + profile.nick + '!', 'Seu histórico foi enviado.');
+    renderRank();
+  }catch(e){ msg.className = 'msgline bad'; msg.textContent = errMsg(e); }
+}
+async function restoreProfile(){
+  const code = $('#rk-restore').value.trim(), msg = $('#rk-rmsg');
+  const [id, secret] = code.split('.');
+  if(!id || !secret){ msg.className = 'msgline bad'; msg.textContent = 'Código inválido.'; return; }
+  msg.className = 'msgline'; msg.textContent = 'Carregando…';
+  try{
+    const r = await rpc('tecla_restore', {p_id: id, p_secret: secret});
+    profile = {id, secret, nick: r.nick};
+    store.set('profile', profile);
+    game.xp = Math.max(game.xp, r.xp || 0);
+    game.bestCombo = Math.max(game.bestCombo, r.best_combo || 0);
+    saveGame();
+    const have = new Set(history.map(h => h.t));
+    (r.runs || []).forEach(h => { if(!have.has(h.t)) history.push({t: h.t, kind: h.kind, name: h.name || '', ppm: h.ppm, acc: +h.acc, sec: h.sec}); });
+    history.sort((a, b) => a.t - b.t);
+    store.set('history', history);
+    msg.className = 'msgline good'; msg.textContent = 'Perfil carregado: ' + r.nick + '.';
+    setTimeout(renderRank, 800);
+  }catch(e){ msg.className = 'msgline bad'; msg.textContent = errMsg(e); }
+}
+async function loadBoard(){
+  const box = $('#rk-table');
+  box.innerHTML = '<div class="empty">Carregando…</div>';
+  try{
+    const rows = await rpc('tecla_ranking', {p_board: rkBoard, p_me: profile ? profile.id : null});
+    if(!rows || !rows.length){ box.innerHTML = '<div class="empty">' + (rkBoard === 'xp' ? 'Ninguém no ranking ainda. Seja o primeiro!' : 'Nenhum teste de velocidade ' + (rkBoard === 'week' ? 'nesta semana' : 'ainda') + '. Faça um teste de 1 minuto para entrar.') + '</div>'; return; }
+    box.innerHTML = '<table class="rank"><tbody>' + rows.map((r, i) => '<tr class="' + (r.me ? 'me' : '') + '" style="animation-delay:' + (i * 0.03) + 's"><td class="p">' + r.pos + '</td><td>' + esc(r.nick) + (r.me ? ' <span style="color:var(--cyan);font-family:var(--mono);font-size:11px">você</span>' : '') + '</td><td class="v">' + (rkBoard === 'xp' ? Math.round(r.value) + ' XP' : Math.round(r.value) + ' ppm') + '</td><td class="a">' + (rkBoard === 'xp' ? 'nível ' + Math.round(r.acc) : Math.round(r.acc) + '%') + '</td></tr>').join('') + '</tbody></table>';
+  }catch(e){ box.innerHTML = '<div class="empty">' + esc(errMsg(e)) + '</div>'; }
 }
 
 /* ---------------- home ---------------- */
@@ -1524,11 +2273,21 @@ function renderHome(){
   $('#sum-avg').innerHTML = (recent.length ? Math.round(recent.reduce((a, h) => a + h.ppm, 0) / recent.length) : 0) + '<small>ppm</small>';
   $('#sum-acc').innerHTML = (recent.length ? Math.round(recent.reduce((a, h) => a + h.acc, 0) / recent.length) : '–') + '<small>%</small>';
   const vis = visibleLessons();
-  const done = vis.filter(i => progress[LESSONS[i].id]).length;
+  const done = vis.filter(i => isDone(LESSONS[i])).length;
   $('#sum-les').innerHTML = done + '<small>/' + vis.length + '</small>';
-  $('#les-count').textContent = done + ' de ' + vis.length + ' concluídas';
+  $('#les-count').textContent = done + ' de ' + vis.length + ' dominadas';
   const nx = nextLessonIdx();
-  $('#btn-continue').textContent = done === 0 ? 'Começar pela etapa 1' : nx >= 0 ? 'Continuar: etapa ' + (nx + 1) : 'Desafio final';
+  $('#btn-continue').textContent = !Object.keys(progress).length ? 'Começar pela etapa 1' : nx >= 0 ? 'Continuar: etapa ' + (nx + 1) : 'Desafio final';
+
+  // profile strip
+  const li = levelInfo(game.xp);
+  $('#pf-lvl').textContent = li.lvl;
+  $('#pf-title').textContent = li.title;
+  $('#pf-sub').textContent = li.into + ' / ' + li.need + ' XP para o nível ' + (li.lvl + 1) + ' · ' + game.xp + ' XP no total';
+  $('#pf-xp').style.width = (li.into / li.need * 100) + '%';
+  $('#pf-ach').textContent = Object.keys(game.ach).length;
+  $('#pf-combo').textContent = game.bestCombo;
+  $('#pf-nick').textContent = profile ? 'no ranking como ' + profile.nick : 'sem apelido no ranking';
 
   // today
   const d = ensureDaily();
@@ -1536,18 +2295,14 @@ function renderHome(){
   $('#td-min').innerHTML = todayMin + '<small>/ 15 min</small>';
   $('#td-meter').style.width = Math.min(100, todayMin / 15 * 100) + '%';
   const finished = d.done >= d.items.length;
-  $('#td-title').textContent = finished ? 'Feito por hoje' : done === 0 ? 'Primeiro dia' : 'Treino de hoje';
+  $('#td-title').textContent = finished ? 'Feito por hoje' : !Object.keys(progress).length ? 'Primeiro dia' : 'Treino de hoje';
   $('#td-desc').textContent = finished ? 'Você completou o treino de hoje. Pode treinar mais se quiser, mas o maior ganho agora vem do descanso e do sono.' :
-    done === 0 ? 'Comece pela posição das mãos. Cerca de 15 minutos; depois, pare e volte amanhã.' :
-    'Uma sequência curta que mistura revisão, conteúdo novo e seus pontos fracos. Cerca de 15 minutos.';
-  let lessonCount = 0;
+    !Object.keys(progress).length ? 'Comece pela posição das mãos. Cerca de 15 minutos; depois, pare e volte amanhã.' :
+    'Revisão, rodadas da etapa atual e seus pontos fracos. A etapa só avança quando você estiver pronto.';
+  const pi = planLessonIdx();
   $('#td-list').innerHTML = d.items.map((it, i) => {
     let lab = ITEM[it].label;
-    if(it === 'lesson'){
-      const n = nextLessonIdx();
-      lab = lessonCount++ === 0 ? 'Etapa ' + (n >= 0 ? n + 1 : '') + (n >= 0 ? ': ' + LESSONS[n].name : '') : 'Mais uma etapa';
-      if(i < d.done) lab = 'Etapa concluída';
-    }
+    if(it === 'lesson') lab = i < d.done ? 'Rodada de etapa feita' : 'Rodada: etapa ' + (pi + 1) + ' · ' + LESSONS[pi].name;
     const st = i < d.done ? 'done' : i === d.done ? 'cur' : '';
     return '<li class="' + st + '"><i>' + (i < d.done ? '✓' : i + 1) + '</i>' + esc(lab) + '<span class="m">~' + ITEM[it].min + ' min</span></li>';
   }).join('');
@@ -1561,7 +2316,7 @@ function renderHome(){
   const cp = currentPhase();
   $('#td-phases').innerHTML = [1, 2, 3].map(p => {
     const ls = vis.filter(i => LESSONS[i].ph === p);
-    const dn = ls.filter(i => progress[LESSONS[i].id]).length;
+    const dn = ls.filter(i => isDone(LESSONS[i])).length;
     return '<div><div class="bar"><i style="width:' + (dn / ls.length * 100) + '%;background:' + PHASES[p].color + '"></i></div><span style="' + (p === cp ? 'color:' + PHASES[p].color : '') + '">' + p + '. ' + PHASES[p].short + ' ' + dn + '/' + ls.length + '</span></div>';
   }).join('');
 
@@ -1576,18 +2331,26 @@ function renderHome(){
     LESSONS.forEach((L, i) => {
       if(L.ph !== p || !vis.includes(i)) return;
       const pr = progress[L.id];
+      const rd = readiness(L);
       const b = document.createElement('button');
-      b.className = 'les' + (pr ? ' done' : '') + (i === nx ? ' next' : '') + (L.rev ? ' rev' : '');
-      const keys = L.add ? [...addFor(L)].map(c => c.toUpperCase()).join(' ') : (L.keys && L.accent ? L.keys.split('').join(' ') : L.rev ? 'revisão' : '');
+      b.className = 'les' + (rd.ready ? ' done' : '') + (i === nx ? ' next' : '');
+      const keys = L.add ? [...addFor(L)].map(c => c.toUpperCase()).join(' ') : L.gen === 'hand' ? L.focus.toUpperCase().split('').join(' ') : L.rev ? 'revisão' : '';
+      const sub = pr && pr.rounds ? (rd.ready ? pr.rounds + ' rodadas' : 'prontidão ' + rd.pct + '% · ' + pr.rounds + ' rodada' + (pr.rounds > 1 ? 's' : '')) : '';
       b.innerHTML = '<span class="n">' + (i === nx ? 'PRÓXIMA · ' : '') + 'ETAPA ' + (i + 1) + '</span>' +
         '<span class="t">' + esc(L.name) + '</span>' + (keys ? '<span class="k">' + esc(keys) + '</span>' : '') +
-        '<span class="st">' + [0, 1, 2].map(s => '<span class="' + (pr && s < pr.stars ? 'y' : '') + '">★</span>').join('') + '</span>';
+        (sub ? '<span class="rd">' + esc(sub) + '</span>' : '') +
+        (pr && pr.rounds && !rd.ready ? '<span class="rb"><i style="width:' + rd.pct + '%"></i></span>' : '') +
+        '<span class="st">' + [0, 1, 2].map(s => '<span class="' + (pr && pr.ready && s < pr.stars ? 'y' : '') + '">★</span>').join('') + '</span>';
       b.addEventListener('click', () => showIntro(i));
       grid.appendChild(b);
     });
     wrap.appendChild(grid);
     box.appendChild(wrap);
   });
+  // achievements
+  $('#achs').innerHTML = ACHS.map(a => '<div class="ach' + (game.ach[a.id] ? ' y' : '') + '"><div class="ic">' + esc(a.ic) + '</div><div><b>' + esc(a.name) + '</b><small>' + esc(a.desc) + '</small></div></div>').join('');
+  $('#ach-count').textContent = Object.keys(game.ach).length + ' de ' + ACHS.length;
+
   const wkk = weakKeys(6);
   $('#weak-home').innerHTML = wkk.length ? wkk.map(x => '<b class="' + (x.slow ? 'slow' : '') + '">' + esc(x.k.toUpperCase()) + '</b>').join('') : '<em>Faça algumas etapas para descobrir.</em>';
   $$('#seg-time button').forEach(b => b.classList.toggle('on', +b.dataset.v === settings.testTime));
@@ -1649,6 +2412,7 @@ function renderAccGuide(){
 
 /* ---------------- events ---------------- */
 document.addEventListener('keydown', e => {
+  if(document.querySelector('.lvlup')) return;
   if(screen === 'type'){
     if(e.key === 'Escape'){ e.preventDefault(); goHome(); return; }
     if(e.key === 'Tab'){ e.preventDefault(); restart(); return; }
@@ -1676,7 +2440,7 @@ document.addEventListener('keydown', e => {
       const okAcc = /[áéíóúãõâêôàç]/i.test(e.key);
       $('#lab-log').innerHTML = 'Recebido: <b style="color:' + (okAcc ? 'var(--ok)' : 'var(--white)') + '">' + esc(e.key) + '</b>' + (okAcc ? ' — acento funcionando!' : '');
     } else if(e.key === 'Backspace'){ const out = $('#lab-out'); out.textContent = out.textContent.slice(0, -1); }
-  } else if(e.key === 'Escape' && screen !== 'home'){ goHome(); }
+  } else if(e.key === 'Escape' && screen !== 'home' && !(e.target && /INPUT|TEXTAREA/.test(e.target.tagName))){ goHome(); }
 });
 $$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
 $('#btn-back').addEventListener('click', goHome);
@@ -1689,6 +2453,11 @@ $('#btn-today').addEventListener('click', () => {
 });
 $('#btn-test').addEventListener('click', () => startTest(false));
 $('#btn-weak').addEventListener('click', () => startWeak(false));
+$('#pr-go').addEventListener('click', startPractice);
+$$('#pr-src .opt').forEach(b => b.addEventListener('click', () => { settings.prSrc = b.dataset.v; saveSettings(); renderPractice(); }));
+$$('#pr-dur button').forEach(b => b.addEventListener('click', () => { settings.prDur = +b.dataset.v; saveSettings(); renderPractice(); }));
+$$('#pr-stop button').forEach(b => b.addEventListener('click', () => { settings.prStop = +b.dataset.v; saveSettings(); renderPractice(); }));
+$$('#rk-tabs button').forEach(b => b.addEventListener('click', () => { rkBoard = b.dataset.v; $$('#rk-tabs button').forEach(x => x.classList.toggle('on', x === b)); loadBoard(); }));
 let resetArmed = 0;
 $('#st-reset').addEventListener('click', e => {
   const b = e.currentTarget;
@@ -1700,11 +2469,22 @@ $('#st-reset').addEventListener('click', e => {
   }
   resetArmed = 0; b.textContent = 'Apagar progresso';
   progress = {}; history = []; keyStats = {}; days = {}; daily = null;
-  store.set('progress2', progress); store.set('history', history); store.set('keys', keyStats); store.set('days', days); store.set('daily', null);
+  game = {xp: 0, ach: {}, bestCombo: 0, rounds: 0};
+  store.set('progress3', progress); store.set('history', history); store.set('keys', keyStats); store.set('days', days); store.set('daily', null); saveGame();
   renderStats();
 });
 $('#r-menu').addEventListener('click', goHome);
 $('#r-again').addEventListener('click', restart);
+$('#r-skip').addEventListener('click', () => {
+  const c = lastCfg;
+  if(!c || c.kind !== 'lesson') return;
+  const L = LESSONS[c.idx];
+  const p = progress[L.id] || (progress[L.id] = {rounds: 0, hist: []});
+  p.ready = true; p.skipped = true; p.stars = p.stars || 1;
+  store.set('progress3', progress);
+  const nxt = visibleLessons().find(i => i > c.idx);
+  if(nxt != null) showIntro(nxt); else goHome();
+});
 $('#r-next').addEventListener('click', () => {
   const c = lastCfg, act = $('#r-next').dataset.act;
   if(act === 'home') goHome();
