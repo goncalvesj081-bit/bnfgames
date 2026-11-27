@@ -649,3 +649,932 @@ const D2=[
 {q:'Na ação de indenização, o autor pede R$ 8.000 de dano material e R$ 15.000 de dano moral. Qual é o valor da causa?',o:['R$ 15.000, o maior pedido','R$ 23.000, a soma dos pedidos','R$ 8.000, o dano comprovado','O valor que o juiz fixar'],c:1,a:'CPC-292'},
 {q:'O juiz negou a tutela de urgência no início do processo. Qual recurso cabe e em que prazo?',o:['Apelação, 15 dias','Agravo de instrumento, 15 dias úteis','Embargos de declaração, 5 dias','Nenhum: só na sentença'],c:1,a:'CPC-1015'}
 ];
+
+/* ================================================================
+   CASOS — cada template gera um processo com variáveis sorteadas.
+   Para criar um caso novo numa atualização: copie um template,
+   mude os textos e registre em TPL. O motor cuida do resto.
+================================================================= */
+const QUAL=[{l:'Nome e prenome',ok:1},{l:'Estado civil e existência de união estável',ok:1},{l:'Profissão',ok:1},{l:'CPF ou CNPJ',ok:1},{l:'Endereço eletrônico',ok:1},{l:'Domicílio e residência',ok:1},{l:'Religião',ok:0},{l:'Renda mensal',ok:0},{l:'Nome dos filhos',ok:0}];
+const EMP_TEL=['Conecta Mais Telefonia S.A.','Vivaz Telecom S.A.','Linha Azul Telecomunicações S.A.','Sinal Forte Telefonia S.A.'];
+const LOJAS=['Casa Bonfim','Magazine Estrela','Lojas Primavera','Móveis Aliança'];
+const PLANOS=['Vida Plena Saúde','Cuidar+ Assistência Médica','Bem Viver Saúde','Saúde Integral S.A.'];
+const TPL={
+neg:{
+  nome:'Negativação indevida',area:'Consumidor',lado:'autor',peca:'inicial',
+  make(){const cli={n:pname(true),f:true,idade:RI(52,66),prof:pick(['diarista','costureira','cozinheira','auxiliar de limpeza'])};
+    const di=RI(4,9),y=+S.g.date.slice(0,4);
+    return {cli,rito:'jec',v:{emp:pick(EMP_TEL),div:RI(23,89)*10+7,dm:pick([6000,8000,10000]),loja:pick(LOJAS),loja2:pick(['Móveis Aliança','Ótica Visão','Magazine Estrela']),ano2:y-RI(1,3),neta:pick(FN_F),vara:RI(1,9),dInc:fmtD(addD(S.g.date,-RI(40,90))),meses:di},hid:{outra:chance(.45),prot:chance(.8)}}},
+  intro:c=>`<p>${esc(first(c.cli.n))} tem ${c.cli.idade} anos e trabalha como ${c.cli.prof} há mais de vinte. Senta na beirada da cadeira, com a bolsa no colo, como quem pede licença.</p><p>"Fui comprar uma geladeira a prazo na ${esc(c.v.loja)}, ${DOUT()}. Era pra minha neta, a ${esc(c.v.neta)}, que vai morar comigo. A moça do caixa falou alto, na frente de todo mundo, que meu nome estava sujo. Uma dívida de ${money(c.v.div)} com a ${esc(c.v.emp)}. Eu nunca tive telefone dessa empresa."</p><p>Ela engole seco. "Eu nunca devi nada pra ninguém."</p>`,
+  atq:[
+    {id:'outra',q:'A senhora já teve o nome negativado antes, por qualquer outra dívida?',a:c=>c.hid.outra?`Ela baixa os olhos. "Teve... uma prestação da ${esc(c.v.loja2)}, em ${c.v.ano2}. Eu fiquei desempregada. Acho que ainda está lá." É uma dívida dela, legítima.`:'"Nunca! Sempre paguei tudo em dia. É por isso que dói tanto."',rev:'outra',good:1},
+    {id:'prot',q:'A senhora reclamou com a empresa? Anotou algum protocolo?',a:c=>c.hid.prot?'Ela tira da bolsa um caderninho: três números de protocolo, com a data e o nome de quem atendeu. "Ninguém resolveu."':'"Liguei, mas não anotei nada. Ficaram me passando de um pra outro."',rev:'prot',good:1},
+    {id:'ext',q:'A senhora trouxe o extrato do SPC ou do Serasa?',a:c=>`Ela mostra o extrato impresso: dívida de ${money(c.v.div)} com a ${esc(c.v.emp)}, incluída em ${c.v.dInc}.`,rev:'ext',good:1},
+    {id:'carta',q:'Recebeu alguma carta avisando, antes de negativarem o nome?',a:()=>'"Nenhuma carta, nada." (Anote: quem deve avisar antes da inscrição é o órgão do cadastro, não a empresa.)',rev:'carta',good:1},
+    {id:'quanto',q:'Quanto a senhora espera receber com essa ação?',a:()=>'"A vizinha disse que dá uns cinquenta mil. É verdade?" Ela te olha cheia de esperança. Agora você precisa administrar essa expectativa.',good:0,flag:'expect'},
+    {id:'ass',q:'Tem certeza de que nunca assinou nada com eles?',a:()=>'"Tenho. Nunca entrei numa loja deles, nem pela internet. Eu nem sei mexer direito no celular."',good:1}
+  ],
+  estrat:c=>[
+    {id:'rito',l:'Qual rito?',opts:[
+      {l:'Juizado Especial Cível',d:'Sem custas no 1º grau e mais rápido. O valor cabe com folga no teto de 40 salários mínimos.',ok:1,fb:'Causa simples, valor baixo e prova documental: o Juizado é o caminho natural.',a:['L9099-3','L9099-54'],set:c=>{c.rito='jec'}},
+      {l:'Procedimento comum (Vara Cível)',d:'Mais lento e com custas, mas admite perícia complexa.',ok:.4,fb:'Possível, mas sem vantagem aqui: a causa é simples e cabe no Juizado, que é mais rápido e não cobra custas no 1º grau.',a:['CPC-318','L9099-54'],set:c=>{c.rito='comum'}}]},
+    {id:'hon',l:'Honorários',opts:[
+      {l:'Contrato escrito: 30% do que ela receber',d:'Só ganha se ela ganhar.',ok:1,fb:'Por escrito, em dinheiro e sobre o êxito: o modelo comum em causas de consumidor.',a:['CED-48','CED-50'],set:c=>{c.hon={pct:.3,fixo:0}}},
+      {l:'"Depois a gente acerta", sem papel',ok:0,fb:'Honorários devem ser contratados, de preferência, por escrito. O "depois a gente acerta" vira briga com o cliente.',a:['CED-48'],fx:[['et',-2]],set:c=>{c.hon={pct:.3,fixo:0,verbal:1}}},
+      {l:'R$ 2.500 adiantados, antes de tudo',ok:.3,fb:'É permitido, mas pesado demais para uma diarista. Ela vai sentir no bolso e na confiança.',a:['EAOAB-22'],fx:[['cli',-5]],set:c=>{c.hon={pct:0,fixo:2500}}}]},
+    {id:'proc',l:'Procuração',opts:[
+      {l:'Colher a procuração assinada hoje',ok:1,fb:'Certo: o advogado postula fazendo prova do mandato.',a:['EAOAB-5','CPC-104']},
+      {l:'Protocolar sem procuração e pegar depois',ok:0,fb:'Sem urgência, não há motivo para agir sem procuração. A exceção do art. 104 é para evitar preclusão, decadência, prescrição ou ato urgente.',a:['CPC-104'],fx:[['jz',-1]]}]},
+    {id:'exp',l:'O que você diz a ela?',opts:[
+      ...(c.rev.outra&&c.hid.outra?[{l:'Explicar que a negativação anterior provavelmente derruba o dano moral, mas que ela tem direito de limpar o nome',ok:1,fb:'Honestidade que protege a cliente: a Súmula 385 afasta o dano moral quando já existe inscrição legítima, mas não o cancelamento.',a:['SUM-STJ385'],fx:[['cli',2]]}]:[]),
+      {l:'Explicar o caminho e os riscos, sem prometer valor',ok:1,fb:'Prometer resultado é a receita da frustração. Explicar o processo constrói confiança.',fx:[['cli',2]]},
+      {l:'"Fica tranquila, a gente tira uns trinta mil deles"',ok:0,fb:'Prometer resultado gera frustração e flerta com a mercantilização da profissão.',a:['CED-39'],fx:[['et',-2],['cli',3]],set:c=>{c.promise=1}}]}
+  ],
+  mont:c=>{const jec=c.rito==='jec',out=c.rev.outra&&c.hid.outra;return [
+    {k:'end',t:'Endereçamento',a:['CPC-319','CDC-101'],opts:[
+      {l:`Ao Juízo do Juizado Especial Cível da Comarca de ${CITY()}`,ok:jec?1:0,why:jec?'':'Você escolheu o procedimento comum: o endereçamento precisa ser à Vara Cível.'},
+      {l:`Ao Juízo da ${c.v.vara}ª Vara Cível da Comarca de ${CITY()}`,ok:jec?0:1,why:jec?'Você escolheu o Juizado: a petição vai para o Juizado Especial Cível.':''},
+      {l:`Ao Juízo da Vara de Família da Comarca de ${CITY()}`,ok:0,why:'Vara de Família cuida de alimentos, guarda e divórcio. Não é o caso.'},
+      {l:`Ao Juízo do Juizado Especial Cível de Barueri/SP, sede da ré`,ok:.3,why:'O consumidor pode propor a ação no próprio domicílio (CDC, art. 101, I). Levar o caso para a sede da ré só prejudica a cliente.'}]},
+    {k:'qual',t:'Qualificação das partes',a:['CPC-319'],items:QUAL},
+    {k:'fatos',t:'Fatos',a:['CPC-319'],items:[
+      {id:'f1',t:'A autora jamais contratou qualquer serviço com a ré.',rel:1,o:1},
+      {id:'f2',t:`Em ${c.v.dInc}, a ré incluiu o nome da autora em cadastro de inadimplentes por suposta dívida de ${money(c.v.div)}.`,rel:1,o:2},
+      {id:'f3',t:`Ao tentar comprar uma geladeira a prazo na ${c.v.loja}, a autora teve o crédito negado, em público.`,rel:1,o:3},
+      {id:'f4',t:c.rev.prot&&c.hid.prot?'A autora reclamou três vezes com a ré (protocolos anexos), sem solução.':'A autora procurou a ré para resolver o problema, sem sucesso.',rel:1,o:4},
+      ...(out?[{id:'f5',t:`A autora possui inscrição anterior, legítima, por dívida com a ${c.v.loja2}.`,rel:0,why:'Fato que joga contra a cliente: não se narra na inicial. O que muda é o pedido (veja os pedidos).'}]:[]),
+      {id:'f6',t:'A autora frequenta a igreja do bairro e é muito querida pelos vizinhos.',rel:0,why:'Irrelevante para o pedido.'}]},
+    {k:'fund',t:'Fundamentos jurídicos',a:['CPC-319'],opts:[
+      {l:'CDC, art. 14: responsabilidade objetiva do fornecedor de serviços',ok:1,a:['CDC-14']},
+      {l:'CDC, art. 6º, VIII: inversão do ônus da prova',ok:1,a:['CDC-6']},
+      {l:'CC, arts. 186 e 927: ato ilícito e dever de indenizar',ok:1,a:['CC-186','CC-927']},
+      {l:'CDC, art. 43, §2º: comunicação da abertura de cadastro',ok:.5,why:'Vale como reforço, mas o dever de avisar é do órgão do cadastro, não da operadora.',a:['CDC-43']},
+      {l:'Súmula 359 do STJ: a operadora não notificou a autora',ok:0,why:'Pegadinha: a Súmula 359 obriga o órgão mantenedor do cadastro a notificar, não o credor. Contra a operadora, não serve.',a:['SUM-STJ359']},
+      {l:'Súmula 385 do STJ',ok:0,why:'Essa súmula joga contra a autora: afasta o dano moral quando há inscrição anterior legítima.',a:['SUM-STJ385']},
+      {l:'Código Civil de 1916, art. 159',ok:0,why:'Lei revogada. O Código Civil vigente é o de 2002.'},
+      {l:'Lei 8.245/91, art. 59',ok:0,why:'Lei errada: é a Lei do Inquilinato.'}]},
+    {k:'ped',t:'Pedidos',a:['CPC-319','CPC-292'],opts:[
+      {id:'tut',l:'Tutela de urgência para excluir o nome do cadastro',ok:1,a:['CPC-300']},
+      {id:'cit',l:'Citação da ré',ok:1},
+      {id:'decl',l:`Declaração de inexistência do débito de ${money(c.v.div)}`,ok:1,val:c.v.div},
+      {id:'dm',l:`Indenização por dano moral de ${money(c.v.dm)}`,ok:out?0:1,val:c.v.dm,why:out?'Com inscrição anterior legítima, a Súmula 385 afasta o dano moral. Pedir assim é perder esse pedido e queimar crédito com o juiz.':'',a:out?['SUM-STJ385']:[]},
+      {id:'inv',l:'Inversão do ônus da prova',ok:1,a:['CDC-6']},
+      {id:'suc',l:'Condenação da ré em honorários de sucumbência',ok:jec?0:1,why:jec?'No Juizado não há sucumbência no 1º grau (Lei 9.099, art. 55).':'',a:jec?['L9099-55']:[]},
+      {id:'mat',l:'Danos materiais de R$ 20.000',ok:0,val:20000,why:'Não decorre dos fatos: nenhum prejuízo material foi narrado.'}]},
+    {k:'valor',t:'Valor da causa',a:['CPC-292']},
+    {k:'prov',t:'Provas',a:['CPC-319'],opts:[
+      {l:'Documental: extrato do cadastro'+(c.rev.prot&&c.hid.prot?' e protocolos':''),ok:1},
+      {l:'Depoimento pessoal do representante da ré',ok:1},
+      {l:'Perícia grafotécnica',ok:jec?0:.5,why:jec?'O Juizado não comporta perícia complexa. E não há assinatura a periciar: a autora nunca assinou nada.':'Não há assinatura a periciar: a autora nunca assinou nada.'},
+      {l:'Inspeção judicial na loja',ok:0,why:'Prova inútil para o caso. Pedir prova sem utilidade irrita o juízo.'}]}
+  ]},
+  base(c){let t=.78;if(c.hid.prot)t+=.06;return t},
+  val(c){return c.v.div+(c.hid.outra?0:c.v.dm)},
+  conc(c){return {txt:`A ${c.v.emp} oferece excluir o nome e pagar`,demand:c.v.dm}},
+  aij(c){const out=c.hid.outra;return [
+    {tp:'choice',tit:'A contestação da ré',txt:`No Juizado, a defesa vem na própria audiência. O ${c.rivalT} entrega a contestação: diz que a linha foi contratada por telefone e junta uma <b>tela do sistema</b> da própria empresa${out?`. E anexa um extrato: <b>${esc(first(c.cli.n))} já tinha outra inscrição, da ${esc(c.v.loja2)}</b>`:''}.`+(out&&!c.rev.outra?` <br><br>${esc(first(c.cli.n))} aperta seu braço. "Eu esqueci, ${DOUT()}..." Você foi pego de surpresa.`:''),
+      opts:[
+        {l:'Impugnar a tela: é prova unilateral, produzida pela própria ré, sem assinatura nem gravação',ok:1,fb:'Exato: a tela de sistema é documento produzido unilateralmente. E, com a inversão do ônus, cabe à ré provar a contratação.',a:['CDC-6','CPC-373'],eff:c=>{c.sc.prova+=.2}},
+        {l:'Pedir prazo para se manifestar depois',ok:.4,fb:'No Juizado tudo se concentra na audiência. Deixar para depois enfraquece a impugnação.',eff:c=>{c.sc.prova+=.05}},
+        {l:'Ficar em silêncio para não piorar',ok:0,fb:'Silêncio diante de documento novo é deixar a versão da ré de pé.',eff:c=>{c.sc.prova-=.1}}]},
+    {tp:'perg',tit:'Depoimento da preposta da ré',txt:'A preposta da operadora senta, ajeita o crachá e evita olhar para a sua cliente. Você pode fazer duas perguntas.',pick:2,qs:[
+      {l:'A empresa tem a gravação da suposta contratação por telefone?',ok:1,ans:'"Não... não localizamos a gravação." O juiz anota.',eff:.18},
+      {l:'Que documento a autora assinou para contratar a linha?',ok:1,ans:'"Não há documento assinado. A venda foi por telefone." O juiz anota de novo.',eff:.14},
+      {l:'A senhora confirma que a empresa errou, não confirma?',ok:0,ans:'"Indefiro a pergunta, doutor(a): ela induz a resposta." O juiz nem levanta os olhos.',a:['CPC-459'],eff:0,fx:[['jz',-2]]},
+      {l:'A senhora gosta de trabalhar na empresa?',ok:0,ans:'"Indefiro. Sem relação com os fatos." Alguém ri baixinho no fundo da sala.',a:['CPC-459'],eff:0,fx:[['jz',-1]]}]}
+  ]},
+  alg(c){return {kw:['nunca contrat*','cadastro','negativa*','inscri*','tela','unilateral','gravac*','protocolo*','inversao','onus','responsabilidade objetiva','constrang*','geladeira','credito','dano moral','cancelamento','inexist*','sumula 385','preexist*'],neg:['contratou a linha','assinou o contrato','a divida existe','deve mesmo','talvez tenha contratado','ela esqueceu de pagar'],
+    q:c.hid.outra?{q:'E a anotação anterior da autora, doutor(a)? A Súmula 385 não afasta o dano moral?',kw:['385','preexist*','anterior','legitim*','cancelamento','exclus*','inexist*','declara*','ainda assim','independente'],neg:['nao existe','e falsa','nunca teve']}:{q:'A ré juntou a tela do sistema com o contrato. Isso não prova a contratação, doutor(a)?',kw:['tela','unilateral','propria re','sistema','assinatura','gravac*','onus','inversao','prova'],neg:['prova sim','realmente prova','contratou']}}},
+  dispo(c,r){const L=[];if(r.decl)L.push(`declarar inexistente o débito de ${money(c.v.div)} e determinar a exclusão definitiva do nome da autora dos cadastros de inadimplentes`);if(r.dm)L.push(`condenar a ré a pagar à autora ${money(r.dm)} a título de danos morais, com correção e juros`);return L},
+  epi(c,w){return w?`<p>Três semanas depois, chega uma foto no seu celular. Uma geladeira branca, ainda com o plástico, e uma menina de uns dez anos fazendo careta na frente dela.</p><p>"Obrigada, ${DOUT()}. Hoje eu dormi a noite inteira."</p>`:`<p>${esc(first(c.cli.n))} escuta a explicação em silêncio. Agradece, educada, e vai embora devagar.</p><p>Na semana seguinte, você passa em frente à ${esc(c.v.loja)}. A geladeira ainda está na vitrine.</p>`},
+  msgs:{wait:c=>`Bom dia, ${DOUT()}. Desculpa incomodar. Tem alguma novidade? Minha neta perguntou da geladeira de novo.`,aud:c=>`Comprei uma blusa nova pra audiência. Precisa levar alguma coisa?`}
+},
+acid:{
+  nome:'Acidente de trânsito (defesa)',area:'Responsabilidade civil',lado:'reu',peca:'contest',
+  make(){const cli={n:pname(false),f:false,idade:RI(24,38),prof:'motoboy de entregas'};const aut=pname(chance(.3));
+    return {cli,rito:'comum',v:{aut,dmat:RI(9,16)*1000+RI(1,9)*100,dmor:pick([10000,15000]),filhos:RI(1,3),cruz:pick(['Av. Brasil com a Rua Tupis','Rua Padre Eustáquio com a Av. Silva Lobo','Av. Amazonas com a Rua Goitacazes']),farm:pick(['Drogaria Popular','Farmácia Bom Preço','Drogaria Central']),testA:pick(FN_F)+' '+pick(SN),testR:pname(chance(.5)),vara:RI(1,32)},hid:{cam:chance(.85),cel:1,amass:chance(.7)}}},
+  intro:c=>`<p>${esc(first(c.cli.n))} chega de jaqueta e capacete na mão, direto de uma entrega. Tem ${c.cli.idade} anos e ${c.v.filhos} ${c.v.filhos>1?'filhos':'filho'}. Coloca o mandado de citação na mesa como se fosse uma bomba.</p><p>"Ele tá me cobrando ${money(c.v.dmat+c.v.dmor)}, ${DOUT()}. Diz que eu furei o sinal na ${esc(c.v.cruz)}. Mentira. Ele mudou de faixa sem dar seta e me jogou no chão. Eu fiquei duas semanas sem trabalhar."</p><p>"Se eu perder, vão levar minha moto. A moto é o meu trabalho."</p>`,
+  atq:[
+    {id:'cam',q:'Tinha alguma câmera ou testemunha por perto?',a:c=>c.hid.cam?`"Tinha a ${esc(c.v.farm)} na esquina! O farmacêutico, ${esc(c.v.testR)}, viu tudo e falou que a câmera deles pega o cruzamento."`:'"Tinha gente na calçada, mas eu não peguei o contato de ninguém."',rev:'cam',good:1},
+    {id:'cel',q:'Você viu o que o motorista estava fazendo antes da batida?',a:()=>'"Tava com o celular na mão, mexendo. Eu vi quando ele virou a cabeça pra baixo."',rev:'cel',good:1},
+    {id:'amass',q:'O orçamento que ele juntou bate com o estrago da batida?',a:c=>c.hid.amass?'Você lê o orçamento com ele. "Peraí: porta traseira esquerda? Eu bati na frente, do lado direito!" O orçamento cobra um dano que não é dessa batida.':'"Bate, sim. Eu bati na frente dele, do lado direito."',rev:'amass',good:1},
+    {id:'cnh',q:'Sua CNH e o licenciamento da moto estão em dia?',a:()=>'"Tudo em dia. Eu vivo disso, não posso dar mole."',good:1},
+    {id:'beb',q:'Você tinha bebido?',a:()=>'Ele se ofende. "Eram dez da manhã, eu tava trabalhando!" Pergunta válida, mas o jeito pesou.',good:0,fx:[['cli',-2]]},
+    {id:'cul',q:'Você assume alguma culpa?',a:()=>'"Eu tava a uns 40, no limite da via. Talvez eu pudesse ter freado antes, sei lá." Anote: isso pode virar culpa concorrente.',good:1}
+  ],
+  estrat:c=>[
+    {id:'hon',l:'Honorários',opts:[
+      {l:'Fixos de R$ 3.000, em 4 parcelas, por escrito',ok:1,fb:'Na defesa não há "êxito" em dinheiro para o cliente: honorário fixo, parcelado e por escrito é o mais justo.',a:['CED-48','EAOAB-22'],set:c=>{c.hon={pct:0,fixo:3000}}},
+      {l:'40% do valor que ele deixar de pagar',ok:.3,fb:'Possível, mas confuso e caro para quem já está apertado. Ele desconfia.',fx:[['cli',-3]],set:c=>{c.hon={pct:0,fixo:4500}}},
+      {l:'A moto como garantia dos honorários',ok:0,fb:'Pegar o instrumento de trabalho do cliente como garantia é desproporcional e cria conflito de interesses com a própria causa.',a:['CED-50'],fx:[['et',-3],['cli',-4]],set:c=>{c.hon={pct:0,fixo:3000}}}]},
+    {id:'proc',l:'Procuração',opts:[
+      {l:'Colher a procuração hoje',ok:1,a:['EAOAB-5']},
+      {l:'Contestar primeiro, procuração depois',ok:0,fb:'Não há urgência que justifique: o prazo de contestação nem começou. Procuração primeiro.',a:['CPC-104'],fx:[['jz',-1]]}]},
+    {id:'exp',l:'O que você diz a ele?',opts:[
+      {l:'Que a defesa depende de impugnar cada fato e provar a versão dele',ok:1,fb:'Na contestação vale a impugnação especificada: o que não for contestado presume-se verdadeiro.',a:['CPC-341','CPC-336'],fx:[['cli',2]]},
+      {l:'"Relaxa, essa causa é ganha"',ok:0,fb:'Ninguém sabe disso ainda. Promessa vira frustração.',fx:[['et',-1]]},
+      {l:'Que um acordo pode ser melhor que o risco',ok:.7,fb:'Pode ser, e é bom ele saber disso. Mas avalie as provas antes.',a:['CPC-3'],fx:[['cli',1]]}]}
+  ],
+  mont:c=>[
+    {k:'end',t:'Endereçamento',a:['CPC-336'],opts:[
+      {l:`Ao Juízo da ${c.v.vara}ª Vara Cível da Comarca de ${CITY()} (autos nº ${c.num})`,ok:1},
+      {l:`Ao Juizado Especial Cível de ${CITY()}`,ok:0,why:'A ação já corre na Vara Cível. A contestação vai para o juízo onde está o processo.'},
+      {l:`Ao Tribunal de Justiça (${TJ()})`,ok:0,why:'O tribunal só entra em recurso. A defesa é no 1º grau.'},
+      {l:`Ao Juízo da Vara da Fazenda Pública`,ok:0,why:'Não há ente público na causa.'}]},
+    {k:'prelim',t:'Preliminares',a:['CPC-336'],opts:[
+      {l:'Nenhuma preliminar cabível: ir direto ao mérito',ok:1},
+      {l:'Inépcia da inicial',ok:0,why:'A inicial narra fatos e pedidos com clareza. Preliminar sem base irrita o juízo.'},
+      {l:'Incompetência do juízo',ok:0,why:'O acidente foi na comarca e o réu mora nela. Não há incompetência.'},
+      {l:'Ilegitimidade passiva',ok:0,why:'O réu é o condutor da moto. Ele é parte legítima.'}]},
+    {k:'imp',t:'Impugnação de cada fato',a:['CPC-341'],items:[
+      {t:'O réu avançou o sinal vermelho.',imp:1,why:'Falso, segundo o cliente: o autor mudou de faixa sem seta.'},
+      {t:'O autor trafegava com atenção e regularmente.',imp:1,why:'O autor estava com o celular na mão.'},
+      {t:`O dano no veículo é de ${money(c.v.dmat)}, conforme orçamento.`,imp:c.hid.amass?1:0,why:c.hid.amass?'O orçamento inclui a porta traseira esquerda, que não foi atingida.':'O orçamento bate com a batida. Impugnar sem base é alterar a verdade (art. 80, II).'},
+      {t:`O acidente ocorreu no cruzamento da ${c.v.cruz}.`,imp:0,why:'É verdade. Negar fato verdadeiro é litigância de má-fé (art. 80, II).'},
+      {t:'O autor sofreu abalo moral indenizável.',imp:1,why:'Acidente com dano só material, sem lesão, em regra não gera dano moral.'}]},
+    {k:'fund',t:'Fundamentos jurídicos',a:['CPC-336'],opts:[
+      {l:'CPC, art. 373, I: cabe ao autor provar o fato constitutivo (a culpa do réu)',ok:1,a:['CPC-373']},
+      {l:'CC, art. 186: não houve culpa do réu, logo não há ato ilícito',ok:1,a:['CC-186']},
+      {l:'CC, art. 945: subsidiariamente, culpa concorrente do autor',ok:1,a:['CC-945']},
+      {l:'CPC, art. 341: o autor não comprovou o dano da porta traseira',ok:c.hid.amass?.5:0,why:c.hid.amass?'Ideia certa, artigo errado: o art. 341 é ônus do réu. O ponto é o ônus do autor (art. 373, I).':'O art. 341 é ônus do réu, não argumento contra o autor.',a:['CPC-341']},
+      {l:'CDC, art. 14: responsabilidade objetiva',ok:0,why:'Não há relação de consumo entre dois motoristas.'},
+      {l:'Súmula 385 do STJ',ok:0,why:'Súmula sobre negativação. Nada a ver com acidente.'},
+      {l:'Código Civil de 1916, art. 159',ok:0,why:'Lei revogada.'},
+      {l:'Lei 9.099, art. 3º',ok:0,why:'Lei do Juizado. A causa corre na Vara Cível.'}]},
+    {k:'ped',t:'Pedidos',a:['CPC-336'],opts:[
+      {id:'imp',l:'Improcedência dos pedidos',ok:1},
+      {id:'945',l:'Subsidiariamente, redução da indenização pela culpa concorrente',ok:1,a:['CC-945']},
+      {id:'suc',l:'Condenação do autor em custas e honorários de sucumbência',ok:1,a:['EAOAB-23']},
+      {id:'prv',l:'Produção de todas as provas admitidas',ok:1},
+      {id:'dmr',l:'Condenar o autor a pagar dano moral ao réu, aqui na contestação',ok:0,why:'Pedido próprio do réu exige reconvenção. Na contestação, sem reconvenção, o pedido não é conhecido.',a:['CPC-343']},
+      {id:'tut',l:'Tutela de urgência para proteger a moto',ok:0,why:'Não há ameaça atual à moto. Pedido sem base.'}]},
+    {k:'prov',t:'Provas',a:['CPC-336'],opts:[
+      {l:'Testemunhal'+(c.rev.cam&&c.hid.cam?` (${c.v.testR}, farmacêutico)`:''),ok:1},
+      {l:'Documental: vídeo da câmera'+(c.rev.cam&&c.hid.cam?` da ${c.v.farm}`:' de estabelecimento próximo'),ok:c.rev.cam&&c.hid.cam?1:.5,why:c.rev.cam?'':'Você não sabe se existe câmera: não perguntou no atendimento.'},
+      {l:'Depoimento pessoal do autor',ok:1},
+      {l:'Perícia de engenharia de tráfego',ok:.3,why:'Cara e desnecessária: o vídeo e a testemunha resolvem.'}]}
+  ],
+  base(c){let t=.4;if(c.hid.cam&&c.rev.cam)t+=.18;if(c.rev.cel)t+=.07;if(c.hid.amass&&c.rev.amass)t+=.08;return t},
+  val(c){return c.v.dmat+c.v.dmor},
+  conc(c){return {txt:`${c.v.aut} aceita encerrar o processo se o seu cliente pagar`}},
+  aij(c){return [
+    {tp:'choice',tit:'A testemunha do autor',txt:`A testemunha do autor é chamada. Ao ser qualificada, ${esc(c.v.testA)} diz, com naturalidade: <b>"Sou cunhada dele. Irmã da esposa."</b> O juiz já se prepara para tomar o compromisso.`,opts:[
+      {l:'Contraditar agora: cunhada é parente colateral por afinidade, impedida de depor',ok:1,fb:'Na hora certa. Cunhada é colateral por afinidade em 2º grau: impedida. Será ouvida, no máximo, como informante, sem compromisso.',a:['CPC-457','CPC-447'],eff:c=>{c.sc.prova+=.16}},
+      {l:'Deixar passar e atacar o depoimento nas alegações finais',ok:0,fb:'A contradita é feita antes do depoimento. Depois, a questão está preclusa e o depoimento vale como de testemunha compromissada.',a:['CPC-457'],eff:c=>{c.sc.prova-=.12}},
+      {l:'Protestar em voz alta que ela vai mentir',ok:0,fb:'Sem fundamento técnico, é só teatro. O juiz não gosta.',fx:[['jz',-4]],eff:c=>{c.sc.prova-=.08}}]},
+    {tp:'perg',tit:c.hid.cam&&c.rev.cam?`Sua testemunha: ${c.v.testR}, farmacêutico`:'Sua testemunha: um pedestre que estava no ponto',txt:'Agora é a sua vez. Perguntas diretas, à testemunha que você arrolou. Escolha duas.',pick:2,qs:[
+      {l:'O que o senhor viu no momento da batida?',ok:1,ans:`"O carro prata mudou de faixa sem seta, em cima da moto. O motoqueiro não teve como desviar."`,eff:.16},
+      {l:'Onde o senhor estava e o que dava para ver dali?',ok:1,ans:c.hid.cam&&c.rev.cam?'"No balcão da farmácia, de frente pro cruzamento. E a nossa câmera grava tudo: eu entreguei o vídeo pro advogado."':'"No ponto de ônibus, a uns dez metros. Vi bem."',eff:c.hid.cam&&c.rev.cam?.2:.08},
+      {l:'O senhor viu que o carro furou a faixa, não viu?',ok:0,ans:'"Indefiro. A pergunta induz a resposta, doutor(a)." O advogado do autor sorri.',a:['CPC-459'],eff:0,fx:[['jz',-2]]},
+      {l:'O motorista do carro estava com o celular?',ok:1,ans:'"Estava. Eu vi a luz da tela no rosto dele." O advogado do autor para de sorrir.',eff:.12}]}
+  ]},
+  alg(c){return {kw:['seta','faixa','mudou de faixa','celular','camera','video','farmac*','testemunha','cunhad*','informante','orcamento','porta traseira','onus','373','culpa','945','concorrente','improcedencia','moto','trabalho'],neg:['avancou o sinal','furou o sinal','estava correndo','culpa do meu cliente','meu cliente errou','assumimos a culpa'],
+    q:{q:'Doutor(a), seu cliente admitiu no depoimento que poderia ter freado antes. Isso não é culpa?',kw:['concorrente','945','reduc*','proporc*','faixa','seta','celular','causa','determinante','limite','velocidade'],neg:['e culpa dele','ele errou','sim, e culpa']}}},
+  dispo(c,r){const L=[];if(r.res==='improc')L.push('julgar IMPROCEDENTES os pedidos, condenando o autor em custas e honorários de 10% do valor da causa');else if(r.res==='parc')L.push(`reconhecer a culpa concorrente e condenar o réu a pagar ${money(r.val)}, metade do dano material comprovado`);else L.push(`condenar o réu a pagar ${money(r.val)} ao autor, com correção e juros`);return L},
+  epi(c,w){return w?`<p>${esc(first(c.cli.n))} manda um áudio de 40 segundos. Dá para ouvir o barulho do trânsito e a moto ligada.</p><p>"${DR()}, eu tô na rua trabalhando. Minha mulher chorou quando eu contei. Obrigado por acreditar em mim."</p>`:`<p>${esc(first(c.cli.n))} vende a moto para pagar a condenação. Manda uma mensagem curta: "Fiz o que deu."</p><p>Duas semanas depois, você o vê de bicicleta, com a bag nas costas, subindo a avenida.</p>`},
+  msgs:{wait:c=>`${DR()}, o cara do carro passou aqui na rua de novo e ficou me encarando. Vai dar certo, né?`,aud:c=>'Tô nervoso pra audiência. Vou de camisa social, pode ser?'}
+},
+saude:{
+  nome:'Plano de saúde nega cirurgia',area:'Saúde / Consumidor',lado:'autor',peca:'inicial',
+  make(){const cli={n:pname(true),f:true,idade:RI(29,41),prof:pick(['operadora de caixa','recepcionista','professora','auxiliar administrativa'])};const filho=pick(['Davi','Miguel','Arthur','Heitor','Théo','Gael']);
+    return {cli,rito:'comum',v:{plano:pick(PLANOS),filho,idade:RI(5,9),cir:RI(9,15)*10000,dm:15000,anos:RI(3,6),dias:RI(12,20),vara:RI(1,30)},hid:{laudo:chance(.85),car:1,neg:chance(.8)}}},
+  intro:c=>`<p>${esc(first(c.cli.n))} entra com uma pasta de exames abraçada contra o peito. O filho, ${esc(c.v.filho)}, de ${c.v.idade} anos, precisa de uma cirurgia cardíaca. O médico marcou para daqui a ${c.v.dias} dias.</p><p>"O plano negou, ${DOUT()}. Disseram que é doença preexistente. Eu pago a ${esc(c.v.plano)} todo mês, nunca atrasei. A cirurgia custa ${money(c.v.cir)}. Eu não tenho esse dinheiro. Eu não tenho nem metade."</p><p>Ela para, respira. "Ele pergunta toda noite se vai doer."</p>`,
+  atq:[
+    {id:'laudo',q:'O médico escreveu no laudo que a cirurgia é urgente?',a:c=>c.hid.laudo?'Ela procura na pasta e entrega: "Risco de agravamento do quadro em curto prazo. Indicação cirúrgica urgente." Assinado e carimbado.':'"Ele falou que é urgente, mas no papel só pôs a indicação da cirurgia."',rev:'laudo',good:1},
+    {id:'car',q:'Há quanto tempo vocês têm o plano?',a:c=>`"Faz ${c.v.anos} anos. O ${esc(c.v.filho)} entrou como dependente quando nasceu." Qualquer carência já passou faz tempo.`,rev:'car',good:1},
+    {id:'neg',q:'A negativa veio por escrito?',a:c=>c.hid.neg?'Ela mostra um e-mail do plano: "Procedimento negado: doença ou lesão preexistente." Data e protocolo.':'"Foi por telefone. Eu anotei o protocolo, pelo menos."',rev:'neg',good:1},
+    {id:'renda',q:'Qual a renda da família?',a:c=>`"Eu ganho uns ${money(RI(2,3)*SM)}. O pai dele não ajuda." Isso conta para a gratuidade da justiça.`,rev:'renda',good:1},
+    {id:'culpa',q:'A senhora escondeu alguma doença quando contratou?',a:()=>'Ela fica vermelha. "Como eu ia saber? Ele nasceu depois do contrato!" Pergunta pertinente, mas doeu.',good:.5,fx:[['cli',-1]]},
+    {id:'imp',q:'A senhora já pensou em fazer pelo SUS?',a:()=>'"A fila é de oito meses. O médico disse que ele não tem oito meses."',good:0}
+  ],
+  estrat:c=>[
+    {id:'rito',l:'Qual rito?',opts:[
+      {l:'Procedimento comum, na Vara Cível, com tutela de urgência',d:`A cirurgia custa ${money(c.v.cir)}: acima do teto do Juizado.`,ok:1,fb:`Certo. O valor econômico (${money(c.v.cir)} + dano moral) passa de 40 salários mínimos (${money(40*SM)}), e a causa pode exigir perícia.`,a:['CPC-318','L9099-3'],set:c=>{c.rito='comum'}},
+      {l:'Juizado Especial Cível',ok:0,fb:`O valor passa do teto do Juizado: 40 salários mínimos (${money(40*SM)}). E pode haver perícia médica, que o Juizado não comporta.`,a:['L9099-3'],set:c=>{c.rito='comum'},fx:[['jz',-1]]}]},
+    {id:'hon',l:'Honorários',opts:[
+      {l:'20% do dano moral que ela receber, por escrito, e nada adiantado',ok:1,fb:'Ela não tem dinheiro agora e o que importa é a cirurgia. Honorário só sobre o êxito em dinheiro, por escrito.',a:['CED-48','CED-50'],set:c=>{c.hon={pct:.2,fixo:0,base:'dm'}}},
+      {l:'R$ 5.000 adiantados, senão não dá',ok:0,fb:'Ela não tem. Exigir isso agora é deixar a criança sem a cirurgia.',fx:[['cli',-8],['rep',-1]],set:c=>{c.hon={pct:0,fixo:5000}}},
+      {l:'30% do valor da cirurgia',ok:0,fb:'A cirurgia é obrigação de fazer: o plano paga o hospital, não a cliente. Cobrar percentual sobre ela é tirar da mãe um dinheiro que ela nunca vai ver. Honorário imoderado.',a:['CED-50'],fx:[['et',-3],['cli',-5]],set:c=>{c.hon={pct:.2,fixo:0,base:'dm'}}}]},
+    {id:'proc',l:'Procuração e urgência',opts:[
+      {l:'Colher a procuração e protocolar ainda esta semana',ok:1,fb:'Urgência real exige agilidade.',a:['EAOAB-5'],fx:[['cli',3]]},
+      {l:'Esperar juntar mais documentos, sem pressa',ok:0,fb:'A cirurgia está marcada. Demorar é deixar o perigo de dano acontecer.',fx:[['cli',-4]]}]}
+  ],
+  mont:c=>[
+    {k:'end',t:'Endereçamento',a:['CPC-319'],opts:[
+      {l:`Ao Juízo da ${c.v.vara}ª Vara Cível da Comarca de ${CITY()}`,ok:1},
+      {l:`Ao Juizado Especial Cível de ${CITY()}`,ok:0,why:`Valor acima do teto do Juizado (${money(40*SM)}).`},
+      {l:`Ao Juízo da Vara de Família de ${CITY()}`,ok:0,why:'Não é causa de família: é contrato de plano de saúde.'},
+      {l:`Ao Juízo da Vara da Fazenda Pública de ${CITY()}`,ok:0,why:'O plano é empresa privada. Fazenda Pública seria contra o Estado (ex.: SUS).'}]},
+    {k:'qual',t:'Qualificação das partes',a:['CPC-319'],items:QUAL},
+    {k:'fatos',t:'Fatos',a:['CPC-319'],items:[
+      {id:'a1',t:`O autor, ${c.v.filho}, de ${c.v.idade} anos, é beneficiário dependente da ré há ${c.v.anos} anos, com mensalidades em dia.`,rel:1,o:1},
+      {id:'a2',t:'O médico assistente indicou cirurgia cardíaca'+(c.rev.laudo&&c.hid.laudo?', com laudo atestando urgência e risco de agravamento.':'.'),rel:1,o:2},
+      {id:'a3',t:'A ré negou a cobertura alegando doença preexistente'+(c.rev.neg&&c.hid.neg?', por e-mail.':'.'),rel:1,o:3},
+      {id:'a4',t:`A cirurgia está marcada para daqui a ${c.v.dias} dias e custa ${money(c.v.cir)}, valor que a família não tem.`,rel:1,o:4},
+      {id:'a5',t:'O pai da criança não paga pensão.',rel:0,why:'Assunto de outra ação (alimentos). Aqui só desvia o foco.'},
+      {id:'a6',t:'A mãe pensou em fazer pelo SUS, mas desistiu.',rel:0,why:'Não ajuda e pode sugerir que existe alternativa.'}]},
+    {k:'fund',t:'Fundamentos jurídicos',a:['CPC-319'],opts:[
+      {l:'CPC, art. 300: tutela de urgência (probabilidade do direito e perigo de dano)',ok:1,a:['CPC-300']},
+      {l:'CDC, art. 14: responsabilidade do fornecedor de serviços',ok:1,a:['CDC-14']},
+      {l:'CDC, art. 6º, VIII: inversão do ônus da prova',ok:1,a:['CDC-6']},
+      {l:'CC, arts. 186 e 927: dano moral pela recusa indevida',ok:.7,a:['CC-186','CC-927']},
+      {l:'CPC, art. 1.015, I: agravo de instrumento',ok:0,why:'Agravo é recurso. Não se fundamenta a inicial nele.'},
+      {l:'Súmula 385 do STJ',ok:0,why:'Súmula sobre negativação. Nada a ver.'},
+      {l:'CC, art. 206, §3º, V: prescrição em 3 anos',ok:0,why:'Prescrição é matéria de defesa e nem se aplica aqui.'},
+      {l:'Lei 9.099, art. 3º',ok:0,why:'Lei do Juizado. A causa vai para a Vara Cível.'}]},
+    {k:'ped',t:'Pedidos',a:['CPC-319','CPC-292'],opts:[
+      {id:'tut',l:'Tutela de urgência: autorizar a cirurgia em 48 horas, sob multa diária',ok:1,a:['CPC-300']},
+      {id:'cit',l:'Citação da ré',ok:1},
+      {id:'obr',l:`Procedência, confirmando a obrigação de custear a cirurgia (${money(c.v.cir)})`,ok:1,val:c.v.cir},
+      {id:'dm',l:`Dano moral de ${money(c.v.dm)}`,ok:1,val:c.v.dm},
+      {id:'grat',l:'Gratuidade da justiça',ok:1,a:['CPC-98']},
+      {id:'suc',l:'Condenação da ré em custas e honorários de sucumbência',ok:1,a:['EAOAB-23']},
+      {id:'pris',l:'Prisão do diretor do plano em caso de descumprimento',ok:0,why:'Não há prisão civil por isso. O meio coercitivo é a multa.'}]},
+    {k:'valor',t:'Valor da causa',a:['CPC-292']},
+    {k:'prov',t:'Provas e audiência',a:['CPC-319'],opts:[
+      {l:'Documental: laudo, negativa, contrato e comprovantes de pagamento',ok:1},
+      {l:'Perícia médica, se necessária',ok:1},
+      {l:'Opção pela audiência de conciliação',ok:1,a:['CPC-319','CPC-334']},
+      {l:'Testemunhal: vizinhos que conhecem a família',ok:0,why:'Não provam nada sobre a cobertura. Prova inútil.'}]}
+  ],
+  base(c){let t=.62;if(c.hid.laudo)t+=.12;if(c.hid.neg)t+=.04;return t},
+  val(c){return c.v.dm},
+  conc(c){return {txt:`A ${c.v.plano} propõe manter a cirurgia autorizada e pagar`,demand:c.v.dm}},
+  alg(){return null},
+  dispo(c,r){const L=[`confirmar a tutela e condenar a ré a custear integralmente a cirurgia indicada`];if(r.dm)L.push(`condenar a ré a pagar ${money(r.dm)} a título de danos morais`);return L},
+  epi(c,w){return w?`<p>Na véspera da alta, ${esc(first(c.cli.n))} manda um desenho por foto. Um boneco de jaleco, outro de terno e gravata, e um menino no meio, de mãos dadas com os dois.</p><p>Embaixo, em letra de criança: <b>"obrigado doutor do papel"</b>.</p>`:`<p>A cirurgia foi feita: a liminar garantiu. Mas a sentença negou o resto, e ${esc(first(c.cli.n))} vai ter que lidar com a cobrança do hospital.</p><p>Ela agradece mesmo assim. "Ele tá vivo, ${DOUT()}. O resto a gente vê."</p>`},
+  msgs:{wait:c=>`${DR()}, desculpa a hora. O ${c.v.filho} teve falta de ar hoje de novo. Sai a liminar?`,aud:c=>'O hospital ligou perguntando da autorização. O que eu falo?'}
+}
+};
+const TPL_ORDER=['neg','acid','saude'];
+
+/* ================================================================
+   DILEMAS ÉTICOS — cena, personagem e três saídas sem resposta óbvia
+================================================================= */
+const EVT=[
+{id:'lista',tit:'A lista do guincho',who:()=>({n:'Dr. Nilton Barbosa',f:false,r:'colega do fórum'}),scene:()=>`No café do fórum, um colega mais velho se aproxima e baixa a voz. "Tenho um contato no guincho. Toda semana ele me passa nome e telefone de vítima de acidente. Cinquenta reais por nome. Quer entrar? É dinheiro fácil."`,opts:[
+  {l:'Recusar e dizer, com calma, que isso é captação de clientela',ok:1,fb:'Angariar causas por terceiros é infração disciplinar, e o Código de Ética veda a captação.',a:['EAOAB-34','CED-7'],fx:[['et',3],['rep',1]]},
+  {l:'Pegar a lista "só para ver", sem pagar',ok:0,fb:'Usar a lista é captar do mesmo jeito. Pagar ou não pagar não muda a infração.',a:['EAOAB-34','CED-7'],fx:[['et',-12],['cx',600]],inf:1},
+  {l:'Comprar dez nomes: a concorrência faz igual',ok:0,fb:'"Todo mundo faz" não é defesa no Tribunal de Ética. É captação de causas.',a:['EAOAB-34','CED-7'],fx:[['et',-15],['cx',1500]],inf:1}]},
+{id:'depo',tit:'O depoimento combinado',who:()=>({n:pname(false),f:false,r:'cliente'}),scene:w=>`${esc(first(w.n))}, um cliente, liga no fim do dia. "${DR()}, meu primo vai ser testemunha. Que tal a gente se encontrar antes e combinar direitinho o que ele vai falar? Eu pago a gasolina dele e um agrado."`,opts:[
+  {l:'Recusar e explicar que combinar e "agradar" testemunha é crime',ok:1,fb:'Testemunha que mente comete falso testemunho; quem oferece vantagem para isso, o crime do art. 343. E alterar a verdade é má-fé processual.',a:['CP-342','CP-343','CPC-80'],fx:[['et',3],['cli',-2]]},
+  {l:'Conversar com o primo só para "organizar a memória" dele',ok:.3,fb:'Orientar a testemunha sobre como funciona a audiência é aceitável. Dizer o que ela deve falar não é. A linha é fina, e você chegou perto dela.',a:['CP-342'],fx:[['et',-3]]},
+  {l:'Aceitar: o cliente tem razão e o primo só vai ajudar',ok:0,fb:'Participar de depoimento combinado é crime e infração grave.',a:['CP-342','CP-343'],fx:[['et',-16],['cli',3]],inf:1}]},
+{id:'outro',tit:'Do outro lado da mesa',who:()=>({n:pname(chance(.5)),f:false,r:'parte contrária'}),scene:w=>`Alguém pede para falar com você na recepção. É ${esc(w.n)}, parte contrária num dos seus processos. "Vi como o(a) senhor(a) trabalha. Quero que me defenda. Pago o dobro do que estão te pagando."`,opts:[
+  {l:'Recusar: você já patrocina a outra parte nessa causa',ok:1,fb:'Defender, na mesma causa, partes contrárias é patrocínio infiel (tergiversação) e conflito de interesses.',a:['CP-355','CED-19','CED-20'],fx:[['et',3],['rep',1]]},
+  {l:'Indicar um colega do mesmo escritório para atendê-lo',ok:0,fb:'Advogados da mesma sociedade não podem representar clientes com interesses opostos.',a:['CED-19'],fx:[['et',-8]],inf:1},
+  {l:'Ouvir a história dele "só por curiosidade"',ok:0,fb:'Receber confidências da parte adversa já contamina o patrocínio e cria conflito.',a:['CED-20'],fx:[['et',-5]]}]},
+{id:'jorn',tit:'O microfone na porta',who:()=>({n:pick(FN_F)+' '+pick(SN),f:true,r:'repórter de TV'}),scene:w=>`Na saída do fórum, ${esc(w.n)}, repórter, aponta o microfone. "Doutor(a), é verdade que sua cliente escondeu uma doença do plano de saúde? Pode contar o que ela disse no seu escritório?"`,opts:[
+  {l:'Falar só do que é público no processo, sem expor nada do que a cliente contou',ok:1,fb:'O que o cliente conta ao advogado é sigiloso. O advogado pode falar do que é público, com sobriedade.',a:['CED-35','EAOAB-7'],fx:[['et',2],['rep',2]]},
+  {l:'Contar os bastidores para defender a cliente na TV',ok:0,fb:'Quebrar o sigilo, mesmo "a favor", é infração disciplinar.',a:['EAOAB-34','CED-35'],fx:[['et',-12],['rep',3]],inf:1},
+  {l:'"Sem comentários" e sair andando',ok:.7,fb:'Não viola nada, mas deixa a versão do outro lado sozinha no ar.',a:['CED-35'],fx:[['rep',-1]]}]},
+{id:'imovel',tit:'Metade da casa',who:()=>({n:pname(false),f:false,r:'cliente'}),scene:w=>`${esc(first(w.n))} tem uma disputa de herança por uma casa. "Não tenho dinheiro pra pagar o senhor(a). Mas se a gente ganhar, metade da casa é sua. Fechado?"`,opts:[
+  {l:'Propor honorários em dinheiro, por escrito, com percentual que não ultrapasse a vantagem dele',ok:1,fb:'Na quota litis, os honorários são em pecúnia e, com a sucumbência, não podem superar a vantagem do cliente.',a:['CED-50','CED-48'],fx:[['et',3],['cli',2]]},
+  {l:'Aceitar metade da casa: é o combinado',ok:0,fb:'Honorários com o próprio bem disputado, e na metade dele, violam a regra da quota litis.',a:['CED-50'],fx:[['et',-10],['cx',800]],inf:1},
+  {l:'Recusar o caso: sem dinheiro, sem advogado',ok:.4,fb:'É direito seu, mas havia uma forma correta de aceitar.',fx:[['rep',-1]]}]},
+{id:'sumiu',tit:'O cliente que sumiu',who:()=>({n:pname(chance(.5)),f:false,r:'cliente'}),scene:w=>`${esc(first(w.n))} não atende há duas semanas. O telefone dá caixa postal, o e-mail volta. E o prazo de um recurso vence em cinco dias.`,opts:[
+  {l:'Cumprir o prazo, seguir tentando contato e, se for renunciar, notificar e continuar por 10 dias',ok:1,fb:'O advogado não pode deixar o cliente perder o direito. Na renúncia, continua representando por 10 dias.',a:['CPC-112','EAOAB-5'],fx:[['et',3],['rep',1]]},
+  {l:'Deixar o prazo correr: sem resposta, sem recurso',ok:0,fb:'Prejudicar por culpa grave interesse confiado ao seu patrocínio é infração.',a:['EAOAB-34'],fx:[['et',-10],['rep',-3]],inf:1},
+  {l:'Mandar um e-mail renunciando e parar no mesmo dia',ok:0,fb:'A renúncia exige comunicação ao mandante e 10 dias de continuidade para evitar prejuízo.',a:['CPC-112','EAOAB-5'],fx:[['et',-6]]}]},
+{id:'post',tit:'"Ganhei! Contrate já!"',who:()=>({n:'Duda',f:true,r:'social media do escritório'}),scene:()=>`A social media do escritório mostra o rascunho de um post: sua foto ao lado de uma cliente sorrindo, com a legenda "MAIS UMA VITÓRIA! Nome sujo? Chama no direct que a gente resolve!"`,opts:[
+  {l:'Trocar por um texto informativo, sem cliente e sem promessa',ok:1,fb:'A publicidade do advogado é informativa, discreta e sóbria, sem captação nem exposição de cliente.',a:['CED-39'],fx:[['et',2]]},
+  {l:'Publicar: rede social é outro mundo',ok:0,fb:'Vale a regra do Código de Ética. Expor cliente e prometer resultado é captação e mercantilização.',a:['CED-39'],fx:[['et',-8],['rep',2]],inf:1},
+  {l:'Publicar, mas borrar o rosto da cliente',ok:.3,fb:'Melhorou a privacidade, mas a promessa e o tom de anúncio continuam.',a:['CED-39'],fx:[['et',-3]]}]},
+{id:'vista',tit:'A porta do cartório',who:()=>({n:pname(chance(.5)),f:false,r:'escrivão'}),scene:w=>`No balcão da vara, o escrivão ${esc(first(w.n))} nem levanta os olhos. "O juiz mandou não dar vista desses autos pra ninguém hoje." O processo não está em segredo de justiça.`,opts:[
+  {l:'Invocar a prerrogativa com respeito e, se negar de novo, registrar e acionar a Comissão de Prerrogativas',ok:1,fb:'Examinar autos que não estão em sigilo, mesmo sem procuração, é direito do advogado.',a:['EAOAB-7'],fx:[['et',2],['jz',1],['rep',1]]},
+  {l:'Gritar que vai processar o cartório inteiro',ok:0,fb:'O direito é seu, mas o escândalo vira problema com o juízo.',a:['EAOAB-7'],fx:[['jz',-6]]},
+  {l:'Aceitar e voltar amanhã',ok:.2,fb:'Você abriu mão de uma prerrogativa que existe para proteger o seu cliente.',a:['EAOAB-7'],fx:[['rep',-1]]}]}
+];
+
+/* ================================================================
+   MOTOR — estado, tempo, processos, tribunal
+================================================================= */
+const RIVAL={n:'Henrique Prado',t:'Dr. Henrique Prado',firm:'Prado & Leme Advogados'};
+const MENTOR={n:'Marta Albuquerque',t:'Dra. Marta Albuquerque',firm:'Albuquerque Advocacia'};
+const FASE={atend:'Atendimento',estrat:'Estratégia e contrato',inicial:'Petição inicial',contest:'Contestação',emenda:'Emenda da inicial',aguarda:'Aguardando o juízo',conc:'Audiência de conciliação',aij:'Audiência de instrução',alg:'Alegações finais',replica:'Réplica',saneamento:'Rol de testemunhas',agravo:'Agravo de instrumento',pos:'Sentença publicada',cumpr:'Cumprimento de sentença',fim:'Encerrado'};
+const ACT=['atend','estrat','inicial','contest','emenda','replica','saneamento','agravo','pos','cumpr','alg'];
+const hoursDay=()=>{const st=S.g.ind.st;return 8-(st>=70?1:0)-(st>=85?1:0)};
+const round100=x=>Math.max(100,Math.round(x/100)*100);
+const partes=c=>c.t==='neg'?{a:c.cli.n,r:c.v.emp}:c.t==='acid'?{a:c.v.aut,r:c.cli.n}:{a:`${c.v.filho} ${c.cli.n.split(' ').slice(1).join(' ')}, representado por sua mãe, ${c.cli.n}`,r:c.v.plano};
+const vara=c=>c.rito==='jec'?`Juizado Especial Cível de ${CITY()}`:`${c.v.vara||RI(1,9)}ª Vara Cível de ${CITY()}`;
+const casesOpen=()=>S.g.cases.filter(c=>!c.done);
+const byId=id=>S.g.cases.find(c=>c.id===id);
+const needs=c=>!c.done&&(c.fb||ACT.includes(c.fase)||(c.aud&&c.aud.d===S.g.date&&!c.aud.ok));
+function auto(c,t){c.autos.push({d:S.g.date,t})}
+function msg(from,txt,cid){S.g.msgs.unshift({d:S.g.date,from,txt,c:cid||null});S.g.msgs=S.g.msgs.slice(0,40)}
+function log(t){S.g.log.unshift({d:S.g.date,t});S.g.log=S.g.log.slice(0,80)}
+function spend(h){const G=S.g;if(G.h<h-1e-9){toast(`Faltam horas hoje (precisa de ${h}h, restam ${G.h}h). Encerre o dia ou vire a noite.`);return false}G.h=Math.round((G.h-h)*10)/10;return true}
+function setPrazo(c,tp,n,lbl,a){c.prazo={tp,n,ini:S.g.date,ate:addUteis(S.g.date,n),lbl,a:a||[]};return c.prazo}
+function waitEv(c,ev,n){c.wait={ev,d:addUteis(S.g.date,n)};c.fase='aguarda'}
+function audAt(c,tp,n){c.aud={tp,d:addUteis(S.g.date,n)};c.fase='aguarda';auto(c,`Designada ${tp==='conc'?'audiência de conciliação':'audiência de instrução e julgamento'} para ${fmtD(c.aud.d)}.`)}
+function dje(c,tit,txt,a,extra){S.g.pop.push({k:'dje',c:c.id,tit,txt,a:a||[],pz:c.prazo&&c.prazo.ini===S.g.date?Object.assign({},c.prazo):null,extra:extra||''});auto(c,tit+(c.prazo&&c.prazo.ini===S.g.date?` Prazo: ${c.prazo.lbl}, até ${fmtD(c.prazo.ate)}.`:''));snd('bell')}
+function pz(c,tp,n,lbl,a){return setPrazo(c,tp,n,lbl,a)}
+
+function newGame(){const st=UI.setup,f=st.sx==='f';
+  S={v:SCHEMA,ver:VERSION,seenV:VERSION,nome:(st.nome||'').trim().slice(0,40)||(f?'Helena Duarte':'Rafael Duarte'),sx:st.sx,uf:st.uf,phase:'tut',tut:0,tutA:null,ex:null,exN:0,usedQ:[],p2:null,
+    vm:{seen:{},fav:{},hl:{},n:0},
+    g:{date:'2028-01-24',h:8,ind:{rep:6,cli:60,et:76,jz:50,st:18},gain:{},cx:900,cases:[],pop:[],msgs:[],log:[],evDone:[],nextEv:null,nextCase:null,tplN:0,rival:{w:0,l:0,a:0},stats:{won:0,lost:0,part:0,acc:0,miss:0,closed:0},inf:0,ted:[],cargo:'bacharel',oab:'',night:false,week:0,fee:0,earn:0}};
+  save();
+}
+function startCareer(){const G=S.g;G.cargo='assoc';let d=G.date;while(wd(d)!==1||!isWork(d))d=addD(d,1);G.date=d;G.h=hoursDay();
+  G.nextCase=addUteis(d,RI(4,5));G.nextEv=addUteis(d,RI(8,11));
+  msg(MENTOR.t,`Bem-vind${g('a','o')} à ${MENTOR.firm}, ${DR()} ${S.nome.split(' ').slice(-1)[0]}. Sua sala é a do fim do corredor. Já deixei o primeiro caso na sua mesa. Regra da casa: aqui ninguém perde prazo.`);
+  newCase('neg');S.phase='car';UI.tab='painel';save();
+}
+function newCase(t){const G=S.g,T=TPL[t],m=T.make(),jf=chance(.5);
+  const c=Object.assign({id:'c'+Date.now().toString(36)+RI(100,999),t,num:'',lado:T.lado,fase:'atend',autos:[],asked:[],rev:{},sc:{peca:.5,prova:.5,alg:.5,pen:0},sat:66,start:G.date,juiz:{n:(jf?'Dra. ':'Dr. ')+pname(jf),f:jf,rig:R(.86,1.18)},rivalT:RIVAL.t,fa:{},prazo:null,wait:null,aud:null,fb:null,done:false},m);
+  c.num=cnj();
+  if(c.lado==='reu'){auto(c,`Distribuída a ação de indenização movida por ${c.v.aut}. Patrono do autor: ${RIVAL.t}.`);auto(c,`Citação de ${c.cli.n}.`)}
+  G.cases.push(c);G.tplN++;G.pop.push({k:'novo',c:c.id});return c}
+function spawnCase(){const G=S.g;const open=casesOpen();
+  let t;if(G.tplN<TPL_ORDER.length)t=TPL_ORDER[G.tplN];else{const busy=new Set(open.map(c=>c.t));const free=TPL_ORDER.filter(x=>!busy.has(x));t=pick(free.length?free:TPL_ORDER)}
+  if(open.length<5){const c=newCase(t);if(G.tplN<=TPL_ORDER.length)msg(MENTOR.t,c.lado==='reu'?`Chegou uma defesa para você. O advogado do outro lado é o ${RIVAL.t}. Cuidado com ele.`:`Mais um caso para você. Atenda com calma: cliente bem ouvido é metade da causa.`,c.id)}
+  G.nextCase=addUteis(G.date,G.tplN<TPL_ORDER.length?RI(5,8):RI(12,20))}
+function spawnEv(){const G=S.g;const left=EVT.filter(e=>!G.evDone.includes(e.id));if(left.length){const e=pick(left);G.pop.push({k:'ev',id:e.id,who:e.who()})}G.nextEv=left.length>1?addUteis(G.date,RI(7,12)):null}
+
+/* ---------- fim do dia ---------- */
+function endDay(){const G=S.g;
+  casesOpen().forEach(c=>{if(c.aud&&c.aud.d<=G.date&&!c.aud.ok)missAud(c)});
+  const used=hoursDay()-G.h;bump('st',G.night?7:used>=7?2:used<=3?-4:-1);
+  const prev=G.date;G.date=nextWork(G.date);G.night=false;
+  if(D0(G.date)-D0(prev)>=3*864e5||wd(G.date)<wd(prev))weekly();
+  G.h=hoursDay();
+  if(G.ind.st>=95){bump('st',-40);G.date=nextWork(G.date);G.h=hoursDay();G.pop.push({k:'info',tit:'Você apagou',sub:'Estresse',txt:`<p>Na quarta xícara de café, a mão tremeu. Você acordou no sofá do escritório com a ${MENTOR.t} te cobrindo com o paletó dela.</p><p>"Vai pra casa. Dois dias. Prazo de processo a gente cumpre. Prazo do corpo, também." Você perdeu um dia útil inteiro.</p>`});}
+  casesOpen().forEach(c=>{
+    if(c.wait&&c.wait.d<=G.date){const ev=c.wait.ev;c.wait=null;COURT[ev](c)}
+    if(c.prazo&&c.prazo.ate<G.date)missPrazo(c);
+    if(c.aud&&c.aud.d===G.date&&!c.aud.ok){c.fase=c.aud.tp;G.pop.push({k:'info',tit:`Hoje: ${c.aud.tp==='conc'?'audiência de conciliação':'audiência de instrução'}`,sub:c.num,txt:`<p>${esc(vara(c))}. Cliente: ${esc(c.cli.n)}. Do outro lado, ${RIVAL.t}.</p><p>Abra o processo para entrar na sala. Faltar tem consequência.</p>`,c:c.id});snd('alert')}
+    if(['atend','estrat','inicial'].includes(c.fase)&&uteisAte(c.start,G.date)>8&&chance(.35)){c.sat=clamp(c.sat-4,0,100);bump('cli',-1);if(chance(.5))msg(c.cli.n,TPL[c.t].msgs.wait(c),c.id)}
+  });
+  if(G.nextCase&&G.date>=G.nextCase)spawnCase();
+  if(G.nextEv&&G.date>=G.nextEv)spawnEv();
+  checkTED();save();
+}
+function weekly(){const G=S.g;G.week++;G.cx+=1050-650;log('Salário de associado (R$ 1.050) menos o custo de vida da semana (R$ 650).');
+  ['rep','cli','et','jz'].forEach(k=>{if(G.ind[k]>90&&!G.gain[k])G.ind[k]-=1});G.gain={};
+  if(G.week===8&&G.stats.closed>=1)msg(MENTOR.t,`Dois meses de casa. Você está indo bem. Continue explicando tudo ao cliente: é isso que traz indicação.`)}
+function fastForward(){let n=0;const G=S.g;do{endDay();n++}while(n<15&&!G.pop.length&&!casesOpen().some(c=>needs(c)||(c.prazo&&uteisAte(G.date,c.prazo.ate)<=2)));render();top()}
+
+/* ---------- prazos e audiências perdidos ---------- */
+function rep(c,p){if(chance(p)){S.g.inf++;bump('et',-8);S.g.ted.push({d:S.g.date,t:`Representação de ${c.cli.n} por prejuízo ao patrocínio (prazo perdido no processo ${c.num}).`});return true}return false}
+function missPrazo(c){const G=S.g,P=c.prazo;c.prazo=null;G.stats.miss++;const ch=fx([['cli',-12],['rep',-4],['st',8]]);c.sat=clamp(c.sat-30,0,100);let t='',a=[];
+  if(P.tp==='emenda'){t='Você não emendou a inicial no prazo. O juiz indeferiu a petição inicial.';a=['CPC-321'];closeCase(c,'indef')}
+  else if(P.tp==='contest'){t='O prazo da contestação passou em branco. Seu cliente é revel: os fatos narrados pelo autor presumem-se verdadeiros.';a=['CPC-344','CPC-355'];c.revel=1;c.sc.pen+=.42;auto(c,'Decretada a revelia do réu.');waitEv(c,'sentenca',RI(8,14))}
+  else if(P.tp==='replica'){t='Sem réplica: as alegações do réu ficaram sem resposta. Preclusão.';a=['CPC-350','CPC-351'];c.sc.pen+=.07;waitEv(c,'sentenca',RI(10,18))}
+  else if(P.tp==='saneamento'){t='O rol de testemunhas não foi apresentado no prazo. A prova testemunhal está preclusa.';a=['CPC-357'];c.sc.prova-=.22;c.noTest=1;audAt(c,'aij',RI(18,25))}
+  else if(P.tp==='agravo'){t='O prazo do agravo acabou. A decisão que negou a tutela ficou de pé.';a=['CPC-1015','CPC-1003'];c.sat=clamp(c.sat-15,0,100);audAt(c,'conc',RI(14,20))}
+  else if(P.tp==='recurso'){t='O prazo do recurso acabou. A sentença transitou em julgado do jeito que estava.';a=[c.rito==='jec'?'L9099-42':'CPC-1003'];afterFinal(c)}
+  else if(P.tp==='cumpr'){t='Você deixou o cumprimento parado. O cliente teve que cobrar você.';afterFinal(c,1)}
+  const r=rep(c,P.tp==='cumpr'?.05:.3);
+  G.pop.push({k:'miss',c:c.id,lbl:P.lbl,ate:P.ate,t,a,ch,rep:r});snd('lose');setTimeout(shake,80)}
+function missAud(c){const G=S.g,tp=c.aud.tp;c.aud.ok=true;let t,a;bump('jz',-5);bump('cli',-10);c.sat=clamp(c.sat-25,0,100);
+  if(c.rito==='jec'&&c.lado==='autor'){t='Você não compareceu. No Juizado, a ausência do autor extingue o processo.';a=['L9099-51'];closeCase(c,'ext')}
+  else if(tp==='conc'){const v=Math.round(TPL[c.t].val(c)*.02);t=`Ausência injustificada à audiência de conciliação: multa de ${money(v)} (2%), por ato atentatório à dignidade da justiça.`;a=['CPC-334'];bump('cx',-Math.round(v/2));noDeal(c)}
+  else{t='Você faltou à instrução. As provas do seu cliente não foram produzidas.';a=['CPC-364'];c.sc.prova=.12;c.sc.alg=.2;waitEv(c,'sentenca',RI(8,14))}
+  G.pop.push({k:'miss',c:c.id,lbl:tp==='conc'?'Audiência de conciliação':'Audiência de instrução',ate:c.aud.d,t,a,ch:[]});snd('lose')}
+function checkTED(){const G=S.g,lv=G.tedLv||0;
+  if(G.inf>=6&&lv<3){G.tedLv=3;G.pop.push({k:'ted',lv:3});S.phase='fim';S.fim='exc'}
+  else if(G.inf>=4&&lv<2){G.tedLv=2;fx([['rep',-15],['cli',-10]]);G.ted.push({d:G.date,t:'Suspensão aplicada pelo Tribunal de Ética e Disciplina.'});G.pop.push({k:'ted',lv:2})}
+  else if(G.inf>=2&&lv<1){G.tedLv=1;fx([['rep',-5]]);G.ted.push({d:G.date,t:'Censura aplicada pelo Tribunal de Ética e Disciplina.'});G.pop.push({k:'ted',lv:1})}}
+
+/* ---------- força da causa e sentença ---------- */
+function strength(c){const T=TPL[c.t];return clamp(.40*T.base(c)+.22*c.sc.peca+.2*clamp(c.sc.prova,0,1)+.18*c.sc.alg-c.sc.pen+(S.g.ind.jz-50)/600,0,1)}
+function computeSent(c){const T=TPL[c.t],s=strength(c),p=clamp((s-.3)*2.3/c.juiz.rig,.04,.96),r=Math.random();
+  let lv=r<p-.1?2:r<p+.12?1:0;const F=[],ped=(c.mres&&c.mres.ped)||{};
+  const tese=T.base(c);F.push({sg:tese>=.6?1:tese>=.45?0:-1,t:tese>=.6?'A tese era forte e os fatos ajudavam.':tese>=.45?'A tese era razoável, mas dependia das provas.':'A tese era frágil desde o começo.'});
+  if(c.sc.peca>=.75)F.push({sg:1,t:`Peça bem construída (nota ${Math.round(c.sc.peca*10)}/10).`});else if(c.sc.peca<.55)F.push({sg:-1,t:`Peça com falhas (nota ${Math.round(c.sc.peca*10)}/10).`,a:['CPC-319']});
+  if(c.sc.prova>=.65)F.push({sg:1,t:'As provas sustentaram a sua versão.'});else if(c.sc.prova<.45)F.push({sg:-1,t:'Faltou prova da sua versão.',a:['CPC-373']});
+  if(c.sc.alg>=.65)F.push({sg:1,t:'Alegações finais convincentes, com os fatos do caso.'});else if(c.sc.alg<.45&&c.algDone)F.push({sg:-1,t:'Alegações finais fracas.',a:['CPC-364']});
+  if(c.revel)F.push({sg:-1,t:'Revelia: os fatos do autor foram presumidos verdadeiros.',a:['CPC-344']});
+  if(c.juiz.rig>1.08)F.push({sg:-1,t:`${c.juiz.f?'A juíza':'O juiz'} é conhecid${c.juiz.f?'a':'o'} pelo rigor com a prova.`});
+  if(S.g.ind.jz>=65)F.push({sg:1,t:'Sua boa relação com a vara pesou a favor.'});
+  let res,dm=0,val=0,omis=null;
+  if(c.lado==='autor')res=['improc','parc','proc'][lv];else res=['proc','parc','improc'][lv];
+  if(c.t==='neg'){const askDm=!!ped.dm;
+    if(c.hid.outra){F.push({sg:-1,t:c.rev.outra?'A inscrição anterior legítima afastou o dano moral (Súmula 385).':'Você foi surpreendido pela inscrição anterior da cliente: não perguntou no atendimento. Sem dano moral (Súmula 385).',a:['SUM-STJ385']});if(res==='proc'&&askDm)res='parc'}
+    if(res!=='improc'&&askDm&&!c.hid.outra)dm=Math.round(c.v.dm*(res==='proc'?R(.7,1):R(.45,.6))/500)*500;
+    if(res==='parc'&&!c.hid.outra&&askDm&&lv===1)dm=Math.round(c.v.dm*.5/500)*500;
+    if(res==='proc'&&!askDm&&!c.hid.outra)F.push({sg:-1,t:'Você não pediu dano moral, que era cabível.'});
+    val=dm;}
+  if(c.t==='acid'){if(res==='proc')val=c.v.dmat+(chance(.3)?Math.round(c.v.dmor*.4/500)*500:0);else if(res==='parc')val=Math.round(c.v.dmat/2/100)*100;
+    if(res==='parc'&&!(ped['945']))res='proc',val=c.v.dmat,F.push({sg:-1,t:'Você não pediu, nem subsidiariamente, o reconhecimento da culpa concorrente.',a:['CC-945']});}
+  if(c.t==='saude'){if(res==='proc')dm=Math.round(c.v.dm*R(.6,1)/500)*500;if(res==='proc'&&!ped.dm)res='parc',F.push({sg:-1,t:'Você não pediu dano moral.'});val=dm}
+  if(c.lado==='autor'&&res==='proc'&&dm>0&&chance(.22)){omis='dano moral';res='parc';c.omDm=dm;dm=0;val=0}
+  c.sent={res,s,p,lv,F,dm,val,omis,d:S.g.date};c.sentD=S.g.date;
+}
+const winOf=c=>{const r=c.sent?c.sent.res:null;if(!r)return 0;return c.lado==='autor'?(r==='proc'?1:r==='parc'?.5:0):(r==='improc'?1:r==='parc'?.5:0)};
+function sentText(c){const T=TPL[c.t],st=c.sent,P=partes(c),J=c.juiz,jec=c.rito==='jec';const L=[];
+  L.push(`Vistos. Trata-se de ação ajuizada por ${P.a} em face de ${P.r}.${jec?' Dispensado o relatório.':' É o relatório. Decido.'}`);
+  st.F.forEach(f=>{if(f.sg>0&&c.lado==='autor'||f.sg<0&&c.lado==='reu')L.push(c.lado==='autor'?'Os elementos dos autos favorecem a parte autora. '+f.t:'A defesa não conseguiu afastar a pretensão. '+f.t);else if(f.sg!==0)L.push(c.lado==='autor'?'Há elementos que militam contra a pretensão autoral. '+f.t:'A defesa trouxe elementos relevantes. '+f.t)});
+  const lbl={proc:'PROCEDENTE',parc:'PARCIALMENTE PROCEDENTE',improc:'IMPROCEDENTE'}[st.res];
+  const ds=T.dispo(c,{res:st.res,decl:c.t==='neg'&&st.res!=='improc',dm:st.dm,val:st.val});
+  L.push(`Ante o exposto, JULGO ${lbl} o pedido, com resolução do mérito (CPC, art. 487, I)${st.res!=='improc'&&ds.length?', para '+ds.join('; e ')+'.':'.'}`);
+  if(st.omis)L.push('<i>(A sentença não diz uma palavra sobre o pedido de dano moral.)</i>');
+  L.push(jec?'Sem custas e honorários no primeiro grau (Lei 9.099, art. 55).':'Custas e honorários pela parte vencida.');
+  L.push(`P.R.I. ${CITY()}, ${fmtExt(S.g.date)}. — ${J.n}, Juiz${J.f?'a':''} de Direito.`);
+  return {L,lbl}}
+
+/* ---------- eventos do tribunal ---------- */
+const COURT={
+  despacho(c){if(c.emenda&&c.emenda.length){pz(c,'emenda',15,'Emenda da inicial',['CPC-321']);c.fase='emenda';dje(c,'Despacho: emende-se a inicial',`Intime-se a parte autora para, no prazo de 15 (quinze) dias, emendar a petição inicial, corrigindo: ${c.emenda.join('; ')}. Pena de indeferimento.`,['CPC-321'])}
+    else{audAt(c,'conc',RI(18,24));dje(c,'Despacho: cite-se e designe-se audiência',`Recebo a inicial. Cite-se a ré. ${c.rito==='jec'?'Designo sessão de conciliação':'Designo audiência de conciliação'} para ${fmtD(c.aud.d)}.`,['CPC-334'])}},
+  tutela(c){const lau=c.hid.laudo&&c.rev.laudo,p=.28+(lau?.38:c.hid.laudo?.12:0)+.32*c.sc.peca+(c.mres&&c.mres.ped&&c.mres.ped.tut?0:-.6);c.tut=chance(clamp(p,.05,.95));
+    if(c.tut){audAt(c,'conc',RI(18,24));dje(c,'Decisão: tutela de urgência DEFERIDA',`Presentes a probabilidade do direito${lau?', demonstrada pelo laudo médico que atesta a urgência,':''} e o perigo de dano, DEFIRO a tutela de urgência para determinar que a ré autorize e custeie a cirurgia em 48 horas, sob pena de multa diária de R$ 5.000. Cite-se.`,['CPC-300']);c.sat=clamp(c.sat+20,0,100);bump('cli',3);msg(c.cli.n,`${DR()}!!! O hospital ligou. Autorizaram! Eu tô tremendo. Obrigada, obrigada, obrigada.`,c.id);snd('win')}
+    else{pz(c,'agravo',15,'Agravo de instrumento',['CPC-1015']);c.fase='agravo';dje(c,'Decisão: tutela de urgência INDEFERIDA',`Não vislumbro, neste momento, elementos que evidenciem a probabilidade do direito${lau?'':', ausente laudo que ateste a urgência'}. INDEFIRO a tutela. Cite-se.`,['CPC-300']);c.sat=clamp(c.sat-10,0,100);msg(c.cli.n,`O juiz negou? Como assim negou? ${DR()}, a cirurgia é daqui a poucos dias. O que a gente faz agora?`,c.id);snd('lose')}},
+  agravoRes(c){const ok=chance(clamp(.45+.4*(c.sc.agr||0)+(c.hid.laudo?.1:0),.1,.92));if(ok){c.tut=true;msg(c.cli.n,'O TJ mandou fazer! O hospital confirmou a data. Eu não sei nem o que dizer.',c.id);c.sat=clamp(c.sat+22,0,100);bump('rep',2);snd('win')}else{c.sat=clamp(c.sat-10,0,100);snd('lose')}
+    audAt(c,'conc',RI(14,20));dje(c,ok?'TJ: agravo PROVIDO, tutela concedida':'TJ: agravo desprovido',ok?'O relator deu efeito ativo ao agravo: a ré deve autorizar a cirurgia em 48 horas.':'O tribunal manteve a decisão de primeiro grau.',['CPC-1015'])},
+  contestRe(c){pz(c,'replica',15,'Réplica',['CPC-350','CPC-351']);c.fase='replica';dje(c,'Contestação juntada: manifeste-se o autor',`A ré contestou: alega doença preexistente e falta de cobertura contratual. Intime-se a parte autora para réplica em 15 dias.`,['CPC-350'])},
+  saneam(c){pz(c,'saneamento',15,'Rol de testemunhas',['CPC-357']);c.fase='saneamento';dje(c,'Decisão de saneamento e organização',`Fixo como pontos controvertidos a dinâmica do acidente e a extensão dos danos. O ônus da prova segue o art. 373 do CPC. Defiro a prova testemunhal: rol em até 15 dias.`,['CPC-357','CPC-373'])},
+  sentenca(c){computeSent(c);c.fase='pos';const w=winOf(c);if(w<1||c.sent.omis)pz(c,'recurso',c.rito==='jec'?10:15,c.rito==='jec'?'Recurso inominado':'Apelação',[c.rito==='jec'?'L9099-42':'CPC-1003']);else c.prazo=null;
+    auto(c,`Sentença: ${{proc:'procedente',parc:'parcialmente procedente',improc:'improcedente'}[c.sent.res]}.`);S.g.pop.push({k:'sent',c:c.id})},
+  embRes(c){if(c.omDm){c.sent.res='proc';c.sent.dm=c.omDm;c.sent.val=c.omDm;c.omDm=0}c.sent.omis=null;c.fase='pos';const w=winOf(c);if(w<1)pz(c,'recurso',c.rito==='jec'?10:15,c.rito==='jec'?'Recurso inominado':'Apelação',[c.rito==='jec'?'L9099-42':'CPC-1003']);else c.prazo=null;c.embDone=1;
+    dje(c,'Embargos de declaração ACOLHIDOS',`Acolho os embargos para suprir a omissão: condeno a ré a pagar ${money(c.sent.dm)} a título de danos morais. ${w<1?'Reabre-se o prazo recursal.':''}`,['CPC-1022','CPC-1026']);snd('win')},
+  recRival(c){if(chance(.45)){c.recBy='rival';waitEv(c,'acordao',RI(22,32));dje(c,'A parte contrária recorreu',`${RIVAL.t} interpôs ${c.rito==='jec'?'recurso inominado':'apelação'}. O escritório apresentou contrarrazões. Os autos sobem para ${c.rito==='jec'?'a Turma Recursal':'o '+TJ()}.`,[c.rito==='jec'?'L9099-41':'CPC-1009'])}else{auto(c,'Certificado o trânsito em julgado.');afterFinal(c)}},
+  acordao(c){const s=strength(c);let txt;
+    if(c.recBy==='me'){const ok=chance(clamp(s-.2+(c.recQ||0)*.15,.08,.65));if(ok){c.sent.res=c.lado==='autor'?(c.sent.res==='improc'?'parc':'proc'):(c.sent.res==='proc'?'parc':'improc');if(c.t==='neg'&&c.sent.res!=='improc'&&!c.hid.outra&&!c.sent.dm)c.sent.dm=Math.round(c.v.dm*.6/500)*500;if(c.t==='acid')c.sent.val=c.sent.res==='parc'?Math.round(c.v.dmat/2/100)*100:0;if(c.t==='saude'&&c.sent.res==='proc')c.sent.dm=Math.round(c.v.dm*.6/500)*500;c.sent.val=c.lado==='autor'?c.sent.dm:c.sent.val;txt='O recurso foi PROVIDO. A decisão melhorou para o seu cliente.';snd('win')}else{txt='O recurso foi DESPROVIDO. A sentença foi mantida.';snd('lose')}}
+    else{const keep=chance(clamp(.62+.3*s,.3,.95));if(keep){txt='O recurso da parte contrária foi DESPROVIDO. Vitória mantida.';snd('win')}else{c.sent.res='parc';if(c.lado==='autor'){c.sent.dm=Math.round((c.sent.dm||0)*.5/500)*500;c.sent.val=c.sent.dm}else c.sent.val=Math.round(c.v.dmat/2/100)*100;txt='O tribunal deu parcial provimento ao recurso da parte contrária.';snd('lose')}}
+    dje(c,(c.rito==='jec'?'Turma Recursal':TJ())+': acórdão publicado',txt,[c.rito==='jec'?'L9099-41':'CPC-1009']);afterFinal(c)},
+  pagto(c){const amt=c.sent.val||c.sent.dm||0;if(c.cumprOK&&chance(.7)){c.paid=amt;dje(c,'Pagamento realizado',`A ré depositou ${money(amt)} no prazo. Expeça-se alvará.`,['CPC-523']);closeCase(c,'final')}
+    else{c.paid=Math.round(amt*1.2);dje(c,'Sem pagamento: multa e penhora online',`Não houve pagamento voluntário. Acrescento multa de 10% e honorários de 10%. Deferida a penhora online: bloqueados ${money(c.paid)}.`,['CPC-523']);closeCase(c,'final')}}
+};
+function noDeal(c){c.aud=null;
+  if(c.rito==='jec'){audAt(c,'aij',RI(14,22))}
+  else if(c.lado==='reu'){pz(c,'contest',15,'Contestação',['CPC-335']);c.fase='contest';dje(c,'Conciliação infrutífera',`Não houve acordo. O prazo de contestação começa a correr da audiência (CPC, art. 335, I): 15 dias úteis.`,['CPC-335'])}
+  else{waitEv(c,'contestRe',RI(12,15))}}
+function afterFinal(c,late){const w=winOf(c);const amt=c.sent?(c.sent.val||c.sent.dm||0):0;
+  if(c.lado==='autor'&&w>0&&amt>0&&!late){c.prazo=null;c.fase='cumpr';auto(c,'Trânsito em julgado. Possível pedir o cumprimento de sentença.')}
+  else closeCase(c,'final')}
+function closeCase(c,how,info){const G=S.g;if(c.done)return;c.done=true;c.fase='fim';c.prazo=null;c.wait=null;c.aud=null;c.how=how;
+  let w=how==='acordo'?(info.good?1:.5):['indef','ext'].includes(how)?0:winOf(c);c.win=w;
+  let fee=0;const hon=c.hon||{pct:0,fixo:0};
+  if(how==='acordo'){const amt=info.amt||0;if(c.lado==='autor')fee=hon.pct*amt;c.paid=c.lado==='autor'?amt:0}
+  else if(c.lado==='autor'){const ben=c.paid||0;fee=hon.pct*(hon.base==='dm'?(c.sent&&c.sent.dm||0):ben);if(c.rito!=='jec'&&w>=1)fee+=.1*TPL[c.t].val(c)}
+  else{if(w>=1&&c.rito!=='jec')fee+=.1*TPL[c.t].val(c)}
+  fee=Math.round(fee);const share=Math.round(fee*.25);c.fee=fee;c.share=share;G.fee+=fee;G.earn+=share;
+  const ch=[];if(share)ch.push(bump('cx',share));
+  if(how==='acordo'){G.stats.acc++;ch.push(...fx([['rep',2],['cli',info.good?4:1],['jz',1]]))}
+  else if(w>=1){G.stats.won++;G.rival.w++;ch.push(...fx([['rep',5],['cli',5],['st',-6]]))}
+  else if(w>0){G.stats.part++;ch.push(...fx([['rep',2],['cli',1]]))}
+  else{G.stats.lost++;G.rival.l++;ch.push(...fx([['rep',-2],['cli',-4],['st',4]]))}
+  G.stats.closed++;c.sat=clamp(c.sat+(w>=1?25:w>0?5:-15),0,100);
+  G.pop.push({k:'epi',c:c.id,ch});
+  if(G.stats.closed===3)G.pop.push({k:'info',tit:'Fim da Temporada 1',sub:'Carreira',txt:`<p>Três processos do começo ao fim. A ${MENTOR.t} te chama na sala dela e fecha a porta.</p><p>"Você tem estômago pra isso. Daqui a pouco vai querer o próprio escritório. Quando chegar a hora, eu te ajudo."</p><p class="mu sm">A carreira solo (captar clientes, definir honorários, abrir o próprio escritório) chega na próxima atualização. Até lá, novos casos continuam chegando.</p>`})}
+
+/* ---------- formulários de decisão (por fase) ---------- */
+function formDef(c){const T=TPL[c.t],jec=c.rito==='jec';
+  if(c.fase==='estrat')return {tit:'Estratégia, contrato e procuração',intro:'Antes de qualquer peça: rito, honorários, procuração e expectativa do cliente.',groups:T.estrat(c),hrs:1,done:doneEstrat};
+  if(c.fase==='replica')return {tit:'Réplica',intro:`O plano alegou doença preexistente: é fato impeditivo do direito do autor. Você tem 15 dias para responder.`,a:['CPC-350','CPC-351'],hrs:3,groups:[
+    {id:'pre',l:'Como responder à preexistência?',opts:[
+      {l:'O plano não fez exame prévio nem provou má-fé: o ônus de provar fato impeditivo é do réu',ok:1,a:['CPC-373','CPC-350'],eff:c=>{c.sc.prova+=.15}},
+      {l:'Admitir que pode haver preexistência, mas pedir compaixão',ok:0,fb:'Admitir fato controvertido contra o próprio cliente entrega o caso.',eff:c=>{c.sc.prova-=.15}},
+      {l:'Não precisa responder: o juiz já sabe',ok:0,fb:'A réplica existe para isso. Sem ela, a alegação fica sem resposta.',a:['CPC-350']}]},
+    {id:'prv',l:'Provas',opts:[
+      {l:'Pedir o julgamento antecipado: a prova é documental e suficiente',ok:1,a:['CPC-355'],eff:c=>{c.sc.prova+=.05}},
+      {l:'Pedir perícia médica',ok:.6,fb:'Possível, mas atrasa. Com laudo e negativa por escrito, a prova documental basta.'},
+      {l:'Pedir depoimento de vizinhos',ok:0,fb:'Prova inútil: vizinhos não sabem nada da cobertura.',fx:[['jz',-2]]}]}],done:c=>{waitEv(c,'sentenca',RI(12,20));auto(c,'Réplica protocolada.');}};
+  if(c.fase==='saneamento'){const cam=c.hid.cam&&c.rev.cam;return {tit:'Especificação de provas e rol de testemunhas',intro:'A decisão de saneamento abriu 15 dias para o rol de testemunhas.',a:['CPC-357'],hrs:1,groups:[
+    {id:'rol',l:'Rol de testemunhas',opts:[
+      {l:`Apresentar o rol com ${cam?c.v.testR:'a testemunha que viu o acidente'}, qualificada, no prazo`,ok:1,a:['CPC-357'],eff:c=>{c.sc.prova+=.05}},
+      {l:'Levar a testemunha no dia, sem rol',ok:0,fb:'Sem rol no prazo, a testemunha pode ser recusada. O §4º do art. 357 existe para isso.',a:['CPC-357'],eff:c=>{c.sc.prova-=.12;c.noTest=1}}]},
+    {id:'out',l:'Outras provas',opts:[
+      ...(cam?[{l:`Juntar o vídeo da câmera da ${c.v.farm}`,ok:1,eff:c=>{c.sc.prova+=.22}}]:[]),
+      {l:'Pedir perícia de engenharia de tráfego',ok:.3,fb:'Cara e lenta para um acidente que testemunha e vídeo resolvem. O juízo não gosta de prova inútil.',fx:[['jz',-2]]},
+      {l:'Nenhuma outra prova',ok:cam?.3:1,fb:cam?'Você tinha um vídeo e não usou.':''}]}],done:c=>{audAt(c,'aij',RI(18,25));auto(c,'Rol de testemunhas apresentado.')}}}
+  if(c.fase==='agravo')return {tit:'Tutela negada: e agora?',intro:`A cirurgia está marcada. ${esc(first(c.cli.n))} liga a cada hora.`,a:['CPC-1015'],hrs:4,groups:[
+    {id:'rec',l:'Qual recurso?',opts:[
+      {l:'Agravo de instrumento ao Tribunal, em 15 dias úteis',ok:1,a:['CPC-1015','CPC-1003'],set:c=>{c.agOK=1}},
+      {l:'Apelação',ok:0,fb:'Apelação é contra sentença. Contra decisão interlocutória sobre tutela, cabe agravo de instrumento.',a:['CPC-1009','CPC-1015']},
+      {l:'Esperar a sentença',ok:0,fb:'A criança não pode esperar a sentença. A tutela negada se ataca com agravo de instrumento.',a:['CPC-1015']}]},
+    {id:'urg',l:'Pedido ao relator',opts:[
+      {l:'Pedir antecipação da tutela recursal, com o laudo e a data da cirurgia',ok:1,eff:c=>{c.sc.agr=(c.sc.agr||0)+.5}},
+      {l:'Só o agravo, sem pedido urgente',ok:.4,fb:'Sem pedido urgente, o agravo pode ser julgado depois da data da cirurgia.'}]}],
+    done:c=>{if(c.agOK){c.sc.agr=(c.sc.agr||0)+.3;waitEv(c,'agravoRes',RI(3,6));auto(c,'Agravo de instrumento interposto no '+TJ()+'.')}else{audAt(c,'conc',RI(14,20));dje(c,'Recurso não conhecido','O recurso escolhido não cabe contra decisão interlocutória sobre tutela provisória.',['CPC-1015'])}}};
+  if(c.fase==='pos'){const st=c.sent,w=winOf(c),G=[];
+    if(st.omis)G.push({id:'emb',l:'A sentença tem algum vício?',opts:[
+      {l:`Sim: omissão sobre o pedido de ${st.omis}. Opor embargos de declaração (5 dias)`,ok:1,a:['CPC-1022','CPC-1023'],set:c=>{c.embOp=1}},
+      {l:'Apelar direto, sem embargar',ok:.3,fb:'A omissão se corrige com embargos de declaração, que são mais rápidos e interrompem o prazo do recurso.',a:['CPC-1022','CPC-1026']},
+      {l:'Aceitar a sentença como está',ok:0,fb:'O juiz esqueceu um pedido. Sem embargos, ele fica sem resposta.',a:['CPC-1022']}]});
+    else if(!c.embDone)G.push({id:'emb',l:'A sentença tem algum vício?',opts:[
+      {l:'Não há omissão, contradição ou obscuridade: não embargar',ok:1,a:['CPC-1022']},
+      {l:'Embargar mesmo assim, para ganhar prazo',ok:0,fb:'Embargos manifestamente protelatórios geram multa de até 2% do valor da causa.',a:['CPC-1026'],fx:[['jz',-4],['cx',-150]]}]});
+    if(w<1||st.omis){G.push({id:'rec',l:'Recorrer?',opts:jec?[
+      {l:'Recurso inominado, em 10 dias, para a Turma Recursal',ok:1,a:['L9099-41','L9099-42'],set:c=>{c.recT='ok'}},
+      {l:'Apelação, em 15 dias úteis',ok:0,fb:'No Juizado não cabe apelação: cabe recurso inominado, em 10 dias. É o erro clássico.',a:['L9099-41','L9099-42'],set:c=>{c.recT='bad'}},
+      {l:'Não recorrer e orientar o cliente',ok:strength(c)<.45?.8:.3,fb:strength(c)<.45?'Com chances baixas, aceitar pode ser a melhor orientação. Mas explique ao cliente.':'Havia espaço para recurso.',set:c=>{c.recT='no'}}]:[
+      {l:'Apelação, em 15 dias úteis',ok:1,a:['CPC-1009','CPC-1003'],set:c=>{c.recT='ok'}},
+      {l:'Recurso inominado, em 10 dias',ok:0,fb:'Recurso inominado é do Juizado. Na Vara Cível, contra sentença, cabe apelação.',a:['CPC-1009','L9099-41'],set:c=>{c.recT='bad'}},
+      {l:'Agravo de instrumento',ok:0,fb:'Agravo é contra decisão interlocutória do rol do art. 1.015. Contra sentença, apelação.',a:['CPC-1015','CPC-1009'],set:c=>{c.recT='bad'}},
+      {l:'Não recorrer e orientar o cliente',ok:strength(c)<.45?.8:.3,fb:strength(c)<.45?'Com chances baixas, aceitar pode ser a melhor orientação.':'Havia espaço para recurso.',set:c=>{c.recT='no'}}]});
+      G.push({id:'prep',l:'Preparo',opts:[
+        {l:'Recolher o preparo e juntar o comprovante com o recurso',ok:1,a:[jec?'L9099-42':'CPC-1007'],set:c=>{c.prepOK=1}},
+        {l:'Recolher só quando o juiz mandar',ok:0,fb:jec?'No Juizado, o preparo é feito em 48 horas, independentemente de intimação, sob pena de deserção.':'Sem preparo na interposição, você será intimado a pagar em dobro, sob pena de deserção.',a:[jec?'L9099-42':'CPC-1007'],set:c=>{c.prepOK=0}},
+        {l:'Não vou recorrer',ok:1,set:c=>{c.prepOK=1}}]})}
+    return {tit:'Depois da sentença',intro:'Leia a sentença com lupa antes de decidir.',hrs:1,groups:G,done:donePos}}
+  if(c.fase==='cumpr')return {tit:'Cumprimento de sentença',intro:`A decisão transitou em julgado. Hora de transformar a vitória em dinheiro na conta de ${esc(first(c.cli.n))}.`,a:['CPC-523'],hrs:1,groups:[
+    {id:'req',l:'O que pedir?',opts:[
+      {l:'Requerer o cumprimento, com intimação da ré para pagar em 15 dias',ok:1,a:['CPC-523'],set:c=>{c.cumprOK=1}},
+      {l:'Esperar a ré pagar espontaneamente, sem pedir nada',ok:0,fb:'O cumprimento definitivo depende de requerimento do exequente.',a:['CPC-523'],set:c=>{c.cumprOK=0}}]},
+    {id:'pen',l:'Penhora online',opts:[
+      {l:'Só se não houver pagamento no prazo de 15 dias',ok:1,a:['CPC-523']},
+      {l:'Já, junto com o requerimento',ok:0,fb:'Antes do prazo de 15 dias, o devedor tem o direito de pagar. A penhora vem depois (art. 523, §3º).',a:['CPC-523'],fx:[['jz',-2]]}]}],done:c=>{waitEv(c,'pagto',16);auto(c,'Requerido o cumprimento de sentença.')}};
+  return null}
+function doneEstrat(c){const G=S.g;auto(c,'Contrato de honorários e procuração assinados.');const hon=c.hon||{pct:.3,fixo:0};
+  if(hon.fixo){const sh=Math.round(hon.fixo*.25);c.fb.ch.push(bump('cx',sh));G.fee+=hon.fixo;G.earn+=sh}
+  if(c.lado==='autor')c.fase='inicial';else audAt(c,'conc',RI(6,10))}
+function donePos(c){const jec=c.rito==='jec';
+  if(c.embOp){c.embOp=0;if(uteisAte(c.sentD,S.g.date)>5){dje(c,'Embargos não conhecidos: intempestivos','Os embargos foram opostos depois do prazo de 5 dias.',['CPC-1023']);c.sent.omis=null;c.omDm=0;c.embDone=1;return}
+    c.prazo=null;waitEv(c,'embRes',RI(5,8));auto(c,'Opostos embargos de declaração.');return}
+  if(c.recT==='ok'){c.prazo=null;if(!c.prepOK){if(jec){dje(c,'Recurso deserto','O preparo não foi feito em 48 horas. Recurso não conhecido (deserção).',['L9099-42']);afterFinal(c);return}bump('cx',-300);auto(c,'Preparo recolhido em dobro.')}
+    c.recBy='me';c.recQ=1;waitEv(c,'acordao',RI(24,34));auto(c,jec?'Interposto recurso inominado.':'Interposta apelação.');return}
+  if(c.recT==='bad'){c.prazo=null;dje(c,'Recurso não conhecido',jec?'No Juizado, contra sentença, cabe recurso inominado (Lei 9.099, art. 41), em 10 dias. A apelação não foi conhecida.':'O recurso escolhido não cabe contra sentença.',[jec?'L9099-41':'CPC-1009']);afterFinal(c);return}
+  c.prazo=null;if(winOf(c)>=1)waitEv(c,'recRival',RI(10,14));else afterFinal(c)}
+function submitForm(c){const F=formDef(c);if(!F)return;const ans=c.fa||{};if(F.groups.some(gr=>ans[gr.id]==null))return toast('Responda todos os itens.');
+  if(!spend(F.hrs))return;const items=[],ch=[];let tot=0;
+  F.groups.forEach(gr=>{const o=gr.opts[ans[gr.id]];if(!o)return;tot+=o.ok;items.push({ok:o.ok>=1?1:o.ok>=.5?.5:0,l:gr.l,c:o.l,t:o.fb||(o.ok>=1?'Boa decisão.':''),a:o.a||[]});ch.push(...fx(o.fx));if(o.set)o.set(c);if(o.eff)o.eff(c)});
+  const sc=tot/F.groups.length;ch.push(...fx(sc>=.9?[['jz',1],['cli',1]]:sc<.5?[['cli',-2]]:[]));
+  c.fb={tit:F.tit,items,ch,sc};c.fa={};snd(sc>=.8?'ok':'no');F.done(c,ans,sc);save();render()}
+
+/* ---------- atendimento ---------- */
+function ask(c,i){const T=TPL[c.t],q=T.atq[i];if(c.asked.includes(q.id)||c.asked.length>=4)return;if(!spend(.5))return;c.asked.push(q.id);if(q.rev)c.rev[q.rev]=1;if(q.fx)fx(q.fx);if(q.flag)c[q.flag]=1;save();render()}
+function endAtend(c){const T=TPL[c.t];const good=c.asked.map(id=>T.atq.find(q=>q.id===id)).filter(q=>q&&q.good>=1).length;const hidden=T.atq.filter(q=>q.rev&&c.hid[q.rev]&&!c.rev[q.rev]);
+  const items=[{ok:good>=3?1:good>=2?.5:0,l:'Perguntas',c:`${good} de ${c.asked.length} perguntas úteis`,t:good>=3?'Bom atendimento: você foi atrás dos fatos que decidem o caso.':'Faltou cavar os fatos. Cliente quase nunca conta tudo de primeira.'}];
+  if(hidden.length)items.push({ok:0,l:'Ficou de fora',c:'Algum fato importante ficou sem pergunta',t:'Ainda há algo que o cliente não contou. Isso pode aparecer na pior hora.'});
+  const ch=fx(good>=3?[['cli',3]]:[['cli',-1]]);c.sat=clamp(c.sat+(good>=3?8:0),0,100);c.fb={tit:'Atendimento concluído',items,ch};c.fase='estrat';auto(c,'Primeiro atendimento ao cliente.');save();render()}
+
+/* ---------- montador de peças ---------- */
+function montBlocks(c){return TPL[c.t].mont(c)}
+function mInit(c){if(!c.m)c.m={i:0,a:{}};const b=montBlocks(c)[c.m.i];if(b&&b.k==='fatos'&&!c.m.a.fatos)c.m.a.fatos={ord:shuffle(b.items.map(x=>x.id)),off:{}};if(b&&!c.m.a[b.k])c.m.a[b.k]=b.k==='end'||b.k==='prelim'||b.k==='valor'?{sel:null}:b.k==='imp'?{v:{}}:{ch:{}};return c.m}
+function valorOpts(c){const B=montBlocks(c),ped=B.find(b=>b.k==='ped'),ch=(c.m.a.ped&&c.m.a.ped.ch)||{};const vals=ped.opts.filter((o,i)=>ch[i]&&o.val).map(o=>o.val);const sum=vals.reduce((a,b)=>a+b,0);const all=ped.opts.filter(o=>o.val).map(o=>o.val);
+  const set=new Set([sum,Math.max(...all,0),all[0]||1000,40*SM]);if(set.size<4)set.add(sum+5000);return {sum,opts:[...set].filter(x=>x>0).sort((a,b)=>a-b)}}
+function gradeBlock(c,b){const a=c.m.a[b.k]||{},fb=[];let s=0;
+  if(b.k==='end'||b.k==='prelim'){const o=b.opts[a.sel];s=o?o.ok:0;if(o&&o.ok>=1)fb.push([1,'Correto.']);else fb.push([0,(o&&o.why)||'Nenhuma opção escolhida.',b.a])}
+  else if(b.k==='qual'){const ch=a.ch||{};let R=0,r=0,d=0;const miss=[],extra=[];b.items.forEach((it,i)=>{if(it.ok){R++;if(ch[i])r++;else miss.push(it.l)}else if(ch[i]){d++;extra.push(it.l)}});s=clamp(r/R-.25*d,0,1);
+    if(miss.length)fb.push([0,'Faltou: '+miss.join(', ').toLowerCase()+'.',['CPC-319']]);if(extra.length)fb.push([0,'Desnecessário: '+extra.join(', ').toLowerCase()+'.']);if(!miss.length&&!extra.length)fb.push([1,'Qualificação completa, como pede o art. 319, II.'])}
+  else if(b.k==='fatos'){const ord=a.ord||[],off=a.off||{},it=id=>b.items.find(x=>x.id===id);const rel=b.items.filter(x=>x.rel),irr=b.items.filter(x=>!x.rel);const kept=ord.filter(id=>!off[id]).map(it);
+    const relK=kept.filter(x=>x.rel),irrK=kept.filter(x=>!x.rel);let pairs=0,okp=0;for(let i=0;i<relK.length;i++)for(let j=i+1;j<relK.length;j++){pairs++;if(relK[i].o<relK[j].o)okp++}const os=pairs?okp/pairs:1;
+    s=.5*relK.length/rel.length+.25*(irr.length?1-irrK.length/irr.length:1)+.25*os;
+    rel.filter(x=>off[x.id]).forEach(x=>fb.push([0,'Você descartou um fato essencial: "'+x.t+'"']));irrK.forEach(x=>fb.push([0,'"'+x.t+'" '+x.why]));if(os<1)fb.push([0,'A narrativa ficou fora de ordem. Conte os fatos na sequência em que aconteceram.']);if(s>=.99)fb.push([1,'Fatos relevantes, na ordem certa, sem nada que prejudique o cliente.'])}
+  else if(b.k==='fund'){const ch=a.ch||{};const sel=b.opts.filter((o,i)=>ch[i]);const tg=Math.min(3,b.opts.filter(o=>o.ok>=1).length);const gs=sel.reduce((x,o)=>x+(o.ok>=.5?o.ok:0),0),bad=sel.filter(o=>o.ok<.5);s=clamp(gs/tg-.34*bad.length,0,1);if(sel.length<2||sel.length>4){s=Math.min(s,.5);fb.push([0,'Escolha de 2 a 4 fundamentos.'])}
+    bad.forEach(o=>fb.push([0,o.l+': '+o.why,o.a]));sel.filter(o=>o.ok>0&&o.ok<1&&o.why).forEach(o=>fb.push([.5,o.l+': '+o.why,o.a]));if(!bad.length&&s>=.9)fb.push([1,'Fundamentação sólida.'])}
+  else if(b.k==='ped'||b.k==='prov'){const ch=a.ch||{};let n=0,okc=0;b.opts.forEach((o,i)=>{if(o.ok>0&&o.ok<1){if(ch[i]&&o.why)fb.push([.5,o.l+': '+o.why,o.a]);return}n++;const on=!!ch[i];if(on===(o.ok>=1))okc++;else if(on)fb.push([0,o.l+': '+(o.why||'não cabe aqui.'),o.a]);else fb.push([0,'Faltou '+(b.k==='ped'?'pedir':'indicar')+': '+o.l.toLowerCase()+'.',o.a])});s=n?okc/n:1;if(s>=.99)fb.push([1,b.k==='ped'?'Pedidos certos, todos decorrentes dos fatos.':'Provas úteis e suficientes.'])}
+  else if(b.k==='valor'){const V=valorOpts(c);s=a.sel===V.sum?1:0;fb.push(s?[1,`Correto: ${money(V.sum)}, a soma dos pedidos com valor econômico.`]:[0,`Valor errado. Com pedidos cumulados, o valor da causa é a soma de todos eles: ${money(V.sum)} (CPC, art. 292, V e VI).`,['CPC-292']])}
+  else if(b.k==='imp'){const v=a.v||{};let ok=0;b.items.forEach((it,i)=>{const ans=v[i];const want=typeof it.imp==='function'?it.imp(c):it.imp;if(ans===want)ok++;else if(want&&ans!==1)fb.push([0,`Não impugnado: "${it.t}" presume-se verdadeiro. ${it.why}`,['CPC-341']]);else fb.push([0,`"${it.t}": ${it.why}`,['CPC-80']])});s=ok/b.items.length;if(s>=.99)fb.push([1,'Cada fato foi enfrentado de forma específica.'])}
+  return {s:clamp(s,0,1),fb}}
+function protocol(c,ctx){const B=montBlocks(c);const res=B.map(b=>({k:b.k,t:b.t,a:b.a,...gradeBlock(c,b)}));const sc=res.reduce((x,r)=>x+r.s,0)/res.length;
+  const pedAns={};const pb=B.find(b=>b.k==='ped');if(pb){const ch=(c.m.a.ped&&c.m.a.ped.ch)||{};pb.opts.forEach((o,i)=>{if(ch[i]&&o.id)pedAns[o.id]=1})}
+  c.mres={sc,res,ped:pedAns};
+  if(ctx==='exam')return sc;
+  if(!spend(5))return;c.sc.peca=sc;const ch=fx(sc>=.85?[['jz',2],['rep',1]]:sc<.5?[['jz',-3]]:[]);
+  const T=TPL[c.t];
+  if(T.peca==='inicial'){const q=res.find(r=>r.k==='qual'),v=res.find(r=>r.k==='valor'),e=res.find(r=>r.k==='end');c.emenda=[];if(q&&q.s<.7)c.emenda.push('a qualificação completa das partes (art. 319, II)');if(v&&v.s<1)c.emenda.push('o valor da causa (art. 292)');
+    if(e&&e.s<.5){bump('jz',-3);c.redistrib=1}auto(c,'Petição inicial protocolada.'+(c.redistrib?' Endereçamento equivocado: autos redistribuídos.':''));
+    if(c.t==='saude')waitEv(c,'tutela',RI(2,4)+(c.redistrib?6:0));else waitEv(c,'despacho',RI(3,6)+(c.redistrib?8:0))}
+  else{auto(c,'Contestação protocolada.');waitEv(c,'saneam',RI(16,24));c.prazo=null}
+  c.fb={tit:(T.peca==='inicial'?'Petição inicial':'Contestação')+` protocolada — nota ${Math.round(sc*10)}/10`,blocks:res,ch};c.m=null;snd(sc>=.75?'ok':'no');save();render();top()}
+
+/* ---------- conciliação ---------- */
+function concInfo(c){const T=TPL[c.t],claim=T.val(c)||1000,s=strength(c);
+  if(c.lado==='autor'){const fair=claim*s,offer=round100(claim*clamp(s,.25,.9)*(c.concR||(c.concR=R(.42,.62))));return {claim,fair,offer,counter:round100(claim*.85)}}
+  const fair=claim*(1-s),offer=round100(claim*(c.concR||(c.concR=R(.5,.7))));return {claim,fair,offer,counter:round100(claim*.3)}}
+function concDo(c,v){const I=concInfo(c),G=S.g;if(!c.aud||c.aud.ok)return;G.h=Math.max(0,Math.round((G.h-3)*10)/10);
+  c.aud.ok=true;let items=[],ch=[];
+  const good=c.lado==='autor'?I.offer>=.75*I.fair:I.offer<=1.25*I.fair;
+  if(v==='aceita'){items.push({ok:good?1:.5,l:'Acordo',c:`Fechado em ${money(I.offer)}`,t:good?'Acordo bom: valor perto do que a causa vale, sem o risco e a demora do processo.':'Acordo abaixo do que a causa valia. Às vezes vale a paz, mas o cliente pode se arrepender.',a:['CPC-3','CPC-487']});
+    auto(c,`Acordo homologado: ${money(I.offer)}.`);c.fb={tit:'Audiência de conciliação',items,ch};closeCase(c,'acordo',{amt:I.offer,good})}
+  else if(v==='contra'){const p=c.lado==='autor'?clamp(strength(c)-.12,.1,.75):clamp(strength(c)-.05,.1,.8);if(chance(p)){items.push({ok:1,l:'Contraproposta',c:`Aceita: ${money(I.counter)}`,t:`${RIVAL.t} consulta o cliente por telefone, bufa, e aceita.`,a:['CPC-3']});auto(c,`Acordo homologado: ${money(I.counter)}.`);c.fb={tit:'Audiência de conciliação',items,ch};closeCase(c,'acordo',{amt:I.counter,good:true})}
+    else{items.push({ok:.5,l:'Contraproposta',c:'Recusada',t:`"Sem chance, ${DOUT()}." Sem acordo, o processo segue.`});c.fb={tit:'Audiência de conciliação',items,ch};noDeal(c)}}
+  else{items.push({ok:good?.5:1,l:'Proposta',c:'Recusada',t:good?'A proposta era razoável. Recusar é apostar na sentença.':'Recusar uma proposta ruim foi a decisão certa.'});c.fb={tit:'Audiência de conciliação',items,ch};noDeal(c)}
+  c.aud=null;save();render();top()}
+
+/* ---------- audiência de instrução ---------- */
+function aijSteps(c){return TPL[c.t].aij?TPL[c.t].aij(c):[]}
+function aijStart(c){if(c.ai)return;spend(Math.min(4,S.g.h))||(S.g.h=0);c.ai={i:0,pk:[],shown:false};c.aud.ok=true;save();render()}
+function aijChoose(c,i){const st=aijSteps(c)[c.ai.i];if(c.ai.shown)return;const o=st.opts[i];c.ai.sel=i;c.ai.shown=true;if(o.eff)o.eff(c);c.ai.ch=fx(o.fx);snd(o.ok>=1?'ok':'no');save();render()}
+function aijAsk(c,i){const st=aijSteps(c)[c.ai.i];if(c.ai.pk.includes(i)||c.ai.pk.length>=st.pick)return;c.ai.pk.push(i);const q=st.qs[i];c.sc.prova+=q.eff||0;fx(q.fx);snd(q.ok?'ok':'no');save();render()}
+function aijNext(c){const n=aijSteps(c).length;c.ai.i++;c.ai.pk=[];c.ai.shown=false;c.ai.sel=null;if(c.ai.i>=n){c.ai=null;c.aud=null;c.fase='alg';UI.txt='';UI.txt2='';auto(c,'Audiência de instrução: provas produzidas.')}save();render();top()}
+
+/* ---------- texto livre: alegações finais ---------- */
+const STOP=new Set('a o e de da do das dos em no na nos nas um uma uns umas que se por para pra com sem nao mas ou como ao aos foi ser sao era esta esse essa isso este isto ele ela eles elas seu sua seus suas meu minha nosso nossa ja tambem quando entao porque pois mais muito ha tem ter foram sido pelo pela pelos pelas sobre entre ate depois antes so mesmo assim todo toda cada qual quem onde lhe me te nos vos excelencia doutor doutora senhor senhora juiz juiza'.split(' '));
+const JARG=['data venia','in casu','outrossim','destarte','ex positis','mormente','precipuamente'];
+function esc2(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+function findTerm(n,t){const pre=t.endsWith('*'),b=esc2(pre?t.slice(0,-1):t);const re=new RegExp('(^|[^a-z0-9])('+b+(pre?'[a-z]*':'s?')+')(?![a-z0-9])','g');const out=[];let m;while((m=re.exec(n)))out.push({i:m.index+m[1].length,w:m[2]});return out}
+const has2=(n,list)=>list.filter(t=>findTerm(n,t).length);
+function negated(n,i){const before=n.slice(Math.max(0,i-60),i).trim().split(/\s+/).slice(-5).join(' ');return /(^| )(nao|nunca|jamais|nem|sem)( |$)|alega que|diz que|afirma que|sustenta que|segundo o autor|segundo a re|teria/.test(before)}
+function sentences(t){return String(t||'').split(/(?<=[.!?;])\s+|\n+/).map(x=>x.trim()).filter(x=>x.length>3)}
+function gradeAlg(t,A){const ss=sentences(t),n=norm(t),words=n.split(/[^a-z0-9%]+/).filter(Boolean),w=words.length,fb=[];let s=22;const seen=new Set(),hits=[];
+  ss.forEach(se=>{const ns=norm(se);const m=has2(ns,A.kw).filter(x=>!seen.has(x)&&findTerm(ns,x).some(z=>!negated(ns,z.i))).slice(0,2);m.forEach(x=>seen.add(x));if(m.length)hits.push(se)});
+  const kf=seen.size;s+=Math.min(kf,6)*8;fb.push([kf>=3?1:0,kf>=3?`Usou os fatos e as provas do caso (${kf} pontos)`:'Faltou trazer os fatos e as provas do caso. Diga o que aconteceu e o que provou.',hits.slice(0,2)]);
+  const jg=has2(n,JARG).length;if(jg>=2){s-=4;fb.push([0,'Juridiquês demais. Juiz quer clareza, não latim.'])}
+  const ped=has2(n,['requer*','pede*','pedido*','procedencia','improcedencia','condena*','julg*','reconhec*']).length>0;if(ped)s+=10;fb.push([ped?1:0,ped?'Fechou com um pedido claro':'Terminou sem pedir nada: diga o que quer que o juiz decida.']);
+  const bad=[];ss.forEach(se=>{const ns=norm(se);A.neg.forEach(k=>findTerm(ns,k).forEach(m=>{if(!negated(ns,m.i)&&!bad.includes(se))bad.push(se)}))});if(bad.length){s-=24;fb.push([0,'Argumento contra o próprio cliente',bad.slice(0,2)])}
+  const stop=words.filter(x=>STOP.has(x)).length;if(w>=8&&stop/w<.2){s-=30;fb.push([0,'Parece uma lista de palavras soltas, não uma argumentação.'])}
+  if(w<30){s-=15;fb.push([0,`Curto demais (${w} palavras). Você tem 20 minutos.`])}else if(w>280){s-=5;fb.push([0,`Longo demais (${w} palavras). Seja objetivo.`])}else s+=8;
+  return {s:Math.round(clamp(s,0,100)),fb}}
+function gradeQ(t,Q){const n=norm(t),ss=sentences(t);let k=0;const seen=new Set();ss.forEach(se=>{const ns=norm(se);has2(ns,Q.kw).forEach(x=>{if(findTerm(ns,x).some(z=>!negated(ns,z.i)))seen.add(x)})});k=seen.size;let s=k>=2?90:k===1?60:20;const bad=ss.filter(se=>Q.neg.some(x=>findTerm(norm(se),x).some(m=>!negated(norm(se),m.i))));if(bad.length)s-=40;if(n.split(/\s+/).length<6)s-=15;return {s:clamp(s,0,100),bad}}
+function algSubmit(c){const A=TPL[c.t].alg(c);if(!c.algR){if(norm(UI.txt).split(/\s+/).filter(Boolean).length<5)return toast('Escreva suas alegações (pelo menos algumas frases).');c.algR={t:UI.txt,r:gradeAlg(UI.txt,A)};UI.txt2='';snd('tick')}
+  else if(!c.algR.q){if(norm(UI.txt2).split(/\s+/).filter(Boolean).length<3)return toast('Responda ao juiz em uma ou duas frases.');c.algR.q=gradeQ(UI.txt2,A.q);c.algR.qt=UI.txt2;c.sc.alg=(c.algR.r.s*.7+c.algR.q.s*.3)/100;c.algDone=1;fx(c.sc.alg>=.7?[['jz',2]]:c.sc.alg<.4?[['jz',-1]]:[]);snd(c.sc.alg>=.6?'ok':'no')}
+  save();render()}
+function algFinish(c){c.algR.done=1;auto(c,'Alegações finais orais. Autos conclusos para sentença.');waitEv(c,'sentenca',RI(9,16));save();render();top()}
+
+/* ---------- dilemas éticos ---------- */
+function evChoose(i){const P=S.g.pop[0],E=EVT.find(e=>e.id===P.id);if(P.sel!=null)return;const o=E.opts[i];P.sel=i;P.ch=fx(o.fx);if(o.inf){S.g.inf++;S.g.ted.push({d:S.g.date,t:`Representação ético-disciplinar: ${E.tit.toLowerCase()}.`})}S.g.evDone.push(E.id);snd(o.ok>=1?'ok':'no');checkTED();save();render()}
+
+/* ================================================================
+   TELAS
+================================================================= */
+const bar=(v,cls)=>`<div class="bar ${cls||''}"><div style="width:${clamp(v,0,100)}%"></div></div>`;
+const bd=(t,c)=>`<span class="bd ${c||''}">${esc(t)}</span>`;
+function prazoCls(ate){const n=uteisAte(S.g.date,ate);return n<=2?'er':n<=5?'wa':'ok'}
+function prazoTxt(ate){const n=uteisAte(S.g.date,ate);return ate===S.g.date?'vence HOJE':n===1?'falta 1 dia útil':`faltam ${n} dias úteis`}
+function fbList(items){return '<ul class="fb">'+items.map(it=>`<li class="${it.ok>=1?'y':it.ok>0?'':'n'}"><i>${it.ok>=1?'✓':it.ok>0?'~':'✗'}</i><div>${it.l?`<b>${esc(it.l)}</b>${it.c?`: ${esc(it.c)}`:''}<br>`:''}${it.t?`<span class="sm">${esc(it.t)}</span>`:''}${(it.q||[]).map(x=>`<q>${esc(x)}</q>`).join('')}${it.a&&it.a.length?`<div>${leis(it.a)}</div>`:''}</div></li>`).join('')+'</ul>'}
+
+function vCover(){const s=load();
+  return `<div class="cover"><div class="frame"></div>
+  <div class="scale">${SCALE}</div><div class="kick">BNF GAMES apresenta</div>
+  <h1>SUIT<i>S</i></h1><div class="tag">Da beca ao tribunal.</div>
+  <div class="lines">Você saiu da faculdade com uma dívida, um diploma e um nome a construir. Passe na OAB, sente do outro lado da mesa de clientes que não dormem, conte cada prazo em dias úteis e encare, audiência após audiência, o ${RIVAL.t}.<br><br>Cada decisão tem um artigo de lei por trás. E o Vade Mecum está sempre na sua mão.</div>
+  <div class="btns">${s?`<button class="btn gold" data-a="continue">Continuar carreira</button>`:''}<button class="btn ${s?'sec':'gold'}" data-a="${s?'askNew':'new'}">Nova carreira</button><a class="btn sec" href="./index.html">Voltar ao BNF GAMES</a></div>
+  <div class="ver">Versão ${VERSION} · <button data-a="news">Novidades e próximas atualizações</button></div></div>`}
+function vSetup(){const st=UI.setup;
+  return `<div style="max-width:560px;margin:0 auto;padding:28px 16px 60px">
+  <div class="ttl"><h1>Sua ficha</h1><span class="sub">Faculdade de Direito · 10º período</span></div>
+  <div class="memo"><div class="mh"><b>Dados do(a) formando(a)</b><span class="xs mu">${esc(VERSION)}</span></div><div class="mb" style="font-family:var(--sans);font-size:14px">
+  <label class="lbl">Nome completo</label><input class="input" data-in="nome" maxlength="40" placeholder="Como vai aparecer na carteira da OAB" value="${esc(st.nome)}">
+  <div style="height:12px"></div><label class="lbl">Tratamento</label><div class="seg"><button class="${st.sx==='f'?'on':''}" data-a="sx" data-v="f">Doutora</button><button class="${st.sx==='m'?'on':''}" data-a="sx" data-v="m">Doutor</button></div>
+  <div style="height:12px"></div><label class="lbl">Estado (seccional da OAB e comarca)</label><select data-ch="uf">${Object.keys(UFS).map(k=>`<option value="${k}" ${k===st.uf?'selected':''}>${UFS[k][0]} (${UFS[k][1]})</option>`).join('')}</select>
+  <p class="note">Pessoas, empresas, escritórios e casos são fictícios. As leis são reais.</p></div></div>
+  <div style="height:14px"></div><button class="btn full" data-a="start">Colar grau</button>
+  <div style="height:8px"></div><button class="btn sec full" data-a="cover">Voltar</button></div>`}
+function preBar(sub){return `<div class="side" style="position:sticky;width:100%;height:auto;flex-direction:row;justify-content:space-between;align-items:center;padding:10px 16px;bottom:auto"><div class="lg serif" style="font-weight:700;letter-spacing:.2em;color:#fff;font-size:17px">SUIT<span class="go">S</span></div><div class="row"><span class="xs" style="color:#C9AEB4">${esc(sub)}</span>${S.phase==='oab1'&&!S.ex.shown?'':`<button class="btn sm sec" data-a="vmTab">📖 Vade Mecum</button>`}</div></div>`}
+function vTut(){const st=S.tut;let h=preBar('Faculdade de Direito')+'<div class="wrap" style="margin:0 auto;max-width:720px">';
+  if(st===0)h+=`<div class="ttl"><h1>A última aula</h1><span class="sub">${esc(UFS[S.uf][1])} · dezembro de 2027</span></div><div class="memo"><div class="mb big"><p>O auditório já está vazio quando o professor Otaviano Brandão te chama. Setenta anos, trinta de tribuna, a gravata sempre torta.</p><p>"${g('Doutora','Doutor')} ${esc(S.nome.split(' ')[0])}... ainda não, né? Falta a Ordem." Ele sorri. "Vou te dizer o que ninguém diz na formatura: advogado não perde causa por não saber a lei. Perde por <b>perder prazo</b>, por <b>não ouvir o cliente</b> e por <b>achar que ética é matéria de prova</b>."</p><p>Ele te entrega um Vade Mecum velho, com as bordas gastas e as páginas cheias de anotação a lápis.</p><p>"Era meu. Agora é seu. Abre sempre que tiver dúvida. Abrir não custa nada. Errar custa."</p></div></div><div style="height:14px"></div><button class="btn full" data-a="tut">Continuar</button>`;
+  else if(st===1)h+=`<div class="ttl"><h1>Como a carreira funciona</h1></div><div class="pn"><div class="pb"><ul class="fb">
+    <li class="y"><i>⚖</i><div><b>Processos de verdade</b><br><span class="sm">Do atendimento ao cumprimento de sentença. Cada fase é uma decisão, e cada decisão tem um artigo de lei.</span></div></li>
+    <li class="y"><i>⏱</i><div><b>O tempo corre em dias úteis</b><br><span class="sm">Cada dia tem 8 horas. Atender, redigir, ir à audiência: tudo gasta horas. Os prazos correm ao mesmo tempo em vários processos, e perder um é o pior erro do jogo.</span></div></li>
+    <li class="y"><i>📈</i><div><b>Seis indicadores</b><br><span class="sm">Reputação, Clientes, Ética (OAB), Juízo e Estresse, além do Caixa. Acima de 80, cada ponto custa o dobro: chegar a 100 exige uma carreira inteira.</span></div></li>
+    <li class="y"><i>📖</i><div><b>Vade Mecum na mão</b><br><span class="sm">Todo link 📖 abre o artigo sem sair da tela. Os artigos começam lacrados e vão abrindo à medida que aparecem.</span></div></li>
+    <li class="y"><i>♟</i><div><b>Um rival</b><br><span class="sm">${RIVAL.t}, da ${RIVAL.firm}, vai estar do outro lado em muitos dos seus processos.</span></div></li></ul></div></div><div style="height:14px"></div><button class="btn full" data-a="tut">Continuar</button>`;
+  else if(st===2){const pub='2027-04-16',ok=addUteis(pub,5),a=S.tutA;let cal='<div class="cal">'+['seg','ter','qua','qui','sex','sáb','dom'].map(x=>`<div class="h">${x}</div>`).join('');let d='2027-04-12';for(let i=0;i<21;i++){const cls=d===pub?'st':isFer(d)?'fe':!isWork(d)?'we':'';const res=a?(d===ok?'ok':d===a?'on':''):'';cal+=`<button class="${cls} ${res}" data-a="tutPick" data-v="${d}" ${a?'disabled':''}>${+d.slice(8)}</button>`;d=addD(d,1)}cal+='</div>';
+    h+=`<div class="ttl"><h1>Treino: contar um prazo</h1><span class="sub">abril de 2027</span></div><div class="memo"><div class="mb"><p>A intimação foi publicada na <b>sexta-feira, 16/04</b> (em dourado). O prazo é de <b>5 dias úteis</b>. Toque no dia em que ele vence.</p><p class="sm mu" style="font-family:var(--sans)">Dica: o dia do começo não conta; o do vencimento conta. Sábado, domingo e feriado não contam (em vermelho, o feriado de Tiradentes).</p>${leis(['CPC-219','CPC-224'])}<div style="height:10px"></div>${cal}</div>
+    ${a?`<div class="desp">${a===ok?`<div class="alert ok"><div><b>Certo: vence em ${fmtL(ok)}.</b>Começa a contar na segunda (19), pula o feriado de quarta (21): 19, 20, 22, 23 e 26.</div></div>`:`<div class="alert er"><div><b>Não. Vence em ${fmtL(ok)}.</b>Exclui o dia da publicação, conta só dias úteis e pula o feriado de 21/04: 19, 20, 22, 23 e 26.</div></div>`}<button class="btn full" data-a="tut">Continuar</button></div>`:''}</div>`}
+  else h+=`<div class="ttl"><h1>O Exame de Ordem</h1></div><div class="memo"><div class="mb"><p>Sem aprovação no Exame de Ordem, não há inscrição na OAB.</p>${leis(['EAOAB-8'])}<p style="margin-top:10px"><b>1ª fase:</b> 20 questões objetivas. Aprova com 10 acertos: a mesma proporção do exame real (40 de 80). Você tem 40 minutos.</p><p><b>2ª fase (Civil):</b> uma peça no Montador, valendo 5 pontos, e 4 questões de fundamento, valendo 1,25 cada. Aprova com 6.</p><p class="sm mu" style="font-family:var(--sans)">Questões escritas para o jogo, no estilo do exame. Reprovou? Tenta no próximo, quatro meses depois.</p></div></div><div style="height:14px"></div><button class="btn full" data-a="oab1">Entrar na sala de prova</button>`;
+  return h+'</div>'}
+function timerH(dl,tot){const left=Math.max(0,dl-Date.now());return `<div class="timer ${left<tot*.15?'low':''}" id="tx"><b id="tt">${fmtT(left)}</b><div class="tb"><div id="tb" style="width:${left/tot*100}%"></div></div></div>`}
+const fmtT=ms=>{const s=Math.ceil(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const QT=40*60e3,PT=15*60e3;
+function vOab1(){const E=S.ex,q=QB[E.q[E.i]],pm=E.perm[E.i],ans=E.ans[E.i];let h=preBar(`${S.exN+1}º Exame de Ordem · 1ª fase`)+'<div class="wrap" style="margin:0 auto;max-width:720px">';
+  h+=timerH(E.dl,QT)+`<div class="prog">${E.q.map((_,i)=>`<div class="${i<E.i?'dn':i===E.i?'on':''}"></div>`).join('')}</div>`;
+  h+=`<div class="memo"><div class="mh"><b>Questão ${E.i+1} de 20</b>${bd(DISC[q.d],'pr')}</div><div class="mb"><p>${esc(q.q)}</p></div><div class="desp">`;
+  pm.forEach((oi,k)=>{const on=ans===oi,shown=E.shown;let cls='';if(shown){if(oi===q.c)cls='on';else if(on)cls='on'}h+=`<button class="ro ${cls}" data-a="ans1" data-v="${oi}" ${shown?'disabled':''} style="${shown&&oi===q.c?'border-color:var(--ok);background:var(--ok2)':shown&&on?'border-color:var(--er);background:var(--er2)':''}"><i></i><div><b>${'ABCD'[k]}) ${esc(q.o[oi])}</b></div></button>`});
+  if(E.shown){const ok=ans===q.c;h+=`<div class="alert ${ok?'ok':'er'}" style="margin-top:8px"><div><b>${ok?'Correta.':ans===-1?'Tempo esgotado.':'Incorreta.'}</b>${esc(q.e)}<div style="margin-top:6px">${lei(q.a)}</div></div></div><button class="btn full" data-a="next1">${E.i<19?'Próxima questão':'Entregar a prova'}</button>`}
+  return h+'</div></div></div>'}
+function vOab1Res(){const E=S.ex,n=E.ans.filter((a,i)=>a===QB[E.q[i]].c).length,ok=n>=10;const by={};E.q.forEach((qi,i)=>{const d=QB[qi].d;by[d]=by[d]||[0,0];by[d][1]++;if(E.ans[i]===QB[qi].c)by[d][0]++});
+  let h=preBar('Resultado da 1ª fase')+'<div class="wrap" style="margin:0 auto;max-width:720px">';
+  h+=`<div class="memo"><div class="mh"><b>Ordem dos Advogados do Brasil · Resultado</b><span class="mono xs">${S.exN+1}º exame</span></div><div class="mb"><p style="font-size:30px;margin:0" class="mono">${n}/20</p><p class="${ok?'ok':'er'}" style="font-weight:600">${ok?'APROVADO(A) NA 1ª FASE':'NÃO APROVADO(A)'}</p><p class="sm mu" style="font-family:var(--sans)">Mínimo: 10 acertos (50%, como no exame real).</p></div></div>`;
+  h+=`<div class="pn"><h3>Por disciplina</h3><div class="tw"><table>${Object.keys(by).map(d=>`<tr><td>${DISC[d]}</td><td class="mono" style="text-align:right">${by[d][0]}/${by[d][1]}</td></tr>`).join('')}</table></div></div><div style="height:14px"></div>`;
+  h+=ok?`<button class="btn full" data-a="oab2">Seguir para a 2ª fase</button>`:`<div class="alert er"><div><b>Faz parte.</b>O próximo exame é daqui a quatro meses. A inscrição custa R$ 300 e o estresse sobe.</div></div><button class="btn full" data-a="retry1">Estudar e tentar o próximo exame</button>`;
+  return h+'</div>'}
+function vOab2(){const P=S.p2;let h=preBar('2ª fase · Prático-profissional (Civil)')+'<div class="wrap" style="margin:0 auto;max-width:760px">';
+  if(P.st==='peca'){h+=timerH(P.dl,PT)+`<div class="alert pr"><div><b>Enunciado</b>${esc(P.c.cli.n)} teve o nome negativado pela ${esc(P.c.v.emp)} por uma dívida de ${money(P.c.v.div)} de uma linha que nunca contratou, e teve o crédito negado em público. Não há outras negativações. Elabore a petição inicial no Juizado Especial Cível.</div></div>`+vMont(P.c,'exam')}
+  else{const D=P.disc,q=D2[D.q[D.i]],a=D.ans[D.i];h+=`<div class="prog">${D.q.map((_,i)=>`<div class="${i<D.i?'dn':i===D.i?'on':''}"></div>`).join('')}</div><div class="memo"><div class="mh"><b>Questão ${D.i+1} de 4 · 1,25 ponto</b><span class="xs mu">Peça: ${f2(P.sc*5)}/5</span></div><div class="mb"><p>${esc(q.q)}</p></div><div class="desp">${q.o.map((o,i)=>`<button class="ro ${a===i?'on':''}" data-a="ans2" data-v="${i}" ${a!=null?'disabled':''} style="${a!=null&&i===q.c?'border-color:var(--ok);background:var(--ok2)':a===i&&i!==q.c?'border-color:var(--er);background:var(--er2)':''}"><i></i><div><b>${esc(o)}</b></div></button>`).join('')}
+    ${a!=null?`<div class="alert ${a===q.c?'ok':'er'}"><div><b>${a===q.c?'Correto.':'Incorreto.'}</b>${lei(q.a)}</div></div><button class="btn full" data-a="next2">${D.i<3?'Próxima':'Entregar'}</button>`:''}</div></div>`}
+  return h+'</div>'}
+const f2=x=>(Math.round(x*100)/100).toFixed(2).replace('.',',');
+function vOab2Res(){const P=S.p2,n=P.disc.ans.filter((a,i)=>a===D2[P.disc.q[i]].c).length,tot=P.sc*5+n*1.25,ok=tot>=6;
+  let h=preBar('Resultado final')+'<div class="wrap" style="margin:0 auto;max-width:720px">';
+  h+=`<div class="memo"><div class="mh"><b>Resultado da 2ª fase</b></div><div class="mb"><p style="font-size:30px;margin:0" class="mono">${f2(tot)}</p><p class="${ok?'ok':'er'}" style="font-weight:600">${ok?'APROVADO(A) NO EXAME DE ORDEM':'NÃO APROVADO(A)'}</p><p class="sm" style="font-family:var(--sans)">Peça: ${f2(P.sc*5)}/5 · Questões: ${f2(n*1.25)}/5 · Mínimo: 6,00</p></div></div>`;
+  if(P.res)h+=`<div class="pn"><h3>Correção da peça, bloco a bloco</h3><div class="pb">${blocksFb(P.res)}</div></div><div style="height:14px"></div>`;
+  h+=ok?`<button class="btn gold full" data-a="posse">Ir para a cerimônia de compromisso</button>`:`<button class="btn full" data-a="retry2">Tentar a 2ª fase no próximo exame</button>`;return h+'</div>'}
+function vPosse(){const a=getArt('RG-20');unlock('RG-20');unlock('EAOAB-8');return preBar('Seccional '+S.uf)+`<div class="wrap" style="margin:0 auto;max-width:680px"><div class="memo"><div class="mh"><b>Ordem dos Advogados do Brasil · Seção ${UFS[S.uf][0]}</b></div><div class="mb big"><p>O salão da Seccional cheira a madeira encerada. Sua mãe está na terceira fila, com o celular erguido desde antes de começar. O presidente pede que os novos advogados fiquem de pé e repitam:</p><p class="say">${esc(a.t.split('"')[1])}</p>${leis(['RG-20','EAOAB-8'])}</div><div class="desp"><button class="btn gold full" data-a="prometo">Prometo</button></div></div></div>`}
+
+/* ---------- casca da carreira ---------- */
+function navCount(k){const G=S.g;if(k==='processos')return casesOpen().filter(needs).length;if(k==='prazos')return casesOpen().filter(c=>c.prazo&&uteisAte(G.date,c.prazo.ate)<=2).length;return 0}
+const TABS=[['painel','Painel'],['processos','Processos'],['prazos','Prazos'],['clientes','Clientes'],['escritorio','Escritório'],['vade','Vade Mecum'],['oab','OAB']];
+function shell(inner){const G=S.g,last=S.nome.split(' ').slice(-1)[0];
+  let h=`<div class="side"><div class="brandbox"><div class="lg">SUIT<i>S</i></div><div class="who"><b>${DR()} ${esc(S.nome)}</b><br>${esc(G.oab)} · ${G.cargo==='assoc'?'Associad'+g('a','o'):'Advogad'+g('a','o')}<br>${MENTOR.firm}</div></div>
+  <div class="mobhd"><div class="lg">SUIT<i>S</i></div><span>${DR()} ${esc(last)}<br>${fmtL(G.date)} · ${G.h}h</span></div>
+  <nav class="nav">${TABS.map(([k,l])=>{const n=navCount(k);return `<button class="${UI.tab===k&&!UI.open?'on':''}" data-a="tab" data-v="${k}"><span>${l}</span>${n?`<i class="${k==='prazos'?'r':''}">${n}</i>`:''}</button>`}).join('')}</nav>
+  <div class="sfoot"><button data-a="news">Novidades (v${VERSION})</button><button data-a="mute">${UI.mute?'Som: desligado':'Som: ligado'}</button><button data-a="askNew">Nova carreira</button><button data-a="cover">Sair para a capa</button></div></div>`;
+  h+=`<div class="main"><div class="ibar">${['rep','cli','et','jz','st'].map(k=>`<div><label>${IND[k]}</label><b>${Math.round(G.ind[k])}</b>${bar(G.ind[k],k==='st'?'st':'')}</div>`).join('')}<div><label>Caixa</label><b class="${G.cx<0?'er':''}">${money(G.cx)}</b></div><div><label>Vade Mecum</label><b>${S.vm.n||0}/${VTOT}</b></div></div><div class="wrap">${inner}</div></div>`;
+  const night=G.h<2&&!G.night;
+  h+=`<div class="foot"><div><div class="inf"><b>${fmtL(G.date)}</b> · ${isRec(G.date)?'<span class="wa b">recesso forense</span> · ':''}Horas hoje: <b>${G.h}h</b>${G.night?' (virou a noite)':''}</div>${night?`<button class="btn sec sm" data-a="night" title="+4h, estresse +7">Virar a noite</button>`:''}<button class="btn sec sm" data-a="ff" title="Avança até algo acontecer">Avançar ▸▸</button><button class="btn sm" data-a="end">Encerrar o dia</button></div></div>`;
+  return h}
+
+function vPainel(){const G=S.g,open=casesOpen(),pend=open.filter(needs),today=open.filter(c=>c.aud&&c.aud.d===G.date&&!c.aud.ok);
+  const soon=open.filter(c=>c.prazo).sort((a,b)=>a.prazo.ate<b.prazo.ate?-1:1);
+  let h=`<div class="ttl"><h1>Bom dia, ${DR()} ${esc(S.nome.split(' ').slice(-1)[0])}</h1><span class="sub">${fmtExt(G.date)}${isRec(G.date)?' · recesso: prazos suspensos e sem audiências':''}</span></div>`;
+  if(today.length)h+=today.map(c=>`<div class="alert er"><div><b>Hoje: ${c.aud.tp==='conc'?'audiência de conciliação':'audiência de instrução'}</b>${esc(c.cli.n)} · ${esc(vara(c))}. <button class="lnk" data-a="open" data-v="${c.id}">Entrar na sala</button></div></div>`).join('');
+  h+=`<div class="grid2"><div class="pn"><h3>Sua mesa <span>${pend.length} pendente${pend.length===1?'':'s'}</span></h3>${pend.length?pend.map(c=>`<button class="li" data-a="open" data-v="${c.id}"><div class="av">${face(c.cli.n,c.cli.f)}</div><div class="t"><b>${esc(c.cli.n)}</b><span>${esc(TPL[c.t].nome)} · ${esc(c.fb?'Ver resultado':FASE[c.fase])}</span></div>${c.prazo?bd(prazoTxt(c.prazo.ate),prazoCls(c.prazo.ate)):''}</button>`).join(''):'<div class="empty">Nada pendente. Avance o tempo ou estude o Vade Mecum.</div>'}</div>
+  <div class="pn"><h3>Prazos <span>dias úteis</span></h3>${soon.length?soon.slice(0,5).map(c=>`<button class="li" data-a="open" data-v="${c.id}"><div class="t"><b>${esc(c.prazo.lbl)}</b><span class="mono">${c.num}</span></div>${bd(fmtDs(c.prazo.ate)+' · '+prazoTxt(c.prazo.ate),prazoCls(c.prazo.ate)+(uteisAte(G.date,c.prazo.ate)<=2?' pulse':''))}</button>`).join(''):'<div class="empty">Nenhum prazo correndo.</div>'}</div></div>`;
+  h+=`<div style="height:12px"></div><div class="grid2"><div class="pn"><h3>Recados</h3>${G.msgs.length?G.msgs.slice(0,5).map(m=>`<div class="msg"><div class="h"><b>${esc(m.from)}</b><span class="mono">${fmtDs(m.d)}</span></div><p>${esc(m.txt)}</p></div>`).join(''):'<div class="empty">Sem recados.</div>'}</div>
+  <div class="pn"><h3>O rival</h3><div class="vs"><div class="av">${face(RIVAL.n,false,'#D8CBBF')}</div><div class="t" style="flex:1"><b>${RIVAL.t}</b><div class="xs mu">${RIVAL.firm} · 22 anos de tribunal</div></div><div class="sc">${G.rival.w}<span class="mu">–</span>${G.rival.l}</div></div><div class="pb sm mu" style="padding-top:0">${G.rival.w>G.rival.l?'"Sorte de principiante", ele diz a quem pergunta. Mas já não sorri quando te vê no corredor.':G.rival.l>G.rival.w?'Ele te cumprimenta pelo nome agora. Com aquele sorriso de quem já sabe o fim.':'Ele ainda não sabe o seu nome. Isso vai mudar.'}</div></div></div>`;
+  return h}
+function vProcessos(){const G=S.g,open=casesOpen(),done=G.cases.filter(c=>c.done);
+  const row=c=>`<tr class="ck" data-a="open" data-v="${c.id}"><td class="mono xs">${c.num}</td><td><b>${esc(c.cli.n)}</b><div class="xs mu">${esc(TPL[c.t].nome)} · ${c.lado==='autor'?'autor':'réu'}</div></td><td>${c.done?bd(c.how==='acordo'?'acordo':c.win>=1?'ganhou':c.win>0?'parcial':'perdeu',c.win>=1?'ok':c.win>0?'wa':'er'):esc(c.fb?'Resultado':FASE[c.fase])}</td><td>${c.prazo?bd(fmtDs(c.prazo.ate),prazoCls(c.prazo.ate)):c.aud?bd('aud. '+fmtDs(c.aud.d),'pr'):c.wait?'<span class="xs mu">aguardando</span>':''}</td></tr>`;
+  return `<div class="ttl"><h1>Processos</h1><span class="sub">${open.length} em andamento</span></div><div class="pn"><div class="tw"><table><tr><th>Número</th><th>Cliente</th><th>Fase</th><th>Prazo</th></tr>${open.map(row).join('')||'<tr><td colspan="4" class="empty">Nenhum processo em andamento.</td></tr>'}</table></div></div>${done.length?`<div class="pn"><h3>Encerrados</h3><div class="tw"><table>${done.map(row).join('')}</table></div></div>`:''}`}
+function vPrazos(){const G=S.g,L=[];casesOpen().forEach(c=>{if(c.prazo)L.push({d:c.prazo.ate,t:c.prazo.lbl,c,k:'p',a:c.prazo.a});if(c.aud)L.push({d:c.aud.d,t:c.aud.tp==='conc'?'Audiência de conciliação':'Audiência de instrução',c,k:'a'})});L.sort((a,b)=>a.d<b.d?-1:1);
+  return `<div class="ttl"><h1>Agenda de prazos</h1><span class="sub">Verde: mais de 5 dias úteis · Amarelo: até 5 · Vermelho: até 2</span></div>
+  <div class="alert pr"><div><b>Como o jogo conta</b>Só dias úteis. Exclui o dia da publicação e inclui o do vencimento. De 20/12 a 20/01, os prazos ficam suspensos.<div>${leis(['CPC-219','CPC-220','CPC-224'])}</div></div></div>
+  <div class="pn">${L.length?L.map(x=>`<button class="li" data-a="open" data-v="${x.c.id}"><div class="t"><b>${esc(x.t)}</b><span>${esc(x.c.cli.n)} · <span class="mono">${x.c.num}</span></span></div>${x.k==='p'?bd(fmtL(x.d)+' · '+prazoTxt(x.d),prazoCls(x.d)+(uteisAte(G.date,x.d)<=2?' pulse':'')):bd(fmtL(x.d),'pr')}</button>`).join(''):'<div class="empty">Agenda livre.</div>'}</div>`}
+function vClientes(){const G=S.g;return `<div class="ttl"><h1>Clientes</h1><span class="sub">Satisfação média: ${Math.round(G.ind.cli)}</span></div><div class="pn">${G.cases.length?G.cases.map(c=>`<button class="li" data-a="open" data-v="${c.id}"><div class="av">${face(c.cli.n,c.cli.f)}</div><div class="t"><b>${esc(c.cli.n)}</b><span>${c.cli.idade} anos · ${esc(c.cli.prof)} · ${esc(TPL[c.t].nome)}</span><span>${c.hon?(c.hon.fixo?'Honorários fixos de '+money(c.hon.fixo):Math.round(c.hon.pct*100)+'% do êxito')+(c.hon.verbal?' (combinado verbal)':''):'Contrato ainda não assinado'}</span></div><div style="width:80px"><div class="xs mu">satisfação</div>${bar(c.sat)}</div></button>`).join(''):'<div class="empty">Nenhum cliente ainda.</div>'}</div>`}
+function vEscritorio(){const G=S.g,st=G.stats;return `<div class="ttl"><h1>${MENTOR.firm}</h1><span class="sub">Você é associad${g('a','o')}: salário de R$ 1.050/semana + 25% dos honorários que gerar</span></div>
+  <div class="pn"><div class="kv k4"><div><label>Caixa</label><b>${money(G.cx)}</b></div><div><label>Sua parte em honorários</label><b>${money(G.earn)}</b></div><div><label>Honorários gerados</label><b>${money(G.fee)}</b></div><div><label>Semanas de casa</label><b>${G.week}</b></div><div><label>Vitórias</label><b>${st.won}</b></div><div><label>Parciais</label><b>${st.part}</b></div><div><label>Acordos</label><b>${st.acc}</b></div><div><label>Derrotas</label><b>${st.lost}</b></div><div><label>Prazos perdidos</label><b class="${st.miss?'er':''}">${st.miss}</b></div><div><label>Casos encerrados</label><b>${st.closed}</b></div><div><label>Você x ${RIVAL.n.split(' ')[1]}</label><b>${G.rival.w}–${G.rival.l}</b></div><div><label>Estresse</label><b>${Math.round(G.ind.st)}</b></div></div></div>
+  <div class="pn"><h3>Carreira</h3><div class="pb"><ul class="fb"><li class="y"><i>✓</i><div><b>Exame de Ordem e inscrição</b><br><span class="sm">${esc(G.oab)}</span></div></li><li class="${G.cargo==='assoc'?'':'y'}"><i>${G.cargo==='assoc'?'●':'✓'}</i><div><b>Associad${g('a','o')} na ${MENTOR.firm}</b><br><span class="sm">Recebe casos da sócia e aprende o ofício.</span></div></li><li><i>○</i><div><b>Advogad${g('a','o')} autônom${g('a','o')}</b> ${bd('próxima atualização','go')}<br><span class="sm">Captar clientes, definir honorários e abrir o próprio escritório.</span></div></li><li><i>○</i><div><b>Sóci${g('a','o')} e especialista</b> ${bd('em breve','go')}<br><span class="sm">Equipe, estagiários e causas maiores.</span></div></li></ul></div></div>
+  <div class="pn"><h3>Movimento</h3>${G.log.length?G.log.slice(0,12).map(l=>`<div class="msg"><div class="h"><span class="mono">${fmtD(l.d)}</span></div><p class="sm" style="font-family:var(--sans)">${esc(l.t)}</p></div>`).join(''):'<div class="empty">Sem movimento.</div>'}</div>`}
+function vOAB(){const G=S.g,lv=G.tedLv||0;return `<div class="ttl"><h1>Situação na OAB</h1><span class="sub">${esc(G.oab)}</span></div>
+  <div class="pn"><div class="kv"><div><label>Inscrição</label><b class="mono">${esc(G.oab)}</b></div><div><label>Situação</label><b class="${lv?'er':'ok'}">${['Regular','Censurad'+g('a','o'),'Suspens'+g('a','o'),'Excluíd'+g('a','o')][lv]}</b></div><div><label>Ética</label><b>${Math.round(G.ind.et)}/100</b>${bar(G.ind.et)}</div><div><label>Representações</label><b>${G.inf}</b></div></div></div>
+  <div class="pn"><h3>Histórico disciplinar</h3>${G.ted.length?G.ted.map(t=>`<div class="msg"><div class="h"><span class="mono">${fmtD(t.d)}</span></div><p class="sm" style="font-family:var(--sans)">${esc(t.t)}</p></div>`).join(''):'<div class="empty">Nenhuma ocorrência. Continue assim.</div>'}</div>
+  <div class="alert pr" style="margin-top:12px"><div><b>Como funciona aqui</b>Duas representações geram censura; quatro, suspensão; seis, exclusão dos quadros, que encerra a carreira.<div>${leis(['EAOAB-35','EAOAB-36','EAOAB-38'])}</div></div></div>`}
+function vVade(){const q=norm(UI.vq).trim(),fav=UI.vf;let list=[];
+  Object.keys(VADE).forEach(c=>{if(UI.vc&&UI.vc!==c)return;Object.keys(VADE[c].arts).forEach(a=>{const key=c+'-'+a,A=VADE[c].arts[a];if(fav&&!S.vm.fav[key])return;
+    if(q){const hay=norm(refL(key)+' '+VADE[c].sh+' '+a+' '+A.r+' '+(A.tg||[]).join(' ')+' '+(S.vm.seen[key]?A.t:''));const terms=q.replace(/art\.?|artigo/g,' ').split(/\s+/).filter(Boolean);if(!terms.every(t=>hay.includes(t)))return}list.push(key)})});
+  let h=`<div class="ttl"><h1>Vade Mecum</h1><span class="sub">${S.vm.n||0} de ${VTOT} artigos estudados</span></div>${bar((S.vm.n||0)/VTOT*100)}<div style="height:12px"></div>
+  <input class="input" data-in="vq" placeholder='Buscar: "CPC 335", "revelia", "prazo"...' value="${esc(UI.vq)}"><div style="height:8px"></div>
+  <div class="row"><div class="seg" style="flex-wrap:wrap"><button class="${!UI.vc?'on':''}" data-a="vc" data-v="">Todos</button>${Object.keys(VADE).map(c=>`<button class="${UI.vc===c?'on':''}" data-a="vc" data-v="${c}">${esc(VADE[c].sh)}</button>`).join('')}</div><button class="btn sm ${fav?'':'sec'}" data-a="vf">★ Favoritos</button></div><div style="height:12px"></div>
+  <div class="pn" id="vlist">${list.length?list.map(k=>{const A=getArt(k),on=S.vm.seen[k];return `<button class="li" data-a="${on?'vm':'locked'}" data-v="${k}"><div class="t"><b>${esc(refL(k))} ${S.vm.fav[k]?'<span class="go">★</span>':''}</b><span>${on?esc(A.r):'Lacrado: abre quando aparecer no jogo'}</span></div>${on?'':'<span class="mu">🔒</span>'}</button>`}).join(''):'<div class="empty">Nada encontrado.</div>'}</div>
+  <p class="note">Textos de lei não têm direito autoral (Lei 9.610/98, art. 8º, IV). Nesta versão, os textos foram transcritos para o jogo e estão marcados para conferência na fonte oficial. Na dúvida, vale o texto publicado no Planalto e no site do CFOAB.</p>`;return h}
+function hlText(key,t){const H=(S.vm.hl[key]||[]).slice().sort((a,b)=>b.length-a.length);let out=esc(t);H.forEach(x=>{const e=esc(x);if(e&&out.includes(e))out=out.split(e).join('<mark>'+e+'</mark>')});return out}
+function vDrawer(){const A=getArt(UI.vm);if(!A)return '';const C=VADE[A.c];unlock(A.key);
+  return `<div class="ov" data-a="vmClose" style="background:rgba(26,8,12,.35)"></div><div class="drw"><div class="dh"><b>📖 ${esc(refL(A.key))}</b><button class="btn sm sec" data-a="vmClose">Fechar</button></div><div class="db">
+  <div class="xs mu">${esc(C.nome)}</div><div class="b" style="margin:4px 0 10px">${esc(A.r)}</div>
+  <div class="art" id="arttxt">${hlText(A.key,A.t)}</div>
+  <div class="row" style="margin-top:14px"><button class="btn sm ${S.vm.fav[A.key]?'gold':'sec'}" data-a="fav" data-v="${A.key}">★ ${S.vm.fav[A.key]?'Favorito':'Favoritar'}</button><button class="btn sm sec" data-a="hl" data-v="${A.key}">Grifar a seleção</button>${(S.vm.hl[A.key]||[]).length?`<button class="btn sm sec" data-a="unhl" data-v="${A.key}">Limpar grifos</button>`:''}</div>
+  <p class="note">Selecione um trecho do texto e toque em "Grifar a seleção".</p>
+  <div class="alert" style="margin-top:12px"><div><b class="vtag">Texto transcrito: conferência pendente</b>Confira na fonte oficial: <a class="lnk" href="${esc(C.fonte)}" target="_blank" rel="noopener">${esc(C.fonte.replace('https://','').split('/')[0])}</a>${C.warn?'. A numeração dos artigos deste código também precisa ser conferida.':''}</div></div></div></div>`}
+
+/* ---------- processo ---------- */
+function blocksFb(res){return res.map(r=>`<div style="margin-bottom:10px"><div class="row"><b class="sm">${esc(r.t)}</b><span class="sp"></span>${bd(Math.round(r.s*10)+'/10',r.s>=.85?'ok':r.s>=.5?'wa':'er')}</div><ul class="fb">${r.fb.map(f=>`<li class="${f[0]>=1?'y':f[0]>0?'':'n'}"><i>${f[0]>=1?'✓':f[0]>0?'~':'✗'}</i><div class="sm">${esc(f[1])}${f[2]&&f[2].length?`<div>${leis(f[2])}</div>`:''}</div></li>`).join('')}</ul></div>`).join('')}
+function vMont(c,ctx){mInit(c);const B=montBlocks(c),i=c.m.i,b=B[i],a=c.m.a[b.k];const peca=ctx==='exam'?'Petição inicial':TPL[c.t].peca==='inicial'?'Petição inicial':'Contestação';
+  let h=`<div class="memo"><div class="mh"><b>Montador de Peças · ${peca}</b><span class="xs mu">Bloco ${i+1} de ${B.length}</span></div><div class="mb" style="font-family:var(--sans);font-size:14px">
+  <div class="stepper">${B.map((x,j)=>`<span class="${j===i?'on':j<i?'dn':''}">${j+1}. ${esc(x.t)}</span>`).join('')}</div>
+  <div class="row" style="margin-bottom:8px"><b>${esc(b.t)}</b><span class="sp"></span>${leis(b.a)}</div>`;
+  if(b.k==='end'||b.k==='prelim')h+=b.opts.map((o,j)=>`<button class="ro ${a.sel===j?'on':''}" data-a="mSel" data-v="${j}"><i></i><div><b class="serif" style="font-weight:400">${esc(o.l)}</b></div></button>`).join('');
+  else if(b.k==='qual'||b.k==='fund'||b.k==='ped'||b.k==='prov'){const items=b.k==='qual'?b.items:b.opts;h+=`<p class="xs mu" style="margin:0 0 8px">${b.k==='qual'?'Marque os dados que a petição precisa trazer sobre as partes.':b.k==='fund'?'Escolha de 2 a 4. Cuidado: há pegadinhas.':b.k==='ped'?'Marque só o que decorre dos fatos.':'Marque as provas úteis.'}</p>`+items.map((o,j)=>`<button class="ro cb ${a.ch[j]?'on':''}" data-a="mChk" data-v="${j}"><i></i><div><b style="font-weight:500">${esc(o.l)}</b></div></button>`).join('')}
+  else if(b.k==='fatos'){const it=id=>b.items.find(x=>x.id===id);h+=`<p class="xs mu" style="margin:0 0 8px">Ordene os fatos (↑ ↓) e descarte o que não ajuda o cliente.</p>`+a.ord.map((id,j)=>{const f=it(id),off=a.off[id];return `<div class="fact ${off?'off':''}"><div class="mv"><button data-a="mUp" data-v="${j}" ${j===0?'disabled':''}>↑</button><button data-a="mDn" data-v="${j}" ${j===a.ord.length-1?'disabled':''}>↓</button></div><div><span class="n">${j+1}.</span> ${esc(f.t)}</div><button class="btn sm ${off?'':'sec'}" data-a="mOff" data-v="${id}">${off?'Usar':'Descartar'}</button></div>`}).join('')}
+  else if(b.k==='imp')h+=`<p class="xs mu" style="margin:0 0 8px">Para cada fato da inicial do autor: impugnar ou admitir?</p>`+b.items.map((it,j)=>`<div class="fact" style="grid-template-columns:1fr auto"><div>${esc(it.t)}</div><div class="seg"><button class="${a.v[j]===1?'on':''}" data-a="mImp" data-v="${j}:1">Impugnar</button><button class="${a.v[j]===0?'on':''}" data-a="mImp" data-v="${j}:0">Admitir</button></div></div>`).join('');
+  else if(b.k==='valor'){const V=valorOpts(c);h+=`<p class="xs mu" style="margin:0 0 8px">Some os pedidos com valor econômico que você marcou.</p>`+V.opts.map(v=>`<button class="ro ${a.sel===v?'on':''}" data-a="mVal" data-v="${v}"><i></i><div><b class="mono">${money(v)}</b></div></button>`).join('')}
+  const last=i===B.length-1;
+  h+=`</div><div class="desp"><div class="row"><button class="btn sec" data-a="mPrev" ${i===0?'disabled':''}>Voltar</button><span class="sp"></span>${last?`<button class="btn gold" data-a="${ctx==='exam'?'mExam':'mProt'}">${ctx==='exam'?'Entregar a peça':'Protocolar (5h)'}</button>`:`<button class="btn" data-a="mNext">Próximo bloco</button>`}</div></div></div>`;return h}
+function vForm(c){const F=formDef(c),ans=c.fa||{};let h=`<div class="memo"><div class="mh"><b>${esc(F.tit)}</b><span class="xs mu">${F.hrs}h</span></div><div class="mb" style="font-family:var(--sans);font-size:14px"><p class="sm" style="margin:0 0 6px">${esc(F.intro||'')}</p>${F.a?leis(F.a):''}`;
+  F.groups.forEach(gr=>{h+=`<div style="margin-top:14px"><label class="lbl">${esc(gr.l)}</label>`+gr.opts.map((o,j)=>`<button class="ro ${ans[gr.id]===j?'on':''}" data-a="fSel" data-v="${gr.id}:${j}"><i></i><div><b>${esc(o.l)}</b>${o.d?`<span>${esc(o.d)}</span>`:''}</div></button>`).join('')+'</div>'});
+  return h+`</div><div class="desp"><button class="btn full" data-a="fGo">Decidir</button></div></div>`}
+function vAtend(c){const T=TPL[c.t];let h=`<div class="memo"><div class="mh"><b>Atendimento</b><span class="xs mu">${c.asked.length}/4 perguntas · 0,5h cada</span></div><div class="mb"><div class="story">${T.intro(c)}</div>`;
+  c.asked.forEach(id=>{const q=T.atq.find(x=>x.id===id);h+=`<p class="b" style="font-family:var(--sans);font-size:13px;margin:12px 0 2px">Você: ${esc(q.q)}</p><div class="say">${q.a(c)}</div>`});
+  h+=`</div><div class="desp"><label>${c.asked.length<4?'O que você pergunta?':'Hora de fechar o atendimento'}</label>`;
+  if(c.asked.length<4)h+=T.atq.map((q,i)=>c.asked.includes(q.id)?'':`<button class="ro" data-a="ask" data-v="${i}"><i></i><div><b style="font-weight:500">${esc(q.q)}</b></div></button>`).join('');
+  return h+`<button class="btn ${c.asked.length>=2?'':'sec'} full" style="margin-top:6px" data-a="endAt">Encerrar o atendimento</button></div></div>`}
+function vConc(c){const I=concInfo(c),P=partes(c);const lines=[`"${DOUT().replace(/^./,x=>x.toUpperCase())}, vamos ser práticos."`,'"Meu cliente quer resolver hoje. Amanhã a proposta não existe mais."','"Você sabe como esse juízo costuma decidir, não sabe?"'];
+  return `<div class="memo"><div class="mh"><b>Audiência de conciliação</b><span class="xs mu">${esc(vara(c))}</span></div><div class="mb"><p>Sala pequena, mesa de fórmica, ar-condicionado no máximo. O conciliador lê os nomes: ${esc(P.a)} contra ${esc(P.r)}. ${RIVAL.t} chega por último, terno impecável, e não tira os olhos do celular.</p><div class="say">${pick(lines)} ${c.lado==='autor'?`${esc(TPL[c.t].conc(c).txt)} <b>${money(I.offer)}</b>. Pegar ou largar.`:`${esc(TPL[c.t].conc(c).txt)} <b>${money(I.offer)}</b>.`}</div><p class="sm" style="font-family:var(--sans)">${c.lado==='autor'?`O pedido em dinheiro é de ${money(I.claim)}.`:`O autor pede ${money(I.claim)}.`} ${esc(first(c.cli.n))} te olha, esperando você dizer o que fazer.</p>${leis(['CPC-3','CPC-334','CPC-487'])}</div>
+  <div class="desp"><label>Sua orientação</label><button class="ro" data-a="conc" data-v="aceita"><i></i><div><b>${c.lado==='autor'?'Aceitar':'Pagar'} ${money(I.offer)}</b><span>Acordo homologado agora. Fim do processo.</span></div></button><button class="ro" data-a="conc" data-v="contra"><i></i><div><b>Contrapropor ${money(I.counter)}</b><span>Pode fechar melhor. Ou nada.</span></div></button><button class="ro" data-a="conc" data-v="recusa"><i></i><div><b>Recusar e seguir com o processo</b><span>Apostar na sentença.</span></div></button></div></div>`}
+function vAij(c){if(!c.ai)return `<div class="memo"><div class="mh"><b>Audiência de instrução e julgamento</b><span class="xs mu">${esc(vara(c))}</span></div><div class="mb"><p>${c.juiz.n} entra, todos se levantam. "Vamos começar. Temos pauta cheia." Do outro lado, ${RIVAL.t} arruma as canetas em fila.</p>${leis(['CPC-459','CPC-457','CPC-364'])}</div><div class="desp"><button class="btn full" data-a="aijGo">Entrar na sala (4h)</button></div></div>`;
+  const st=aijSteps(c)[c.ai.i];let h=`<div class="memo"><div class="mh"><b>${esc(st.tit)}</b><span class="xs mu">etapa ${c.ai.i+1} de ${aijSteps(c).length}</span></div><div class="mb"><p>${st.txt}</p></div><div class="desp">`;
+  if(st.tp==='choice'){st.opts.forEach((o,j)=>{h+=`<button class="ro ${c.ai.sel===j?'on':''}" data-a="aijC" data-v="${j}" ${c.ai.shown?'disabled':''}><i></i><div><b>${esc(o.l)}</b></div></button>`});
+    if(c.ai.shown){const o=st.opts[c.ai.sel];h+=`<div class="alert ${o.ok>=1?'ok':o.ok>0?'':'er'}"><div><b>${o.ok>=1?'Boa.':o.ok>0?'Mais ou menos.':'Erro.'}</b>${esc(o.fb)}<div>${leis(o.a)}</div>${chipsH(c.ai.ch)}</div></div><button class="btn full" data-a="aijN">Continuar</button>`}}
+  else{h+=`<label>Perguntas (${c.ai.pk.length}/${st.pick})</label>`;st.qs.forEach((q,j)=>{const done=c.ai.pk.includes(j);h+=`<button class="ro ${done?'on':''}" data-a="aijQ" data-v="${j}" ${done||c.ai.pk.length>=st.pick?'disabled':''}><i></i><div><b>${esc(q.l)}</b>${done?`<span class="serif" style="font-style:italic;font-size:14px;color:var(--tx2)">${esc(q.ans.replace('doutor(a)',DOUT()))}</span>${q.a?`<div>${leis(q.a)}</div>`:''}`:''}</div></button>`});
+    if(c.ai.pk.length>=st.pick)h+=`<button class="btn full" data-a="aijN">Continuar</button>`}
+  return h+'</div></div>'}
+function vAlg(c){const A=TPL[c.t].alg(c),R=c.algR;let h=`<div class="memo"><div class="mh"><b>Alegações finais orais</b><span class="xs mu">20 minutos, prorrogáveis por 10</span></div><div class="mb"><p>"Com a palavra, o advogado ${c.lado==='autor'?'do autor':'do réu'}." O silêncio da sala pesa. ${esc(first(c.cli.n))} segura a respiração ao seu lado.</p>${lei('CPC-364')}<p class="sm mu" style="font-family:var(--sans);margin-top:8px">Escreva como se estivesse falando ao juiz: os fatos, as provas produzidas, o direito e o pedido. Citar fato do caso vale mais que juridiquês. E nunca admita nada contra o seu cliente.</p></div><div class="desp">`;
+  if(!R)h+=`<textarea data-in="txt" id="ans" placeholder="Excelência, ...">${esc(UI.txt)}</textarea><div style="height:8px"></div><button class="btn full" data-a="alg">Proferir as alegações</button>`;
+  else{h+=`<div class="say">${esc(R.t)}</div><div class="pn"><h3>Avaliação <span>${R.r.s}/100</span></h3><div class="pb">${fbList(R.r.fb.map(f=>({ok:f[0],t:f[1],q:f[2]})))}</div></div><div style="height:12px"></div>`;
+    h+=`<div class="alert pr"><div><b>${esc(c.juiz.n)} interrompe:</b><span class="serif" style="font-size:15px">"${esc(A.q.q.replace('doutor(a)',DOUT()))}"</span></div></div>`;
+    if(!R.q)h+=`<textarea data-in="txt2" id="ans" style="min-height:90px" placeholder="Responda em uma ou duas frases.">${esc(UI.txt2)}</textarea><div style="height:8px"></div><button class="btn full" data-a="alg">Responder ao juiz</button>`;
+    else h+=`<div class="say">${esc(R.qt)}</div><div class="alert ${R.q.s>=60?'ok':'er'}"><div><b>${R.q.s>=80?'Resposta firme.':R.q.s>=60?'Respondeu, sem brilho.':'Resposta fraca.'}</b>${R.q.bad.length?'Cuidado: "'+esc(R.q.bad[0])+'" joga contra o seu cliente.':R.q.s<60?'Faltou enfrentar o ponto que o juiz levantou.':'O juiz anota e acena com a cabeça.'}</div></div><div class="note">Nota final das alegações: <b>${Math.round(c.sc.alg*100)}/100</b>.</div><div style="height:8px"></div><button class="btn full" data-a="algEnd">Encerrar a audiência</button>`}
+  return h+'</div></div>'}
+function waitInfo(c){const G=S.g;if(c.aud)return `Audiência marcada para <b>${fmtL(c.aud.d)}</b>${c.aud.d===G.date?' (hoje)':''}.`;if(c.wait){const n={despacho:'despacho inicial do juiz',tutela:'decisão sobre a tutela de urgência',agravoRes:'julgamento do agravo no '+TJ(),contestRe:'contestação da ré',saneam:'decisão de saneamento',sentenca:'sentença',embRes:'julgamento dos embargos',recRival:'decisão da parte contrária sobre recurso',acordao:'julgamento do recurso',pagto:'pagamento ou penhora'}[c.wait.ev];return `Aguardando: <b>${n}</b>. O cartório não avisa quando: a intimação chega pelo Diário.`}return 'Aguardando.'}
+function vCase(c){const G=S.g,T=TPL[c.t],P=partes(c);let h=`<button class="lnk sm" data-a="tab" data-v="processos">← Processos</button><div style="height:8px"></div>`;
+  h+=`<div class="pn"><div class="li" style="border-bottom:1px solid var(--ln2)"><div class="av">${face(c.cli.n,c.cli.f)}</div><div class="t"><b>${esc(c.cli.n)}</b><span>${c.cli.idade} anos · ${esc(c.cli.prof)}</span><span class="mono xs">${c.num}</span></div><div style="width:90px;text-align:right"><div class="xs mu">satisfação</div>${bar(c.sat)}</div></div>
+  <div class="kv"><div><label>Ação</label><b>${esc(T.nome)}</b></div><div><label>Você representa</label><b>${c.lado==='autor'?'o autor':'o réu'}</b></div><div><label>Rito</label><b>${c.fase==='atend'||c.fase==='estrat'&&c.lado==='autor'?'a definir':c.rito==='jec'?'Juizado Especial Cível':'Procedimento comum'}</b></div><div><label>Juízo</label><b>${c.fase==='atend'||c.fase==='estrat'||c.fase==='inicial'?'—':esc(vara(c))}</b></div><div><label>Partes</label><b style="white-space:normal;font-weight:500;font-size:12.5px">${esc(P.a)} × ${esc(P.r)}</b></div><div><label>Do outro lado</label><b>${RIVAL.t}</b></div></div></div>`;
+  if(c.prazo)h+=`<div style="height:12px"></div><div class="alert ${prazoCls(c.prazo.ate)==='er'?'er':prazoCls(c.prazo.ate)==='wa'?'':'ok'}"><div><b>Prazo: ${esc(c.prazo.lbl)}. Vence ${fmtL(c.prazo.ate)} (${prazoTxt(c.prazo.ate)}).</b>${leis(c.prazo.a)}</div></div>`;else h+='<div style="height:12px"></div>';
+  if(c.fb){h+=`<div class="pn"><h3>${esc(c.fb.tit)}</h3><div class="pb">${c.fb.blocks?blocksFb(c.fb.blocks):fbList(c.fb.items)}${chipsH(c.fb.ch)}<div style="height:10px"></div><button class="btn full" data-a="fbOk">Continuar</button></div></div>`}
+  else if(c.done)h+=`<div class="pn"><h3>Encerrado</h3><div class="pb"><p>${c.how==='acordo'?'Acordo homologado.':c.how==='indef'?'Petição inicial indeferida.':c.how==='ext'?'Processo extinto pela ausência do autor.':'Decisão final: '+({proc:'procedente',parc:'parcialmente procedente',improc:'improcedente'}[c.sent&&c.sent.res]||'—')+'.'}</p><p class="sm">Honorários do escritório: <b>${money(c.fee||0)}</b> · sua parte: <b>${money(c.share||0)}</b></p>${c.sent?`<button class="btn sec sm" data-a="reSent" data-v="${c.id}">Reler a sentença</button>`:''}</div></div>`;
+  else if(c.fase==='atend')h+=vAtend(c);
+  else if(['estrat','replica','saneamento','agravo','pos','cumpr'].includes(c.fase)){if(c.fase==='pos')h+=`<button class="btn sec sm" data-a="reSent" data-v="${c.id}" style="margin-bottom:10px">Reler a sentença</button>`;h+=vForm(c)}
+  else if(c.fase==='inicial'||c.fase==='contest')h+=c.m?vMont(c,'case'):`<div class="memo"><div class="mh"><b>${c.fase==='inicial'?'Petição inicial':'Contestação'}</b><span class="xs mu">5h no protocolo</span></div><div class="mb"><p>${c.fase==='inicial'?'Hora de transformar a história em peça. Endereçamento, qualificação, fatos, fundamentos, pedidos, valor da causa e provas.':'Toda a matéria de defesa vai aqui. O que não for impugnado presume-se verdadeiro.'}</p>${leis(c.fase==='inicial'?['CPC-319','CPC-292']:['CPC-335','CPC-336','CPC-341'])}</div><div class="desp"><button class="btn full" data-a="mStart">Abrir o Montador de Peças</button></div></div>`;
+  else if(c.fase==='emenda')h+=`<div class="memo"><div class="mh"><b>Emenda da inicial</b><span class="xs mu">2h</span></div><div class="mb"><p>O juiz mandou corrigir: ${esc(c.emenda.join('; '))}.</p>${lei('CPC-321')}</div><div class="desp"><button class="btn full" data-a="emendar">Emendar e protocolar (2h)</button></div></div>`;
+  else if(c.fase==='conc'&&c.aud&&c.aud.d===G.date)h+=vConc(c);
+  else if(c.fase==='aij'&&c.aud&&c.aud.d===G.date||c.ai)h+=vAij(c);
+  else if(c.fase==='alg')h+=vAlg(c);
+  else h+=`<div class="pn"><h3>Andamento</h3><div class="pb sm">${waitInfo(c)}</div></div>`;
+  h+=`<div class="pn"><h3>Autos <span>${c.autos.length} atos</span></h3>${c.autos.length?`<ul class="tl">${c.autos.slice().reverse().map(x=>`<li><div class="d">${fmtD(x.d)}</div>${esc(x.t)}</li>`).join('')}</ul>`:'<div class="empty">Ainda não há processo: o caso está no escritório.</div>'}</div>`;
+  return h}
+
+/* ---------- janelas ---------- */
+function prazoBox(p){if(!p)return '';const skip=[];let d=p.ini;while(d<p.ate){d=addD(d,1);if(isWork(d)&&isRec(d)){if(!skip.includes('recesso'))skip.push('recesso')}else if(isFer(d)&&wd(d)%6)skip.push('feriado de '+fmtDs(d))}
+  return `<div class="pz">Publicação: <b>${fmtL(p.ini)}</b>. A contagem começa no primeiro dia útil seguinte. <b>${p.n} dias úteis</b> → vence <b>${fmtL(p.ate)}</b>.${skip.length?' Não contam: '+skip.join(', ')+'.':''}<div>${leis(['CPC-219','CPC-224'].concat(skip.includes('recesso')?['CPC-220']:[]))}</div></div>`}
+function vPop(){const G=S.g,P=G.pop[0];if(!P)return '';const c=P.c?byId(P.c):null;
+  if(P.k==='sent')return vSent(c,true);
+  if(P.k==='dje')return `<div class="ov"><div class="md dje"><div class="mh2"><small>DIÁRIO DA JUSTIÇA ELETRÔNICO · ${TJ()} · ${fmtD(G.date)}</small><h2>${esc(P.tit)}</h2></div><div class="mbd"><div class="proc">Processo ${c?c.num:''} · ${c?esc(vara(c)):''}<br>Cliente: ${c?esc(c.cli.n):''}</div><p style="margin:0">${esc(P.txt)}</p><div style="margin-top:8px">${leis(P.a)}</div>${prazoBox(P.pz)}</div><div class="mft">${c&&!c.done?`<button class="btn sec" data-a="popOpen" data-v="${c.id}">Abrir o processo</button>`:''}<button class="btn" data-a="popOk">Ciente</button></div></div></div>`;
+  if(P.k==='novo'){const T=TPL[c.t];return `<div class="ov"><div class="md"><div class="mh2"><small>Novo caso · ${esc(T.area)}</small><h2>${esc(T.nome)}</h2></div><div class="mbd"><div class="row" style="align-items:flex-start;flex-wrap:nowrap"><div class="av" style="width:56px;height:56px">${face(c.cli.n,c.cli.f)}</div><div><b>${esc(c.cli.n)}</b><div class="sm mu">${c.cli.idade} anos · ${esc(c.cli.prof)}</div><p class="sm" style="margin:6px 0 0">${c.lado==='autor'?'Quer entrar com uma ação.':'Foi processado e precisa de defesa.'} ${c.lado==='reu'?`O advogado do autor é o ${RIVAL.t}.`:''}</p></div></div></div><div class="mft"><button class="btn sec" data-a="popOk">Depois</button><button class="btn" data-a="popOpen" data-v="${c.id}">Atender agora</button></div></div></div>`}
+  if(P.k==='info')return `<div class="ov"><div class="md"><div class="mh2"><small>${esc(P.sub||'Aviso')}</small><h2>${esc(P.tit)}</h2></div><div class="mbd big">${P.txt}</div><div class="mft">${P.c&&c&&!c.done?`<button class="btn sec" data-a="popOpen" data-v="${c.id}">Abrir o processo</button>`:''}<button class="btn" data-a="popOk">Entendi</button></div></div></div>`;
+  if(P.k==='miss')return `<div class="ov" style="background:rgba(80,0,0,.7)"><div class="md" style="border-top-color:var(--er)"><div class="mh2"><small style="color:var(--er)">Prazo perdido · ${esc(P.lbl)} · venceu em ${fmtD(P.ate)}</small><h2>${c?esc(c.cli.n):''}</h2></div><div class="mbd"><p class="big" style="margin-top:0">${esc(P.t)}</p>${leis(P.a)}${P.rep?`<div class="alert er" style="margin-top:10px"><div><b>Representação na OAB</b>O cliente levou o caso ao Tribunal de Ética.${leis(['EAOAB-34'])}</div></div>`:''}${chipsH(P.ch)}<p class="sm mu">"${esc(MENTOR.t)}: aqui ninguém perde prazo." Você lembra da frase a noite inteira.</p></div><div class="mft"><button class="btn er" data-a="popOk">Assumir o erro</button></div></div></div>`;
+  if(P.k==='ev'){const E=EVT.find(e=>e.id===P.id),w=P.who;let h=`<div class="ov"><div class="md"><div class="mh2"><small>Dilema · ${esc(w.r)}</small><h2>${esc(E.tit)}</h2></div><div class="mbd"><div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="av" style="width:52px;height:52px">${face(w.n,w.f)}</div><div class="story">${E.scene(w)}</div></div><div style="height:10px"></div>`;
+    E.opts.forEach((o,i)=>{h+=`<button class="ro ${P.sel===i?'on':''}" data-a="evC" data-v="${i}" ${P.sel!=null?'disabled':''}><i></i><div><b>${esc(o.l)}</b></div></button>`});
+    if(P.sel!=null){const o=E.opts[P.sel];h+=`<div class="alert ${o.ok>=1?'ok':o.ok>0?'':'er'}"><div><b>${o.ok>=1?'Conduta correta.':o.ok>0?'Zona cinzenta.':'Infração.'}</b>${esc(o.fb)}<div>${leis(o.a)}</div>${o.inf?'<div class="er b sm" style="margin-top:4px">Gerou representação no Tribunal de Ética e Disciplina.</div>':''}${chipsH(P.ch)}</div></div>`}
+    return h+`</div>${P.sel!=null?'<div class="mft"><button class="btn" data-a="popOk">Continuar</button></div>':''}</div></div>`}
+  if(P.k==='epi'){const w=c.win;const head=c.how==='acordo'?'Acordo fechado':['indef','ext'].includes(c.how)?'Processo encerrado sem julgamento do mérito':w>=1?'Vitória':w>0?'Vitória parcial':'Derrota';
+    const rl=c.how==='acordo'?`${RIVAL.t} recolhe os papéis. "Foi um prazer, ${DOUT()}." Não pareceu.`:w>=1?`No corredor, ${RIVAL.t} passa sem olhar. Depois volta dois passos. "Boa audiência." E vai embora.`:`${RIVAL.t} ajeita a abotoadura. "Volte quando tiver mais estrada, ${DOUT()}."`;
+    return `<div class="ov"><div class="md" style="border-top-color:${w>=1?'var(--ok)':w>0?'var(--go)':'var(--er)'}"><div class="mh2"><small>${esc(TPL[c.t].nome)} · epílogo</small><h2>${head}</h2></div><div class="mbd"><div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="av" style="width:56px;height:56px">${face(c.cli.n,c.cli.f)}</div><div class="story">${TPL[c.t].epi(c,w>=.5||c.how==='acordo')}</div></div><p class="sm mu">${rl}</p><div class="pz">Honorários do escritório: <b>${money(c.fee||0)}</b> · sua parte (25%): <b>${money(c.share||0)}</b></div>${chipsH(P.ch)}</div><div class="mft"><button class="btn" data-a="popOk">Fechar o processo</button></div></div></div>`}
+  if(P.k==='ted'){const t=['','Censura','Suspensão','Exclusão'][P.lv];return `<div class="ov" style="background:rgba(30,0,0,.75)"><div class="md" style="border-top-color:var(--er)"><div class="mh2"><small style="color:var(--er)">Tribunal de Ética e Disciplina · OAB/${S.uf}</small><h2>${t}</h2></div><div class="mbd big"><p>${P.lv===3?'Seis representações. O Conselho Seccional decide pela sua exclusão dos quadros da Ordem. A carteira vermelha volta para a gaveta da Seccional.':P.lv===2?'O Tribunal de Ética aplica a suspensão. Clientes leem no Diário. Alguns ligam; outros não ligam mais.':'O Tribunal de Ética aplica a pena de censura. Fica no seu histórico. A próxima será pior.'}</p>${leis(['EAOAB-35',P.lv===3?'EAOAB-38':'EAOAB-36'])}</div><div class="mft"><button class="btn er" data-a="popOk">${P.lv===3?'Fim da carreira':'Seguir em frente'}</button></div></div></div>`}
+  return ''}
+function vSent(c,isPop){const st=c.sent,T=sentText(c),w=winOf(c),cls=w>=1?'w':w>0?'p':'l',n=T.L.length;
+  return `<div class="sent"><div class="pg"><div class="hdr"><b>PODER JUDICIÁRIO · ${TJ()}</b>${esc(vara(c))}<br><span class="mono">Processo ${c.num}</span></div><p style="text-align:center;letter-spacing:.14em;font-family:var(--sans);font-weight:700;animation-delay:.1s">SENTENÇA</p>${T.L.map((l,i)=>`<p class="${i===n-3?'dsp':''}" style="animation-delay:${.5+i*.9}s">${l}</p>`).join('')}
+  <div class="stamp ${cls}" style="animation-delay:${.5+(n-3)*.9+.6}s">${T.lbl}</div>
+  <div class="after" style="animation-delay:${.5+n*.9+.4}s"><div class="hr"></div><b class="sm" style="font-family:var(--sans)">Por que ${w>=1?'você venceu':w>0?'a vitória foi parcial':'você perdeu'}</b><ul class="fb" style="margin-top:6px">${st.F.map(f=>`<li class="${f.sg>0?'y':f.sg<0?'n':''}"><i>${f.sg>0?'+':f.sg<0?'−':'·'}</i><div class="sm" style="font-family:var(--sans)">${esc(f.t)}${f.a?`<div>${leis(f.a)}</div>`:''}</div></li>`).join('')}</ul><p class="xs mu" style="font-family:var(--sans)">Força da causa estimada: ${Math.round(st.s*100)}/100 · chance de êxito: ${Math.round(st.p*100)}%</p><button class="btn full" data-a="${isPop?'popOk':'sentClose'}">${isPop?'Continuar':'Fechar'}</button></div></div></div>`}
+function vNews(){return `<div class="ov" data-a="newsClose"><div class="md" data-stop="1"><div class="mh2"><small>Novidades · versão ${VERSION}</small><h2>${esc(CHANGELOG[0].t)}</h2></div><div class="mbd">${CHANGELOG.map(c=>`<div class="b sm">${c.v} · ${c.d}</div><ul class="fb">${c.i.map(x=>`<li class="y"><i>✓</i><div class="sm">${esc(x)}</div></li>`).join('')}</ul>`).join('<div class="hr"></div>')}<div class="hr"></div><div class="b sm">Próximas atualizações</div><ul class="fb">${ROADMAP.map(x=>`<li><i>○</i><div class="sm">${esc(x)}</div></li>`).join('')}</ul><p class="note">Seu save continua valendo nas próximas versões.</p></div><div class="mft"><button class="btn" data-a="newsClose">Fechar</button></div></div></div>`}
+function vConfirm(){return `<div class="ov"><div class="md"><div class="mh2"><small>Nova carreira</small><h2>Começar do zero?</h2></div><div class="mbd"><p>A carreira atual será apagada: processos, clientes, Vade Mecum estudado e o placar contra o ${RIVAL.t}.</p></div><div class="mft"><button class="btn sec" data-a="confNo">Cancelar</button><button class="btn er" data-a="new">Apagar e recomeçar</button></div></div></div>`}
+function vFim(){const G=S.g;return `<div class="cover"><div class="frame"></div><div class="kick">Fim da carreira</div><h1 style="font-size:clamp(40px,9vw,72px)">EXCLUÍD${g('A','O')}</h1><div class="tag">O Tribunal de Ética falou por último.</div><div class="lines">${G.stats.closed} processos encerrados · ${G.stats.won} vitórias · ${G.inf} representações · ${S.vm.n} artigos estudados.<br><br>A advocacia é feita de prazos, de clientes e de ética. Faltou a terceira.</div><div class="btns"><button class="btn gold" data-a="new">Nova carreira</button><button class="btn sec" data-a="cover">Capa</button></div></div>`}
+
+/* ---------- render ---------- */
+function render(){let h='';
+  if(UI.screen==='cover')h=vCover();else if(UI.screen==='setup')h=vSetup();
+  else if(S){switch(S.phase){case 'tut':h=vTut();break;case 'oab1':h=vOab1();break;case 'oab1res':h=vOab1Res();break;case 'oab2':h=vOab2();break;case 'oab2res':h=vOab2Res();break;case 'posse':h=vPosse();break;case 'fim':h=vFim();break;
+    default:{let inner;if(UI.open&&byId(UI.open))inner=vCase(byId(UI.open));else inner={painel:vPainel,processos:vProcessos,prazos:vPrazos,clientes:vClientes,escritorio:vEscritorio,vade:vVade,oab:vOAB}[UI.tab]();h=shell(inner);if(S.g.pop.length)h+=vPop();if(UI.sent)h+=vSent(byId(UI.sent),false)}}
+    if(S.phase!=='car'&&UI.tab==='vade'&&S.phase!=='fim')h=preBar('Vade Mecum')+`<div class="wrap" style="margin:0 auto;max-width:760px"><button class="lnk sm" data-a="vmBack">← Voltar</button><div style="height:8px"></div>${vVade()}</div>`;}
+  if(UI.vm)h+=vDrawer();if(UI.modal==='news')h+=vNews();if(UI.modal==='confirm')h+=vConfirm();
+  if(UI.toast)h+=`<div class="toast">${esc(UI.toast)}</div>`;
+  const fa=document.activeElement,fid=fa&&fa.dataset?fa.dataset.in:null,pos=fa&&fa.selectionStart;
+  $.innerHTML=h;document.body.classList.toggle('dark',UI.screen==='cover'||(S&&S.phase==='fim'&&UI.screen==='game'));
+  if(fid){const t=$.querySelector(`[data-in="${fid}"]`);if(t){t.focus();try{t.selectionStart=t.selectionEnd=pos}catch(e){}}}
+}
+setInterval(()=>{if(!S||UI.screen!=='game')return;let dl,tot;if(S.phase==='oab1'&&!S.ex.shown){dl=S.ex.dl;tot=QT}else if(S.phase==='oab2'&&S.p2.st==='peca'){dl=S.p2.dl;tot=PT}else return;
+  const left=Math.max(0,dl-Date.now()),t=document.getElementById('tt'),b=document.getElementById('tb'),x=document.getElementById('tx');if(t)t.textContent=fmtT(left);if(b)b.style.width=(left/tot*100)+'%';if(x)x.classList.toggle('low',left<tot*.15);
+  if(left<=0){if(S.phase==='oab1'){for(let i=S.ex.i;i<20;i++)if(S.ex.ans[i]==null)S.ex.ans[i]=-1;S.phase='oab1res';toast('Tempo esgotado. Prova recolhida.')}else{examPeca()}save();render()}},500);
+
+/* ---------- ações ---------- */
+function startOab1(){const used=new Set(S.usedQ);let pickQ=[];Object.keys(DIST).forEach(d=>{let pool=QB.map((q,i)=>i).filter(i=>QB[i].d===d&&!used.has(i));if(pool.length<DIST[d])pool=QB.map((q,i)=>i).filter(i=>QB[i].d===d);pickQ=pickQ.concat(shuffle(pool).slice(0,DIST[d]))});pickQ=shuffle(pickQ);
+  S.usedQ=S.usedQ.concat(pickQ);S.ex={q:pickQ,perm:pickQ.map(()=>shuffle([0,1,2,3])),i:0,ans:[],dl:Date.now()+QT,shown:false};S.phase='oab1';save();render();top()}
+function startOab2(){const c={t:'neg',num:'—',lado:'autor',rito:'jec',rev:{prot:1,ext:1},asked:[],sc:{},autos:[],m:null};Object.assign(c,TPL.neg.make());c.rito='jec';c.hid.outra=false;c.hid.prot=true;c.rev={prot:1};
+  S.p2={st:'peca',c,dl:Date.now()+PT,sc:0,res:null,disc:{q:shuffle(D2.map((x,i)=>i)).slice(0,4),i:0,ans:[]}};S.phase='oab2';save();render();top()}
+function examPeca(){const P=S.p2;if(P.st!=='peca')return;mInit(P.c);P.sc=protocol(P.c,'exam')||0;P.res=P.c.mres.res;P.st='disc';save();render();top()}
+function curCase(){return UI.open?byId(UI.open):null}
+function act(a,v,el){const G=S&&S.g,c=S&&S.phase==='car'?curCase():(S&&S.phase==='oab2'?S.p2.c:null);
+  switch(a){
+  case 'new':store.del(KEY);S=null;UI.modal=null;UI.screen='setup';UI.setup.nome='';render();top();break;
+  case 'askNew':UI.modal='confirm';render();break;case 'confNo':UI.modal=null;render();break;
+  case 'cover':UI.screen='cover';UI.open=null;UI.vm=null;render();top();break;
+  case 'continue':S=load();if(S){UI.screen='game';UI.tab='painel';UI.open=null;if(S.seenV!==VERSION){S.seenV=VERSION;UI.modal='news';save()}render();top()}break;
+  case 'sx':UI.setup.sx=v;render();break;
+  case 'start':newGame();UI.screen='game';render();top();break;
+  case 'news':UI.modal='news';render();break;case 'newsClose':UI.modal=null;render();break;
+  case 'mute':UI.mute=!UI.mute;store.set('suits_mute',UI.mute?'1':'0');render();break;
+  case 'tut':S.tut++;save();render();top();break;
+  case 'tutPick':S.tutA=v;snd(v===addUteis('2027-04-16',5)?'ok':'no');save();render();break;
+  case 'oab1':startOab1();break;
+  case 'ans1':if(S.ex.shown)return;S.ex.ans[S.ex.i]=+v;S.ex.shown=true;snd(+v===QB[S.ex.q[S.ex.i]].c?'ok':'no');save();render();break;
+  case 'next1':if(S.ex.i<19){S.ex.i++;S.ex.shown=false}else S.phase='oab1res';save();render();top();break;
+  case 'retry1':S.exN++;S.g.date=addD(S.g.date,120);S.g.cx-=300;S.g.ind.st=clamp(S.g.ind.st+10,0,100);startOab1();break;
+  case 'oab2':startOab2();break;
+  case 'ans2':{const D=S.p2.disc;if(D.ans[D.i]!=null)return;D.ans[D.i]=+v;snd(+v===D2[D.q[D.i]].c?'ok':'no');save();render();break}
+  case 'next2':{const D=S.p2.disc;if(D.i<3)D.i++;else S.phase='oab2res';save();render();top();break}
+  case 'retry2':S.exN++;S.g.date=addD(S.g.date,120);S.g.cx-=300;S.g.ind.st=clamp(S.g.ind.st+8,0,100);startOab2();break;
+  case 'posse':S.phase='posse';save();render();top();break;
+  case 'prometo':S.g.oab=`OAB/${S.uf} ${RI(140,320)}.${String(RI(0,999)).padStart(3,'0')}`;snd('win');startCareer();render();top();break;
+  case 'tab':UI.tab=v;UI.open=null;render();top();break;
+  case 'open':case 'popOpen':if(a==='popOpen'){G.pop.shift()}UI.open=v;UI.tab='processos';save();render();top();break;
+  case 'popOk':{const P=G.pop.shift();if(P&&P.k==='ted'&&P.lv===3){S.phase='fim'}save();render();break}
+  case 'evC':evChoose(+v);break;
+  case 'end':endDay();render();top();break;
+  case 'ff':fastForward();break;
+  case 'night':if(G.night)return;G.night=true;G.h+=4;bump('st',3);toast('Café, silêncio e a luz da tela. +4 horas.');save();render();break;
+  case 'ask':ask(c,+v);break;case 'endAt':if(c.asked.length<1)return toast('Faça ao menos uma pergunta.');endAtend(c);break;
+  case 'fSel':{const [gid,j]=v.split(':');c.fa=c.fa||{};c.fa[gid]=+j;render();break}
+  case 'fGo':submitForm(c);break;
+  case 'fbOk':c.fb=null;save();render();top();break;
+  case 'mStart':c.m={i:0,a:{}};save();render();top();break;
+  case 'mSel':mInit(c).a[montBlocks(c)[c.m.i].k].sel=+v;render();break;
+  case 'mVal':mInit(c).a.valor.sel=+v;render();break;
+  case 'mChk':{const A=mInit(c).a[montBlocks(c)[c.m.i].k];A.ch[v]=!A.ch[v];render();break}
+  case 'mUp':case 'mDn':{const A=mInit(c).a.fatos,i=+v,j=a==='mUp'?i-1:i+1;[A.ord[i],A.ord[j]]=[A.ord[j],A.ord[i]];render();break}
+  case 'mOff':{const A=mInit(c).a.fatos;A.off[v]=!A.off[v];render();break}
+  case 'mImp':{const [i,x]=v.split(':');mInit(c).a.imp.v[i]=+x;render();break}
+  case 'mNext':{const b=montBlocks(c)[c.m.i],A=c.m.a[b.k];if((b.k==='end'||b.k==='prelim'||b.k==='valor')&&A.sel==null)return toast('Escolha uma opção.');if(b.k==='imp'&&Object.keys(A.v).length<b.items.length)return toast('Decida sobre todos os fatos.');c.m.i++;mInit(c);save();render();top();break}
+  case 'mPrev':c.m.i=Math.max(0,c.m.i-1);render();top();break;
+  case 'mProt':{const b=montBlocks(c)[c.m.i];if(b.k==='valor'&&c.m.a.valor.sel==null)return toast('Escolha o valor da causa.');protocol(c,'case');break}
+  case 'mExam':{const b=montBlocks(c)[c.m.i];if(c.m.a[b.k]&&c.m.a[b.k].sel==null&&b.k==='valor')return toast('Escolha o valor da causa.');examPeca();break}
+  case 'emendar':if(!spend(2))return;c.emenda=[];auto(c,'Emenda à inicial protocolada.');c.prazo=null;waitEv(c,'despacho',RI(3,6));fx([['jz',-1]]);save();render();break;
+  case 'conc':concDo(c,v);break;
+  case 'aijGo':aijStart(c);break;case 'aijC':aijChoose(c,+v);break;case 'aijQ':aijAsk(c,+v);break;case 'aijN':aijNext(c);break;
+  case 'alg':algSubmit(c);break;case 'algEnd':algFinish(c);break;
+  case 'reSent':UI.sent=v;render();break;case 'sentClose':UI.sent=null;render();break;
+  case 'vm':UI.vm=v;save();render();break;case 'vmClose':UI.vm=null;render();break;
+  case 'locked':toast('Artigo lacrado: ele abre quando aparecer no jogo.');break;
+  case 'vmTab':UI.prevPhaseTab=UI.tab;UI.tab='vade';render();top();break;
+  case 'vmBack':UI.tab='painel';render();top();break;
+  case 'vc':UI.vc=v;render();break;case 'vf':UI.vf=!UI.vf;render();break;
+  case 'fav':S.vm.fav[v]=!S.vm.fav[v];save();render();break;
+  case 'hl':{const sel=String(window.getSelection?window.getSelection():'').trim();if(sel.length<3)return toast('Selecione um trecho do texto primeiro.');const A=getArt(v);if(!A.t.includes(sel))return toast('Selecione dentro do texto do artigo.');S.vm.hl[v]=(S.vm.hl[v]||[]).concat([sel]);save();render();break}
+  case 'unhl':S.vm.hl[v]=[];save();render();break;
+  }
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;if(b.classList.contains('ov')&&e.target!==b)return;act(b.dataset.a,b.dataset.v,b)});
+document.addEventListener('input',e=>{const t=e.target,k=t.dataset&&t.dataset.in;if(!k)return;if(k==='nome')UI.setup.nome=t.value;else if(k==='vq'){UI.vq=t.value;render()}else if(k==='txt')UI.txt=t.value;else if(k==='txt2')UI.txt2=t.value});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.ch==='uf')UI.setup.uf=t.value});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(UI.vm){UI.vm=null;render()}else if(UI.modal){UI.modal=null;render()}}});
+if(location.hash==='#dev')window.__suits={get S(){return S},act,render,UI};
+render();
+})();
+</script>
+<script src="./bnf-config.js"></script>
+<script src="./bnf-analytics.js" data-page="Suits"></script>
+</body>
+</html>
