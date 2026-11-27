@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4A1420">
+<meta name="description" content="Suits — simulador de carreira na advocacia: Exame da OAB, processos do CPC e do Juizado do começo ao fim, prazos em dias úteis, um rival no tribunal e o Vade Mecum na mão. Grátis.">
+<title>Suits</title>
+<link rel="icon" href="./bnf-favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --hd:#4A1420;--hd2:#5E1B29;--bg:#EEEAE2;--pn:#FFFDF9;--pn2:#F6F2EA;--ln:#DDD4C6;--ln2:#EAE4D8;
+  --tx:#231A17;--tx2:#4A3F3A;--mu:#6E625B;--mu2:#9A8F86;
+  --pr:#7A2433;--pr2:#F6E9EA;--go:#A8843A;--go2:#F5EDD9;--ok:#1E6B45;--ok2:#E4F1E8;--wa:#8F5F00;--wa2:#FBF0D3;--er:#B42318;--er2:#FBE9E6;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;--serif:'IBM Plex Serif',Georgia,serif;
+  --sw:232px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:14px;line-height:1.45}
+body{overflow-x:hidden}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0;text-align:left}
+button:disabled{cursor:not-allowed;opacity:.45}
+:focus-visible{outline:2px solid var(--go);outline-offset:1px}
+.mono{font-family:var(--mono)} .serif{font-family:var(--serif)} .mu{color:var(--mu)} .mu2{color:var(--mu2)} .ok{color:var(--ok)} .er{color:var(--er)} .wa{color:var(--wa)} .pr{color:var(--pr)} .go{color:var(--go)}
+.sm{font-size:12.5px} .xs{font-size:11.5px} .b{font-weight:600} .c{text-align:center}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sp{flex:1}
+
+/* ---------- casca: barra lateral ---------- */
+.side{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--hd);color:#E8D6DA;display:flex;flex-direction:column;z-index:40}
+.brandbox{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brandbox .lg{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:.22em;color:#fff}
+.brandbox .lg i{font-style:normal;color:var(--go)}
+.brandbox .who{font-size:11.5px;color:#C9AEB4;margin-top:4px;line-height:1.35}
+.brandbox .who b{color:#fff;font-weight:600}
+.nav{padding:8px 0;flex:1;overflow:auto}
+.nav button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 18px;color:#E2CDD2;font-size:13.5px;font-weight:500;border-left:3px solid transparent}
+.nav button:hover{background:rgba(255,255,255,.04)}
+.nav button.on{background:rgba(255,255,255,.08);border-left-color:var(--go);color:#fff;font-weight:600}
+.nav i{font-style:normal;min-width:18px;height:18px;line-height:18px;text-align:center;border-radius:9px;background:var(--go);color:#2A0C12;font-size:10.5px;font-weight:700;padding:0 5px}
+.nav i.r{background:#E0483A;color:#fff}
+.sfoot{padding:12px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:11.5px;display:flex;flex-direction:column;gap:6px}
+.sfoot button{color:#C9AEB4} .sfoot button:hover{color:#fff}
+.main{margin-left:var(--sw);min-height:100vh;padding-bottom:84px}
+.mobhd{display:none}
+@media (max-width:759px){
+  .side{position:sticky;bottom:auto;width:100%;height:auto;flex-direction:column}
+  .brandbox{display:none}
+  .mobhd{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;gap:10px}
+  .mobhd .lg{font-family:var(--serif);font-weight:700;letter-spacing:.2em;color:#fff;font-size:16px}
+  .mobhd .lg i{font-style:normal;color:var(--go)}
+  .mobhd span{font-size:11px;color:#C9AEB4;text-align:right;line-height:1.3}
+  .nav{display:flex;overflow-x:auto;padding:0;scrollbar-width:none;background:var(--hd2)}
+  .nav::-webkit-scrollbar{display:none}
+  .nav button{width:auto;flex-shrink:0;border-left:0;border-bottom:2px solid transparent;padding:10px 12px;gap:6px;font-size:13px}
+  .nav button.on{border-bottom-color:var(--go);background:transparent}
+  .sfoot{display:none}
+  .main{margin-left:0}
+}
+
+/* ---------- barra de indicadores ---------- */
+.ibar{background:var(--pn);border-bottom:1px solid var(--ln);display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.ibar>div{padding:8px 12px;border-right:1px solid var(--ln2);min-width:0}
+.ibar>div:last-child{border-right:0}
+.ibar label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ibar b{display:block;font-size:14px;font-weight:600;font-family:var(--mono);white-space:nowrap}
+.ibar .bar{margin-top:4px}
+@media (max-width:759px){.ibar{grid-template-columns:repeat(4,minmax(0,1fr))}.ibar>div{padding:6px 8px;border-bottom:1px solid var(--ln2)}.ibar b{font-size:13px}}
+.bar{height:4px;background:var(--ln2);border-radius:1px;overflow:hidden;min-width:40px}
+.bar>div{height:100%;background:var(--pr)}
+.bar.st>div{background:var(--wa)}
+
+.wrap{padding:16px;max-width:900px}
+@media (max-width:759px){.wrap{padding:12px}}
+.ttl{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:2px 0 12px;flex-wrap:wrap}
+.ttl h1{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;font-family:var(--serif)}
+.ttl .sub{font-size:12px;color:var(--mu)}
+
+/* painéis */
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:3px;overflow:hidden}
+.pn+.pn,.pn+.memo,.memo+.pn,.memo+.memo,.alert+.pn{margin-top:12px}
+.pn>h3{margin:0;padding:8px 12px;background:var(--pn2);border-bottom:1px solid var(--ln);font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tx2);display:flex;justify-content:space-between;gap:8px}
+.pn>h3 span{font-weight:500;letter-spacing:0;text-transform:none;color:var(--mu)}
+.pb{padding:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:759px){.grid2{grid-template-columns:1fr}}
+.grid2>.pn+.pn{margin-top:0}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.kv>div{padding:9px 12px;border-bottom:1px solid var(--ln2);border-right:1px solid var(--ln2);min-width:0}
+.kv>div:nth-child(2n){border-right:0}
+.kv label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu2);font-weight:600}
+.kv b{display:block;font-size:13.5px;font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis}
+.li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-bottom:1px solid var(--ln2);width:100%}
+.li:last-child{border-bottom:0}
+button.li:hover{background:#FBF8F2}
+.li .t{flex:1;min-width:0}
+.li .t b{display:block;font-size:13.5px;font-weight:600}
+.li .t span{display:block;font-size:12px;color:var(--mu);margin-top:1px}
+.empty{padding:18px 12px;color:var(--mu);font-size:12.5px;text-align:center}
+
+/* tabelas */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{background:var(--pn2);text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);font-weight:700;padding:7px 10px;border-bottom:1px solid var(--ln);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--ln2);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr.ck{cursor:pointer} tr.ck:hover td{background:#FBF8F2}
+
+/* selos e chips */
+.bd{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:2px;background:var(--pn2);color:var(--mu);border:1px solid var(--ln);white-space:nowrap;font-family:var(--sans)}
+.bd.ok{background:var(--ok2);color:var(--ok);border-color:#B5D9C2}
+.bd.wa{background:var(--wa2);color:var(--wa);border-color:#EDD594}
+.bd.er{background:var(--er2);color:var(--er);border-color:#F0BDB6}
+.bd.pr{background:var(--pr2);color:var(--pr);border-color:#E3BFC4}
+.bd.go{background:var(--go2);color:#7A5E20;border-color:#E2CF9F}
+.pulse{animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 3px rgba(180,35,24,.18)}}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid var(--ln);background:#fff;font-family:var(--mono)}
+.chip.up{color:var(--ok);border-color:#B5D9C2;background:var(--ok2)}
+.chip.dn{color:var(--er);border-color:#F0BDB6;background:var(--er2)}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:3px;background:var(--pr);color:#fff;font-size:13px;font-weight:600;border:1px solid var(--pr);white-space:nowrap}
+.btn:hover{filter:brightness(1.06)}
+.btn.sec{background:#fff;color:var(--pr);border-color:#D9B5BB}
+.btn.gold{background:var(--go);border-color:var(--go);color:#fff}
+.btn.er{background:#fff;color:var(--er);border-color:#F0B8B1}
+.btn.full{width:100%;height:42px}
+.btn.sm{height:30px;padding:0 10px;font-size:12px}
+.lnk{color:var(--pr);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.lei{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--pr);background:var(--pr2);border:1px solid #E3BFC4;border-radius:2px;padding:1px 6px;margin:2px 4px 2px 0;white-space:nowrap}
+.lei:hover{background:#F0DADD}
+
+/* rodapé de tempo */
+.foot{position:fixed;left:var(--sw);right:0;bottom:0;z-index:35;background:var(--pn);border-top:1px solid var(--ln);box-shadow:0 -4px 14px rgba(74,20,32,.07);padding:9px 16px calc(9px + env(safe-area-inset-bottom))}
+.foot>div{max-width:868px;display:flex;align-items:center;gap:10px}
+.foot .inf{flex:1;font-size:12px;color:var(--mu);line-height:1.35;min-width:0}
+.foot .inf b{color:var(--tx);font-family:var(--mono)}
+@media (max-width:759px){.foot{left:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom))}.foot .btn{padding:0 10px;font-size:12px}}
+
+/* papel timbrado */
+.memo{background:#fff;border:1px solid var(--ln);border-radius:2px;box-shadow:0 1px 0 var(--ln2)}
+.memo .mh{display:flex;justify-content:space-between;gap:10px;padding:12px 14px 10px;border-bottom:2px solid var(--hd);align-items:flex-end}
+.memo .mh b{font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.memo .mb{padding:14px;font-family:var(--serif);font-size:15px;line-height:1.62;color:#2a211e}
+.memo .mb p{margin:0 0 10px}
+.memo .meta{font-family:var(--sans);font-size:12px;color:var(--mu);margin-bottom:10px;line-height:1.5}
+.memo .meta b{color:var(--tx)}
+.desp{border-top:1px dashed var(--ln);padding:12px 14px 14px;background:var(--pn2)}
+.desp>label,.lbl{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--tx2);margin-bottom:8px}
+.ro{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;width:100%;padding:10px 12px;background:#fff;border:1px solid var(--ln);border-radius:3px;margin-bottom:6px}
+.ro:hover{border-color:#D4B3B9}
+.ro i{width:16px;height:16px;border-radius:50%;border:2px solid var(--mu2);margin-top:2px}
+.ro.cb i{border-radius:3px}
+.ro.on{border-color:var(--pr);background:var(--pr2)} .ro.on i{border:5px solid var(--pr)}
+.ro.cb.on i{border:2px solid var(--pr);background:var(--pr) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='2.2'/%3E%3C/svg%3E") center/12px no-repeat}
+.ro b{display:block;font-size:13.5px;font-weight:600}
+.ro span{display:block;font-size:12px;color:var(--mu);margin-top:2px}
+.ro.dis{opacity:.5}
+
+.alert{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid #EDD594;background:var(--wa2);border-radius:3px;font-size:12.5px;margin-bottom:12px}
+.alert.er{border-color:#F0BDB6;background:var(--er2)}
+.alert.ok{border-color:#B5D9C2;background:var(--ok2)}
+.alert.pr{border-color:#E3BFC4;background:var(--pr2)}
+.alert b{display:block}
+.note{font-size:11.5px;color:var(--mu);margin:10px 2px 0;line-height:1.5}
+.fb{list-style:none;margin:0;padding:0}
+.fb li{display:grid;grid-template-columns:18px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--ln2);font-size:13px}
+.fb li:last-child{border-bottom:0}
+.fb li>i{font-style:normal;font-weight:700}
+.fb li.y>i{color:var(--ok)} .fb li.n>i{color:var(--er)}
+.fb li q{display:block;font-family:var(--serif);font-style:italic;color:var(--tx2);margin-top:3px;quotes:'“' '”'}
+.input,textarea,select{width:100%;border:1px solid var(--ln);border-radius:3px;background:#fff;padding:9px 10px;font-size:14px}
+textarea{min-height:160px;resize:vertical;font-family:var(--serif);font-size:15px;line-height:1.55}
+.prog{display:flex;gap:3px;margin-bottom:10px}
+.prog>div{flex:1;height:4px;background:var(--ln);border-radius:1px}
+.prog>div.on{background:var(--pr)} .prog>div.dn{background:var(--go)}
+.fact{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:8px 10px;background:#fff;border:1px solid var(--ln);border-radius:3px;margin-bottom:6px;font-family:var(--serif);font-size:14px}
+.fact.off{opacity:.45;text-decoration:line-through}
+.fact .mv{display:flex;flex-direction:column;gap:2px}
+.fact .mv button{width:26px;height:20px;border:1px solid var(--ln);border-radius:2px;font-size:11px;text-align:center;background:var(--pn2)}
+.fact .n{font-family:var(--mono);font-size:11px;color:var(--mu2)}
+.seg{display:inline-flex;border:1px solid var(--ln);border-radius:3px;overflow:hidden}
+.seg button{padding:5px 9px;font-size:12px;font-weight:600;color:var(--mu);font-family:var(--sans);border-right:1px solid var(--ln)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--pr);color:#fff}
+.timer{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.timer .tb{flex:1;height:6px;background:var(--ln);border-radius:1px;overflow:hidden}
+.timer .tb>div{height:100%;background:var(--pr);transition:width .25s linear}
+.timer b{font-family:var(--mono);font-size:14px}
+.timer.low b{color:var(--er)} .timer.low .tb>div{background:var(--er)}
+
+/* autos (linha do tempo) */
+.tl{list-style:none;margin:0;padding:6px 12px 10px}
+.tl li{position:relative;padding:6px 0 6px 18px;font-size:12.5px;border-left:2px solid var(--ln);margin-left:4px}
+.tl li:before{content:'';position:absolute;left:-6px;top:11px;width:10px;height:10px;border-radius:50%;background:var(--pn);border:2px solid var(--pr)}
+.tl li .d{font-family:var(--mono);font-size:11px;color:var(--mu)}
+
+/* cliente */
+.av{width:44px;height:44px;border-radius:3px;overflow:hidden;flex-shrink:0;background:#E9DED2}
+.av svg{display:block;width:100%;height:100%}
+.story{font-family:var(--serif);font-size:15px;line-height:1.6;color:#2a211e}
+.story p{margin:0 0 9px}
+.say{border-left:3px solid var(--go);padding:2px 0 2px 12px;margin:8px 0;font-family:var(--serif);font-style:italic;color:var(--tx2)}
+.msg{padding:9px 12px;border-bottom:1px solid var(--ln2);font-size:13px}
+.msg:last-child{border-bottom:0}
+.msg .h{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--mu);margin-bottom:2px}
+.msg .h b{color:var(--tx);font-weight:600}
+.msg p{margin:0;font-family:var(--serif);font-size:14px}
+
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(26,8,12,.62);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px;animation:fade .18s ease-out}
+.md{background:var(--pn);width:100%;max-width:580px;max-height:90vh;overflow:auto;border-radius:3px;border-top:4px solid var(--hd);box-shadow:0 18px 60px rgba(0,0,0,.35);animation:rise .22s ease-out}
+.md .mh2{padding:14px 16px 10px;border-bottom:1px solid var(--ln)}
+.md .mh2 small{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--go);font-weight:700}
+.md .mh2 h2{margin:3px 0 0;font-family:var(--serif);font-size:20px;line-height:1.25}
+.md .mbd{padding:14px 16px}
+.md .mft{padding:12px 16px;border-top:1px solid var(--ln);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;background:var(--pn2)}
+.dje .mh2{background:#fff;border-bottom:2px solid var(--tx)}
+.dje .mh2 small{color:var(--tx);font-family:var(--mono)}
+.dje .mbd{font-family:var(--serif);font-size:15px;line-height:1.6}
+.dje .proc{font-family:var(--mono);font-size:12px;color:var(--mu);margin-bottom:8px}
+.pz{margin-top:12px;padding:10px 12px;border:1px solid var(--ln);background:var(--pn2);font-family:var(--sans);font-size:12.5px;border-radius:3px}
+.pz b{font-family:var(--mono)}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{transform:translateY(14px);opacity:0}}
+
+/* drawer do Vade Mecum */
+.drw{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--pn);z-index:90;box-shadow:-12px 0 40px rgba(0,0,0,.25);display:flex;flex-direction:column;animation:slide .2s ease-out}
+.drw .dh{background:var(--hd);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.drw .dh b{font-family:var(--serif);font-size:15px}
+.drw .db{padding:14px;overflow:auto;flex:1}
+@keyframes slide{from{transform:translateX(40px);opacity:0}}
+.art{font-family:var(--serif);font-size:15px;line-height:1.62;color:#2a211e;white-space:pre-line}
+.art mark{background:#F6E27A;padding:0 1px}
+.art.lock{color:var(--mu2);font-style:italic}
+.vtag{font-size:10.5px;color:var(--wa);font-weight:600}
+
+/* capa */
+body.dark{background:#170A0E}
+.cover{min-height:100vh;background:#170A0E;color:#EADBD3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;position:relative;overflow:hidden}
+.cover .frame{position:absolute;inset:14px;border:1px solid rgba(168,132,58,.35);pointer-events:none}
+.cover .frame:after{content:'';position:absolute;inset:6px;border:1px solid rgba(168,132,58,.15)}
+.cover .kick{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--go);font-weight:600}
+.cover h1{font-family:var(--serif);font-weight:700;font-size:clamp(64px,15vw,128px);letter-spacing:.2em;margin:12px 0 4px;color:#fff;line-height:1;padding-left:.2em}
+.cover h1 i{font-style:normal;color:var(--go)}
+.cover .tag{font-family:var(--serif);font-style:italic;font-size:19px;color:#D8C2B9;margin-bottom:26px}
+.cover .lines{max-width:520px;font-size:14px;color:#BFA9A2;line-height:1.7;margin-bottom:28px}
+.cover .btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px}
+.cover .btn{height:46px;font-size:14px}
+.cover .btn.sec{background:transparent;color:#EADBD3;border-color:rgba(234,219,211,.35)}
+.cover .ver{margin-top:26px;font-size:11px;color:#8E7770}
+.cover .ver button{color:var(--go);text-decoration:underline}
+.cover .scale{width:64px;height:64px;margin-bottom:6px}
+
+/* sentença */
+.sent{position:fixed;inset:0;z-index:95;background:#120709;color:#EADBD3;overflow:auto;padding:30px 18px 40px;display:flex;justify-content:center}
+.sent .pg{max-width:640px;width:100%;background:#FBF7EF;color:#241a17;padding:26px 24px 30px;border-radius:2px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6);align-self:flex-start}
+.sent .pg .hdr{text-align:center;font-family:var(--sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);border-bottom:2px solid #241a17;padding-bottom:10px;margin-bottom:14px}
+.sent .pg .hdr b{display:block;font-size:13px;color:#241a17;letter-spacing:.1em}
+.sent .pg p{font-family:var(--serif);font-size:15.5px;line-height:1.65;margin:0 0 12px;opacity:0;animation:ln .6s ease-out forwards}
+.sent .pg p.dsp{font-weight:600}
+.sent .stamp{position:absolute;left:50%;top:46%;font-family:var(--serif);font-weight:700;font-size:clamp(26px,7vw,44px);letter-spacing:.08em;padding:8px 18px;border:5px double currentColor;border-radius:4px;opacity:0;transform:translate(-50%,-50%) rotate(-9deg) scale(3);animation:stamp .32s cubic-bezier(.2,1.4,.4,1) forwards;pointer-events:none;white-space:nowrap;background:rgba(251,247,239,.82)}
+.stamp.w{color:#1E6B45}.stamp.p{color:#8F5F00}.stamp.l{color:#B42318}
+.sent .after{opacity:0;animation:ln .5s ease-out forwards;margin-top:16px}
+@keyframes ln{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes stamp{to{opacity:.94;transform:translate(-50%,-50%) rotate(-9deg) scale(1)}}
+.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translate(-6px,2px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,-1px)}}
+
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:99;background:var(--hd);color:#fff;border-radius:3px;padding:10px 15px;font-size:13px;max-width:90vw;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.big{font-family:var(--serif);font-size:16px;line-height:1.65}
+.big p{margin:0 0 12px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-width:380px}
+.cal div,.cal button{padding:7px 0;text-align:center;font-size:12px;border-radius:2px;font-family:var(--mono)}
+.cal .h{font-family:var(--sans);font-size:10px;text-transform:uppercase;color:var(--mu2);font-weight:700}
+.cal button{background:#fff;border:1px solid var(--ln)}
+.cal button.we{background:var(--pn2);color:var(--mu2)}
+.cal button.fe{background:var(--er2);color:var(--er)}
+.cal button.st{background:var(--go2);border-color:var(--go)}
+.cal button.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.cal button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.stepper{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.stepper span{font-size:11px;padding:3px 8px;border-radius:10px;border:1px solid var(--ln);color:var(--mu);background:#fff}
+.stepper span.on{border-color:var(--pr);color:var(--pr);font-weight:600}
+.stepper span.dn{background:var(--ok2);border-color:#B5D9C2;color:var(--ok)}
+.vs{display:flex;align-items:center;gap:12px;padding:12px}
+.vs .sc{font-family:var(--mono);font-size:22px;font-weight:600}
+.hr{height:1px;background:var(--ln2);margin:12px 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ================================================================
+   SUITS — simulador de carreira na advocacia (BNF GAMES)
+   Arquivo único, sem build. Estrutura pensada para atualizações:
+   - VERSION / CHANGELOG / ROADMAP: o que mudou e o que vem
+   - SCHEMA + migrate(): o save antigo continua valendo
+   - Conteúdo em registros: VADE (leis), QB (questões da OAB),
+     TPL (casos), EVT (dilemas éticos). Novo conteúdo = nova entrada.
+   Textos de lei: transcritos para o jogo e marcados como "a conferir"
+   até a conferência na fonte oficial (planalto.gov.br / CFOAB).
+   Pessoas, empresas, escritórios e casos são fictícios.
+================================================================= */
+(function(){
+'use strict';
+const $=document.getElementById('app');
+const R=(a,b)=>a+Math.random()*(b-a);
+const RI=(a,b)=>Math.floor(R(a,b+1));
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const chance=p=>Math.random()<p;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const money=x=>(x<0?'−':'')+'R$ '+Math.abs(Math.round(x)).toLocaleString('pt-BR');
+const SM=1600; /* salário mínimo de referência do jogo */
+
+const VERSION='1.0.0',SCHEMA=1,KEY='suits_v1';
+const CHANGELOG=[
+  {v:'1.0.0',d:'27/11/2026',t:'Temporada 1 — A Beca',i:[
+    'Faculdade, Exame da OAB (1ª e 2ª fase) e cerimônia de compromisso',
+    'Três casos completos: negativação indevida (Juizado), acidente de trânsito (defesa) e plano de saúde com tutela de urgência',
+    'Montador de Peças por blocos: petição inicial e contestação',
+    'Audiências de conciliação e de instrução, com contradita e perguntas às testemunhas',
+    'Alegações finais em texto livre, com pergunta do juiz',
+    'Sentença, embargos, recurso inominado, apelação, agravo e cumprimento de sentença',
+    'Prazos em dias úteis, feriados nacionais e recesso forense',
+    'Dr. Henrique Prado, o rival do outro lado da mesa',
+    'Vade Mecum com busca, favoritos, grifos e desbloqueio',
+    'Oito dilemas éticos e o Tribunal de Ética e Disciplina']}
+];
+const ROADMAP=[
+  'Advogado autônomo: captar clientes, definir honorários e abrir o próprio escritório',
+  'Novos casos: cobrança com prescrição, despejo e alimentos',
+  'Montador para réplica, apelação, contrarrazões, embargos e cumprimento',
+  'Sustentação oral no Tribunal de Justiça',
+  'Equipe: estagiários, associados e sociedade'
+];
+
+const store={mem:{},set(k,v){try{localStorage.setItem(k,v)}catch(e){this.mem[k]=v}},get(k){try{const r=localStorage.getItem(k);return r===null?(this.mem[k]||null):r}catch(e){return this.mem[k]||null}},del(k){try{localStorage.removeItem(k)}catch(e){}delete this.mem[k]}};
+let S=null;
+const UI={screen:'cover',tab:'painel',open:null,setup:{nome:'',sx:'f',uf:'MG'},vm:null,vq:'',vc:'',vf:false,toast:null,txt:'',txt2:'',modal:null,mute:store.get('suits_mute')==='1',sel:''};
+function save(){if(S)store.set(KEY,JSON.stringify(S))}
+function migrate(s){
+  if(!s||typeof s!=='object'||!s.v||s.v>SCHEMA)return null;
+  /* migrações futuras entram aqui, em ordem: if(s.v===1){ ...; s.v=2 } */
+  return s;
+}
+function load(){try{const r=store.get(KEY);return r?migrate(JSON.parse(r)):null}catch(e){return null}}
+function toast(t){UI.toast=t;render();clearTimeout(toast.h);toast.h=setTimeout(()=>{UI.toast=null;render()},2800)}
+const top=()=>window.scrollTo(0,0);
+const g=(f,m)=>S&&S.sx==='m'?m:f;
+const DR=()=>g('Dra.','Dr.');
+const DOUT=()=>g('doutora','doutor');
+
+/* ---------- som (WebAudio, sem arquivos) ---------- */
+let AC=null;
+function tone(f1,f2,dur,type,vol,delay){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const n=AC.currentTime+(delay||0),o=AC.createOscillator(),gn=AC.createGain();o.type=type;o.frequency.setValueAtTime(f1,n);o.frequency.exponentialRampToValueAtTime(f2,n+dur);gn.gain.setValueAtTime(vol,n);gn.gain.exponentialRampToValueAtTime(.0001,n+dur);o.connect(gn);gn.connect(AC.destination);o.start(n);o.stop(n+dur+.03)}catch(e){}}
+function snd(t){if(UI.mute)return;
+  if(t==='thud'){tone(120,38,.45,'sine',.7);tone(60,30,.3,'triangle',.25)}
+  else if(t==='win'){tone(392,392,.5,'triangle',.14);tone(523,523,.5,'triangle',.12,.12);tone(659,659,.8,'triangle',.12,.24)}
+  else if(t==='lose'){tone(220,150,.8,'sawtooth',.05);tone(165,110,.9,'sine',.12,.1)}
+  else if(t==='bell'){tone(880,870,.5,'sine',.1);tone(1320,1310,.35,'sine',.04)}
+  else if(t==='alert'){tone(520,520,.12,'square',.05);tone(520,520,.12,'square',.05,.18)}
+  else if(t==='tick'){tone(1200,1200,.03,'square',.03)}
+  else if(t==='ok'){tone(660,990,.15,'sine',.08)}
+  else if(t==='no'){tone(300,200,.2,'sine',.1)}
+}
+function shake(){document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake');setTimeout(()=>document.body.classList.remove('shake'),500)}
+
+/* ---------- calendário: dias úteis, feriados e recesso ---------- */
+const D0=s=>{const p=s.split('-').map(Number);return new Date(Date.UTC(p[0],p[1]-1,p[2]))};
+const DS=d=>d.toISOString().slice(0,10);
+const addD=(s,n)=>{const d=D0(s);d.setUTCDate(d.getUTCDate()+n);return DS(d)};
+const wd=s=>D0(s).getUTCDay();
+const FER={'01-01':'Confraternização Universal','04-21':'Tiradentes','05-01':'Dia do Trabalho','09-07':'Independência','10-12':'Nossa Senhora Aparecida','11-02':'Finados','11-15':'Proclamação da República','11-20':'Dia da Consciência Negra','12-25':'Natal'};
+const isFer=s=>!!FER[s.slice(5)];
+const isRec=s=>{const m=+s.slice(5,7),d=+s.slice(8,10);return (m===12&&d>=20)||(m===1&&d<=20)};
+const isWork=s=>wd(s)!==0&&wd(s)!==6&&!isFer(s);      /* dia de expediente */
+const isUtil=s=>isWork(s)&&!isRec(s);                 /* dia que conta prazo (CPC, arts. 219 e 220) */
+const nextWork=s=>{let d=addD(s,1);while(!isWork(d))d=addD(d,1);return d};
+const addUteis=(s,n)=>{let d=s;while(n>0){d=addD(d,1);if(isUtil(d))n--}return d};
+const uteisAte=(a,b)=>{if(b<=a)return 0;let n=0,d=a;while(d<b){d=addD(d,1);if(isUtil(d))n++}return n};
+const WD=['dom','seg','ter','qua','qui','sex','sáb'];
+const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const fmtD=s=>s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4);
+const fmtDs=s=>s.slice(8,10)+'/'+s.slice(5,7);
+const fmtL=s=>WD[wd(s)]+', '+fmtDs(s);
+const fmtExt=s=>+s.slice(8,10)+' de '+MES[+s.slice(5,7)-1]+' de '+s.slice(0,4);
+
+/* ---------- nomes (fictícios, com lista de bloqueio) ---------- */
+const FN_F=['Maria','Ana','Lúcia','Cláudia','Rosângela','Patrícia','Juliana','Fernanda','Aline','Sandra','Vera','Lurdes','Tereza','Simone','Daniela','Kátia','Marlene','Denise','Raquel','Viviane','Elaine','Jussara','Cristiane','Regina','Sueli','Tatiane','Priscila','Neusa','Edna','Rosana'];
+const FN_M=['José','João','Antônio','Carlos','Paulo','Valdir','Márcio','Rogério','Edson','Luiz','Sérgio','Reinaldo','Wellington','Anderson','Cristiano','Gilberto','Adriano','Fábio','Renato','Marcos','Josué','Ademir','Leandro','Rodrigo','Elias','Nilton','Osvaldo','Raimundo','Jair','Everton'];
+const SN=['Silva','Santos','Oliveira','Souza','Pereira','Costa','Rodrigues','Almeida','Nascimento','Lima','Araújo','Ferreira','Carvalho','Gomes','Martins','Rocha','Ribeiro','Barbosa','Moreira','Teixeira','Mendes','Cardoso','Correia','Batista','Freitas','Pinto','Campos','Vieira','Monteiro','Dias','Moraes','Siqueira','Fonseca','Lacerda','Peixoto','Quintino','Brandão','Toledo'];
+const FAMOUS=new Set(['Fernanda Lima','Fernanda Souza','Ana Moura','Simone Mendes','João Gomes','Paulo Costa','Carlos Alberto','Daniela Mercury','Fábio Assunção','Rodrigo Santoro','Marcos Mion','Rogério Ceni','Reinaldo Azevedo','Adriano Imperador','Juliana Paes','Cláudia Raia','Patrícia Poeta','Regina Duarte','Sandra Annenberg','Leandro Lima','Edson Arantes','Marcos Pontes','Rodrigo Faro','Luiz Fernando','José Dirceu','Antônio Fagundes','Tatiane Silva','Ana Costa','Jair Rodrigues','Neusa Borges','Elaine Mickely','Ademir Silva','Raquel Dodge','Sérgio Moraes']);
+function pname(f){let n,k=0;do{n=pick(f?FN_F:FN_M)+' '+pick(SN)+(chance(.5)?' '+pick(SN):'')}while((FAMOUS.has(n)||FAMOUS.has(n.split(' ').slice(0,2).join(' ')))&&++k<30);return n}
+const first=n=>n.split(' ')[0];
+
+/* ---------- UFs (segmento J=8, código do tribunal) ---------- */
+const UFS={AC:['Acre','Rio Branco','01'],AL:['Alagoas','Maceió','02'],AP:['Amapá','Macapá','03'],AM:['Amazonas','Manaus','04'],BA:['Bahia','Salvador','05'],CE:['Ceará','Fortaleza','06'],DF:['Distrito Federal','Brasília','07'],ES:['Espírito Santo','Vitória','08'],GO:['Goiás','Goiânia','09'],MA:['Maranhão','São Luís','10'],MT:['Mato Grosso','Cuiabá','11'],MS:['Mato Grosso do Sul','Campo Grande','12'],MG:['Minas Gerais','Belo Horizonte','13'],PA:['Pará','Belém','14'],PB:['Paraíba','João Pessoa','15'],PR:['Paraná','Curitiba','16'],PE:['Pernambuco','Recife','17'],PI:['Piauí','Teresina','18'],RJ:['Rio de Janeiro','Rio de Janeiro','19'],RN:['Rio Grande do Norte','Natal','20'],RS:['Rio Grande do Sul','Porto Alegre','21'],RO:['Rondônia','Porto Velho','22'],RR:['Roraima','Boa Vista','23'],SC:['Santa Catarina','Florianópolis','24'],SE:['Sergipe','Aracaju','25'],SP:['São Paulo','São Paulo','26'],TO:['Tocantins','Palmas','27']};
+const CITY=()=>UFS[S.uf][1];
+const TJ=()=>S.uf==='DF'?'TJDFT':'TJ'+S.uf;
+function cnj(){const n=String(RI(1,9999999)).padStart(7,'0'),a=(S.g?S.g.date:'2028-01-01').slice(0,4),tr=UFS[S.uf][2],o=String(RI(24,9999)).padStart(4,'0');let dd='00';try{const r=Number(BigInt(n+a+'8'+tr+o+'00')%97n);dd=String(98-r).padStart(2,'0')}catch(e){}return `${n}-${dd}.${a}.8.${tr}.${o}`}
+
+/* ---------- rostos (SVG próprio, determinístico) ---------- */
+function hashS(t){let h=7;for(const c of String(t))h=(h*31+c.charCodeAt(0))>>>0;return h}
+function face(name,fem,bg){
+  const h=hashS(name),sk=['#F1D1B5','#E4B793','#CF9970','#B07650','#875838'][h%5],hc=['#1F1712','#3A2A1E','#6B4A2E','#2A2A2A','#9C7A4E','#A7A7A7'][(h>>3)%6];
+  const sty=fem?['long','bun','bob'][(h>>6)%3]:['short','buzz','bald','side'][(h>>6)%4],gl=(h>>11)%5===0,beard=!fem&&(h>>9)%3===0;
+  let o=`<svg viewBox="0 0 64 64"><rect width="64" height="64" fill="${bg||'#E9DED2'}"/>`;
+  if(sty==='long')o+=`<path d="M14 30c0-14 8-21 18-21s18 7 18 21v22H14z" fill="${hc}"/>`;
+  o+=`<path d="M10 64c2-11 10-16 22-16s20 5 22 16z" fill="${fem?'#7A2433':'#3B3F4A'}"/><rect x="27" y="40" width="10" height="9" fill="${sk}"/>`;
+  o+=`<ellipse cx="32" cy="29" rx="12.5" ry="14.5" fill="${sk}"/>`;
+  if(sty==='short'||sty==='side')o+=`<path d="M19.5 27c0-10 5.5-14 12.5-14s12.5 4 12.5 14c-2-5-6-7-12.5-7s-10.5 2-12.5 7z" fill="${hc}"/>`;
+  if(sty==='buzz')o+=`<path d="M20 25c1-8 6-11 12-11s11 3 12 11c-3-3-7-4-12-4s-9 1-12 4z" fill="${hc}" opacity=".8"/>`;
+  if(sty==='bun')o+=`<circle cx="32" cy="12" r="5" fill="${hc}"/><path d="M19.5 28c0-10 5.5-14 12.5-14s12.5 4 12.5 14c-3-6-7-8-12.5-8s-9.5 2-12.5 8z" fill="${hc}"/>`;
+  if(sty==='bob')o+=`<path d="M18 36c-1-15 5-22 14-22s15 7 14 22c-1-9-4-14-14-14s-13 5-14 14z" fill="${hc}"/>`;
+  if(sty==='long')o+=`<path d="M19.5 28c0-10 5.5-14 12.5-14s12.5 4 12.5 14c-3-6-7-8-12.5-8s-9.5 2-12.5 8z" fill="${hc}"/>`;
+  o+=`<circle cx="27" cy="30" r="1.5" fill="#2A1E18"/><circle cx="37" cy="30" r="1.5" fill="#2A1E18"/><path d="M28 37c2.5 1.6 5.5 1.6 8 0" stroke="#7A4A3A" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+  if(beard)o+=`<path d="M20 31c1 10 6 13 12 13s11-3 12-13c-2 5-6 7-12 7s-10-2-12-7z" fill="${hc}" opacity=".85"/>`;
+  if(gl)o+=`<g fill="none" stroke="#2A2A2A" stroke-width="1.2"><circle cx="27" cy="30" r="4"/><circle cx="37" cy="30" r="4"/><path d="M31 30h2"/></g>`;
+  return o+'</svg>';
+}
+const SCALE='<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="#A8843A" stroke-width="2"><path d="M32 8v46M18 54h28M14 18h36"/><path d="M14 18l-8 16h16zM50 18l-8 16h16z"/><path d="M6 34c0 4 4 6 8 6s8-2 8-6M42 34c0 4 4 6 8 6s8-2 8-6"/></g><circle cx="32" cy="8" r="3" fill="#A8843A"/></svg>';
+
+/* ---------- indicadores com retorno decrescente ---------- */
+const IND={rep:'Reputação',cli:'Clientes',et:'Ética (OAB)',jz:'Juízo',st:'Estresse'};
+function bump(k,d){
+  const G=S.g;if(k==='cx'){G.cx+=d;return {k,d}}
+  let x=G.ind[k];const b=x;
+  if(k==='st')x=clamp(x+d,0,100);
+  else if(d>0){let r=d;while(r>1e-6){const c=x>=80?2:1;const s=Math.min(1,r/c);x+=s;r-=s*c}x=Math.min(100,x);G.gain[k]=1}
+  else x=Math.max(0,x+d);
+  G.ind[k]=x;return {k,d:Math.round(x)-Math.round(b),raw:d,max:d>0&&x>=100};
+}
+function fx(list){return (list||[]).map(a=>bump(a[0],a[1])).filter(c=>c.d!==0||c.max)}
+function chipsH(cs){if(!cs||!cs.length)return '';return '<div class="chips">'+cs.map(c=>{
+  if(c.k==='cx')return `<span class="chip ${c.d>=0?'up':'dn'}">Caixa ${c.d>=0?'+':'−'}${money(Math.abs(c.d)).replace('R$ ','R$ ')}</span>`;
+  const good=c.k==='st'?c.d<0:c.d>0;return `<span class="chip ${good?'up':'dn'}">${IND[c.k]} ${c.d>0?'+':''}${c.d}${c.max?' (máx.)':''}</span>`}).join('')+'</div>'}
+
+/* ================================================================
+   VADE MECUM — só os artigos que o jogo usa.
+   ok:0 = transcrito, conferência na fonte oficial pendente.
+   Para conferir: abrir a "fonte", comparar e trocar ok:0 por ok:1.
+================================================================= */
+const PL='https://www.planalto.gov.br/ccivil_03/';
+const VADE={
+CF:{nome:'Constituição Federal de 1988',sh:'CF',fonte:PL+'constituicao/constituicao.htm',arts:{
+ '5':{r:'Direitos e garantias fundamentais (incisos usados no jogo)',tg:['garantias','casa','habeas corpus','contraditorio'],t:'Art. 5º Todos são iguais perante a lei, sem distinção de qualquer natureza, garantindo-se aos brasileiros e aos estrangeiros residentes no País a inviolabilidade do direito à vida, à liberdade, à igualdade, à segurança e à propriedade, nos termos seguintes:\n(...)\nXI - a casa é asilo inviolável do indivíduo, ninguém nela podendo penetrar sem consentimento do morador, salvo em caso de flagrante delito ou desastre, ou para prestar socorro, ou, durante o dia, por determinação judicial;\n(...)\nXXXV - a lei não excluirá da apreciação do Poder Judiciário lesão ou ameaça a direito;\n(...)\nLV - aos litigantes, em processo judicial ou administrativo, e aos acusados em geral são assegurados o contraditório e ampla defesa, com os meios e recursos a ela inerentes;\n(...)\nLXVIII - conceder-se-á "habeas-corpus" sempre que alguém sofrer ou se achar ameaçado de sofrer violência ou coação em sua liberdade de locomoção, por ilegalidade ou abuso de poder;\n(...)\nLXXIV - o Estado prestará assistência jurídica integral e gratuita aos que comprovarem insuficiência de recursos;'},
+ '133':{r:'O advogado é indispensável à administração da justiça',tg:['advogado'],t:'Art. 133. O advogado é indispensável à administração da justiça, sendo inviolável por seus atos e manifestações no exercício da profissão, nos limites da lei.'}}},
+CPC:{nome:'Código de Processo Civil (Lei 13.105/2015)',sh:'CPC',fonte:PL+'_ato2015-2018/2015/lei/l13105.htm',arts:{
+ '3':{r:'Inafastabilidade e solução consensual',tg:['acordo','conciliacao','mediacao'],t:'Art. 3º Não se excluirá da apreciação jurisdicional ameaça ou lesão a direito.\n§ 1º É permitida a arbitragem, na forma da lei.\n§ 2º O Estado promoverá, sempre que possível, a solução consensual dos conflitos.\n§ 3º A conciliação, a mediação e outros métodos de solução consensual de conflitos deverão ser estimulados por juízes, advogados, defensores públicos e membros do Ministério Público, inclusive no curso do processo judicial.'},
+ '46':{r:'Foro do domicílio do réu (regra)',tg:['competencia','foro'],t:'Art. 46. A ação fundada em direito pessoal ou em direito real sobre bens móveis será proposta, em regra, no foro de domicílio do réu.\n(...)'},
+ '80':{r:'Litigância de má-fé',tg:['ma-fe','lealdade'],t:'Art. 80. Considera-se litigante de má-fé aquele que:\nI - deduzir pretensão ou defesa contra texto expresso de lei ou fato incontroverso;\nII - alterar a verdade dos fatos;\nIII - usar do processo para conseguir objetivo ilegal;\nIV - opuser resistência injustificada ao andamento do processo;\nV - proceder de modo temerário em qualquer incidente ou ato do processo;\nVI - provocar incidente manifestamente infundado;\nVII - interpuser recurso com intuito manifestamente protelatório.'},
+ '98':{r:'Gratuidade da justiça',tg:['gratuidade','custas'],t:'Art. 98. A pessoa natural ou jurídica, brasileira ou estrangeira, com insuficiência de recursos para pagar as custas, as despesas processuais e os honorários advocatícios tem direito à gratuidade da justiça, na forma da lei.\n(...)'},
+ '104':{r:'Procuração: quando o advogado pode agir sem ela',tg:['procuracao','mandato'],t:'Art. 104. O advogado não será admitido a postular em juízo sem procuração, salvo para evitar preclusão, decadência ou prescrição, ou para praticar ato considerado urgente.\n§ 1º Nas hipóteses previstas no caput, o advogado deverá, independentemente de caução, exibir a procuração no prazo de 15 (quinze) dias, prorrogável por igual período por despacho do juiz.\n§ 2º O ato não ratificado será considerado ineficaz relativamente àquele em cujo nome foi praticado, respondendo o advogado pelas despesas e por perdas e danos.'},
+ '112':{r:'Renúncia ao mandato',tg:['renuncia','mandato'],t:'Art. 112. O advogado poderá renunciar ao mandato a qualquer tempo, provando, na forma prevista neste Código, que comunicou a renúncia ao mandante, a fim de que este nomeie sucessor.\n§ 1º Durante os 10 (dez) dias seguintes, o advogado continuará a representar o mandante, desde que necessário para lhe evitar prejuízo.\n§ 2º Dispensa-se a comunicação referida no caput quando a procuração tiver sido outorgada a vários advogados e a parte continuar representada por outro, apesar da renúncia.'},
+ '219':{r:'Prazos em dias úteis',tg:['prazo','dias uteis'],t:'Art. 219. Na contagem de prazo em dias, estabelecido por lei ou pelo juiz, computar-se-ão somente os dias úteis.\nParágrafo único. O disposto neste artigo aplica-se somente aos prazos processuais.'},
+ '220':{r:'Recesso: suspensão de 20/12 a 20/1',tg:['prazo','recesso','ferias'],t:'Art. 220. Suspende-se o curso do prazo processual nos dias compreendidos entre 20 de dezembro e 20 de janeiro, inclusive.\n§ 1º Ressalvadas as férias individuais e os feriados instituídos por lei, os juízes, os membros do Ministério Público, da Defensoria Pública e da Advocacia Pública e os auxiliares da Justiça exercerão suas atribuições durante o período previsto no caput.\n§ 2º Durante a suspensão do prazo, não se realizarão audiências nem sessões de julgamento.'},
+ '224':{r:'Contagem: exclui o começo, inclui o vencimento',tg:['prazo','contagem','publicacao'],t:'Art. 224. Salvo disposição em contrário, os prazos serão contados excluindo o dia do começo e incluindo o dia do vencimento.\n§ 1º Os dias do começo e do vencimento do prazo serão protraídos para o primeiro dia útil seguinte, se coincidirem com dia em que o expediente forense for encerrado antes ou iniciado depois da hora normal ou houver indisponibilidade da comunicação eletrônica.\n§ 2º Considera-se como data de publicação o primeiro dia útil seguinte ao da disponibilização da informação no Diário da Justiça eletrônico.\n§ 3º A contagem do prazo terá início no primeiro dia útil que seguir ao da publicação.'},
+ '292':{r:'Valor da causa',tg:['valor da causa','inicial'],t:'Art. 292. O valor da causa constará da petição inicial ou da reconvenção e será:\n(...)\nV - na ação indenizatória, inclusive a fundada em dano moral, o valor pretendido;\nVI - na ação em que há cumulação de pedidos, a quantia correspondente à soma dos valores de todos eles;\n(...)'},
+ '300':{r:'Tutela de urgência',tg:['tutela','liminar','urgencia'],t:'Art. 300. A tutela de urgência será concedida quando houver elementos que evidenciem a probabilidade do direito e o perigo de dano ou o risco ao resultado útil do processo.\n§ 1º Para a concessão da tutela de urgência, o juiz pode, conforme o caso, exigir caução real ou fidejussória idônea para ressarcir os danos que a outra parte possa vir a sofrer, podendo a caução ser dispensada se a parte economicamente hipossuficiente não puder oferecê-la.\n§ 2º A tutela de urgência pode ser concedida liminarmente ou após justificação prévia.\n§ 3º A tutela de urgência de natureza antecipada não será concedida quando houver perigo de irreversibilidade dos efeitos da decisão.'},
+ '318':{r:'Procedimento comum',tg:['rito','procedimento'],t:'Art. 318. Aplica-se a todas as causas o procedimento comum, salvo disposição em contrário deste Código ou de lei.\nParágrafo único. O procedimento comum aplica-se subsidiariamente aos demais procedimentos especiais e ao processo de execução.'},
+ '319':{r:'Requisitos da petição inicial',tg:['inicial','requisitos'],t:'Art. 319. A petição inicial indicará:\nI - o juízo a que é dirigida;\nII - os nomes, os prenomes, o estado civil, a existência de união estável, a profissão, o número de inscrição no Cadastro de Pessoas Físicas ou no Cadastro Nacional da Pessoa Jurídica, o endereço eletrônico, o domicílio e a residência do autor e do réu;\nIII - o fato e os fundamentos jurídicos do pedido;\nIV - o pedido com as suas especificações;\nV - o valor da causa;\nVI - as provas com que o autor pretende demonstrar a verdade dos fatos alegados;\nVII - a opção do autor pela realização ou não de audiência de conciliação ou de mediação.\n(...)'},
+ '321':{r:'Emenda da inicial em 15 dias',tg:['emenda','inicial','indeferimento'],t:'Art. 321. O juiz, ao verificar que a petição inicial não preenche os requisitos dos arts. 319 e 320 ou que apresenta defeitos e irregularidades capazes de dificultar o julgamento de mérito, determinará que o autor, no prazo de 15 (quinze) dias, a emende ou a complete, indicando com precisão o que deve ser corrigido ou completado.\nParágrafo único. Se o autor não cumprir a diligência, o juiz indeferirá a petição inicial.'},
+ '334':{r:'Audiência de conciliação ou de mediação',tg:['audiencia','conciliacao','multa'],t:'Art. 334. Se a petição inicial preencher os requisitos essenciais e não for o caso de improcedência liminar do pedido, o juiz designará audiência de conciliação ou de mediação com antecedência mínima de 30 (trinta) dias, devendo ser citado o réu com pelo menos 20 (vinte) dias de antecedência.\n(...)\n§ 8º O não comparecimento injustificado do autor ou do réu à audiência de conciliação é considerado ato atentatório à dignidade da justiça e será sancionado com multa de até dois por cento da vantagem econômica pretendida ou do valor da causa, revertida em favor da União ou do Estado.\n(...)'},
+ '335':{r:'Prazo da contestação: 15 dias',tg:['contestacao','defesa','prazo'],t:'Art. 335. O réu poderá oferecer contestação, por petição, no prazo de 15 (quinze) dias, cujo termo inicial será a data:\nI - da audiência de conciliação ou de mediação, ou da última sessão de conciliação, quando qualquer parte não comparecer ou, comparecendo, não houver autocomposição;\nII - do protocolo do pedido de cancelamento da audiência de conciliação ou de mediação apresentado pelo réu, quando ocorrer a hipótese do art. 334, § 4º, inciso I;\nIII - prevista no art. 231, de acordo com o modo como foi feita a citação, nas demais hipóteses.\n(...)'},
+ '336':{r:'Toda a matéria de defesa na contestação',tg:['contestacao','eventualidade'],t:'Art. 336. Incumbe ao réu alegar, na contestação, toda a matéria de defesa, expondo as razões de fato e de direito com que impugna o pedido do autor e especificando as provas que pretende produzir.'},
+ '341':{r:'Impugnação especificada dos fatos',tg:['contestacao','impugnacao','presuncao'],t:'Art. 341. Incumbe também ao réu manifestar-se precisamente sobre as alegações de fato constantes da petição inicial, presumindo-se verdadeiras as não impugnadas, salvo se:\nI - não for admissível, a seu respeito, a confissão;\nII - a petição inicial não estiver acompanhada de instrumento que a lei considerar da substância do ato;\nIII - estiverem em contradição com a defesa, considerada em seu conjunto.\nParágrafo único. O ônus da impugnação especificada dos fatos não se aplica ao defensor público, ao advogado dativo e ao curador especial.'},
+ '343':{r:'Reconvenção',tg:['reconvencao','contestacao'],t:'Art. 343. Na contestação, é lícito ao réu propor reconvenção para manifestar pretensão própria, conexa com a ação principal ou com o fundamento da defesa.\n(...)'},
+ '344':{r:'Revelia',tg:['revelia','contestacao'],t:'Art. 344. Se o réu não contestar a ação, será considerado revel e presumir-se-ão verdadeiras as alegações de fato formuladas pelo autor.'},
+ '350':{r:'Réplica: fato impeditivo, modificativo ou extintivo',tg:['replica'],t:'Art. 350. Se o réu alegar fato impeditivo, modificativo ou extintivo do direito do autor, este será ouvido no prazo de 15 (quinze) dias, permitindo-lhe o juiz a produção de prova.'},
+ '351':{r:'Réplica: preliminares',tg:['replica','preliminar'],t:'Art. 351. Se o réu alegar qualquer das matérias enumeradas no art. 337, o juiz determinará a oitiva do autor no prazo de 15 (quinze) dias, permitindo-lhe a produção de prova.'},
+ '355':{r:'Julgamento antecipado do mérito',tg:['julgamento antecipado','revelia'],t:'Art. 355. O juiz julgará antecipadamente o pedido, proferindo sentença com resolução de mérito, quando:\nI - não houver necessidade de produção de outras provas;\nII - o réu for revel, ocorrer o efeito previsto no art. 344 e não houver requerimento de prova, na forma do art. 349.'},
+ '357':{r:'Saneamento e organização do processo',tg:['saneamento','provas','testemunhas'],t:'Art. 357. Não ocorrendo nenhuma das hipóteses deste Capítulo, deverá o juiz, em decisão de saneamento e de organização do processo:\nI - resolver as questões processuais pendentes, se houver;\nII - delimitar as questões de fato sobre as quais recairá a atividade probatória, especificando os meios de prova admitidos;\nIII - definir a distribuição do ônus da prova, observado o art. 373;\nIV - delimitar as questões de direito relevantes para a decisão do mérito;\nV - designar, se necessário, audiência de instrução e julgamento.\n(...)\n§ 4º Caso tenha sido determinada a produção de prova testemunhal, o juiz fixará prazo comum não superior a 15 (quinze) dias para que as partes apresentem rol de testemunhas.\n(...)'},
+ '364':{r:'Alegações finais',tg:['alegacoes finais','memoriais'],t:'Art. 364. Finda a instrução, o juiz dará a palavra ao advogado do autor e do réu, bem como ao membro do Ministério Público, se for o caso de sua intervenção, sucessivamente, pelo prazo de 20 (vinte) minutos para cada um, prorrogável por 10 (dez) minutos, a critério do juiz.\n(...)\n§ 2º Quando a causa apresentar questões complexas de fato ou de direito, o debate oral poderá ser substituído por razões finais escritas, que serão apresentadas pelo autor e pelo réu, bem como pelo Ministério Público, se for o caso de sua intervenção, em prazos sucessivos de 15 (quinze) dias, assegurada vista dos autos.'},
+ '373':{r:'Ônus da prova',tg:['prova','onus'],t:'Art. 373. O ônus da prova incumbe:\nI - ao autor, quanto ao fato constitutivo de seu direito;\nII - ao réu, quanto à existência de fato impeditivo, modificativo ou extintivo do direito do autor.\n(...)'},
+ '447':{r:'Testemunhas incapazes, impedidas e suspeitas',tg:['testemunha','impedimento','contradita'],t:'Art. 447. Podem depor como testemunhas todas as pessoas, exceto as incapazes, impedidas ou suspeitas.\n(...)\n§ 2º São impedidos:\nI - o cônjuge, o companheiro, o ascendente e o descendente em qualquer grau e o colateral, até o terceiro grau, de alguma das partes, por consanguinidade ou afinidade, salvo se o exigir o interesse público ou, tratando-se de causa relativa ao estado da pessoa, não se puder obter de outro modo a prova que o juiz repute necessária ao julgamento do mérito;\n(...)'},
+ '457':{r:'Contradita da testemunha',tg:['testemunha','contradita','audiencia'],t:'Art. 457. Antes de depor, a testemunha será qualificada, declarará ou confirmará seus dados e informará se tem relações de parentesco com a parte ou interesse no objeto do processo.\n§ 1º É lícito à parte contraditar a testemunha, arguindo-lhe a incapacidade, o impedimento ou a suspeição, bem como, caso a testemunha negue os fatos que lhe são imputados, provar a contradita com documentos ou com testemunhas, até 3 (três), apresentadas no ato e inquiridas em separado.\n(...)'},
+ '459':{r:'Perguntas diretas às testemunhas',tg:['testemunha','perguntas','audiencia'],t:'Art. 459. As perguntas serão formuladas pelas partes diretamente à testemunha, começando pela que a arrolou, não admitindo o juiz aquelas que puderem induzir a resposta, não tiverem relação com as questões de fato objeto da atividade probatória ou importarem repetição de outra já respondida.\n(...)'},
+ '487':{r:'Resolução de mérito (inclui acordo homologado)',tg:['sentenca','merito','acordo'],t:'Art. 487. Haverá resolução de mérito quando o juiz:\nI - acolher ou rejeitar o pedido formulado na ação ou na reconvenção;\nII - decidir, de ofício ou a requerimento, sobre a ocorrência de decadência ou prescrição;\nIII - homologar:\na) o reconhecimento da procedência do pedido formulado na ação ou na reconvenção;\nb) a transação;\nc) a renúncia à pretensão formulada na ação ou na reconvenção.\n(...)'},
+ '523':{r:'Cumprimento de sentença: 15 dias, multa e honorários de 10%',tg:['cumprimento','execucao','multa'],t:'Art. 523. No caso de condenação em quantia certa, ou já fixada em liquidação, e no caso de decisão sobre parcela incontroversa, o cumprimento definitivo da sentença far-se-á a requerimento do exequente, sendo o executado intimado para pagar o débito, no prazo de 15 (quinze) dias, acrescido de custas, se houver.\n§ 1º Não ocorrendo pagamento voluntário no prazo do caput, o débito será acrescido de multa de dez por cento e, também, de honorários de advogado de dez por cento.\n(...)\n§ 3º Não efetuado tempestivamente o pagamento voluntário, será expedido, desde logo, mandado de penhora e avaliação, seguindo-se os atos de expropriação.'},
+ '1003':{r:'Prazo dos recursos: 15 dias',tg:['recurso','prazo','apelacao'],t:'Art. 1.003. O prazo para interposição de recurso conta-se da data em que os advogados, a sociedade de advogados, a Advocacia Pública, a Defensoria Pública ou o Ministério Público são intimados da decisão.\n(...)\n§ 5º Excetuados os embargos de declaração, o prazo para interpor os recursos e para responder-lhes é de 15 (quinze) dias.\n(...)'},
+ '1007':{r:'Preparo e deserção',tg:['preparo','desercao','recurso'],t:'Art. 1.007. No ato de interposição do recurso, o recorrente comprovará, quando exigido pela legislação pertinente, o respectivo preparo, inclusive porte de remessa e de retorno, sob pena de deserção.\n(...)\n§ 4º O recorrente que não comprovar, no ato de interposição do recurso, o recolhimento do preparo, inclusive porte de remessa e de retorno, será intimado, na pessoa de seu advogado, para realizar o recolhimento em dobro, sob pena de deserção.\n(...)'},
+ '1009':{r:'Da sentença cabe apelação',tg:['apelacao','recurso'],t:'Art. 1.009. Da sentença cabe apelação.\n(...)'},
+ '1015':{r:'Agravo de instrumento (rol)',tg:['agravo','tutela','recurso'],t:'Art. 1.015. Cabe agravo de instrumento contra as decisões interlocutórias que versarem sobre:\nI - tutelas provisórias;\n(...)'},
+ '1022':{r:'Embargos de declaração: cabimento',tg:['embargos','omissao','contradicao'],t:'Art. 1.022. Cabem embargos de declaração contra qualquer decisão judicial para:\nI - esclarecer obscuridade ou eliminar contradição;\nII - suprir omissão de ponto ou questão sobre o qual devia se pronunciar o juiz de ofício ou a requerimento;\nIII - corrigir erro material.\n(...)'},
+ '1023':{r:'Embargos de declaração: 5 dias',tg:['embargos','prazo'],t:'Art. 1.023. Os embargos serão opostos, no prazo de 5 (cinco) dias, em petição dirigida ao juiz, com indicação do erro, obscuridade, contradição ou omissão, e não se sujeitam a preparo.\n(...)'},
+ '1026':{r:'Embargos: interrompem o prazo; multa se protelatórios',tg:['embargos','multa','protelatorio'],t:'Art. 1.026. Os embargos de declaração não possuem efeito suspensivo e interrompem o prazo para a interposição de recurso.\n(...)\n§ 2º Quando manifestamente protelatórios os embargos de declaração, o juiz ou o tribunal, em decisão fundamentada, condenará o embargante a pagar ao embargado multa não excedente a dois por cento sobre o valor atualizado da causa.\n(...)'}}},
+L9099:{nome:'Lei dos Juizados Especiais (Lei 9.099/1995)',sh:'Lei 9.099',fonte:PL+'leis/l9099.htm',arts:{
+ '3':{r:'Competência: até 40 salários mínimos',tg:['juizado','jec','teto'],t:'Art. 3º O Juizado Especial Cível tem competência para conciliação, processo e julgamento das causas cíveis de menor complexidade, assim consideradas:\nI - as causas cujo valor não exceda a quarenta vezes o salário mínimo;\n(...)'},
+ '9':{r:'Advogado: facultativo até 20 salários mínimos',tg:['juizado','advogado'],t:'Art. 9º Nas causas de valor até vinte salários mínimos, as partes comparecerão pessoalmente, podendo ser assistidas por advogado; nas de valor superior, a assistência é obrigatória.\n(...)'},
+ '20':{r:'Réu ausente: revelia no Juizado',tg:['juizado','revelia','audiencia'],t:'Art. 20. Não comparecendo o demandado à sessão de conciliação ou à audiência de instrução e julgamento, reputar-se-ão verdadeiros os fatos alegados no pedido inicial, salvo se o contrário resultar da convicção do Juiz.'},
+ '41':{r:'Recurso para o próprio Juizado',tg:['recurso inominado','juizado','turma recursal'],t:'Art. 41. Da sentença, excetuada a homologatória de conciliação ou laudo arbitral, caberá recurso para o próprio Juizado.\n§ 1º O recurso será julgado por uma turma composta por três Juízes togados, em exercício no primeiro grau de jurisdição, reunidos na sede do Juizado.\n§ 2º No recurso, as partes serão obrigatoriamente representadas por advogado.'},
+ '42':{r:'Recurso em 10 dias; preparo em 48 horas',tg:['recurso inominado','prazo','preparo'],t:'Art. 42. O recurso será interposto no prazo de dez dias, contados da ciência da sentença, por petição escrita, da qual constarão as razões e o pedido do recorrente.\n§ 1º O preparo será feito, independentemente de intimação, nas quarenta e oito horas seguintes à interposição, sob pena de deserção.\n§ 2º Após o preparo, a Secretaria intimará o recorrido para oferecer resposta escrita no prazo de dez dias.'},
+ '51':{r:'Autor ausente: extinção',tg:['juizado','extincao','audiencia'],t:'Art. 51. Extingue-se o processo, além dos casos previstos em lei:\nI - quando o autor deixar de comparecer a qualquer das audiências do processo;\n(...)'},
+ '54':{r:'Sem custas no 1º grau',tg:['juizado','custas'],t:'Art. 54. O acesso ao Juizado Especial independerá, em primeiro grau de jurisdição, do pagamento de custas, taxas ou despesas.\n(...)'},
+ '55':{r:'Sem sucumbência no 1º grau',tg:['juizado','honorarios','sucumbencia'],t:'Art. 55. A sentença de primeiro grau não condenará o vencido em custas e honorários de advogado, ressalvados os casos de litigância de má-fé. Em segundo grau, o recorrente, vencido, pagará as custas e honorários de advogado, que serão fixados entre dez por cento e vinte por cento do valor de condenação ou, não havendo condenação, do valor corrigido da causa.\n(...)'}}},
+CDC:{nome:'Código de Defesa do Consumidor (Lei 8.078/1990)',sh:'CDC',fonte:PL+'leis/l8078compilado.htm',arts:{
+ '2':{r:'Conceito de consumidor',tg:['consumidor'],t:'Art. 2° Consumidor é toda pessoa física ou jurídica que adquire ou utiliza produto ou serviço como destinatário final.\n(...)'},
+ '6':{r:'Direitos básicos: inversão do ônus da prova',tg:['inversao','onus','prova','consumidor'],t:'Art. 6º São direitos básicos do consumidor:\n(...)\nVIII - a facilitação da defesa de seus direitos, inclusive com a inversão do ônus da prova, a seu favor, no processo civil, quando, a critério do juiz, for verossímil a alegação ou quando for ele hipossuficiente, segundo as regras ordinárias de experiências;\n(...)'},
+ '14':{r:'Responsabilidade objetiva do fornecedor de serviços',tg:['responsabilidade','servico','consumidor'],t:'Art. 14. O fornecedor de serviços responde, independentemente da existência de culpa, pela reparação dos danos causados aos consumidores por defeitos relativos à prestação dos serviços, bem como por informações insuficientes ou inadequadas sobre sua fruição e riscos.\n(...)'},
+ '26':{r:'Decadência: vícios aparentes',tg:['vicio','decadencia','prazo'],t:'Art. 26. O direito de reclamar pelos vícios aparentes ou de fácil constatação caduca em:\nI - trinta dias, tratando-se de fornecimento de serviço e de produtos não duráveis;\nII - noventa dias, tratando-se de fornecimento de serviço e de produtos duráveis.\n(...)'},
+ '27':{r:'Prescrição: fato do produto ou serviço, 5 anos',tg:['prescricao','consumidor'],t:'Art. 27. Prescreve em cinco anos a pretensão à reparação pelos danos causados por fato do produto ou do serviço prevista na Seção II deste Capítulo, iniciando-se a contagem do prazo a partir do conhecimento do dano e de sua autoria.\n(...)'},
+ '42':{r:'Cobrança de dívidas',tg:['cobranca','consumidor'],t:'Art. 42. Na cobrança de débitos, o consumidor inadimplente não será exposto a ridículo, nem será submetido a qualquer tipo de constrangimento ou ameaça.\nParágrafo único. O consumidor cobrado em quantia indevida tem direito à repetição do indébito, por valor igual ao dobro do que pagou em excesso, acrescido de correção monetária e juros legais, salvo hipótese de engano justificável.'},
+ '43':{r:'Bancos de dados e cadastros',tg:['cadastro','negativacao','spc'],t:'Art. 43. O consumidor, sem prejuízo do disposto no art. 86, terá acesso às informações existentes em cadastros, fichas, registros e dados pessoais e de consumo arquivados sobre ele, bem como sobre as suas respectivas fontes.\n(...)\n§ 2° A abertura de cadastro, ficha, registro e dados pessoais e de consumo deverá ser comunicada por escrito ao consumidor, quando não solicitada por ele.\n(...)'},
+ '49':{r:'Direito de arrependimento: 7 dias',tg:['arrependimento','compra'],t:'Art. 49. O consumidor pode desistir do contrato, no prazo de 7 dias a contar de sua assinatura ou do ato de recebimento do produto ou serviço, sempre que a contratação de fornecimento de produtos e serviços ocorrer fora do estabelecimento comercial, especialmente por telefone ou a domicílio.\n(...)'},
+ '101':{r:'Ação no domicílio do consumidor',tg:['competencia','foro','consumidor'],t:'Art. 101. Na ação de responsabilidade civil do fornecedor de produtos e serviços, sem prejuízo do disposto nos Capítulos I e II deste título, serão observadas as seguintes normas:\nI - a ação pode ser proposta no domicílio do autor;\n(...)'}}},
+CC:{nome:'Código Civil (Lei 10.406/2002)',sh:'CC',fonte:PL+'leis/2002/l10406compilada.htm',arts:{
+ '2':{r:'Início da personalidade',tg:['personalidade','nascituro'],t:'Art. 2º A personalidade civil da pessoa começa do nascimento com vida; mas a lei põe a salvo, desde a concepção, os direitos do nascituro.'},
+ '3':{r:'Absolutamente incapazes',tg:['capacidade'],t:'Art. 3º São absolutamente incapazes de exercer pessoalmente os atos da vida civil os menores de 16 (dezesseis) anos.'},
+ '5':{r:'Fim da menoridade',tg:['capacidade','maioridade'],t:'Art. 5º A menoridade cessa aos dezoito anos completos, quando a pessoa fica habilitada à prática de todos os atos da vida civil.\n(...)'},
+ '186':{r:'Ato ilícito',tg:['ato ilicito','responsabilidade','dano moral'],t:'Art. 186. Aquele que, por ação ou omissão voluntária, negligência ou imprudência, violar direito e causar dano a outrem, ainda que exclusivamente moral, comete ato ilícito.'},
+ '205':{r:'Prescrição geral: 10 anos',tg:['prescricao'],t:'Art. 205. A prescrição ocorre em dez anos, quando a lei não lhe haja fixado prazo menor.'},
+ '206':{r:'Prazos prescricionais especiais',tg:['prescricao','reparacao civil','cobranca'],t:'Art. 206. Prescreve:\n(...)\n§ 3º Em três anos:\n(...)\nV - a pretensão de reparação civil;\n(...)\n§ 5º Em cinco anos:\nI - a pretensão de cobrança de dívidas líquidas constantes de instrumento público ou particular;\n(...)'},
+ '927':{r:'Dever de indenizar',tg:['responsabilidade','indenizacao'],t:'Art. 927. Aquele que, por ato ilícito (arts. 186 e 187), causar dano a outrem, fica obrigado a repará-lo.\n(...)'},
+ '945':{r:'Culpa concorrente da vítima',tg:['culpa concorrente','indenizacao','acidente'],t:'Art. 945. Se a vítima tiver concorrido culposamente para o evento danoso, a sua indenização será fixada tendo-se em conta a gravidade de sua culpa em confronto com a do autor do dano.'}}},
+EAOAB:{nome:'Estatuto da Advocacia e da OAB (Lei 8.906/1994)',sh:'Estatuto da OAB',fonte:PL+'leis/l8906.htm',arts:{
+ '1':{r:'Atividades privativas da advocacia',tg:['advocacia','postulacao'],t:'Art. 1º São atividades privativas de advocacia:\nI - a postulação a órgão do Poder Judiciário e aos juizados especiais;\nII - as atividades de consultoria, assessoria e direção jurídicas.\n(...)'},
+ '5':{r:'Mandato e procuração',tg:['procuracao','mandato','renuncia'],t:'Art. 5º O advogado postula, em juízo ou fora dele, fazendo prova do mandato.\n§ 1º O advogado, afirmando urgência, pode atuar sem procuração, obrigando-se a apresentá-la no prazo de quinze dias, prorrogável por igual período.\n(...)\n§ 3º O advogado que renunciar ao mandato continuará, durante os dez dias seguintes à notificação da renúncia, a representar o mandante, salvo se for substituído antes do término desse prazo.\n(...)'},
+ '7':{r:'Direitos (prerrogativas) do advogado',tg:['prerrogativas','autos','sigilo'],t:'Art. 7º São direitos do advogado:\nI - exercer, com liberdade, a profissão em todo o território nacional;\n(...)\nXIII - examinar, em qualquer órgão dos Poderes Judiciário e Legislativo, ou da Administração Pública em geral, autos de processos findos ou em andamento, mesmo sem procuração, quando não estejam sujeitos a sigilo ou segredo de justiça, assegurada a obtenção de cópias, com possibilidade de tomar apontamentos;\n(...)\nXIX - recusar-se a depor como testemunha em processo no qual funcionou ou deva funcionar, ou sobre fato relacionado com pessoa de quem seja ou foi advogado, mesmo quando autorizado ou solicitado pelo constituinte, bem como sobre fato que constitua sigilo profissional;\n(...)'},
+ '8':{r:'Requisitos da inscrição como advogado',tg:['inscricao','exame de ordem'],t:'Art. 8º Para inscrição como advogado é necessário:\nI - capacidade civil;\nII - diploma ou certidão de graduação em direito, obtido em instituição de ensino oficialmente autorizada e credenciada;\nIII - título de eleitor e quitação do serviço militar, se brasileiro;\nIV - aprovação em Exame de Ordem;\nV - não exercer atividade incompatível com a advocacia;\nVI - idoneidade moral;\nVII - prestar compromisso perante o conselho.\n(...)'},
+ '22':{r:'Direito aos honorários',tg:['honorarios'],t:'Art. 22. A prestação de serviço profissional assegura aos inscritos na OAB o direito aos honorários convencionados, aos fixados por arbitramento judicial e aos de sucumbência.\n(...)'},
+ '23':{r:'Honorários de sucumbência pertencem ao advogado',tg:['honorarios','sucumbencia'],t:'Art. 23. Os honorários incluídos na condenação, por arbitramento ou sucumbência, pertencem ao advogado, tendo este direito autônomo para executar a sentença nesta parte, podendo requerer que o precatório, quando necessário, seja expedido em seu favor.'},
+ '34':{r:'Infrações disciplinares (incisos usados no jogo)',tg:['infracao','captacao','sigilo'],t:'Art. 34. Constitui infração disciplinar:\n(...)\nIV - angariar ou captar causas, com ou sem a intervenção de terceiros;\n(...)\nVII - violar, sem justa causa, sigilo profissional;\n(...)\nIX - prejudicar, por culpa grave, interesse confiado ao seu patrocínio;\n(...)\nXX - locupletar-se, por qualquer forma, à custa do cliente ou da parte adversa, por si ou interposta pessoa;\n(...)'},
+ '35':{r:'Sanções disciplinares',tg:['sancoes','ted'],t:'Art. 35. As sanções disciplinares consistem em:\nI - censura;\nII - suspensão;\nIII - exclusão;\nIV - multa.\n(...)'},
+ '36':{r:'Censura',tg:['sancoes','censura'],t:'Art. 36. A censura é aplicável nos casos de:\nI - infrações definidas nos incisos I a XVI e XXIX do art. 34;\nII - violação a preceito do Código de Ética e Disciplina;\nIII - violação a preceito desta lei, quando para a infração não se tenha estabelecido sanção mais grave.\n(...)'},
+ '38':{r:'Exclusão',tg:['sancoes','exclusao'],t:'Art. 38. A exclusão é aplicável nos casos de:\nI - aplicação, por três vezes, de suspensão;\nII - infrações definidas nos incisos XXVI a XXVIII do art. 34.\n(...)'}}},
+CED:{nome:'Código de Ética e Disciplina da OAB (Res. 02/2015 do CFOAB)',sh:'Código de Ética',fonte:'https://www.oab.org.br/arquivos/resolucao-n-022015-ced-2030601765.pdf',warn:1,arts:{
+ '7':{r:'Vedada a captação de clientela',tg:['captacao','etica'],t:'Art. 7º É vedado o oferecimento de serviços profissionais que impliquem, direta ou indiretamente, angariar ou captar clientela.'},
+ '19':{r:'Clientes com interesses opostos',tg:['conflito de interesses','etica'],t:'Art. 19. Os advogados integrantes da mesma sociedade profissional, ou reunidos em caráter permanente para cooperação recíproca, não podem representar, em juízo ou fora dele, clientes com interesses opostos.'},
+ '20':{r:'Conflito de interesses entre constituintes',tg:['conflito de interesses','etica'],t:'Art. 20. Sobrevindo conflitos de interesse entre seus constituintes e não conseguindo o advogado harmonizá-los, caber-lhe-á optar, com prudência e discrição, por um dos mandatos, renunciando aos demais, resguardado sempre o sigilo profissional.'},
+ '35':{r:'Sigilo profissional',tg:['sigilo','etica'],t:'Art. 35. O advogado tem o dever de guardar sigilo dos fatos de que tome conhecimento no exercício da profissão.\n(...)'},
+ '39':{r:'Publicidade: informativa, discreta e sóbria',tg:['publicidade','etica','redes sociais'],t:'Art. 39. A publicidade profissional do advogado tem caráter meramente informativo e deve primar pela discrição e sobriedade, não podendo configurar captação de clientela ou mercantilização da profissão.'},
+ '48':{r:'Contrato de honorários por escrito',tg:['honorarios','contrato'],t:'Art. 48. A prestação de serviços profissionais por advogado, individualmente ou integrado em sociedades, será contratada, preferentemente, por escrito.\n(...)'},
+ '50':{r:'Cláusula quota litis',tg:['honorarios','quota litis'],t:'Art. 50. Na hipótese da adoção de cláusula quota litis, os honorários devem ser necessariamente representados por pecúnia e, quando acrescidos dos honorários da sucumbência, não podem ser superiores às vantagens advindas a favor do constituinte ou do cliente.\n(...)'}}},
+RG:{nome:'Regulamento Geral do Estatuto da Advocacia e da OAB',sh:'Regulamento Geral',fonte:'https://www.oab.org.br/content/pdf/legislacaooab/regulamentogeral.pdf',warn:1,arts:{
+ '20':{r:'O compromisso do advogado',tg:['compromisso','inscricao'],t:'Art. 20. O requerente à inscrição principal no quadro de advogados presta o seguinte compromisso perante o Conselho Seccional, a Diretoria ou o Conselho da Subseção:\n"Prometo exercer a advocacia com dignidade e independência, observar a ética, os deveres e prerrogativas profissionais e defender a Constituição, a ordem jurídica do Estado Democrático, os direitos humanos, a justiça social, a boa aplicação das leis, a rápida administração da justiça e o aperfeiçoamento da cultura e das instituições jurídicas."\n(...)'}}},
+CP:{nome:'Código Penal (Decreto-Lei 2.848/1940)',sh:'CP',fonte:PL+'decreto-lei/del2848compilado.htm',arts:{
+ '14':{r:'Crime consumado e tentado',tg:['tentativa'],t:'Art. 14 - Diz-se o crime:\nI - consumado, quando nele se reúnem todos os elementos de sua definição legal;\nII - tentado, quando, iniciada a execução, não se consuma por circunstâncias alheias à vontade do agente.\nParágrafo único - Salvo disposição em contrário, pune-se a tentativa com a pena correspondente ao crime consumado, diminuída de um a dois terços.'},
+ '25':{r:'Legítima defesa',tg:['legitima defesa','excludente'],t:'Art. 25 - Entende-se em legítima defesa quem, usando moderadamente dos meios necessários, repele injusta agressão, atual ou iminente, a direito seu ou de outrem.\n(...)'},
+ '157':{r:'Roubo',tg:['roubo'],t:'Art. 157 - Subtrair coisa móvel alheia, para si ou para outrem, mediante grave ameaça ou violência a pessoa, ou depois de havê-la, por qualquer meio, reduzido à impossibilidade de resistência:\nPena - reclusão, de 4 (quatro) a 10 (dez) anos, e multa.\n(...)'},
+ '342':{r:'Falso testemunho',tg:['falso testemunho','testemunha'],t:'Art. 342. Fazer afirmação falsa, ou negar ou calar a verdade como testemunha, perito, contador, tradutor ou intérprete em processo judicial, ou administrativo, inquérito policial, ou em juízo arbitral:\nPena - reclusão, de 2 (dois) a 4 (quatro) anos, e multa.\n(...)'},
+ '343':{r:'Corrupção ativa de testemunha',tg:['testemunha','suborno'],t:'Art. 343. Dar, oferecer ou prometer dinheiro ou qualquer outra vantagem a testemunha, perito, contador, tradutor ou intérprete, para fazer afirmação falsa, negar ou calar a verdade em depoimento, perícia, cálculos, tradução ou interpretação:\nPena - reclusão, de três a quatro anos, e multa.\n(...)'},
+ '355':{r:'Patrocínio infiel e tergiversação',tg:['patrocinio infiel','conflito de interesses'],t:'Art. 355 - Trair, na qualidade de advogado ou procurador, o dever profissional, prejudicando interesse, cujo patrocínio, em juízo, lhe é confiado:\nPena - detenção, de seis meses a três anos, e multa.\nParágrafo único - Incorre na pena deste artigo o advogado ou procurador judicial que defende na mesma causa, simultânea ou sucessivamente, partes contrárias.'}}},
+CPP:{nome:'Código de Processo Penal (Decreto-Lei 3.689/1941)',sh:'CPP',fonte:PL+'decreto-lei/del3689compilado.htm',arts:{
+ '10':{r:'Prazo do inquérito policial',tg:['inquerito','prazo'],t:'Art. 10. O inquérito deverá terminar no prazo de 10 dias, se o indiciado tiver sido preso em flagrante, ou estiver preso preventivamente, contado o prazo, nesta hipótese, a partir do dia em que se executar a ordem de prisão, ou no prazo de 30 dias, quando estiver solto, mediante fiança ou sem ela.\n(...)'},
+ '306':{r:'Comunicação da prisão',tg:['prisao','flagrante'],t:'Art. 306. A prisão de qualquer pessoa e o local onde se encontre serão comunicados imediatamente ao juiz competente, ao Ministério Público e à família do preso ou à pessoa por ele indicada.\n(...)'},
+ '396':{r:'Resposta à acusação: 10 dias',tg:['resposta a acusacao','prazo'],t:'Art. 396. Nos procedimentos ordinário e sumário, oferecida a denúncia ou queixa, o juiz, se não a rejeitar liminarmente, recebê-la-á e ordenará a citação do acusado para responder à acusação, por escrito, no prazo de 10 (dez) dias.\n(...)'},
+ '593':{r:'Apelação criminal: 5 dias',tg:['apelacao','prazo','penal'],t:'Art. 593. Caberá apelação no prazo de 5 (cinco) dias:\n(...)'}}},
+SUM:{nome:'Súmulas do STJ',sh:'Súmula',fonte:'https://scon.stj.jus.br/SCON/sumstj/',arts:{
+ 'STJ359':{r:'Notificação prévia cabe ao órgão mantenedor',tg:['negativacao','notificacao','cadastro'],t:'Súmula 359 do STJ: Cabe ao órgão mantenedor do Cadastro de Proteção ao Crédito a notificação do devedor antes de proceder à inscrição.'},
+ 'STJ385':{r:'Inscrição preexistente afasta o dano moral',tg:['negativacao','dano moral','cadastro'],t:'Súmula 385 do STJ: Da anotação irregular em cadastro de proteção ao crédito, não cabe indenização por dano moral, quando preexistente legítima inscrição, ressalvado o direito ao cancelamento.'}}}
+};
+const VTOT=Object.values(VADE).reduce((a,c)=>a+Object.keys(c.arts).length,0);
+function artN(c,a){if(c==='SUM')return a.replace('STJ','');const n=+a;if(n<10)return a+'º';return n>=1000?String(n).replace(/(\d)(\d{3})$/,'$1.$2'):a}
+function refL(key){const [c,a]=key.split('-');const C=VADE[c];if(!C)return key;if(c==='SUM')return 'Súmula '+artN(c,a)+' do STJ';return C.sh+', art. '+artN(c,a)}
+function getArt(key){const [c,a]=key.split('-');return VADE[c]&&VADE[c].arts[a]?Object.assign({c,a,key},VADE[c].arts[a]):null}
+function unlock(key){if(S&&S.vm&&getArt(key)&&!S.vm.seen[key]){S.vm.seen[key]=1;S.vm.n=(S.vm.n||0)+1}}
+const lei=key=>{if(!getArt(key))return '';unlock(key);return `<button class="lei" data-a="vm" data-v="${key}">📖 ${esc(refL(key))}</button>`};
+const leis=list=>(list||[]).map(lei).join('');
+
+/* ================================================================
+   EXAME DA OAB — banco de questões originais, escritas para o jogo.
+   d: disciplina · o: alternativas · c: índice da correta · a: artigo
+================================================================= */
+const DISC={et:'Ética e Estatuto',co:'Constitucional',ci:'Civil',pc:'Processo Civil',pe:'Penal',pp:'Processo Penal',cd:'Consumidor'};
+const DIST={et:5,co:2,ci:3,pc:5,pe:2,pp:1,cd:2};
+const QB=[
+{d:'et',q:'Qual destes NÃO é requisito para a inscrição como advogado?',o:['Aprovação em Exame de Ordem','Prestar compromisso perante o conselho','Idoneidade moral','Três anos de prática jurídica'],c:3,a:'EAOAB-8',e:'O art. 8º lista capacidade civil, diploma, título de eleitor e quitação militar, aprovação no Exame, não exercer atividade incompatível, idoneidade moral e compromisso. Prática prévia não é exigida.'},
+{d:'et',q:'Afirmando urgência, o advogado protocola uma petição sem procuração. Em quanto tempo precisa apresentá-la?',o:['5 dias, improrrogáveis','15 dias, prorrogável por igual período','30 dias','Não precisa, se o cliente confirmar por telefone'],c:1,a:'EAOAB-5',e:'O Estatuto (art. 5º, §1º) e o CPC (art. 104, §1º) dão 15 dias, prorrogáveis por igual período.'},
+{d:'et',q:'O advogado notifica o cliente da renúncia ao mandato. O que acontece nos 10 dias seguintes?',o:['Fica liberado na hora','Continua representando o cliente, salvo se for substituído antes','Precisa devolver os honorários em dobro','O processo fica suspenso'],c:1,a:'EAOAB-5',e:'Durante os dez dias seguintes à notificação, ele continua representando o mandante (art. 5º, §3º).'},
+{d:'et',q:'Pagar um guincheiro para indicar vítimas de acidentes de trânsito configura:',o:['Publicidade permitida','Infração disciplinar de captação de causas','Conduta lícita, se houver contrato escrito','Crime de patrocínio infiel'],c:1,a:'EAOAB-34',e:'Angariar ou captar causas, com ou sem intervenção de terceiros, é infração (art. 34, IV).'},
+{d:'et',q:'Os honorários de sucumbência pertencem:',o:['À parte vencedora','Ao advogado, que pode executá-los de forma autônoma','Ao Estado','Metade ao cliente, metade ao advogado'],c:1,a:'EAOAB-23',e:'Os honorários de sucumbência pertencem ao advogado, com direito autônomo de executar (art. 23).'},
+{d:'et',q:'Quais são as sanções disciplinares previstas no Estatuto?',o:['Advertência, multa e prisão','Censura, suspensão, exclusão e multa','Censura e cassação do diploma','Suspensão e detenção'],c:1,a:'EAOAB-35',e:'O art. 35 lista censura, suspensão, exclusão e multa.'},
+{d:'et',q:'Violar, sem justa causa, o sigilo profissional é:',o:['Infração disciplinar','Permitido se o cliente já pagou os honorários','Mera falta de cortesia','Permitido se o juiz perguntar'],c:0,a:'EAOAB-34',e:'É infração disciplinar (art. 34, VII).'},
+{d:'et',q:'O advogado pode se recusar a depor como testemunha sobre fato ligado a quem foi seu cliente?',o:['Não, nunca','Sim, mesmo que o cliente autorize','Só se o cliente proibir','Só no processo penal'],c:1,a:'EAOAB-7',e:'É prerrogativa recusar-se a depor, mesmo autorizado ou solicitado pelo constituinte (art. 7º, XIX).'},
+{d:'et',q:'O advogado pode examinar autos de processo em andamento, sem procuração, quando:',o:['Nunca','Os autos não estiverem sujeitos a sigilo ou segredo de justiça','Pagar uma taxa ao cartório','O juiz autorizar por escrito'],c:1,a:'EAOAB-7',e:'É direito do advogado, salvo sigilo ou segredo de justiça (art. 7º, XIII).'},
+{d:'et',q:'Pela Constituição, o advogado é:',o:['Servidor auxiliar do juiz','Indispensável à administração da justiça','Dispensável nos tribunais','Subordinado ao Ministério Público'],c:1,a:'CF-133',e:'O art. 133 da Constituição diz que o advogado é indispensável à administração da justiça.'},
+{d:'et',q:'A postulação a órgão do Poder Judiciário e aos juizados especiais é, segundo o Estatuto:',o:['Livre a qualquer pessoa alfabetizada','Atividade privativa da advocacia','Privativa da Defensoria Pública','Privativa do Ministério Público'],c:1,a:'EAOAB-1',e:'O art. 1º, I, lista a postulação como atividade privativa (a própria Lei 9.099 tem exceções, como o art. 9º).'},
+{d:'et',q:'A censura é aplicável, entre outros casos, à:',o:['Violação a preceito do Código de Ética e Disciplina','Aplicação de três suspensões','Condenação por crime infamante','Falsa prova de requisito para a inscrição'],c:0,a:'EAOAB-36',e:'O art. 36, II, prevê censura para violação a preceito do Código de Ética.'},
+{d:'et',q:'A exclusão dos quadros da OAB é aplicável quando:',o:['O advogado recebe a primeira censura','Há aplicação, por três vezes, de suspensão','O advogado atrasa uma audiência','O advogado anuncia em jornal'],c:1,a:'EAOAB-38',e:'Três suspensões levam à exclusão (art. 38, I).'},
+{d:'et',q:'Prejudicar, por culpa grave, o interesse confiado ao seu patrocínio é:',o:['Infração disciplinar','Risco normal da profissão','Conduta atípica','Assunto só de responsabilidade civil'],c:0,a:'EAOAB-34',e:'É infração (art. 34, IX). Perder prazo por descuido pode se enquadrar aqui.'},
+{d:'et',q:'Na cláusula quota litis, segundo o Código de Ética, os honorários:',o:['Podem ser pagos com bens do cliente em qualquer caso','Devem ser em pecúnia e, somados à sucumbência, não podem superar a vantagem do cliente','São proibidos','Não têm limite'],c:1,a:'CED-50',e:'Quota litis: honorários em dinheiro, com o teto da vantagem obtida pelo cliente.'},
+{d:'et',q:'A publicidade profissional do advogado deve ter caráter:',o:['Comercial, com promoções','Meramente informativo, com discrição e sobriedade','Livre, desde que seja verdadeira','Proibido em qualquer meio'],c:1,a:'CED-39',e:'A publicidade é informativa, discreta e sóbria, sem captação nem mercantilização.'},
+{d:'co',q:'A casa é asilo inviolável. À noite, sem consentimento do morador, é possível entrar:',o:['Por determinação judicial','Em flagrante delito, desastre ou para prestar socorro','Nunca','Por ordem do delegado'],c:1,a:'CF-5',e:'Ordem judicial só vale durante o dia. À noite, só flagrante, desastre ou socorro (art. 5º, XI).'},
+{d:'co',q:'Quem sofre coação ilegal na liberdade de locomoção deve impetrar:',o:['Mandado de segurança','Habeas data','Habeas corpus','Ação popular'],c:2,a:'CF-5',e:'É o habeas corpus (art. 5º, LXVIII).'},
+{d:'co',q:'"A lei não excluirá da apreciação do Poder Judiciário lesão ou ameaça a direito" é o princípio da:',o:['Legalidade','Inafastabilidade da jurisdição','Anterioridade','Irretroatividade'],c:1,a:'CF-5',e:'É a inafastabilidade da jurisdição (art. 5º, XXXV), repetida no art. 3º do CPC.'},
+{d:'co',q:'Aos litigantes em processo judicial ou administrativo são assegurados:',o:['Apenas o direito de recorrer','O contraditório e a ampla defesa','Advogado gratuito em qualquer caso','Julgamento em 30 dias'],c:1,a:'CF-5',e:'Contraditório e ampla defesa (art. 5º, LV).'},
+{d:'co',q:'A assistência jurídica integral e gratuita do Estado é garantida:',o:['A todos, sem exceção','Aos que comprovarem insuficiência de recursos','Somente em matéria penal','Só a servidores públicos'],c:1,a:'CF-5',e:'Art. 5º, LXXIV: aos que comprovarem insuficiência de recursos.'},
+{d:'pc',q:'O CPC repete a garantia de que não se excluirá da apreciação jurisdicional ameaça ou lesão a direito no:',o:['Art. 1º','Art. 3º','Art. 319','Art. 1.009'],c:1,a:'CPC-3',e:'É o art. 3º do CPC.'},
+{d:'pc',q:'Sobre a solução consensual de conflitos, o CPC determina que ela:',o:['É proibida depois de ajuizada a ação','Deve ser estimulada por juízes, advogados, defensores e MP, inclusive no curso do processo','Só cabe no Juizado','Depende de autorização do tribunal'],c:1,a:'CPC-3',e:'Art. 3º, §3º.'},
+{d:'ci',q:'A personalidade civil da pessoa começa:',o:['Da concepção','Do nascimento com vida, ressalvados desde a concepção os direitos do nascituro','Do registro civil','Aos 16 anos'],c:1,a:'CC-2',e:'Art. 2º do Código Civil.'},
+{d:'ci',q:'São absolutamente incapazes de exercer pessoalmente os atos da vida civil:',o:['Os menores de 18 anos','Os menores de 16 anos','Os pródigos','Os ébrios habituais'],c:1,a:'CC-3',e:'Desde 2015, só os menores de 16 anos são absolutamente incapazes (art. 3º).'},
+{d:'ci',q:'A menoridade cessa:',o:['Aos 16 anos','Aos 18 anos completos','Aos 21 anos','Só com o casamento'],c:1,a:'CC-5',e:'Art. 5º: aos dezoito anos completos.'},
+{d:'ci',q:'Quando a lei não fixa prazo menor, a prescrição ocorre em:',o:['3 anos','5 anos','10 anos','20 anos'],c:2,a:'CC-205',e:'O prazo geral é de dez anos (art. 205).'},
+{d:'ci',q:'A pretensão de reparação civil prescreve em:',o:['1 ano','3 anos','5 anos','10 anos'],c:1,a:'CC-206',e:'Três anos (art. 206, §3º, V). Na relação de consumo por fato do serviço, o CDC dá cinco (art. 27).'},
+{d:'ci',q:'A cobrança de dívida líquida prevista em contrato particular prescreve em:',o:['2 anos','3 anos','5 anos','10 anos'],c:2,a:'CC-206',e:'Cinco anos (art. 206, §5º, I).'},
+{d:'ci',q:'Quem, por negligência, causa a outra pessoa um dano exclusivamente moral:',o:['Não comete ato ilícito','Comete ato ilícito','Só responde se houver também dano material','Só responde criminalmente'],c:1,a:'CC-186',e:'O art. 186 diz "ainda que exclusivamente moral".'},
+{d:'ci',q:'Se a vítima concorreu culposamente para o próprio dano, a indenização:',o:['É excluída','É fixada considerando a gravidade da culpa dela em confronto com a do autor do dano','É dobrada','Não muda'],c:1,a:'CC-945',e:'É a culpa concorrente (art. 945).'},
+{d:'pc',q:'Na contagem de prazo processual em dias:',o:['Contam-se dias corridos','Computam-se somente os dias úteis','Exclui-se só o domingo','O juiz decide caso a caso'],c:1,a:'CPC-219',e:'Somente dias úteis (art. 219).'},
+{d:'pc',q:'O curso do prazo processual fica suspenso:',o:['De 1º a 31 de janeiro','De 20 de dezembro a 20 de janeiro, inclusive','Durante o carnaval','Durante todo o mês de julho'],c:1,a:'CPC-220',e:'É o recesso do art. 220.'},
+{d:'pc',q:'Na contagem, os prazos processuais:',o:['Incluem o dia do começo e excluem o do vencimento','Excluem o dia do começo e incluem o do vencimento','Incluem os dois','Excluem os dois'],c:1,a:'CPC-224',e:'Art. 224: exclui o começo, inclui o vencimento.'},
+{d:'pc',q:'No procedimento comum, o réu tem quantos dias para contestar?',o:['5 dias','10 dias','15 dias','30 dias'],c:2,a:'CPC-335',e:'Quinze dias úteis (art. 335).'},
+{d:'pc',q:'Se o réu não contestar a ação:',o:['O processo é extinto','Será revel, e presumem-se verdadeiras as alegações de fato do autor','O juiz nomeia outro réu','O autor perde a ação'],c:1,a:'CPC-344',e:'É a revelia (art. 344).'},
+{d:'pc',q:'Os fatos da inicial que o réu não impugna especificamente:',o:['São ignorados pelo juiz','Presumem-se verdadeiros, salvo as exceções legais','Geram multa ao réu','Precisam de perícia'],c:1,a:'CPC-341',e:'Ônus da impugnação especificada (art. 341). Contestação genérica é quase revelia.'},
+{d:'pc',q:'Se a petição inicial tem um defeito sanável, o juiz:',o:['Indefere na hora','Manda emendar em 15 dias, indicando com precisão o que corrigir','Julga improcedente','Manda citar mesmo assim'],c:1,a:'CPC-321',e:'Art. 321. Só se o autor não emendar é que vem o indeferimento.'},
+{d:'pc',q:'Na ação indenizatória, inclusive por dano moral, o valor da causa é:',o:['Fixado livremente pelo juiz','O valor pretendido','Sempre 40 salários mínimos','Simbólico, de R$ 1.000'],c:1,a:'CPC-292',e:'Art. 292, V: o valor pretendido.'},
+{d:'pc',q:'A tutela de urgência exige:',o:['Perícia prévia','Probabilidade do direito e perigo de dano ou risco ao resultado útil do processo','Trânsito em julgado','Concordância do réu'],c:1,a:'CPC-300',e:'Os dois requisitos do art. 300.'},
+{d:'pc',q:'Contra decisão interlocutória sobre tutela provisória cabe:',o:['Apelação','Agravo de instrumento','Embargos infringentes','Recurso inominado'],c:1,a:'CPC-1015',e:'Art. 1.015, I.'},
+{d:'pc',q:'Qual o prazo para opor embargos de declaração no CPC?',o:['5 dias','10 dias','15 dias','48 horas'],c:0,a:'CPC-1023',e:'Cinco dias (art. 1.023).'},
+{d:'pc',q:'Excetuados os embargos de declaração, o prazo para recorrer e responder no CPC é de:',o:['5 dias','10 dias','15 dias','30 dias'],c:2,a:'CPC-1003',e:'Art. 1.003, §5º. Atenção: no Juizado o recurso inominado é de 10 dias.'},
+{d:'pc',q:'O recorrente que não comprova o preparo ao interpor o recurso:',o:['Tem o recurso deserto na hora','É intimado para recolher em dobro, sob pena de deserção','Fica isento','Paga multa de 10%'],c:1,a:'CPC-1007',e:'Art. 1.007, §4º: recolhimento em dobro.'},
+{d:'pc',q:'Não pago o débito no prazo do cumprimento de sentença, ele é acrescido de:',o:['Multa de 2%','Multa de 10% e honorários de 10%','Juros de 1% ao mês, apenas','Multa de 20%'],c:1,a:'CPC-523',e:'Art. 523, §1º.'},
+{d:'pc',q:'No Juizado Especial Cível, o recurso contra a sentença deve ser interposto em:',o:['5 dias','10 dias','15 dias','30 dias'],c:1,a:'L9099-42',e:'Dez dias (art. 42 da Lei 9.099). É o erro clássico de quem vem do CPC.'},
+{d:'pc',q:'No Juizado, o autor que falta a uma audiência:',o:['É multado em 2%','Tem o processo extinto','Ganha mais prazo','É considerado revel'],c:1,a:'L9099-51',e:'Art. 51, I. Quem fica revel quando falta é o réu (art. 20).'},
+{d:'pe',q:'Diz-se tentado o crime quando:',o:['O agente desiste voluntariamente','Iniciada a execução, não se consuma por circunstâncias alheias à vontade do agente','Não há dolo','Há arrependimento posterior'],c:1,a:'CP-14',e:'Art. 14, II.'},
+{d:'pe',q:'Salvo disposição em contrário, a tentativa é punida com a pena do crime consumado:',o:['Aumentada de um terço','Diminuída de um a dois terços','Sempre pela metade','Sem diminuição'],c:1,a:'CP-14',e:'Art. 14, parágrafo único.'},
+{d:'pe',q:'Age em legítima defesa quem:',o:['Revida uma agressão que já terminou','Usando moderadamente os meios necessários, repele injusta agressão, atual ou iminente','Salva alguém de perigo atual que não provocou','Cumpre dever legal'],c:1,a:'CP-25',e:'Art. 25. A alternativa C descreve o estado de necessidade.'},
+{d:'pe',q:'Subtrair coisa alheia móvel mediante grave ameaça à pessoa é:',o:['Furto','Roubo','Estelionato','Apropriação indébita'],c:1,a:'CP-157',e:'Art. 157.'},
+{d:'pe',q:'A testemunha que mente em processo judicial comete:',o:['Fraude processual','Falso testemunho','Denunciação caluniosa','Nenhum crime'],c:1,a:'CP-342',e:'Art. 342. Quem oferece vantagem para a testemunha mentir comete o crime do art. 343.'},
+{d:'pp',q:'Com o indiciado preso, o inquérito deve terminar, em regra, em:',o:['5 dias','10 dias','30 dias','90 dias'],c:1,a:'CPP-10',e:'Dez dias preso, trinta solto (art. 10).'},
+{d:'pp',q:'Recebida a denúncia no rito ordinário, o acusado é citado para responder à acusação, por escrito, em:',o:['5 dias','10 dias','15 dias','20 dias'],c:1,a:'CPP-396',e:'Dez dias (art. 396).'},
+{d:'pp',q:'A prisão de qualquer pessoa deve ser comunicada imediatamente:',o:['Só à família','Ao juiz competente, ao Ministério Público e à família do preso ou a quem ele indicar','Ao delegado-geral','À imprensa'],c:1,a:'CPP-306',e:'Art. 306.'},
+{d:'pp',q:'O prazo geral para apelar no processo penal é de:',o:['5 dias','10 dias','15 dias','48 horas'],c:0,a:'CPP-593',e:'Cinco dias (art. 593). Bem diferente dos 15 do CPC.'},
+{d:'cd',q:'Para o CDC, consumidor é quem adquire ou utiliza produto ou serviço:',o:['Para revender','Como destinatário final','Apenas se for pessoa física','Somente com nota fiscal'],c:1,a:'CDC-2',e:'Art. 2º. Pessoa jurídica também pode ser consumidora.'},
+{d:'cd',q:'O fornecedor de serviços responde pelos defeitos na prestação do serviço:',o:['Só com culpa provada','Independentemente de culpa','Só se houver contrato escrito','Apenas por dolo'],c:1,a:'CDC-14',e:'É responsabilidade objetiva (art. 14).'},
+{d:'cd',q:'Numa compra feita por telefone, o consumidor pode desistir em:',o:['3 dias','7 dias','15 dias','30 dias'],c:1,a:'CDC-49',e:'Direito de arrependimento: 7 dias (art. 49).'},
+{d:'cd',q:'O direito de reclamar de vício aparente em produto durável caduca em:',o:['30 dias','90 dias','1 ano','5 anos'],c:1,a:'CDC-26',e:'Noventa dias para duráveis (art. 26, II).'},
+{d:'cd',q:'A reparação por danos causados por fato do produto ou do serviço prescreve em:',o:['1 ano','3 anos','5 anos','10 anos'],c:2,a:'CDC-27',e:'Cinco anos, contados do conhecimento do dano e da autoria (art. 27).'},
+{d:'cd',q:'Segundo a Súmula 385 do STJ, se já existe inscrição legítima anterior, a nova anotação irregular:',o:['Gera dano moral em dobro','Não gera indenização por dano moral, ressalvado o direito ao cancelamento','Gera dano moral presumido','Não pode ser cancelada'],c:1,a:'SUM-STJ385',e:'Súmula 385. Pergunte sempre ao cliente se ele já tinha o nome negativado.'},
+{d:'cd',q:'A quem cabe notificar o devedor antes da inscrição em cadastro de proteção ao crédito?',o:['Ao credor','Ao órgão mantenedor do cadastro','Ao juiz','Ao Procon'],c:1,a:'SUM-STJ359',e:'Súmula 359: ao órgão mantenedor (SPC, Serasa), não ao credor.'}
+];
+/* 2ª fase: questões "discursivas" em que se escolhe o fundamento certo */
+const D2=[
+{q:'Maria foi citada numa ação de cobrança e quer se defender. A audiência de conciliação aconteceu ontem e não houve acordo. Qual é o prazo e a partir de quando ele corre?',o:['15 dias úteis, a partir da audiência','15 dias corridos, a partir da citação','10 dias úteis, a partir da juntada do mandado','5 dias úteis, a partir da audiência'],c:0,a:'CPC-335'},
+{q:'No Juizado, a sentença julgou improcedente o pedido de João. O estagiário preparou uma apelação para protocolar em 15 dias. O que você corrige?',o:['Nada, está certo','O recurso é o inominado, em 10 dias, com preparo em 48 horas','O recurso é agravo de instrumento, em 15 dias','Cabem só embargos de declaração'],c:1,a:'L9099-42'},
+{q:'A sentença condenou o réu, mas não disse nada sobre o pedido de dano moral, que estava na inicial. Qual a medida adequada?',o:['Apelação, por erro de julgamento','Embargos de declaração por omissão, em 5 dias','Ação rescisória','Nova ação só para o dano moral'],c:1,a:'CPC-1022'},
+{q:'Na contestação, o réu impugnou só o valor do dano e ficou em silêncio sobre a culpa no acidente. Qual a consequência?',o:['Nenhuma: o juiz analisa tudo de ofício','Presume-se verdadeira a alegação de culpa não impugnada','O processo é extinto','O autor precisa provar a culpa por perícia'],c:1,a:'CPC-341'},
+{q:'O plano de saúde negou uma cirurgia urgente, e o médico atesta risco de agravamento em dias. O que pedir já na inicial?',o:['Tutela de urgência, mostrando a probabilidade do direito e o perigo de dano','Somente o dano moral','Produção antecipada de prova pericial','Nada: aguardar a sentença'],c:0,a:'CPC-300'},
+{q:'O cliente tem uma ação por negativação indevida, mas você descobre que ele já tinha outra inscrição legítima anterior. Como orienta?',o:['Pedir dano moral em dobro','Pedir o cancelamento e a declaração de inexistência, sem expectativa de dano moral','Desistir de tudo','Esconder o fato do juiz'],c:1,a:'SUM-STJ385'},
+{q:'Na ação de indenização, o autor pede R$ 8.000 de dano material e R$ 15.000 de dano moral. Qual é o valor da causa?',o:['R$ 15.000, o maior pedido','R$ 23.000, a soma dos pedidos','R$ 8.000, o dano comprovado','O valor que o juiz fixar'],c:1,a:'CPC-292'},
+{q:'O juiz negou a tutela de urgência no início do processo. Qual recurso cabe e em que prazo?',o:['Apelação, 15 dias','Agravo de instrumento, 15 dias úteis','Embargos de declaração, 5 dias','Nenhum: só na sentença'],c:1,a:'CPC-1015'}
+];
