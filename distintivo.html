@@ -453,8 +453,9 @@ const has=(U,t)=>U.tags.includes(t);
 const FN_F=['Ana','Beatriz','Camila','Daniela','Eliane','Fernanda','Gabriela','Helena','Ingrid','Joana','Kátia','Luana','Márcia','Natália','Patrícia','Renata','Simone','Tatiane','Vanessa','Jaqueline','Rosângela','Lurdes','Cláudia','Débora','Priscila','Neide','Bianca','Flávia'];
 const FN_M=['André','Bruno','Carlos','Diego','Eduardo','Fábio','Gustavo','Henrique','Igor','João','Leandro','Marcelo','Nilton','Otávio','Paulo','Rafael','Sérgio','Thiago','Vinícius','Wagner','Edson','Jorge','Márcio','Roberto','Anderson','Osmar','Dárcio','Joaquim'];
 const SN=['Silva','Souza','Oliveira','Santos','Pereira','Lima','Costa','Ferreira','Rodrigues','Almeida','Nascimento','Carvalho','Gomes','Ribeiro','Barbosa','Rocha','Araújo','Moura','Teixeira','Cardoso','Mendes','Freitas','Batista','Cavalcanti','Siqueira','Tavares','Vilela','Nogueira','Brito','Pacheco','Queiroz','Fontes','Arruda','Paiva'];
-function pname(r,f){r=r||Math.random;return rp(r,f?FN_F:FN_M)+' '+rp(r,SN)}
-const AP=['"Magrelo"','"Baixinho"','"Neguinho"','"Alemão"','"Gordo"','"Cabeça"','"Zóio"','"Paraíba"','"Branco"','"Pezão"','"Tico"','"Russo"'];
+const FAMOUS=new Set(['Wagner Moura','Fernanda Lima','Thiago Silva','Fernanda Souza','Leandro Lima','Ana Moura','Débora Nascimento','Simone Mendes','Diego Souza','Rafael Cardoso','João Gomes','Eduardo Costa','Camila Queiroz','Paulo Costa','Daniela Mercury','Bruno Gomes','Marcelo Rossi','Fábio Assunção','Gustavo Lima','Roberto Carlos','Ana Paula Arruda','Carlos Alberto','Renata Vasconcellos','Patrícia Poeta','Fátima Bernardes']);
+function pname(r,f){r=r||Math.random;let n,k=0;do{n=rp(r,f?FN_F:FN_M)+' '+rp(r,SN)}while(FAMOUS.has(n)&&++k<20);return n}
+const AP=['"Magrelo"','"Baixinho"','"Alemão"','"Gordo"','"Cabeça"','"Zóio"','"Paraíba"','"Branco"','"Pezão"','"Tico"','"Russo"','"Galego"','"Bigode"','"Careca"','"Toddy"','"Fumaça"','"Pernambuco"','"Cigano"','"Doutor"','"Coruja"','"Sombra"','"Pirata"','"Mineiro"','"Cearense"'];
 const C1=['Santa Rita','São Bento','Nova','Bom Jesus','Lagoa','Campo','Serra','Porto','Pedra','Vale','Cachoeira','Monte','Barra','Ribeirão','Ponte','Alto','Palmeira','Boa Esperança','Cedro','Água','Jatobá','Buriti','Aroeira','Ipê'];
 const C2=['Alegre','Dourada','do Sul','do Norte','Velha','Grande','Bonita','Funda','Azul','das Flores','do Oeste','Verde','Clara','Formosa','do Leste','da Mata','do Campo','Bela','Branca','Seca','do Ouro','Serena'];
 const BAIR=['Centro','Jardim das Acácias','Vila Operária','Parque Industrial','Conjunto Habitacional','Bairro Alto','Vila Nova','Jardim Primavera','São Cristóvão','Morro do Cruzeiro','Beira-Rio','Distrito Industrial','Vila Esperança','Cohab','Jardim Paraíso','Santa Luzia','Vila Rica','Rodoviária','Jardim Bela Vista','Novo Horizonte','Vila Mariana do Norte','Parque das Palmeiras'];
@@ -643,12 +644,12 @@ const CT={
   carga:{n:'Roubo de carga',w:2,base:()=>28},
 };
 const POSTS=[
-  {classe:'3ª Classe',team:4,verba:40,mult:1,cases:2,esc:.35,r:[.12,.16]},
-  {classe:'2ª Classe',team:6,verba:90,mult:1.1,cases:3,esc:.38,r:[.11,.15]},
-  {classe:'1ª Classe',team:8,verba:160,mult:1.2,cases:3,esc:.4,r:[.1,.14]},
-  {classe:'Classe Especial',team:9,verba:350,mult:1.5,cases:3,esc:.42,r:[.09,.13]},
-  {classe:'Classe Especial',team:9,verba:1200,mult:2.2,cases:2,esc:.4,r:[.08,.11]},
-  {classe:'Cargo político',team:9,verba:3000,mult:2.6,cases:2,esc:.4,r:[.08,.11]},
+  {classe:'3ª Classe',team:4,verba:40,mult:1,cases:2,esc:.35,r:[.18,.24]},
+  {classe:'2ª Classe',team:6,verba:130,mult:1.1,cases:3,esc:.38,r:[.17,.23]},
+  {classe:'1ª Classe',team:8,verba:220,mult:1.2,cases:3,esc:.4,r:[.16,.22]},
+  {classe:'Classe Especial',team:9,verba:350,mult:1.5,cases:3,esc:.42,r:[.15,.2]},
+  {classe:'Classe Especial',team:9,verba:1200,mult:2.2,cases:2,esc:.4,r:[.13,.18]},
+  {classe:'Cargo político',team:9,verba:3000,mult:2.6,cases:2,esc:.4,r:[.13,.18]},
 ];
 const DEPTS=[
   {id:'dhpp',n:'Departamento de Homicídios e Proteção à Pessoa',f:['homic','vdom'],d:'Homicídios, feminicídios e desaparecimentos na capital.'},
@@ -683,7 +684,8 @@ function genGroup(G,t,r){
   else{n='Quadrilha de roubo de carga da rodovia';eff={carga:.4,roubo:.04};arm=2}
   for(const k in eff)if(!G.types.includes(k))delete eff[k];
   const f=Math.round(R(65,95)),mem=Math.round(RI(4,8)*(1+G.lv*.45));
-  return {id:'g'+(++G.seq),n,t,eff,arm,f,f0:f,intel:Math.round(R(5,18)),mem,lid:pick(FN_M)+' '+pick(AP),st:'at',lidp:false,tip:false};
+  G.usedAp=G.usedAp||[];const ap=pick(AP.filter(a=>!G.usedAp.includes(a)))||pick(AP);G.usedAp.push(ap);
+  return {id:'g'+(++G.seq),n,t,eff,arm,f,f0:f,intel:Math.round(R(5,18)),mem,lid:pick(FN_M)+' '+ap,st:'at',lidp:false,tip:false};
 }
 function initGroups(G){const n=[2,3,4,4,5,5][G.lv],pool=G.types.filter(t=>t!=='vdom');G.groups=[];
   const order=shuffle(pool).sort((a,b)=>CT[b].w-CT[a].w+R(-1.5,1.5));for(let i=0;i<n;i++)G.groups.push(genGroup(G,order[i%order.length]))}
@@ -711,12 +713,14 @@ function startPost(lv,cityId,o){
     proj:{},verba:POSTS[lv].verba,cam:city.tier>=2?.5:.35,det:{},tmp:{},idx:{},b:{},hist:[],cases:[]};
   G.types=cityTypes(U,city,lv,dept);G.types.forEach(t=>{G.idx[t]=100;G.b[t]=100;G.tmp[t]=1;G.det[t]=0});
   G.cast=genCast(G);G.team=genTeam(G);initGroups(G);pickMetas(G);
+  if(prev&&prev.promise){const P=prev.promise,ok=prev.idx[P.k]<=P.v*.95;G.imp=clamp(G.imp+(ok?5:-6),0,100);G.diary.unshift({w:G.week,t:ok?`Promessa cumprida antes da mudança: ${promiseTxt(P)}.`:`Você saiu sem cumprir a promessa de ${promiseTxt(P)}. A imprensa registra.`})}
   S.g=G;S.phase='car';
   G.hist.push(snap(G));
   for(let i=0;i<POSTS[lv].cases+1;i++)newCase(G);
   G.ev='posse';UI.tab='painel';UI.open=null;UI.view='ev';
   diary(`Posse: ${cargoName(G)} — ${unitName(G)}${lv<4?' ('+city.nome+')':''}.`);
 }
+function topGroup(G){const mk=G.metas.map(m=>m.k),a=G.groups.filter(x=>x.st==='at'&&x.intel<100);return a.sort((x,y)=>(Object.keys(y.eff).some(k=>mk.includes(k))-Object.keys(x.eff).some(k=>mk.includes(k)))||(y.intel-x.intel))[0]}
 function diary(t){const G=S.g;G.diary.unshift({w:G.week,t});if(G.diary.length>60)G.diary.length=60}
 function lever(G,t){let v=0;G.groups.forEach(q=>{if(q.st==='at'&&q.eff[t])v+=q.eff[t]*q.f/q.f0});for(const id in PROJ){const p=PROJ[id];if(p.fx&&p.fx[t]&&projAvail(G,id)&&!(G.proj[id]&&G.proj[id].ok))v+=-p.fx[t]/100}if(t==='vdom')v+=.06;return v}
 function pickMetas(G,cont){
@@ -777,12 +781,19 @@ const DIL={
   per:{n:'Requisitar perícia',hh:2,d:'Local, IML ou balística',ok:c=>!c.dil.per&&c.t!=='golpe'},
   rec:{n:'Reconhecimento formal',hh:6,d:'CPP, art. 226: fila com pessoas parecidas',ok:c=>!c.dil.rec&&c.aut>=20&&!['golpe','rural','carga'].includes(c.t)},
   recf:{n:'Reconhecimento por foto',hh:1,d:'Rápido: mostrar foto no celular',ok:c=>!c.dil.rec&&c.aut>=20&&!['golpe','rural','carga'].includes(c.t),warn:1},
+  campo:{n:'Diligência de campo',hh:6,d:'Vizinhança, comércio, informantes',ok:c=>(c.dil.campo||0)<2&&c.t!=='golpe'},
   que:{n:'Quebra de sigilo',hh:4,d:'Telefônico, bancário ou telemático (juiz)',ok:c=>!c.dil.que},
+  pix:{n:'Rastrear o PIX',hh:4,d:'Sigilo bancário das contas de destino (juiz)',ok:c=>c.t==='golpe'&&!c.dil.pix},
+  plat:{n:'Dados da plataforma do anúncio',hh:3,d:'Marco Civil, art. 22: registros de acesso (juiz)',ok:c=>c.t==='golpe'&&!c.dil.plat},
+  prints:{n:'Perícia nos prints e no celular',hh:2,d:'Conversas, comprovantes, metadados',ok:c=>c.t==='golpe'&&!c.dil.prints},
+  busca:{n:'Busca na casa do suspeito',hh:4,d:'Mandado judicial: provas físicas',ok:c=>!c.dil.busca&&c.aut>=40},
+  interr:{n:'Interrogar o suspeito',hh:4,d:'Com defensor; calar é direito',ok:c=>!c.dil.interr&&c.aut>=30},
   int:{n:'Interceptação telefônica',hh:4,d:'Lei 9.296: só crime com reclusão (juiz)',ok:c=>!c.dil.int&&!c.det&&!!c.g},
   mp:{n:'Medidas protetivas',hh:2,d:'Pedido ao juiz em até 48h',ok:c=>c.t==='vdom'&&!c.dil.mp&&!c.fem},
-  prev:{n:'Representar por preventiva',hh:3,d:'CPP, art. 312 (juiz)',ok:c=>!c.preso&&!c.dil.prev&&c.aut>=45&&!c.det},
-  pror:{n:'Pedir prorrogação',hh:1,d:'Mais 30 dias (solto)',ok:c=>!c.preso&&c.dl-S.g.day<=12&&c.pror<2},
-  rel:{n:'Relatar e indiciar',hh:4,d:'Relatório final ao juízo e ao MP',ok:()=>true,main:1},
+  prev:{n:'Representar por preventiva',hh:3,d:'CPP, art. 312 (juiz)',ok:c=>!c.preso&&(!c.dil.prev||(c.dil.prev==='neg'&&c.aut>=(c.prevA||0)+10))&&c.aut>=45&&!c.det},
+  pror:{n:'Pedir prorrogação',hh:1,d:'Mais 30 dias (solto)',ok:c=>!c.preso&&c.dl-S.g.day<=12&&c.pror<3},
+  rel:{n:'Relatar e indiciar',hh:4,d:'Autoria ≥ 60 e materialidade ≥ 50',ok:()=>true,main:1},
+  rsi:{n:'Relatar sem indiciamento',hh:3,d:'Encerra sem autor definido, sem penalidade',ok:()=>true},
 };
 function caseLog(c,t){c.log.unshift(t);if(c.log.length>8)c.log.length=8}
 function doDil(id,k){
@@ -791,7 +802,7 @@ function doDil(id,k){
   if(!spend(G,D.hh))return;
   const e=teamEff(G),grp=G.groups.find(q=>q.id===c.g);let msg='';
   switch(k){
-    case 'oit':{const n=c.dil.oit||0,a=R(8,15)*e*(1-.3*n);c.aut=clamp(c.aut+a,0,100);c.mat=clamp(c.mat+R(2,6),0,100);c.dil.oit=n+1;msg=n===0?`Vítima e testemunhas ouvidas. Surge uma descrição do autor.`:n===1?'Novas testemunhas confirmam parte da versão.':'As oitivas já não acrescentam muito.';break}
+    case 'oit':{const n=c.dil.oit||0,a=R(8,15)*e*(1-.3*n);c.aut=clamp(c.aut+a,0,100);c.mat=clamp(c.mat+R(2,6),0,100);c.dil.oit=n+1;if(grp&&grp.st==='at'&&n<2)grp.intel=clamp(grp.intel+3*gaeco(G),0,100);msg=n===0?`Vítima e testemunhas ouvidas. Surge uma descrição do autor.`:n===1?'Novas testemunhas confirmam parte da versão.':'As oitivas já não acrescentam muito.';break}
     case 'img':c.dil.img=1;if(c.cam){c.aut=clamp(c.aut+R(15,26)*e,0,100);msg='Uma câmera de comércio registrou o autor e a placa do veículo.'}else{c.aut=clamp(c.aut+R(0,4),0,100);msg='Nenhuma câmera funcionando no trecho.'}break;
     case 'per':c.dil.per='p';c.pend.push({k:'per',at:G.week+(G.proj.perito&&G.proj.perito.ok?1:RI(1,3))});msg='Perícia requisitada. O laudo leva de uma a três semanas.';break;
     case 'rec':c.dil.rec=1;c.aut=clamp(c.aut+R(12,18),0,100);msg='Reconhecimento formal: a vítima aponta o suspeito entre quatro pessoas parecidas.';break;
@@ -800,10 +811,17 @@ function doDil(id,k){
     case 'int':{c.dil.int='p';const p=clamp(.25+c.aut/200+(grp?grp.intel/300:0)+(G.jud-50)/150+bInt(),.05,.9);c.pend.push({k:'int',at:G.week+1,p});msg='Representação por interceptação enviada. Decisão na próxima semana.';break}
     case 'mp':c.dil.mp=1;c.pend.push({k:'mp',at:G.week+1,p:.92});msg='Pedido de medidas protetivas enviado ao juiz.';break;
     case 'prev':{c.dil.prev='p';const p=clamp(.3+(c.aut-45)/90+(c.mat-30)/200+(G.jud-50)/150,.1,.95);c.pend.push({k:'prev',at:G.week+1,p});msg='Representação por prisão preventiva enviada ao juiz.';break}
+    case 'campo':{const n=c.dil.campo||0;c.dil.campo=n+1;c.aut=clamp(c.aut+R(5,11)*e,0,100);c.mat=clamp(c.mat+R(4,9),0,100);if(grp&&grp.st==='at')grp.intel=clamp(grp.intel+2,0,100);msg=n?'Mais uma volta pelo bairro: detalhes novos, nada decisivo.':'A equipe percorre o bairro e acha um vizinho que viu a fuga.';break}
+    case 'pix':{c.dil.pix='p';c.pend.push({k:'pix',at:G.week+1,p:clamp(.45+c.aut/180+(G.jud-50)/150+bInt(),.15,.95)});msg='Pedido de quebra do sigilo bancário das contas de destino enviado ao juiz.';break}
+    case 'plat':{c.dil.plat='p';c.pend.push({k:'plat',at:G.week+1,p:clamp(.5+(G.jud-50)/150+bInt(),.2,.95)});msg='Pedido de dados da plataforma enviado ao juiz (Marco Civil, art. 22).';break}
+    case 'prints':c.dil.prints='p';c.pend.push({k:'prints',at:G.week+1});msg='Prints e celular da vítima enviados à perícia.';break;
+    case 'busca':{c.dil.busca='p';c.pend.push({k:'busca',at:G.week+1,p:clamp(.35+c.aut/150+(G.jud-50)/150+bInt(),.1,.95)});msg='Representação por busca e apreensão enviada ao juiz.';break}
+    case 'interr':c.dil.interr=1;c.aut=clamp(c.aut+R(3,10),0,100);msg=chance(.5)?`${c.sus} usa o direito ao silêncio. A versão do advogado ajuda a fechar lacunas.`:`${c.sus} dá uma versão que as provas desmentem em dois pontos.`;break;
+    case 'rsi':c.st='sa';c.preso=false;msg='Relatório final sem indiciamento. O caso vai ao MP, que pode requisitar novas diligências.';diary(`IP ${c.num} relatado sem indiciamento.`);break;
     case 'pror':c.dl+=30;c.pror++;G.jud=clamp(G.jud-1,0,100);msg='Prazo prorrogado por mais 30 dias.';break;
     case 'rel':msg=relatar(G,c);break;
   }
-  caseLog(c,msg);save();render();if(k!=='rel')toast(msg);
+  caseLog(c,msg);save();render();if(k!=='rel'&&k!=='rsi')toast(msg);
 }
 function relatar(G,c){
   if(c.nul&&c.dil.rec&&!c.dil.que&&c.aut<85){c.nul=false;c.dil.rec=0;c.aut=clamp(c.aut-22,0,100);c.dl=Math.max(c.dl,G.day+20);G.jud=clamp(G.jud-4,0,100);c.dev++;
@@ -879,41 +897,73 @@ function execOp(){
   if(has(U,'milicia')&&q.arm>=2&&!P.mpc){G.integ=clamp(G.integ-5,0,100);G.jud=clamp(G.jud-6,0,100);L.push(['balanço','A operação não foi comunicada ao MP, como exige o STF na ADPF 635.','bad'])}
   if(P.imp){if(!res.mortos&&!res.bala)G.imp=clamp(G.imp+4,0,100);if(chance(.35)){G.integ=clamp(G.integ-4,0,100);L.push(['balanço','As imagens dos presos na TV geram representação por exposição indevida (Lei 13.869, art. 13).','bad'])}}
   G.imp=clamp(G.imp+succ*5-res.mortos*3-(res.bala?14:0)-(leak?3:0),0,100);G.com=clamp(G.com+succ*3-res.mortos*2-(res.bala?15:0),0,100);
-  if(res.bala){G.integ=clamp(G.integ-4,0,100);G.stress=clamp(G.stress+12,0,100);G.flags.crise='bala'}
+  if(res.bala){G.integ=clamp(G.integ-4,0,100);G.stress=clamp(G.stress+12,0,100);G.flags.crise='bala';G.criseAte=G.week+1}
   k.team.forEach(a=>{a.fat=clamp(a.fat+15,0,100);a.mor=clamp(a.mor+(succ>.6&&!res.pmor?4:-2),0,100)});
   if(res.pmor){G.team.forEach(a=>a.mor=clamp(a.mor-18,0,100));G.stress=clamp(G.stress+15,0,100)}
   G.stats.ops++;G.stats.presos+=res.presos;G.stats.mortes+=res.mortos;G.stats.pmortes+=res.pmor;
   delete G.mand[q.id];
-  G.lastOp={g:q.n,L,res,succ,lid,w:G.week};G.plan=null;
+  q.opsN=(q.opsN||0)+1;G.lastOp={g:q.n,L,res,succ,lid,w:G.week,n:q.opsN};G.plan=null;
   diary(`Operação contra ${q.n}: ${res.presos} presos${res.mortos?`, ${res.mortos} mortos`:''}${leak?', vazamento':''}.`);
   UI.view='op';save();render();top();
 }
 
 /* ---------- imprensa ---------- */
-const AP2=[['dados','Apresentar dados e fatos','Números, resultado, próximos passos'],['sigilo','Preservar o sigilo','Não detalhar o que está em curso'],['assumir','Reconhecer o problema','Admitir o limite e mostrar o plano'],['prometer','Prometer prazo','"Em 30 dias isso muda"'],['expor','Expor o suspeito','Nome, foto, "é culpado"'],['culpar','Culpar terceiros','Justiça, leis, falta de efetivo']];
+const AP2={dados:'Dados e fatos',sigilo:'Sigilo',assumir:'Reconhecer',prometer:'Promessa',expor:'Expor suspeito',culpar:'Culpar terceiros'};
+const OPTS={
+  op:[['dados','Apresentar o balanço','Presos, apreensões, o que muda'],['sigilo','Falar só do que já é público','O resto segue em sigilo'],['assumir','Admitir o que não deu certo','Fugas, vazamento, limites'],['expor','Exibir os presos','Nomes, fotos, "são culpados"'],['culpar','"A Justiça vai soltar"','A gente prende, eles soltam']],
+  sus:[['sigilo','Não exibir e explicar por quê','A lei proíbe expor preso'],['dados','Dizer o que pesa contra eles','Sem nome nem rosto'],['expor','Mostrar o rosto e dizer o nome','"A população tem direito"'],['culpar','"Se dependesse de mim, mostrava"','Culpar a lei']],
+  inv:[['sigilo','Preservar o sigilo','Investigação em curso'],['dados','Falar do que já está provado','Sem antecipar alvos'],['prometer','"Vem mais por aí em breve"','Anunciar novos alvos'],['expor','Citar nomes de suspeitos','Inclusive políticos']],
+  vio:[['assumir','Abrir apuração independente','Perícia, corregedoria, câmeras'],['dados','Explicar a dinâmica do confronto','Laudos, armas apreendidas'],['sigilo','"Não vou comentar"','O caso está sob apuração'],['culpar','"Quem atira em polícia recebe tiro"','Defender a tropa sem ressalvas']],
+  alta:[['assumir','Reconhecer o aumento e mostrar o plano','Sem rodeios'],['dados','Explicar com números','Onde, quando e por quê'],['prometer','Prometer queda em 30 dias','Cria cobrança'],['culpar','Culpar efetivo e leis','Falta gente, a lei é fraca'],['sigilo','"Estamos trabalhando"','Sem detalhes']],
+  queda:[['dados','Mostrar o que funcionou','Ações e números'],['assumir','Ser cauteloso','"Ainda é cedo para comemorar"'],['prometer','Prometer que vai cair mais','Cria cobrança'],['culpar','"Antes ninguém trabalhava"','Criticar o antecessor']],
+  prom:[['dados','Apresentar metas e prazos realistas','Com indicadores'],['assumir','Dizer que não há solução rápida','Com plano'],['prometer','Prometer resultado em 30 dias','Arriscado'],['culpar','"Depende do governo"','Transferir a conta']],
+  pol:[['dados','Responder com resultados','Números, sem atacar'],['assumir','Reconhecer as críticas justas','E chamar para o diálogo'],['culpar','Rebater atacando','"Eles não entendem de polícia"'],['sigilo','Não responder','"Não comento política"']],
+  cri:[['assumir','Assumir a falha e anunciar mudanças','Corregedoria, protocolo novo'],['prometer','Prometer responsabilização com prazo','"Em 30 dias, respostas"'],['dados','Explicar o procedimento seguido','Defender os registros'],['expor','Apontar um culpado já','Antes da apuração'],['culpar','Culpar a Justiça ou o governo','"Não tínhamos meios"']],
+  rep:[['assumir','Admitir que o grupo se reorganizou','E explicar por quê'],['dados','Mostrar o que mudou desde a última','Presos, força do grupo'],['prometer','Prometer desarticular de vez','Com prazo'],['culpar','"A Justiça soltou todo mundo"','Culpar terceiros']],
+};
 const SM={op:{dados:3,sigilo:1,assumir:1,prometer:0,expor:-3,culpar:-1},sus:{dados:1,sigilo:3,assumir:1,prometer:0,expor:-4,culpar:-1},inv:{dados:0,sigilo:3,assumir:1,prometer:-1,expor:-3,culpar:-1},
-  alta:{dados:2,sigilo:-1,assumir:3,prometer:-1,expor:-1,culpar:-2},prom:{dados:2,sigilo:0,assumir:2,prometer:1,expor:-2,culpar:-2},pol:{dados:3,sigilo:0,assumir:1,prometer:-1,expor:-2,culpar:-3},
-  vio:{dados:1,sigilo:-2,assumir:3,prometer:0,expor:-2,culpar:-2},cri:{dados:0,sigilo:-2,assumir:3,prometer:1,expor:-3,culpar:-3}};
-const REACT={dados:['Os jornalistas anotam tudo. Os números entram na matéria.','Os números não respondem o que foi perguntado. A pergunta volta.'],sigilo:['Os jornalistas reclamam, mas o promotor elogia a cautela.','Soa como fuga. A sala murmura.'],
-  assumir:['A franqueza desarma a sala. Ninguém esperava ouvir isso de uma autoridade.','Admitir sem mostrar saída deixa a sensação de descontrole.'],prometer:['A promessa vira manchete, e um relógio começa a correr.','Prometer prazo para algo que não depende só de você é arriscado.'],
-  expor:['O público aplaude. A defesa já prepara a representação por abuso de autoridade (Lei 13.869, art. 38).','O público aplaude. A defesa já prepara a representação por abuso de autoridade (Lei 13.869, art. 38).'],culpar:['A plateia concorda, mas a pergunta era sobre você.','O Judiciário e o governo respondem em nota. A pauta vira briga.']};
+  alta:{dados:2,sigilo:-1,assumir:3,prometer:-1,expor:-1,culpar:-2},queda:{dados:3,assumir:2,prometer:-1,culpar:-2,sigilo:0,expor:-2},prom:{dados:2,sigilo:0,assumir:2,prometer:0,expor:-2,culpar:-2},pol:{dados:3,sigilo:0,assumir:1,prometer:-1,expor:-2,culpar:-3},
+  vio:{dados:1,sigilo:-2,assumir:3,prometer:0,expor:-2,culpar:-3},cri:{dados:0,sigilo:-2,assumir:3,prometer:1,expor:-3,culpar:-3},rep:{assumir:3,dados:2,prometer:-1,culpar:-2,sigilo:0,expor:-3}};
+const REACT={
+  dados:[['Os jornalistas anotam tudo. Os números entram na matéria.','A resposta objetiva encerra a pergunta. Ninguém insiste.'],['Os números são corretos, mas não era isso que foi perguntado.'],['Os números não respondem a pergunta. Ela volta, mais dura.','Despejar estatística diante de uma tragédia soa frio.']],
+  sigilo:[['Os jornalistas reclamam, mas o promotor elogia a cautela.','A repórter insiste uma vez e desiste: investigação em curso é investigação em curso.'],['A sala aceita, sem entusiasmo.'],['Soa como fuga. A sala murmura.','Mais um "não posso falar". A paciência da imprensa acabou.']],
+  assumir:[['A franqueza desarma a sala. Ninguém esperava ouvir isso de uma autoridade.','Reconhecer o problema e mostrar o caminho vira a melhor frase do dia.'],['A sinceridade é registrada, mas faltou dizer o que muda.'],['Admitir sem mostrar saída deixa a sensação de descontrole.']],
+  prometer:[['A promessa vira manchete, e um relógio começa a correr.'],['A promessa é anotada com ceticismo. Agora todo mundo vai cobrar.'],['Prometer prazo para algo que não depende só de você é arriscado. A sala percebe.']],
+  expor:[[''],[''],['A defesa já prepara a representação por abuso de autoridade.','Parte do público aplaude; o Ministério Público, não.']],
+  culpar:[['A plateia concorda, mas a pergunta era sobre você.'],['A plateia concorda, mas a pergunta era sobre você.'],['O Judiciário e o governo respondem em nota. A pauta vira briga.','Culpar os outros num momento desses pega mal até entre os aliados.']],
+};
+const RQ={cri:{expor:'Apontar culpado antes da apuração não devolve uma vida. A defesa já fala em abuso de autoridade.',dados:'Defender os registros diante de uma morte soa como desculpa burocrática.'},vio:{culpar:'A frase vira meme e é exibida no Jornal Nacional. O Ministério Público abre procedimento.'}};
+const LAW={expor:'Lei 13.869/2019 (Abuso de Autoridade): art. 13 proíbe expor o preso à curiosidade pública; art. 38 proíbe antecipar a atribuição de culpa antes de concluída a apuração.',sigilo:'CPP, art. 20: a autoridade assegura no inquérito o sigilo necessário à elucidação do fato.',vio:'STF, ADPF 635: uso da força em operações deve ser excepcional, justificado e documentado.'};
 function critType(G){let w=null,wv=-9;G.metas.forEach(m=>{const v=(G.idx[m.k]-G.b[m.k])/G.b[m.k];if(v>wv){wv=v;w=m.k}});return {k:w,v:wv}}
+function impAdd(G,d){if(d>0)d*=clamp((100-G.imp)/40,.15,1);G.imp=clamp(G.imp+d,0,100)}
+function setPromise(G,src){if(G.promise)return null;const ct=critType(G);G.promise={k:ct.k,w:G.week+6,v:G.idx[ct.k],src};diary(`Promessa (${src}): reduzir ${CT[ct.k].n.toLowerCase()} em 5% até a semana ${G.week+6}.`);return G.promise}
+function promiseTxt(P){return `reduzir ${CT[P.k].n.toLowerCase()} em 5% até a semana ${P.w}`}
 function openColetiva(ctx){
   const G=S.g,ct=critType(G),cn=CT[ct.k].n.toLowerCase(),rep=()=>pname(null,chance(.55)),o=[`Rádio ${G.city.nome}`,`TV ${UF(G.uf).uf} Notícias`,`Jornal Gazeta`,`Portal ${G.city.nome} Agora`,'Agência de notícias'];
   let qs;
-  if(ctx==='op'){const L=G.lastOp;qs=[{qt:'op',x:`Qual o balanço da operação contra "${L.g}"?`}];qs.push(L.res.mortos||L.res.bala?{qt:'vio',x:`Houve ${L.res.bala?'um morador baleado':L.res.mortos+' mortos'}. A polícia exagerou?`}:{qt:'sus',x:`${L.lid?'O líder preso':'Os presos'} — pode dizer os nomes e mostrar o rosto?`});qs.push({qt:'inv',x:'Há políticos envolvidos? Quem são os próximos alvos?'})}
+  if(ctx==='op'){const L=G.lastOp,r=L.res;qs=[];
+    if(L.n>1)qs.push({qt:'rep',x:`É a ${L.n}ª operação contra "${L.g}". Por que esse grupo continua ativo?`});
+    const sm=Object.assign({},SM.op);if(r.leak||!r.presos){sm.assumir=3;sm.dados=0}else if(r.mortos||r.bala){sm.assumir=2;sm.dados=1}else if(L.lid)sm.dados=3;
+    qs.push({qt:'op',x:`Qual o balanço da operação contra "${L.g}"?`,sm});
+    qs.push(r.mortos||r.bala?{qt:'vio',x:`Houve ${r.bala?'um morador baleado':r.mortos+(r.mortos>1?' mortos':' morto')}. A polícia exagerou?`}:{qt:'sus',x:`${L.lid?'O líder preso':'Os presos'} — pode dizer os nomes e mostrar o rosto?`});
+    if(qs.length<3)qs.push({qt:'inv',x:'Há políticos envolvidos? Quem são os próximos alvos?'})}
   else if(ctx==='cri'){qs=[{qt:'cri',x:G.flags.crise==='bala'?'Um morador inocente foi baleado dentro de casa na sua operação. Quem responde por isso?':'Uma mulher que já tinha procurado a polícia foi morta. Onde a polícia falhou?'},{qt:'prom',x:'O que muda a partir de hoje?'},{qt:'pol',x:`${G.lv>=3?'O governo':'O prefeito'} diz que a polícia precisa "fazer a sua parte". O que responde?`}]}
-  else{qs=[{qt:'alta',x:`Os casos de ${cn} ${ct.v>0?'subiram':'mudaram pouco'}${ct.v>0?' '+f1(ct.v*100)+'%':''} desde o início do ciclo. Por quê?`},{qt:'prom',x:'Quando a população vai sentir diferença?'},{qt:'pol',x:`${G.lv>=3?'Deputados':'Vereadores'} dizem que falta comando na polícia. O que responde?`}]}
+  else{const up=ct.v>.02,dn=ct.v<-.02;qs=[up?{qt:'alta',x:`Os casos de ${cn} subiram ${f1(ct.v*100)}% desde o início do ciclo. Por quê?`}:dn?{qt:'queda',x:`Os casos de ${cn} caíram ${f1(-ct.v*100)}% desde o início do ciclo. É resultado do seu trabalho ou sorte?`}:{qt:'alta',x:`Os casos de ${cn} quase não mudaram desde o início do ciclo. O que está faltando?`},{qt:'prom',x:'Quando a população vai sentir diferença?'},{qt:'pol',x:`${G.lv>=3?'Deputados':'Vereadores'} dizem que falta comando na polícia. O que responde?`}]}
   qs.forEach(q=>{q.rep=rep();q.out=pick(o)});
-  G.col={ctx,qs,i:0,ans:[]};UI.view='col';save();render();top();
+  G.col={ctx,qs,i:0,ans:[],before:{imp:G.imp,com:G.com,integ:G.integ,jud:G.jud,pol:G.pol}};UI.view='col';save();render();top();
 }
 function colAnswer(a){
-  const G=S.g,C=G.col,q=C.qs[C.i],sc=SM[q.qt][a];C.ans.push({a,sc,r:REACT[a][sc>0?0:1]});
+  const G=S.g,C=G.col,q=C.qs[C.i];let sc=(q.sm||SM[q.qt])[a];
+  const nsig=C.ans.filter(x=>x.a==='sigilo').length;if(a==='sigilo'&&nsig>=1)sc-=2;
+  let r=RQ[q.qt]&&RQ[q.qt][a]||pick(REACT[a][sc>0?0:sc===0?1:2]);
+  if(a==='sigilo'&&nsig>=1)r='De novo o sigilo. Fugir de todas as perguntas vira falta de transparência.';
+  let law=a==='expor'?LAW.expor:a==='sigilo'&&sc>0?LAW.sigilo:q.qt==='vio'&&sc<0?LAW.vio:'';
   if(a==='expor'){G.integ=clamp(G.integ-5,0,100);G.jud=clamp(G.jud-4,0,100);G.com=clamp(G.com+1,0,100)}
   if(a==='culpar'&&q.qt==='pol')G.pol=clamp(G.pol-4,0,100);
-  if(a==='prometer'&&!G.promise){const ct=critType(G);G.promise={k:ct.k,w:G.week+6,v:G.idx[ct.k]}}
-  C.i++;
-  if(C.i>=C.qs.length){const tot=C.ans.reduce((x,y)=>x+y.sc,0);G.imp=clamp(G.imp+tot*1.6,0,100);G.com=clamp(G.com+tot*.5,0,100);C.tot=tot;C.hl=headline(G,C.ctx,tot);G.stats.entrev++;diary(`Coletiva: "${C.hl}"`);if(C.ctx==='cri')G.flags.crise=null}
+  if(a==='prometer'){const P=setPromise(G,'coletiva');r+=P?` Promessa registrada: ${promiseTxt(P)}.`:' (Já existe uma promessa em andamento.)'}
+  C.ans.push({a,sc,r,law});C.i++;
+  if(C.i>=C.qs.length){const tot=C.ans.reduce((x,y)=>x+y.sc,0);impAdd(G,tot*1.6);G.com=clamp(G.com+tot*.5,0,100);C.tot=tot;C.hl=headline(G,C.ctx,tot);G.stats.entrev++;diary(`Coletiva: "${C.hl}"`);if(C.ctx==='cri')G.flags.crise=null;
+    C.after={imp:G.imp,com:G.com,integ:G.integ,jud:G.jud,pol:G.pol}}
   save();render();top();
 }
 function headline(G,ctx,tot){const c=G.city.nome,qn=G.lastOp?G.lastOp.g:'';
@@ -921,26 +971,81 @@ function headline(G,ctx,tot){const c=G.city.nome,qn=G.lastOp?G.lastOp.g:'';
     cri:[[`"Nós falhamos", admite ${g('a delegada','o delegado')} de ${c}`,`Polícia assume erro e anuncia mudanças`],[`Polícia promete apurar caso que chocou ${c}`],[`Autoridade culpa terceiros após tragédia em ${c}`]],
     gen:[[`Com dados na mão, polícia de ${c} detalha plano contra o crime`],[`Polícia de ${c} diz ter plano, mas não convence`],[`Na defensiva, polícia de ${c} culpa a Justiça e as leis`]]}[ctx==='op'?'op':ctx==='cri'?'cri':'gen'];
   return pick(tot>=4?H[0]:tot>=0?H[1]:H[2]);}
-const TVW={pos:['investigacao','inteligencia','integracao','prevencao','esclarec','pericia','policia militar','ministerio publico','comunidade','receptacao','prioridade','meta','operacao','dinheiro','lavagem','protetiva','rede de protecao','analise','mancha criminal','camera'],emp:['vitima','familia','populacao','moradores','mulheres','vida'],tra:['reconhec','desafio','ainda','precisamos','falha','limite','nao e suficiente','longo prazo'],neg:['bandido bom','cpf cancelado','vagabundo','zerar','acabar com o crime','lixo','vai pagar','marginal','nao tem jeito'],cul:['a justica solta','prende e solta','culpa d','a lei e fraca','direitos humanos atrapalham']};
+
+/* entrevista: termos com * são radicais; os demais casam com palavra inteira (aceita plural) */
+const TVW={pos:['investig*','inteligencia','integra*','preven*','esclarec*','perici*','policia militar','ministerio publico','comunidade','receptac*','prioriz*','prioridade','meta','metas','operac*','dinheiro','lavagem','protetiva*','rede de protecao','analise','mancha criminal','camera*','planej*','diagnostic*'],
+  emp:['vitima*','familia*','populacao','moradores','mulheres','vida','vidas','pessoas'],
+  tra:['reconhec*','desafio*','ainda','precisamos','falha*','limite*','nao e suficiente','longo prazo','honest*','dificil','nao e facil','ainda falta','temos muito a fazer','nao vou mentir','admito','sincer*'],
+  neg:['bandido bom','cpf cancelado','vagabundo*','zerar','acabar com o crime','vai pagar','nao tem jeito','lixo humano','vao para a vala'],
+  cul:['a justica solta','prende e solta','culpa da justica','culpa do governo','a lei e fraca','direitos humanos atrapalham'],
+  data:['por cento','dados','numero*','indice*','taxa*','estatistic*']};
+const STOP=new Set('de a o que e do da em um uma para com nao os as no na se por mais dos das como mas ao ele ela isso esse essa este esta nos ja e esta sao foi ser tem ter ha muito pela pelo ate tambem so quando sem mesmo aos seu sua nossa nosso vamos vai estamos temos eu voce gente quem onde porque pois entao cada todo toda'.split(' '));
+const TOPIC={
+  alta:{kw:[],h:'os números'},queda:{kw:['mant*','sustent*','continu*','resultado*','trabalho'],h:'a queda'},estavel:{kw:['falt*','precis*','ajust*','mud*'],h:'os índices'},
+  op:{kw:['mandado*','prova*','apreens*','pres*','continu*','dinheiro','alvos'],h:'a operação'},
+  registro:{kw:['boletim','registr*','delegacia online','delegacia eletronica','retorno','subnotifica*','atendimento','acolh*','denunc*','cifra negra'],h:'o registro de ocorrências'},
+  letal:{kw:['camera*','corporal','protocolo*','uso da forca','corregedoria','perici*','inteligencia','planej*','excepcional'],h:'a letalidade policial'},
+  corrup:{kw:['corregedoria','afast*','apura*','ministerio publico','transparen*','denunc*','tolerancia'],h:'o desvio de conduta'},
+  greve:{kw:['dialogo','servicos essenciais','valoriz*','salario*','populacao','flagrante*'],h:'a greve'},
+  vdom:{kw:['protetiva*','48 horas','patrulha','maria da penha','acolh*','sala','rede de protecao','monitor*'],h:'a violência contra a mulher'},
+  chegada:{kw:['experien*','aprend*','equipe','diagnostic*','ouvir','escut*','comunidade','dados'],h:'a chegada'},
+  regiao:{kw:['plantao','regional','municipios','delegacias','visita*','integra*','cidades'],h:'a região'},
+  follow:{kw:['dados','resultado*','mud*','numero*','avanc*','cumpr*'],h:'a promessa'},
+};
+const OUTK={tv:{n:'TV ao vivo',hint:'Resposta curta e direta: até ~110 palavras.',max:110},radio:{n:'Rádio',hint:'Conversa: até ~160 palavras.',max:160},jornal:{n:'Jornal',hint:'O jornal cobra dados: traga números.',max:200,data:1},podcast:{n:'Podcast',hint:'Formato longo: dá para ser técnico (até ~280 palavras).',max:280}};
+const outKind=o=>/^TV|Rede Nacional/.test(o)?'tv':/Rádio/.test(o)?'radio':/Podcast/.test(o)?'podcast':'jornal';
+function esc2(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+function findTerm(n,t){const pre=t.endsWith('*'),b=esc2(pre?t.slice(0,-1):t);const re=new RegExp('(^|[^a-z0-9])('+b+(pre?'[a-z]*':'s?')+')(?![a-z0-9])','g');const out=[];let m;while((m=re.exec(n)))out.push({i:m.index+m[1].length,w:m[2]});return out}
+const has2=(n,list)=>list.filter(t=>findTerm(n,t).length);
+function negated(n,i){const before=n.slice(Math.max(0,i-60),i).trim().split(/\s+/).slice(-5).join(' ');return /(^| )(nao|nunca|jamais|nem)( |$)|seria desonesto|dizem que|diz que|acham que|acha que|falam que|muita gente|alguns dizem/.test(before)}
+function pickTopic(G){
+  const ct=critType(G),cn=CT[ct.k].n.toLowerCase(),c=G.city.nome,U=UF(G.uf),L=[];G.tvUsed=G.tvUsed||[];
+  const ALL=[],add=(id,q,w)=>{ALL.push({id,q,w});if(!G.tvUsed.slice(-3).includes(id))L.push({id,q,w})};
+  if(ct.v>.02)add('alta',`Os casos de ${cn} em ${c} subiram ${f1(ct.v*100)}% desde que o ciclo começou. O que a polícia está fazendo, concretamente?`,3);
+  else if(ct.v<-.02)add('queda',`Os casos de ${cn} em ${c} caíram ${f1(-ct.v*100)}% desde que o ciclo começou. É resultado do trabalho ou sorte? Dá para manter?`,3);
+  else add('estavel',`Os casos de ${cn} em ${c} quase não mudaram neste ciclo. O que está faltando?`,2);
+  if(G.lastOp&&G.week-G.lastOp.w<=3)add('op',`A operação contra "${G.lastOp.g}" resolveu alguma coisa ou foi só para a foto?`,3);
+  add('registro',`Muita gente em ${c} diz que não adianta registrar ocorrência. O que diria a essas pessoas?`,1);
+  if(G.stats.mortes>0||has(U,'faccao')||has(U,'milicia'))add('letal',`A polícia de ${U.nome} mata muito em operações? Como reduzir a letalidade sem expor policiais?`,G.stats.mortes?2:1);
+  if(G.integ<75||G.team.some(a=>a.known))add('corrup','Há denúncias de policiais cobrando "taxa" de comerciantes. Como a sua gestão lida com desvio de conduta?',G.team.some(a=>a.known)?3:1);
+  if(G.usedEv.includes('greve')||(G.evCd&&G.evCd.greve))add('greve','Os policiais civis falam em greve por salário. De que lado você está?',1);
+  if(G.types.includes('vdom'))add('vdom',`Mulheres com medida protetiva continuam sendo agredidas em ${c}. O que a delegacia faz?`,G.metas.some(m=>m.k==='vdom')||G.flags.crise==='fem'?3:1);
+  const prev=G.posts.length>1?G.posts[G.posts.length-2]:null;if(prev&&G.cycN===1&&G.cw<=5)add('chegada',`Você chega de ${prev.nome}. O que traz de lá para ${G.lv>=3?'o novo cargo':c}?`,4);
+  if(G.lv===1)add('regiao','Os prefeitos da região dizem que a Seccional só olha para a cidade-sede. Como vai atender os municípios pequenos?',2);
+  if(G.promise)add('follow',`Você prometeu ${promiseTxt(G.promise)}. Faltam ${Math.max(0,G.promise.w-G.week)} semanas. Vai cumprir?`,5);
+  else if(G.lastTV&&G.week-G.lastTV.w>=3&&G.week-G.lastTV.w<=12)add('follow',`Na nossa última conversa, na semana ${G.lastTV.w}, o tema era ${TOPIC[G.lastTV.id].h}. O que mudou desde então?`,3);
+  return wpick(L.length?L:ALL,x=>x.w);
+}
 function openTV(invId){const G=S.g,iv=G.inv.find(x=>x.id===invId);if(!iv)return;if(G.ag.length>=3)return toast('Sua agenda da semana está cheia (3 compromissos).');
-  G.ag.push('tv');G.inv=G.inv.filter(x=>x.id!==invId);const ct=critType(G),cn=CT[ct.k].n.toLowerCase();
-  const topics=[`Os casos de ${cn} em ${G.city.nome} ${ct.v>0?'subiram '+f1(ct.v*100)+'%':'mudaram '+f1(Math.abs(ct.v*100))+'%'} desde que o ciclo começou. O que a polícia está fazendo, concretamente?`];
-  if(G.lastOp&&G.week-G.lastOp.w<=3)topics.push(`A operação contra "${G.lastOp.g}" resolveu alguma coisa ou foi só para a foto?`);
-  topics.push(`Muita gente em ${G.city.nome} diz que não adianta registrar ocorrência. O que diria a essas pessoas?`);
-  G.tv={out:iv.out,host:iv.host,q:pick(topics)};UI.ans='';UI.view='tv';save();render();top()}
-function gradeTV(t){
-  const n=' '+norm(t||'')+' ',w=(t||'').trim().split(/\s+/).filter(Boolean).length,fb=[];let s=30;
-  if(/\d/.test(n)||/por cento|dados|numeros|indice|taxa/.test(n)){s+=14;fb.push([true,'Trouxe dados concretos'])}else fb.push([false,'Faltaram números ou dados'])
-  const p=TVW.pos.filter(k=>n.includes(k)).length;s+=Math.min(p,4)*7;fb.push([p>=2,p>=2?`Explicou o plano (${p} pontos citados)`:'Plano vago: cite investigação, inteligência, integração, prevenção']);
-  const e=TVW.emp.some(k=>n.includes(k));if(e)s+=8;fb.push([e,e?'Falou das vítimas e da população':'Esqueceu as vítimas']);
-  const tr=TVW.tra.some(k=>n.includes(k));if(tr)s+=8;fb.push([tr,tr?'Reconheceu limites com honestidade':'Soou como propaganda']);
-  const ng=TVW.neg.filter(k=>n.includes(k)).length;if(ng){s-=20*ng;fb.push([false,'Usou linguagem de confronto que a lei e a imprensa não perdoam'])}
-  const cu=TVW.cul.some(k=>n.includes(k));if(cu){s-=8;fb.push([false,'Culpou terceiros'])}
-  if(w<25){s-=15;fb.push([false,`Resposta curta demais (${w} palavras)`])}else if(w<=170)s+=5;else{s-=5;fb.push([false,'Longa demais para TV'])}
+  G.ag.push('tv');G.inv=G.inv.filter(x=>x.id!==invId);const tp=pickTopic(G);G.tvUsed.push(tp.id);
+  G.tv={out:iv.out,host:iv.host,q:tp.q,id:tp.id,k:outKind(iv.out)};UI.ans='';UI.view='tv';save();render();top()}
+function sentences(t){return t.split(/(?<=[.!?;])\s+|\n+/).map(x=>x.trim()).filter(x=>x.length>3)}
+function gradeTV(t,T){
+  const G=S.g,K=OUTK[T.k],n=norm(t||''),words=n.split(/[^a-z0-9%]+/).filter(Boolean),w=words.length,fb=[],tp=TOPIC[T.id]||{kw:[]};let s=30;
+  const dOK=/\d/.test(n)||has2(n,TVW.data).length;const dv=K.data?20:16;if(dOK){s+=dv;fb.push([true,'Trouxe dados concretos'])}else{s-=K.data?6:0;fb.push([false,K.data?'O jornal cobrou números e você não trouxe':'Faltaram números ou dados'])}
+  let pts=0;const seen=new Set();sentences(norm(t||'')).forEach(se=>{const m=has2(se,TVW.pos.concat(tp.kw)).filter(x=>!seen.has(x)).slice(0,2);m.forEach(x=>seen.add(x));pts+=m.length});
+  const onTopic=!tp.kw.length||has2(n,tp.kw).length>0;if(!onTopic)pts=Math.min(pts,2);
+  s+=Math.min(pts,4)*7;fb.push([pts>=2,pts>=2?`Explicou o plano (${pts} pontos citados)`:'Plano vago: diga o que vai fazer, com quem e onde']);
+  if(!onTopic)fb.push([false,`Não respondeu ao que foi perguntado: fale sobre ${tp.h}`]);
+  const e=has2(n,TVW.emp).length>0;if(e)s+=9;fb.push([e,e?'Falou das vítimas e da população':'Esqueceu as vítimas e a população']);
+  const tr=has2(n,TVW.tra).length>0;if(tr)s+=10;fb.push([tr,tr?'Reconheceu limites com honestidade':'Faltou reconhecer um limite ou dificuldade']);
+  const ng=[];TVW.neg.forEach(k=>findTerm(n,k).forEach(m=>{if(!negated(n,m.i))ng.push(m.w)}));if(ng.length){s-=20*ng.length;fb.push([false,`Usou "${ng[0]}": linguagem de confronto que a lei e a imprensa não perdoam`])}
+  const cu=[];TVW.cul.forEach(k=>findTerm(n,k).forEach(m=>{if(!negated(n,m.i))cu.push(m.w)}));if(cu.length){s-=8;fb.push([false,`Culpou terceiros ("${cu[0]}")`])}
+  const stop=words.filter(x=>STOP.has(x)).length;if(w>=8&&stop/w<.22){s-=30;fb.push([false,'Parece uma lista de palavras soltas, não uma resposta'])}
+  if(w<25){s-=15;fb.push([false,`Resposta curta demais (${w} palavras)`])}else if(w<=K.max)s+=7;else{s-=6;fb.push([false,`Longa demais para ${K.n.toLowerCase()} (${w} palavras)`])}
+  if(G.imp>70){const p=Math.round((G.imp-70)/3);s-=p;if(p>=2)fb.push([false,'Com sua imagem em alta, a imprensa está mais exigente'])}
   return {s:Math.round(clamp(s,0,100)),fb};
 }
-function finishTV(){const G=S.g,T=G.tv;T.res=gradeTV(UI.ans);T.ans=UI.ans;const s=T.res.s;G.imp=clamp(G.imp+(s-50)/4,0,100);G.com=clamp(G.com+(s-50)/10,0,100);G.stats.entrev++;
-  const c=G.city.nome;T.hl=s>=70?pick([`"Não existe atalho", diz ${g('delegada','delegado')} sobre a segurança em ${c}`,`Entrevista: o plano da polícia para ${c}, ponto a ponto`]):s>=45?pick([`Polícia de ${c} defende estratégia, mas números ainda preocupam`]):pick([`Entrevista desastrosa expõe falta de rumo na polícia de ${c}`,`Fala de autoridade policial em ${c} gera reação de especialistas`]);
+function bestQuote(t,T){const tp=TOPIC[T.id]||{kw:[]};const ss=sentences(t);if(!ss.length)return '';let best=ss[0],bv=-1;ss.forEach(x=>{const v=has2(norm(x),TVW.pos.concat(tp.kw,TVW.tra)).length;if(v>bv){bv=v;best=x}});best=best.replace(/[.!?;]+$/,'');if(best.length>110)best=best.slice(0,110).replace(/\s+\S*$/,'')+'…';return best}
+function worstQuote(t){const ss=sentences(t);const x=ss.find(z=>has2(norm(z),TVW.tra.concat(TVW.neg,TVW.cul)).length)||ss[ss.length-1]||'';return x.replace(/[.!?;]+$/,'').slice(0,90)}
+function finishTV(){const G=S.g,T=G.tv;T.ans=UI.ans;T.res=gradeTV(UI.ans,T);const s=T.res.s;impAdd(G,(s-50)/4);G.com=clamp(G.com+(s-50)/10,0,100);G.stats.entrev++;
+  const c=G.city.nome,D=g('Delegada','Delegado'),q=bestQuote(UI.ans,T),h=(TOPIC[T.id]||{h:'a segurança'}).h;
+  if(s>=60&&G.imp>=35)T.hl=q?`"${q}", diz ${D.toLowerCase()} de ${c}`:`${D} de ${c} detalha plano sobre ${h}`;
+  else if(s>=60){const wq=worstQuote(UI.ans);T.hl=`${D} de ${c} admite: "${wq||q}"`;T.dist=1}
+  else if(s>=40)T.hl=`${D} de ${c} fala sobre ${h}, mas não convence`;
+  else{const wq=worstQuote(UI.ans);T.hl=wq?`Fala de ${D.toLowerCase()} sobre ${h} gera reação: "${wq}"`:`Entrevista desastrosa expõe falta de rumo na polícia de ${c}`}
+  if(/prometo|garanto|vou reduzir|em \d+ dias/.test(norm(UI.ans))){const P=setPromise(G,'entrevista');if(P)T.prom=promiseTxt(P)}
+  G.lastTV={w:G.week,id:T.id};
   diary(`Entrevista (${T.out}): "${T.hl}"`);save();render();top()}
 
 /* ---------- projetos e agenda ---------- */
@@ -959,7 +1064,8 @@ const PROJ={
   dh:{n:'Programa estadual de esclarecimento de homicídios',c:80,w:5,fx:{homic:-10},d:'Equipes exclusivas para homicídio em todo o estado. MVI −10%.',lv:4},
   cor:{n:'Câmeras corporais e corregedoria ativa',c:60,w:4,d:'Menos mortes em confronto e menos desvios na tropa.',lv:4},
 };
-const pcost=(G,id)=>Math.round(PROJ[id].c*[1,1.5,2.2,4,12,25][G.lv]);
+const pcost=(G,id)=>Math.round(PROJ[id].c*[1,1.5,2.2,4,12,25][G.lv]*(id==='cam'&&G.flags.camEv?.6:1));
+const pname2=(G,id)=>id==='cam'&&G.flags.camEv?'Ampliar a rede de câmeras do comércio':PROJ[id].n;
 function projAvail(G,id){const p=PROJ[id];if(p.lv&&G.lv<p.lv)return false;if(p.fx&&!Object.keys(p.fx).some(t=>G.types.includes(t)))return false;return true}
 function startProj(id){const G=S.g,p=PROJ[id],c=pcost(G,id);if(G.proj[id])return;const nd=p.need?p.need(G):'';if(nd)return toast(nd);if(G.verba<c)return toast('Verba insuficiente neste ciclo.');
   G.verba-=c;G.proj[id]={left:p.w,ok:false};if(id==='sala')G.com=clamp(G.com+3,0,100);diary(`Projeto iniciado: ${p.n}.`);save();render();toast(`${p.n}: implantação em ${p.w} semanas.`)}
@@ -976,7 +1082,7 @@ function doAgenda(k){
   const G=S.g;if(G.ag.length>=3)return toast('Agenda cheia: 3 compromissos por semana.');if(G.ag.includes(k))return toast('Já está na agenda desta semana.');G.ag.push(k);let m='';
   switch(k){
     case 'pm':G.pm=clamp(G.pm+6,0,100);tmpAdd(G,'roubo',-2.5);tmpAdd(G,'furto',-2);m=`${G.cast.pm.n} aceita trocar dados toda semana. Policiamento ajustado aos pontos críticos.`;break;
-    case 'conseg':{G.com=clamp(G.com+5,0,100);const q=pick(G.groups.filter(x=>x.st==='at'));if(q&&chance(.6)){q.intel=clamp(q.intel+10*gaeco(G),0,100);m=`Um morador procura você depois da reunião com uma informação sobre "${q.n}".`}else m='Reclamações de iluminação, de ônibus e de demora no atendimento. Você anota tudo.';break}
+    case 'conseg':{G.com=clamp(G.com+5,0,100);const q=topGroup(G);if(q&&chance(.6)){q.intel=clamp(q.intel+10*gaeco(G),0,100);m=`Um morador procura você depois da reunião com uma informação sobre "${q.n}".`}else m='Reclamações de iluminação, de ônibus e de demora no atendimento. Você anota tudo.';break}
     case 'mpj':G.jud=clamp(G.jud+6,0,100);m=`Despacho com ${G.cast.juiz.n} e ${G.cast.prom.n}. As representações passam a ser lidas com mais boa vontade.`;break;
     case 'pref':{G.pol=clamp(G.pol+6,0,100);if(chance(.3)){const v=Math.round(POSTS[G.lv].verba*.2);G.verba+=v;m=`Apoio garantido e ${mil(v)} de reforço de verba.`}else m=G.lv>=3?'O governo promete apoio. Foto no Palácio.':`${G.cast.pref.n} promete apoio. Foto para as redes.`;break}
     case 'equipe':G.team.forEach(a=>a.mor=clamp(a.mor+5,0,100));m='A equipe fala do excesso de plantões e da viatura quebrada. Sai da reunião mais leve.';break;
@@ -997,7 +1103,11 @@ function resolvePend(G,c,p,rep,add){
     case 'int':if(chance(p.p)){c.dil.int='ok';G.hhResNext=(G.hhResNext||0)+12;add.push({k:'intr',at:G.week+3});caseLog(c,'Interceptação deferida por 15 dias.');rep.push(['Judiciário',`${N}: interceptação deferida por 15 dias. A escuta consome 12h da equipe.`])}else{c.dil.int='neg';caseLog(c,'Interceptação indeferida.');rep.push(['Judiciário',`${N}: interceptação indeferida. O juiz entende que há outros meios de prova.`,'bad'])}break;
     case 'intr':c.aut=clamp(c.aut+R(20,30),0,100);if(grp){grp.intel=clamp(grp.intel+R(20,35)*gaeco(G),0,100);if(chance(.4))grp.tip=true}caseLog(c,'Relatório da interceptação concluído.');rep.push(['Inteligência',`${N}: a escuta termina${grp?` e revela a rotina de "${grp.n}"${grp.tip?', incluindo onde guardam armas':''}`:''}.`]);break;
     case 'mp':if(chance(p.p)){G.det.vdom=clamp((G.det.vdom||0)+.015,0,.2);caseLog(c,'Medidas protetivas deferidas.');rep.push(['Judiciário',`${N}: medidas protetivas deferidas para ${c.v}.`])}else{c.dil.mp=0;rep.push(['Judiciário',`${N}: medidas protetivas negadas. Reforce o pedido.`,'bad'])}break;
-    case 'prev':if(chance(p.p)){c.preso=true;c.dil.prev='ok';c.dl=G.day+7+10;if(grp)grp.f=clamp(grp.f-4,0,100);caseLog(c,'Preventiva decretada e cumprida. Prazo de 10 dias.');rep.push(['Judiciário',`${N}: prisão preventiva de ${c.sus} decretada. Novo prazo: 10 dias.`])}else{c.dil.prev=0;caseLog(c,'Preventiva negada.');rep.push(['Judiciário',`${N}: preventiva negada. Faltam requisitos do art. 312.`,'bad'])}break;
+    case 'pix':if(chance(p.p)){c.dil.pix='ok';c.aut=clamp(c.aut+R(15,25),0,100);c.mat=clamp(c.mat+R(8,14),0,100);if(grp)grp.intel=clamp(grp.intel+10*gaeco(G),0,100);caseLog(c,'Sigilo bancário quebrado: o dinheiro passou por contas-laranja até um titular.');rep.push(['Judiciário',`${N}: quebra do sigilo bancário deferida.`])}else{c.dil.pix='neg';rep.push(['Judiciário',`${N}: quebra do sigilo bancário indeferida.`,'bad'])}break;
+    case 'plat':if(chance(p.p)){c.dil.plat='ok';c.aut=clamp(c.aut+R(12,20),0,100);caseLog(c,'A plataforma entregou IPs e cadastro do anunciante.');rep.push(['Judiciário',`${N}: dados da plataforma deferidos.`])}else{c.dil.plat='neg';rep.push(['Judiciário',`${N}: pedido de dados da plataforma indeferido.`,'bad'])}break;
+    case 'prints':c.dil.prints='ok';c.mat=clamp(c.mat+R(25,35),0,100);caseLog(c,'Laudo dos prints e do celular juntado.');rep.push(['Perícia',`${N}: laudo dos prints e do celular da vítima chegou.`]);break;
+    case 'busca':if(chance(p.p)){c.dil.busca='ok';c.mat=clamp(c.mat+R(18,30),0,100);c.aut=clamp(c.aut+R(5,12),0,100);if(grp)grp.intel=clamp(grp.intel+6,0,100);caseLog(c,'Busca cumprida: objetos e documentos apreendidos.');rep.push(['Judiciário',`${N}: busca e apreensão deferida e cumprida.`])}else{c.dil.busca='neg';rep.push(['Judiciário',`${N}: busca indeferida.`,'bad'])}break;
+    case 'prev':if(chance(p.p)){c.preso=true;c.dil.prev='ok';c.dl=G.day+7+10;if(grp)grp.f=clamp(grp.f-4,0,100);caseLog(c,'Preventiva decretada e cumprida. Prazo de 10 dias.');rep.push(['Judiciário',`${N}: prisão preventiva de ${c.sus} decretada. Novo prazo: 10 dias.`])}else{c.dil.prev='neg';c.prevA=c.aut;caseLog(c,'Preventiva negada. Novo pedido só com fato novo.');rep.push(['Judiciário',`${N}: preventiva negada. Faltam requisitos do art. 312.`,'bad'])}break;
   }
 }
 function endWeek(){
@@ -1012,7 +1122,7 @@ function endWeek(){
   G.groups.forEach((q,i)=>{if(q.st==='at')q.f=Math.min(q.f0,q.f+1);else if(q.st==='des'&&G.week-q.down>=14){const nq=genGroup(G,q.t);nq.f0=q.f0;nq.f=Math.round(q.f0*R(.3,.45));G.groups[i]=nq;if(q.t==='homic')tmpAdd(G,'homic',8);rep.push(['Inteligência',`Um novo grupo ocupa o espaço deixado por "${q.n}": "${nq.n}".${q.t==='homic'?' A disputa por território faz os homicídios subirem.':''}`,'bad'])}});
   G.types.forEach(t=>{const tg=targetIdx(G,t);G.idx[t]=clamp(G.idx[t]+(tg-G.idx[t])*.35+R(-1.2,1.2),30,180);G.tmp[t]=1+(G.tmp[t]-1)*.8;G.det[t]=(G.det[t]||0)*.95});
   G.cases.forEach(c=>{if(c.st!=='ab')return;
-    if(c.t==='vdom'&&!c.dil.mp&&!c.preso&&!c.fem&&chance(.07)){c.fem=true;c.t='homic';c.ti='Feminicídio de '+c.v;c.aut=clamp(c.aut+25,0,100);c.dl=nd+30;c.dil={};c.pend=[];tmpAdd(G,'homic',3);G.imp=clamp(G.imp-6,0,100);G.com=clamp(G.com-5,0,100);G.stress=clamp(G.stress+6,0,100);G.flags.crise='fem';G.criseW=G.week;caseLog(c,'A vítima foi morta. O inquérito passa a apurar feminicídio.');rep.push(['Crise',`${c.v}, que tinha registro na delegacia (IP ${c.num}), foi morta pelo agressor. Não havia medida protetiva.`,'bad']);diary(`Feminicídio de ${c.v} com registro anterior sem medida protetiva.`);return}
+    if(c.t==='vdom'&&!c.dil.mp&&!c.preso&&!c.fem&&chance(.07)){c.fem=true;c.t='homic';c.ti='Feminicídio de '+c.v;c.aut=clamp(c.aut+25,0,100);c.dl=nd+30;c.dil={};c.pend=[];tmpAdd(G,'homic',3);G.imp=clamp(G.imp-6,0,100);G.com=clamp(G.com-5,0,100);G.stress=clamp(G.stress+6,0,100);G.flags.crise='fem';G.criseAte=G.week+1;caseLog(c,'A vítima foi morta. O inquérito passa a apurar feminicídio.');rep.push(['Crise',`${c.v}, que tinha registro na delegacia (IP ${c.num}), foi morta pelo agressor. Não havia medida protetiva.`,'bad']);diary(`Feminicídio de ${c.v} com registro anterior sem medida protetiva.`);return}
     if(c.preso&&c.dl<nd){c.preso=false;c.dl=nd+30;G.jud=clamp(G.jud-5,0,100);G.imp=clamp(G.imp-3,0,100);caseLog(c,'Prisão relaxada por excesso de prazo.');rep.push(['Prazo',`IP ${c.num}: preso solto por excesso de prazo (10 dias do art. 10 do CPP).`,'bad'])}
     else if(!c.preso&&c.dl<nd){if(c.pror<2){c.pror++;c.dl+=30;G.jud=clamp(G.jud-2,0,100);caseLog(c,'Prazo vencido: o juiz prorroga e cobra andamento.');rep.push(['Prazo',`IP ${c.num}: prazo vencido. O juiz prorrogou, mas cobrou andamento.`,'bad'])}else{c.st='ac';rep.push(['Prazo',`IP ${c.num} remetido ao juízo sem conclusão. Vai para o acervo.`,'bad'])}}});
   const open=G.cases.filter(c=>c.st==='ab'),closed=G.cases.filter(c=>c.st!=='ab').slice(0,10);G.cases=open.concat(closed);
@@ -1020,8 +1130,8 @@ function endWeek(){
   G.team.forEach(m=>{if(m.off){m.fat=clamp(m.fat-30,0,100);m.mor=clamp(m.mor+4,0,100)}else{m.fat=clamp(m.fat+(ratio>.9?10:ratio>.7?4:-6),0,100);if(m.fat>65)m.mor=clamp(m.mor-4,0,100)}m.mor=clamp(m.mor+(60-m.mor)*.05,0,100);m.off=false});
   G.stress=clamp(G.stress+1.5+(ratio>.95?2:0)+open.filter(c=>c.preso).length*.4,0,100);
   if(G.promise&&G.week+1>=G.promise.w){const ok=G.idx[G.promise.k]<=G.promise.v*.95;G.imp=clamp(G.imp+(ok?6:-8),0,100);rep.push(['Imprensa',ok?'A promessa feita na coletiva foi cumprida e a imprensa registra.':'A promessa feita na coletiva não foi cumprida. A cobrança vira manchete.',ok?'good':'bad']);G.promise=null}
-  if(G.flags.crise&&G.week-G.criseW>=1&&!G.colDone){G.imp=clamp(G.imp-8,0,100);G.com=clamp(G.com-4,0,100);rep.push(['Imprensa','Você não deu explicações públicas sobre a crise. O silêncio vira a notícia.','bad']);G.flags.crise=null}
-  G.colDone=false;
+  if(G.flags.crise&&G.week>=(G.criseAte||0)){G.imp=clamp(G.imp-8,0,100);G.com=clamp(G.com-4,0,100);rep.push(['Imprensa','Você não deu explicações públicas sobre a crise. O silêncio vira a notícia.','bad']);G.flags.crise=null}
+  G.imp=clamp(G.imp+(55-G.imp)*.04,0,100);
   G.inv=G.inv.filter(x=>x.exp>G.week+1);if(G.inv.length<2&&chance(.32)){const o=pick(G.lv>=3?['Rede Nacional de TV','Jornal da Capital','Rádio Estadual','Podcast Segurança em Pauta']:[`Rádio ${G.city.nome} FM`,`TV ${UF(G.uf).uf} — jornal local`,`Jornal Gazeta de ${G.city.nome}`,'Podcast Segurança em Pauta']);G.inv.push({id:'i'+(++G.seq),out:o,host:pname(null,chance(.6)),exp:G.week+3});rep.push(['Imprensa',`${o} convida você para uma entrevista.`])}
   if(G.reforco&&G.week+1>=G.reforco){const f=chance(.45),roles=G.lv<=2?'inv':G.lv===3?'che':'dir';G.team.push({id:'a'+(++G.seq),n:pname(null,f),f,role:roles,sk:Math.round(R(45,80)),mor:70,fat:5,cor:chance(.1),known:false,off:false});G.reforco=0;rep.push(['Equipe','O reforço pedido chegou: mais uma pessoa na equipe.','good'])}
   if(!G.team.some(a=>a.known)&&G.team.some(a=>a.cor)&&chance(.05))G.flags.taxa=1;
@@ -1032,7 +1142,7 @@ function endWeek(){
   if(G.stress>=100){endGame('burn');return}
   if(G.integ<35&&!G.flags.pad){G.flags.pad=1;G.ev='corregedoria';G.evx={}}
   else if(G.cw>=(G.ext?18:12))evalCycle(G);
-  else if(chance(.5))pickEvent(G);
+  else pickEvent(G);
   UI.view='rep';UI.open=null;save();render();top();
 }
 function evalCycle(G){const res=metaRes(G),er=escRate(G),eok=er>=G.escT,ok=res.every(r=>r.ok);G.eval={res,er,eok,ok,ext:G.ext};
@@ -1094,7 +1204,7 @@ const EVS=[
  p:['{vn} mostra a vitrine estilhaçada. "Quinta vez, {dr}. Levam óculos, relógio, qualquer coisa que venda rápido. Os comerciantes estão falando em contratar uns rapazes para resolver do jeito deles."'],
  o:[{t:'Montar campana com a equipe nas noites seguintes',s:'Cansativo, mas pega em flagrante.',fx:{mor:-3,stress:4,furto:-5,intel:10},r:'Na terceira noite, dois rapazes são presos com uma mochila de relógios. Um deles solta para quem vende.'},
     {t:'Propor câmeras dos comerciantes integradas à delegacia',s:'Investimento coletivo.',fx:{com:5,furto:-3,cam:.1},r:'Os comerciantes fazem uma vaquinha. Em duas semanas, doze câmeras mandam imagem para a delegacia.'},
-    {t:'Prometer rondas e pedir paciência',s:'Ganha tempo.',fx:{com:-3},r:'O lojista agradece sem acreditar. No grupo dos comerciantes: "polícia de novo prometendo".'}]},
+    {t:'Prometer rondas e pedir paciência',s:'Ganha tempo.',fx:{com:-3,follow:'justica'},r:'O lojista agradece sem acreditar. No grupo dos comerciantes: "polícia de novo prometendo".'}]},
 {id:'festa',lv:[0,1],loc:'praca',who:'emp',wr:'Empresário',kick:'A festa da cidade',t:'O palanque',
  p:['A festa da cidade é patrocinada por {empn}, o homem que "empresta" dinheiro e cobra com visitas noturnas. Ele faz questão de te chamar ao palanque, ao lado do prefeito.','"Uma foto, {dr}. A cidade precisa ver que autoridade e quem gera emprego andam juntos."'],
  o:[{t:'Recusar e abrir investigação sobre agiotagem',s:'Integridade, com preço político.',fx:{integ:6,pol:-6,com:2},r:'Na segunda-feira, três pessoas aparecem na delegacia para contar das "visitas" de cobrança.'},
@@ -1214,11 +1324,17 @@ const EVS=[
  o:[{t:'Ir ao almoço e desligar o celular',s:'',fx:{stress:-14},r:'Comida boa, conversa à toa, sobrinho no colo. Você tinha esquecido como era.'},
     {t:'Prometer que vai na próxima',s:'',fx:{stress:6},r:'Ela não acredita. Você também não.'}]},
 ];
+EVS.push({id:'justica',q:1,lv:[0,5],loc:'praca',who:'emp',wr:'Comerciante',kick:'Furtos em série',t:'Os "seguranças" da praça',
+ p:['Os comerciantes cansaram de esperar as rondas prometidas. Contrataram "seguranças" que, ontem à noite, espancaram um rapaz de 16 anos acusado de furto. O vídeo circula nos grupos da cidade com aplausos.','{empn}, que ajudou a pagar os homens, liga: "{Dr}, a gente só fez o que a polícia não fez."'],
+ o:[{t:'Autuar os agressores e investigar quem pagou',s:'Linchamento é crime, não segurança.',fx:{integ:7,com:-3,pol:-3,furto:-2},r:'Três presos, dois comerciantes indiciados como mandantes. Parte da praça te xinga; a mãe do rapaz agradece na rádio.'},
+    {t:'Ouvir todos e deixar o caso esfriar',s:'Evitar briga com o comércio.',fx:{integ:-10,com:2},r:'Os "seguranças" continuam na praça. Agora cobram mensalidade de quem não pagou.'}]});
 const PAD={id:'corregedoria',loc:'gabinete',who:null,kick:'Corregedoria',t:'O processo disciplinar',p:['A Corregedoria abriu processo administrativo disciplinar para apurar condutas incompatíveis com o cargo: ofertas aceitas, casos abafados, operações ilegais, pedidos políticos atendidos.'],o:[{t:'Apresentar defesa e colaborar',s:'O resultado depende da sua conduta até aqui.',fx:{pad:1},r:''}]};
 const evById=id=>id==='posse'?posseEv(S.g):id==='corregedoria'?PAD:EVS.find(e=>e.id===id);
 function pickEvent(G){
   const U=UF(G.uf);G.evCd=G.evCd||{};
-  const ok=EVS.filter(e=>(e.rep?!(G.evCd[e.id]>G.week):!G.usedEv.includes(e.id))&&G.lv>=e.lv[0]&&G.lv<=e.lv[1]&&(!e.tg||e.tg.some(t=>has(U,t)))&&(!e.pf||e.pf.includes(G.city.perfil))&&(!e.cond||e.cond(G)));
+  G.queue=G.queue||[];const qi=G.queue.findIndex(x=>x.at<=G.week);if(qi>=0){const id=G.queue[qi].id;G.queue.splice(qi,1);G.ev=id;G.usedEv.push(id);G.evx={vn:pname(null,chance(.5)),cor:null};return}
+  if(!pickEvent.force&&!chance(.5))return;
+  const ok=EVS.filter(e=>!e.q&&(e.rep?!(G.evCd[e.id]>G.week):!G.usedEv.includes(e.id))&&G.lv>=e.lv[0]&&G.lv<=e.lv[1]&&(!e.tg||e.tg.some(t=>has(U,t)))&&(!e.pf||e.pf.includes(G.city.perfil))&&(!e.cond||e.cond(G)));
   if(!ok.length)return;const e=ok.find(x=>x.id==='taxa')||pick(ok);
   G.ev=e.id;if(e.rep)G.evCd[e.id]=G.week+25;else G.usedEv.push(e.id);
   const cor=G.team.find(a=>a.cor&&!a.known);G.evx={vn:pname(null,e.vf!==undefined?e.vf:chance(.5)),cor:cor?cor.id:null};G.flags.taxa=0;
@@ -1239,10 +1355,10 @@ function whoOf(e){const G=S.g,X=G.evx||{},C=G.cast;if(!e.who)return null;
 }
 const STAT=[['com','Comunidade'],['pol','Apoio político'],['imp','Imprensa'],['integ','Integridade'],['jud','MP e Judiciário'],['pm','Relação com a PM'],['stress','Estresse']];
 function chooseEv(i){
-  const G=S.g,e=evById(G.ev),o=e.o[i];const before={};STAT.forEach(([k])=>before[k]=G[k]);const mb=G.team.reduce((a,m)=>a+m.mor,0)/G.team.length,ib=Object.assign({},G.tmp);
+  const G=S.g,e=evById(G.ev),o=e.o[i];const before={};STAT.forEach(([k])=>before[k]=G[k]);const mb=G.team.reduce((a,m)=>a+m.mor,0)/G.team.length,ib=Object.assign({},G.tmp),cam=G.cam,gi={};G.groups.forEach(q=>gi[q.id]=q.intel);
   applyFx(G,o.fx||{});
   diary(`${fill(e.t)} — ${fill(o.t)}.`);
-  G.evOut={i,before,mb,ib};
+  G.evOut={i,before,mb,ib,cam,gi};
   if(G.exon){endGame('pad');return}
   save();render();top();
 }
@@ -1251,9 +1367,10 @@ function applyFx(G,fx){
     if(['com','pol','imp','integ','stress','pm','jud'].includes(k))G[k]=clamp(G[k]+v,0,100);
     else if(k==='mor')G.team.forEach(m=>m.mor=clamp(m.mor+v,0,100));
     else if(k==='verba')G.verba=Math.max(0,G.verba+v*[1,1.5,2.2,4,12,25][G.lv]);
-    else if(k==='intel'){const q=pick(G.groups.filter(x=>x.st==='at'));if(q)q.intel=clamp(q.intel+v*gaeco(G),0,100)}
+    else if(k==='intel'){const q=topGroup(G);if(q)q.intel=clamp(q.intel+v*gaeco(G),0,100)}
     else if(k==='cases')G.cases.forEach(c=>{if(c.st==='ab')c.aut=clamp(c.aut+v,0,100)});
-    else if(k==='cam')G.cam=clamp(G.cam+v,0,.9);
+    else if(k==='cam'){G.cam=clamp(G.cam+v,0,.9);G.flags.camEv=1}
+    else if(k==='follow'){G.queue=G.queue||[];G.queue.push({id:v,at:G.week+RI(3,5)})}
     else if(k==='promise'){const ct=critType(G);G.promise={k:ct.k,w:G.week+5,v:G.idx[ct.k]}}
     else if(k==='afasta'){const id=(G.evx||{}).cor;if(id&&G.team.length>1)G.team=G.team.filter(a=>a.id!==id)}
     else if(k==='known'){const m=G.team.find(a=>a.id===(G.evx||{}).cor);if(m)m.known=true}
@@ -1474,11 +1591,11 @@ const COL=['#1D4E89','#B42318','#1E7B4D','#946200','#6B3FA0'];
 const ARM=['sem armas','armas brancas e leves','armas de fogo','fuzis'];
 function cHead(){
   const G=S.g,U=UF(G.uf),open=G.cases.filter(c=>c.st==='ab');
-  const bInq=open.filter(c=>c.dl-G.day<=7).length,bOps=Object.values(G.mand).filter(m=>m.st==='ok').length,bImp=G.inv.length+(G.flags.crise?1:0),bGab=3-G.ag.length;
+  const bInq=open.filter(c=>c.dl-G.day<=7).length,bOps=Object.values(G.mand).filter(m=>m.st==='ok').length,bImp=G.inv.length+(G.flags.crise?1:0),bGab=0;
   const T=[['painel','Painel',0],['inq','Inquéritos',bInq],['ops','Operações',bOps],['equipe','Equipe',G.team.some(a=>a.known)?1:0],['imp','Imprensa',bImp],['gab','Gabinete',bGab]];
   const q=[['Equipe',avgMor(G)],['Comunidade',G.com],['Política',G.pol],['Imprensa',G.imp],['Integridade',G.integ],['Estresse',G.stress]];
   return `<div class="sys"><div class="r"><div class="brand"><span class="lg">${SEAL_S}</span><div style="min-width:0"><b>SISPOL</b><br><span>${esc(unitName(G))}</span></div></div><div class="usr"><div><b style="color:#fff">${esc(S.nome)}</b><br>${esc(cargoName(G))}</div><div class="av">${face(S.nome,S.sexo==='f')}</div></div></div></div>
-  <div class="sys2"><span>${esc(G.lv>=4?U.nome:G.city.nome+' ('+U.uf+')')} · ciclo ${G.cycN}, semana <b>${G.cw+1}</b>/${G.ext?18:12}</span><span>${dstr(G.day)}</span></div>
+  <div class="sys2"><span>${esc(G.lv>=4?U.nome:G.city.nome+' ('+U.uf+')')} · ${G.cycN}º ciclo no posto, semana <b>${G.cw+1}</b>/${G.ext?18:12}</span><span>${dstr(G.day)}</span></div>
   <div class="qs" style="background:#fff">${q.map(([n,v],i)=>`<div><label>${n}</label><b class="${i===5?(v>75?'er':v>55?'wa':''):(v<35?'er':v<50?'wa':'')}">${f0(v)}</b></div>`).join('')}</div>
   <nav class="mods">${T.map(([k,n,b])=>`<button class="mod ${UI.tab===k?'on':''}" data-a="tab" data-v="${k}">${n}${b?`<i>${b}</i>`:''}</button>`).join('')}</nav>`;
 }
@@ -1508,9 +1625,10 @@ function cmap(G){
 }
 function tPainel(G){
   let h='';
-  if(G.flags.crise)h+=`<div class="alert er"><div><b>Crise</b>${G.flags.crise==='bala'?'Um morador foi baleado durante a sua operação.':'Uma mulher que já tinha registro na delegacia foi morta pelo agressor.'} A imprensa espera explicações nesta semana.<div style="margin-top:8px"><button class="btn sm er" data-a="colcri">Convocar coletiva</button></div></div></div>`;
+  if(G.flags.crise)h+=`<div class="alert er"><div><b>Crise</b>${G.flags.crise==='bala'?'Um morador foi baleado durante a sua operação.':'Uma mulher que já tinha registro na delegacia foi morta pelo agressor.'} A imprensa espera uma coletiva até o fim da semana ${G.criseAte||G.week}${G.criseAte===G.week?' (esta semana)':''}. Se você ficar calad${g('a','o')}, Imprensa −8 e Comunidade −4.<div style="margin-top:8px"><button class="btn sm er" data-a="colcri">Convocar coletiva</button></div></div></div>`;
   const urg=G.cases.filter(c=>c.st==='ab'&&c.dl-G.day<=7);if(urg.length)h+=`<div class="alert"><div><b>${urg.length} inquérito${urg.length>1?'s':''} com prazo vencendo em até 7 dias</b>${urg.filter(c=>c.preso).length?'Com preso: se o prazo de 10 dias vencer, a prisão é relaxada.':'Relate, peça prorrogação ou acelere as diligências.'}</div></div>`;
-  if(G.stress>=75)h+=`<div class="alert er"><div><b>Estresse em ${f0(G.stress)}</b>Em 100, a carreira termina em afastamento médico. Use a agenda: "Tempo para você".</div></div>`;
+  if(G.stress>=55)h+=`<div class="alert ${G.stress>=75?'er':''}"><div><b>Estresse em ${f0(G.stress)}</b>O estresse sobe toda semana e com equipe sobrecarregada. Em 100, a carreira termina em afastamento médico. Reserve um compromisso da agenda para "Tempo para você" (−12) no Gabinete.</div></div>`;
+  if(G.promise){const P=G.promise,cur=(G.idx[P.k]-P.v)/P.v,left=P.w-G.week;h+=`<div class="alert"><div><b>Promessa pública ativa (${P.src||'imprensa'})</b>Reduzir ${CT[P.k].n.toLowerCase()} em 5% até a semana ${P.w} (${left>0?'faltam '+left+' semana'+(left>1?'s':''):'vence nesta semana'}). Agora: ${cur<=0?'−':'+'}${f1(Math.abs(cur*100))}%. Cumprir: Imprensa +6. Falhar: Imprensa −8.</div></div>`}
   h+=`<div class="pn"><h3>Metas do ciclo <span>avaliação em ${(G.ext?18:12)-G.cw} semana(s)</span></h3>${metaRows(G)}</div>`;
   h+=`<div class="pn"><h3>Índice das metas <span>base 100 no início do ciclo</span></h3>${chart(G)}</div>`;
   const L=G.hist[G.hist.length-1],P=G.hist[G.hist.length-2]||L;
@@ -1520,14 +1638,14 @@ function tPainel(G){
   return h;
 }
 function evBars(c){return `<div class="ev2"><span>Autoria</span>${bar(c.aut,c.aut>=60?'var(--ok)':'var(--pr)')}<b>${f0(c.aut)}</b></div><div class="ev2"><span>Materialidade</span>${bar(c.mat,c.mat>=50?'var(--ok)':'var(--pr)')}<b>${f0(c.mat)}</b></div>`}
-const PN={per:'Perícia em andamento',que:'Quebra de sigilo aguardando juiz',int:'Interceptação aguardando juiz',intr:'Interceptação em curso',mp:'Medidas protetivas aguardando juiz',prev:'Preventiva aguardando juiz'};
+const PN={pix:'Quebra bancária aguardando juiz',plat:'Dados da plataforma aguardando juiz',prints:'Perícia nos prints em andamento',busca:'Busca aguardando juiz',per:'Perícia em andamento',que:'Quebra de sigilo aguardando juiz',int:'Interceptação aguardando juiz',intr:'Interceptação em curso',mp:'Medidas protetivas aguardando juiz',prev:'Preventiva aguardando juiz'};
 function tInq(G){
   const open=G.cases.filter(c=>c.st==='ab').sort((a,b)=>(b.preso-a.preso)||(a.dl-b.dl)),cl=G.cases.filter(c=>c.st!=='ab');
   let h=`<div class="pn"><div class="kv k4"><div><label>Em andamento</label><b>${open.length}</b></div><div><label>Com preso</label><b class="${open.some(c=>c.preso)?'wa':''}">${open.filter(c=>c.preso).length}</b></div><div><label>Esclarecidos no ciclo</label><b>${G.cyc.solved}/${G.cyc.opened}</b></div><div><label>Horas livres</label><b>${f0(hhLeft(G))}h</b></div></div></div>`;
   h+=`<p class="note" style="margin:8px 2px 10px">Para indiciar: autoria ≥ 60 e materialidade ≥ 50. Preso: 10 dias; solto: 30 dias (CPP, art. 10). Quebras, escutas e preventivas dependem do juiz.</p>`;
   h+=`<div class="pn"><h3>Inquéritos em andamento</h3>${open.map(c=>{const dd=c.dl-G.day,on=UI.open===c.id,gq=G.groups.find(q=>q.id===c.g);
-    let x=`<div class="cs"><button class="csh" data-a="case" data-v="${c.id}"><div><b>${esc(c.ti)}</b><div class="xs mu">IP ${c.num} · ${CT[c.t].n}${gq?` · ligado a "${esc(gq.n)}"`:''}</div>${evBars(c)}</div><div style="text-align:right">${c.preso?'<span class="bd er">Preso</span><br>':''}<span class="bd ${dd<=7?'wa':''}" style="margin-top:4px">${dd<0?'vencido':dd+' dias'}</span></div></button>`;
-    if(on){x+=`<div class="csb">${c.pend.length?`<div class="pend">${c.pend.map(p=>'⏳ '+PN[p.k]).join(' · ')}</div>`:''}<div class="dg">${Object.keys(DIL).filter(k=>DIL[k].ok(c)).map(k=>{const D=DIL[k],pd=c.pend.some(p=>p.k===k);return `<button class="dgb ${D.main?'main':''} ${D.warn?'wa':''}" data-a="dil" data-v="${c.id}:${k}" ${pd?'disabled':''}><b>${D.n} · ${D.hh}h</b><span>${D.d}</span></button>`}).join('')}</div><ul class="lg2" style="margin-top:10px">${c.log.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`}
+    let x=`<div class="cs"><button class="csh" data-a="case" data-v="${c.id}"><div><b>${esc(c.ti)}</b><div class="xs mu">IP ${c.num} · ${CT[c.t].n}</div>${gq?`<div style="margin-top:4px"><span class="bd pr" style="white-space:normal">Grupo: ${esc(gq.n)}${gq.st!=='at'?' (desarticulado)':''}</span></div>`:''}${evBars(c)}</div><div style="text-align:right">${c.preso?'<span class="bd er">Preso</span><br>':''}<span class="bd ${dd<=7?'wa':''}" style="margin-top:4px">${dd<0?'vencido':dd+' dias'}</span>${c.pror?`<br><span class="xs mu">prorrogado ${c.pror}×</span>`:''}</div></button>`;
+    if(on){x+=`<div class="csb">${c.pend.length?`<div class="pend">${c.pend.map(p=>'⏳ '+PN[p.k]).join(' · ')}</div>`:''}${c.dil.prev==='neg'&&!DIL.prev.ok(c)&&!c.preso?`<div class="pend">Preventiva negada: novo pedido só com fato novo (autoria ${f0((c.prevA||0)+10)}; atual ${f0(c.aut)}).</div>`:''}<div class="dg">${Object.keys(DIL).filter(k=>DIL[k].ok(c)).map(k=>{const D=DIL[k],pd=c.pend.some(p=>p.k===k);return `<button class="dgb ${D.main?'main':''} ${D.warn?'wa':''}" data-a="dil" data-v="${c.id}:${k}" ${pd?'disabled':''}><b>${D.n} · ${D.hh}h</b><span>${D.d}</span></button>`}).join('')}</div><ul class="lg2" style="margin-top:10px">${c.log.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`}
     return x+'</div>'}).join('')||'<div class="pb sm mu">Nenhum inquérito em andamento.</div>'}</div>`;
   if(cl.length)h+=`<div class="pn"><h3>Encerrados recentemente</h3><div class="tw"><table>${cl.map(c=>`<tr><td class="sm">${esc(c.ti)}<div class="xs mu">IP ${c.num}</div></td><td><span class="bd ${c.st==='rel'?'ok':'er'}">${c.st==='rel'?'Indiciado':c.st==='sa'?'Sem autoria':'Acervo'}</span></td></tr>`).join('')}</table></div></div>`;
   return h;
@@ -1540,7 +1658,7 @@ function tOps(G){
   h+=`<div class="pn"><h3>Grupos criminosos mapeados</h3>${G.groups.map(q=>{const m=G.mand[q.id],des=q.st!=='at';
     return `<div class="grp ${des?'mut':''}"><div class="h"><div><b>${esc(q.n)}</b><div class="xs mu">${CT[q.t].n} · ~${q.mem} integrantes · ${ARM[q.arm]}${q.lidp?' · líder preso':` · líder: ${esc(q.lid)}`}</div></div>${des?'<span class="bd ok">Desarticulado</span>':m?`<span class="bd ${m.st==='ok'?'ok':m.st==='p'?'wa':'er'}">${m.st==='ok'?'Mandados OK':m.st==='p'?'Aguardando juiz':'Indeferido'}</span>`:''}</div>
     ${des?'':`<div class="ev2"><span>Força</span>${bar(q.f/q.f0*100,'var(--er)')}<b>${f0(q.f/q.f0*100)}</b></div><div class="ev2"><span>Inteligência</span>${bar(q.intel)}<b>${f0(q.intel)}</b></div>${q.tip?'<div class="pend">A escuta revelou onde guardam armas: operação mais eficaz.</div>':''}
-    <div class="seg" style="margin-top:8px">${!m?`<button class="btn sm sec" data-a="mand" data-v="${q.id}" ${q.intel<35?'disabled':''}>Mandado de busca · 6h</button><button class="btn sm sec" data-a="mandp" data-v="${q.id}" ${q.intel<60?'disabled':''}>Busca + temporária · 6h</button>`:''}<button class="btn sm" data-a="plan" data-v="${q.id}" ${q.intel<35||G.opDone?'disabled':''}>Planejar operação</button></div>`}</div>`}).join('')}</div>`;
+    <div class="seg" style="margin-top:8px">${!m?`<button class="btn sm sec" data-a="mand" data-v="${q.id}" ${q.intel<35?'disabled':''}>Mandado de busca · 6h</button><button class="btn sm sec" data-a="mandp" data-v="${q.id}" ${q.intel<60?'disabled':''}>Busca + temporária · 6h</button>`:''}<button class="btn sm" data-a="plan" data-v="${q.id}" ${q.intel<35||G.opDone?'disabled':''}>Planejar operação</button></div>${q.intel<35?`<div class="xs mu" style="margin-top:6px">Mandado e operação precisam de 35 de inteligência (atual: ${f0(q.intel)}). Use quebras, escutas e oitivas nos inquéritos deste grupo.</div>`:!m&&q.intel<60?`<div class="xs mu" style="margin-top:6px">Prisão temporária precisa de 60 de inteligência (atual: ${f0(q.intel)}).</div>`:''}${G.opDone&&q.intel>=35?'<div class="xs mu" style="margin-top:6px">Já houve uma operação nesta semana.</div>':''}`}</div>`}).join('')}</div>`;
   return h;
 }
 function sg(on,act,v,t,s){return `<button class="sg ${on?'on':''}" data-a="${act}" data-v="${v}">${t}${s?`<span>${s}</span>`:''}</button>`}
@@ -1569,7 +1687,7 @@ function tEquipe(G){
 }
 function tImp(G){
   let h='';
-  if(G.flags.crise)h+=`<div class="alert er"><div><b>A imprensa cobra explicações</b>Ficar calado custa caro.<div style="margin-top:8px"><button class="btn sm er" data-a="colcri">Coletiva sobre a crise</button></div></div></div>`;
+  if(G.flags.crise)h+=`<div class="alert er"><div><b>A imprensa cobra explicações</b>Prazo: até o fim da semana ${G.criseAte||G.week}. Ficar em silêncio custa Imprensa −8 e Comunidade −4.<div style="margin-top:8px"><button class="btn sm er" data-a="colcri">Coletiva sobre a crise</button></div></div></div>`;
   h+=`<div class="pn"><h3>Coletiva de imprensa <span>usa 1 compromisso da agenda</span></h3><div class="pb"><p class="sm" style="margin:0 0 10px">Três perguntas de repórteres. Para cada uma, você escolhe a linha da resposta. Lembre: antecipar culpa ou expor preso é abuso de autoridade (Lei 13.869, arts. 13 e 38).</p><div class="seg">${G.lastOp&&G.lastOp.w===G.week&&!G.lastOp.col?'<button class="btn sm" data-a="colop">Coletiva sobre a operação</button>':''}<button class="btn sm sec" data-a="colgen" ${G.colW===G.week?'disabled':''}>Coletiva sobre os índices</button></div></div></div>`;
   h+=`<div class="pn"><h3>Pedidos de entrevista <span>você escreve as respostas</span></h3>${G.inv.length?G.inv.map(i=>`<div class="pol"><div class="h"><div><b>${esc(i.out)}</b><div class="xs mu">Com ${esc(i.host)} · expira na semana ${i.exp}</div></div><div class="seg"><button class="btn sm sec" data-a="tvno" data-v="${i.id}">Recusar</button><button class="btn sm" data-a="tv" data-v="${i.id}">Aceitar</button></div></div></div>`).join(''):'<div class="pb sm mu">Nenhum pedido no momento. Operações e crises atraem a imprensa.</div>'}</div>`;
   const hs=G.diary.filter(d=>/^Coletiva|^Entrevista/.test(d.t)).slice(0,8);
@@ -1579,7 +1697,7 @@ function tImp(G){
 function nextReq(G){return ['Cumprir as metas de um ciclo para ser promovid'+g('a','o')+' à 2ª Classe.','Cumprir as metas de um ciclo para a 1ª Classe.',`Cumprir metas e ter mérito 8 (você tem ${G.merito}) para a Classe Especial.`,`Cumprir metas, mérito 12 (você tem ${G.merito}) e apoio político 50 para a Delegacia-Geral.`,`Cumprir metas com imagem pública 55 para receber convite de outro estado.`,`Cumprir as metas de dois ciclos (${G.lv5ok}/2) para encerrar com missão cumprida.`][G.lv]}
 function tGab(G){
   let h=`<div class="pn"><h3>Agenda da semana <span>${G.ag.length}/3 compromissos</span></h3><div class="pb"><div class="dg" style="margin-top:0">${Object.keys(AG).map(k=>`<button class="dgb ${G.ag.includes(k)?'main':''}" data-a="ag" data-v="${k}" ${G.ag.includes(k)||G.ag.length>=3?'disabled':''}><b>${AG[k].n}${G.ag.includes(k)?' ✓':''}</b><span>${AG[k].d}</span></button>`).join('')}</div></div></div>`;
-  h+=`<div class="pn"><h3>Projetos <span>verba do ciclo: ${mil(G.verba)}</span></h3>${Object.keys(PROJ).filter(id=>projAvail(G,id)).map(id=>{const p=PROJ[id],st=G.proj[id],c=pcost(G,id);return `<div class="pol"><div class="h"><div><b>${p.n}</b><div class="xs mu">${mil(c)} · ${p.w} semanas</div></div>${st?(st.ok?'<span class="bd ok">Implantado</span>':`<span class="bd wa">${st.left} sem.</span>`):`<button class="btn sm" data-a="proj" data-v="${id}" ${G.verba<c?'disabled':''}>Iniciar</button>`}</div><p style="margin-bottom:0">${p.d}</p></div>`}).join('')}</div>`;
+  h+=`<div class="pn"><h3>Projetos <span>verba do ciclo: ${mil(G.verba)}</span></h3><p class="note" style="margin:8px 12px 0">A cada novo ciclo entram ${mil(POSTS[G.lv].verba)}. A "Agenda política" às vezes rende reforço de verba.</p>${Object.keys(PROJ).filter(id=>projAvail(G,id)).map(id=>{const p=PROJ[id],st=G.proj[id],c=pcost(G,id);return `<div class="pol"><div class="h"><div><b>${pname2(G,id)}</b><div class="xs mu">${mil(c)} · ${p.w} semanas${!st&&G.verba<c?` · faltam ${mil(c-G.verba)}`:''}</div></div>${st?(st.ok?'<span class="bd ok">Implantado</span>':`<span class="bd wa">${st.left} sem.</span>`):`<button class="btn sm" data-a="proj" data-v="${id}" ${G.verba<c?'disabled':''}>Iniciar</button>`}</div><p style="margin-bottom:0">${p.d}</p></div>`}).join('')}</div>`;
   h+=`<div class="pn"><h3>Carreira</h3><div class="kv"><div><label>Cargo</label><b>${esc(cargoName(G))}</b></div><div><label>Classe</label><b>${POSTS[G.lv].classe}</b></div><div><label>Mérito</label><b>${G.merito}</b></div><div><label>Semanas de carreira</label><b>${G.week}</b></div><div><label>Inquéritos relatados</label><b>${G.stats.solved}</b></div><div><label>Operações / presos</label><b>${G.stats.ops} / ${G.stats.presos}</b></div></div><div class="pb"><p class="sm" style="margin:0 0 10px"><b>Próximo passo:</b> ${nextReq(G)}</p><div class="tl">${G.posts.map((p,i)=>`<div class="${i===G.posts.length-1?'n':'d'}"><b class="sm">${LVN[p.lv]}</b><div class="xs mu">${esc(p.nome)} (${p.uf}) · desde a semana ${p.w}</div></div>`).join('')}</div><button class="btn sm sec" data-a="apos">Aposentar-se e encerrar a carreira</button></div></div>`;
   return h;
 }
@@ -1591,17 +1709,18 @@ function vOpRes(){const G=S.g,O=G.lastOp,r=O.res;
 function vCol(){const G=S.g,C=G.col;let h=cHead()+'<div class="wrap">';
   const last=C.ans[C.ans.length-1];
   if(C.i>=C.qs.length){h+=`<div class="ttl"><div><h1>Repercussão</h1><div class="sub">Coletiva de imprensa</div></div></div><div class="paper"><div class="src">Manchete do dia seguinte</div><div class="hl1">${esc(C.hl)}</div><p>${C.tot>=4?'A coletiva foi bem recebida por especialistas e pelo Ministério Público.':C.tot>=0?'A coletiva teve momentos bons e ruins.':'A coletiva gerou mais crise do que resolveu.'}</p></div>
-    <div class="pn" style="margin-top:12px"><h3>Suas respostas</h3>${C.qs.map((q,i)=>`<div class="pol"><div class="xs mu">${esc(q.out)}</div><b>${esc(q.x)}</b><p style="margin:4px 0 0"><span class="bd ${C.ans[i].sc>0?'ok':C.ans[i].sc<0?'er':''}">${AP2.find(a=>a[0]===C.ans[i].a)[1]}</span> ${esc(C.ans[i].r)}</p></div>`).join('')}</div><div style="margin-top:12px"><button class="btn full" data-a="coldone">Voltar ao painel</button></div></div>`;return h}
+    <div class="pn" style="margin-top:12px"><h3>Suas respostas</h3>${C.qs.map((q,i)=>`<div class="pol"><div class="xs mu">${esc(q.out)}</div><b>${esc(q.x)}</b><p style="margin:4px 0 0"><span class="bd ${C.ans[i].sc>0?'ok':C.ans[i].sc<0?'er':''}">${AP2[C.ans[i].a]}</span> ${esc(C.ans[i].r)}</p>${C.ans[i].law?`<p class="xs mu" style="margin:4px 0 0">⚖ ${esc(C.ans[i].law)}</p>`:''}</div>`).join('')}</div>
+    ${C.after?`<div class="pn" style="margin-top:12px"><h3>Efeito nos indicadores</h3><div class="pb"><div class="seg">${[['imp','Imprensa'],['com','Comunidade'],['integ','Integridade'],['jud','MP e Judiciário'],['pol','Apoio político']].map(([k,n])=>{const d=C.after[k]-C.before[k];return Math.abs(d)>=.5?`<span class="bd ${d>0?'ok':'er'}">${n} ${d>0?'+':'−'}${f0(Math.abs(d))}</span>`:''}).join('')||'<span class="sm mu">Sem efeito relevante.</span>'}</div></div></div>`:''}<div style="margin-top:12px"><button class="btn full" data-a="coldone">Voltar ao painel</button></div></div>`;return h}
   const q=C.qs[C.i];
-  if(last)h+=`<div class="alert ${last.sc>0?'ok':last.sc<0?'er':''}"><div>${esc(last.r)}</div></div>`;
+  if(last)h+=`<div class="alert ${last.sc>0?'ok':last.sc<0?'er':''}"><div>${esc(last.r)}${last.law?`<div class="xs" style="margin-top:4px">⚖ ${esc(last.law)}</div>`:''}</div></div>`;
   h+=`<div class="pn"><h3>Coletiva de imprensa <span>pergunta ${C.i+1} de ${C.qs.length}</span></h3><div class="pb"><div class="who" style="margin-bottom:10px"><span class="face" style="width:40px;height:40px">${face(q.rep,/a$/.test(q.rep.split(' ')[0]))}</span><div class="sm"><b>${esc(q.rep)}</b><div class="xs mu">${esc(q.out)}</div></div></div><p style="font-family:var(--serif);font-size:16px;line-height:1.5;margin:0">"${esc(q.x)}"</p>
-  <div class="ans">${AP2.map(a=>`<button class="an" data-a="cans" data-v="${a[0]}"><b>${a[1]}</b><span>${a[2]}</span></button>`).join('')}</div></div></div></div>`;
+  <div class="ans">${OPTS[q.qt].map(a=>`<button class="an" data-a="cans" data-v="${a[0]}"><b>${a[1]}</b><span>${a[2]}</span></button>`).join('')}</div></div></div></div>`;
   return h;
 }
-function vTV(){const G=S.g,T=G.tv;let h=cHead()+'<div class="wrap">';
-  h+=`<div class="pn"><h3>Entrevista <span>${esc(T.out)}</span></h3><div class="pb"><div class="who" style="margin-bottom:10px"><span class="face" style="width:40px;height:40px">${face(T.host,/a$/.test(T.host.split(' ')[0]))}</span><div class="sm"><b>${esc(T.host)}</b><div class="xs mu">${esc(T.out)}</div></div></div><p style="font-family:var(--serif);font-size:16px;line-height:1.5;margin:0">"${esc(T.q)}"</p></div></div>`;
-  if(T.res){h+=`<div class="paper" style="margin-top:12px"><div class="src">${esc(T.out)}</div><div class="hl1">${esc(T.hl)}</div><p>"${esc((T.ans||'').slice(0,240))}${(T.ans||'').length>240?'…':''}"</p></div><div class="pn" style="margin-top:12px"><h3>Avaliação da repercussão <span>${T.res.s}/100</span></h3><div class="pb"><ul class="lg2">${T.res.fb.map(([ok,x])=>`<li class="${ok?'ok':'er'}">${ok?'✓':'✗'} ${esc(x)}</li>`).join('')}</ul></div></div><div style="margin-top:12px"><button class="btn full" data-a="dash">Voltar ao painel</button></div></div>`;return h}
-  return h+`<div class="pn" style="margin-top:12px"><h3>Sua resposta</h3><div class="pb"><textarea id="ans" style="min-height:170px" placeholder="Escreva como falaria ao vivo...">${esc(UI.ans)}</textarea><p class="note">Dados, plano concreto, respeito às vítimas e honestidade sobre os limites costumam funcionar. Promessas impossíveis e linguagem de confronto, não.</p></div></div><div style="margin-top:12px"><button class="btn full" data-a="tvok">Responder</button></div></div>`;
+function vTV(){const G=S.g,T=G.tv,K=OUTK[T.k||'tv'];T.k=T.k||'tv';T.id=T.id||'alta';let h=cHead()+'<div class="wrap">';
+  h+=`<div class="pn"><h3>Entrevista <span>${esc(T.out)}</span></h3><div class="pb"><div class="who" style="margin-bottom:10px"><span class="face" style="width:40px;height:40px">${face(T.host,/a$/.test(T.host.split(' ')[0]))}</span><div class="sm"><b>${esc(T.host)}</b><div class="xs mu">${esc(T.out)} · ${K.n}</div></div></div><p style="font-family:var(--serif);font-size:16px;line-height:1.5;margin:0">"${esc(T.q)}"</p></div></div>`;
+  if(T.res){h+=`<div class="paper" style="margin-top:12px"><div class="src">${esc(T.out)}</div><div class="hl1">${esc(T.hl)}</div><p>"${esc((T.ans||'').slice(0,240))}${(T.ans||'').length>240?'…':''}"</p>${T.dist?'<p class="xs mu">Com a relação com a imprensa ruim, o jornal escolheu a frase que mais te prejudica.</p>':''}</div>${T.prom?`<div class="alert" style="margin-top:12px"><div><b>Promessa registrada</b>Você prometeu no ar: ${esc(T.prom)}.</div></div>`:''}<div class="pn" style="margin-top:12px"><h3>Avaliação da repercussão <span>${T.res.s}/100</span></h3><div class="pb"><ul class="lg2">${T.res.fb.map(([ok,x])=>`<li class="${ok?'ok':'er'}">${ok?'✓':'✗'} ${esc(x)}</li>`).join('')}</ul></div></div><div style="margin-top:12px"><button class="btn full" data-a="dash">Voltar ao painel</button></div></div>`;return h}
+  return h+`<div class="pn" style="margin-top:12px"><h3>Sua resposta</h3><div class="pb"><textarea id="ans" style="min-height:170px" placeholder="Escreva como falaria ao vivo...">${esc(UI.ans)}</textarea><p class="note"><b>${K.n}:</b> ${K.hint} Dados, plano concreto, respeito às vítimas e honestidade sobre os limites costumam funcionar. Promessas ("prometo", "em 30 dias") viram cobrança.</p></div></div><div style="margin-top:12px"><button class="btn full" data-a="tvok">Responder</button></div></div>`;
 }
 
 /* ---------- cenas (escuras) ---------- */
@@ -1609,6 +1728,8 @@ function hud(sub){const G=S.g,U=UF(G.uf);return `<header class="hud"><div class=
 function pers(w){if(!w)return '';return `<div class="pers"><span class="pface">${face(w.n,!!w.f)}</span><div><b>${esc(w.n)}</b><span>${esc(w.r)}</span></div></div>`}
 function deltas(G,O){const out=[];STAT.forEach(([k,n])=>{const d=G[k]-O.before[k];if(Math.abs(d)>=.5){const good=k==='stress'?d<0:d>0;out.push(`<span class="dt ${good?'up':'dn'}">${n} ${d>0?'+':'−'}${f0(Math.abs(d))}</span>`)}});
   const md=avgMor(G)-O.mb;if(Math.abs(md)>=.5)out.push(`<span class="dt ${md>0?'up':'dn'}">Moral da equipe ${md>0?'+':'−'}${f0(Math.abs(md))}</span>`);
+  if(O.cam!==undefined&&Math.abs(G.cam-O.cam)>.01)out.push(`<span class="dt up">Câmeras ${G.cam>O.cam?'+':'−'}${f0(Math.abs(G.cam-O.cam)*100)}%</span>`);
+  if(O.gi)G.groups.forEach(q=>{const d=q.intel-(O.gi[q.id]||q.intel);if(d>=.5)out.push(`<span class="dt up">Inteligência sobre "${esc(q.n)}" +${f0(d)}</span>`)});
   G.types.forEach(t=>{const d=(G.tmp[t]-(O.ib[t]||1))*100;if(Math.abs(d)>=.5)out.push(`<span class="dt ${d<0?'up':'dn'}">${CT[t].n} ${d<0?'↓':'↑'}${f0(Math.abs(d))}%</span>`)});
   return out.join('')||'<span class="dt">Sem efeito imediato</span>'}
 function vEvent(){
@@ -1748,7 +1869,7 @@ function act(a,v){
 }
 $.addEventListener('click',e=>{const sv=e.target.closest('#tgt');if(sv){shoot(e,sv);return}const b=e.target.closest('[data-a]');if(!b||b.disabled)return;act(b.dataset.a,b.dataset.v)});
 $.addEventListener('input',e=>{if(e.target.id==='nm')UI.setup.nome=e.target.value;if(e.target.id==='ans')UI.ans=e.target.value});
-window.__dist={get S(){return S},set S(x){S=x},UI,act,QB,UFS,EVS,DIL,render,endWeek,startPost,genCities};
+window.__dist={get S(){return S},set S(x){S=x},UI,act,gradeTV,findTerm,negated,QB,UFS,EVS,DIL,render,endWeek,startPost,genCities};
 render();
 })();
 </script>
