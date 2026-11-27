@@ -315,6 +315,40 @@ body.dark,body.dark #app{background:#0C0E12}
 .rli span{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#E0A33A;margin-right:8px}
 .mut{opacity:.6}
 .tag2{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:2px;background:#0B2545;color:#fff;margin-left:6px;vertical-align:1px}
+
+/* capa */
+.sys,.sys2{box-shadow:0 0 0 100vmax var(--hd);clip-path:inset(0 -100vmax)}
+.sys2{box-shadow:0 0 0 100vmax var(--hd2)}
+.hud{box-shadow:0 0 0 100vmax rgba(12,14,18,.9);clip-path:inset(0 -100vmax)}
+.cv{color:#E8E6E1;padding-bottom:40px}
+.cvh{position:relative}
+.cva{aspect-ratio:4/3}
+@media (min-width:640px){.cva{aspect-ratio:16/8}}
+.cva::after{background:linear-gradient(180deg,rgba(12,14,18,0) 20%,rgba(12,14,18,.75) 62%,rgba(12,14,18,1) 100%)}
+.cvt{position:relative;z-index:2;margin-top:-90px;padding:0 18px}
+.cvt h1{margin:6px 0 10px;font-family:'Archivo',sans-serif;font-stretch:125%;font-weight:900;font-size:clamp(34px,10.5vw,48px);line-height:.95;letter-spacing:.01em;text-transform:uppercase;overflow-wrap:anywhere}
+.cvt p{font-family:'Source Serif 4',Georgia,serif;font-size:18px;line-height:1.55;color:#D8D4CB;margin:0;max-width:600px}
+.cvb{margin-top:22px;max-width:420px}
+.cvb .sbtn{max-width:none}
+.cvs{font-size:12.5px;color:#8C93A0;margin-top:8px;text-align:center}
+.cvs b{color:#E0A33A;font-family:var(--mono)}
+.cvn{display:block;width:100%;margin-top:10px;height:44px;border-radius:12px;border:1px solid #2C313B;background:#15181E;color:#E8E6E1;font-weight:600;font-size:14px;text-align:center}
+.cvn:hover{border-color:#E0A33A}
+.cvsec{padding:30px 18px 0}
+.cvl{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:1fr;gap:0;border-left:2px solid #2A2F38}
+.cvl li{position:relative;padding:8px 0 8px 18px}
+.cvl li::before{content:"";position:absolute;left:-6px;top:15px;width:10px;height:10px;border-radius:50%;background:#0C0E12;border:2px solid #E0A33A}
+.cvl span{font-family:var(--mono);font-size:11px;color:#E0A33A;margin-right:8px}
+.cvl b{font-size:15px}
+.cvl i{display:block;font-style:normal;font-size:12.5px;color:#8C93A0;margin-top:2px}
+.cvg{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.cvc{padding:16px;border-radius:14px;border:1px solid #2A2F38;background:#15181E}
+.cvc svg{width:24px;height:24px;color:#E0A33A;display:block;margin-bottom:10px}
+.cvc b{display:block;font-size:16px}
+.cvc span{display:block;font-size:13.5px;color:#8C93A0;margin-top:4px;line-height:1.45}
+.cvf{font-size:12px;color:#6B7280;line-height:1.55;padding:28px 18px 0;margin:0}
+@media (min-width:640px){.cvt{margin-top:-120px;padding:0 28px}.cvt h1{font-size:72px}.cvsec{padding:36px 28px 0}.cvf{padding:30px 28px 0}
+.cvg{grid-template-columns:1fr 1fr}.cvl{grid-template-columns:repeat(2,1fr);border-left:0;gap:6px 24px}.cvl li{border-left:2px solid #2A2F38}}
 </style>
 </head>
 <body>
@@ -1314,22 +1348,19 @@ function sysbar(ctx,date){
   <div class="sys2"><span>${ctx}</span><span>${date||''}</span></div>`;
 }
 function vCover(){
-  const sv=load(),best=+store.get(BEST)||0;
-  return `<div class="cover">${sysbar('Acesso ao sistema','Ambiente de simulação')}
-  <div class="login"><div class="pn"><div class="pb" style="text-align:center;padding:22px 16px 18px">${SEAL.replace('<svg','<svg class="seal"')}<div style="font-size:18px;font-weight:700">Distintivo</div><div class="sm mu" style="margin-top:2px">Simulador de carreira de Delegado(a) de Polícia Civil</div></div>
-  <div class="pb" style="border-top:1px solid var(--ln2)">
-   <p class="sm" style="margin:0 0 12px;color:var(--tx2)">Escolha um dos 27 estados, passe no concurso e assuma uma delegacia no interior. Conduza inquéritos dentro dos prazos do CPP, planeje operações, cuide da equipe, enfrente a imprensa e suba de classe até a Delegacia-Geral. Quem vai longe recebe convite para comandar a segurança de outro estado.</p>
-   ${sv&&sv.phase!=='fim'?`<button class="btn full" data-a="continue">Continuar carreira</button><button class="btn sec full" style="margin-top:8px" data-a="new">Nova carreira</button>`:`<button class="btn full" data-a="new">Iniciar carreira</button>`}
-   ${best?`<p class="xs mu mono" style="text-align:center;margin:10px 0 0">Melhor pontuação: ${best}</p>`:''}
-  </div></div>
-  <div class="pn"><h3>Módulos</h3><div class="tw"><table>
-   <tr><td class="b">Concurso</td><td class="sm mu">Estudo, objetiva, discursiva, TAF, psicológica, investigação social, oral, títulos e academia</td></tr>
-   <tr><td class="b">Inquéritos</td><td class="sm mu">Oitivas, perícia, quebras de sigilo, interceptação, preventiva e relatório, com prazos do CPP</td></tr>
-   <tr><td class="b">Operações</td><td class="sm mu">Inteligência, mandados, efetivo, horário, apoio, sigilo e risco de confronto</td></tr>
-   <tr><td class="b">Imprensa</td><td class="sm mu">Coletivas e entrevistas escritas por você</td></tr>
-   <tr><td class="b">Gabinete</td><td class="sm mu">Agenda, projetos, verba, metas e promoções</td></tr></table></div></div>
-  <p class="note">Taxas de crime aproximadas a partir do Anuário Brasileiro de Segurança Pública; os números semanais são simulados e não são estatística oficial. Pessoas, casos, grupos criminosos e cidades do interior são fictícios. Grátis e sem cadastro.</p>
-  <p class="note"><a href="./index.html" style="color:var(--pr)">← BNF Games</a></p></div></div>`;
+  const sv=load(),best=+store.get(BEST)||0,cont=sv&&sv.phase!=='fim';
+  let sub='';if(cont){const U=UF(sv.g?sv.g.uf:sv.uf);sub=sv.g?`${esc(sv.nome)} · ${['Titular de DP','Seccional','Região Metropolitana','Diretoria na capital','Delegacia-Geral','Secretaria'][sv.g.lv]} · ${esc(sv.g.lv>=4?U.nome:sv.g.city.nome+' ('+U.uf+')')} · semana ${sv.g.week}`:`${esc(sv.nome)} · concurso da Polícia Civil — ${esc(U.nome)}`}
+  const steps=[['Concurso','8 meses de estudo e 7 etapas'],['Titular de DP','Uma cidade pequena do interior'],['Seccional','Coordena a região'],['Região Metropolitana','Cidade-dormitório, facções'],['Diretoria','Departamento na capital'],['Delegacia-Geral','Toda a Polícia Civil do estado'],['Secretaria','Convite de outro estado']];
+  const mods=[['Inquéritos','Oitivas, perícia, quebras de sigilo, escuta, preventiva e relatório, dentro dos prazos do CPP.','<path d="M6 3h9l5 5v13H6z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15 3v5h5M9 13h8M9 17h6" stroke="currentColor" stroke-width="1.8"/>'],
+    ['Operações','Inteligência, mandados, efetivo, horário legal, apoio tático e risco de confronto.','<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5" stroke="currentColor" stroke-width="1.8"/>'],
+    ['Imprensa','Coletivas em que cada resposta pesa e entrevistas escritas por você.','<rect x="9" y="2" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" fill="none" stroke="currentColor" stroke-width="1.8"/>'],
+    ['Gabinete','Equipe cansada, verba curta, projetos, metas e promoções.','<path d="M3 21h18M5 21V10l7-6 7 6v11M10 21v-6h4v6" fill="none" stroke="currentColor" stroke-width="1.8"/>']];
+  return `<div class="cv"><header class="hud"><div class="hl"><span class="hseal">${SEAL_S}</span><div><b>Distintivo</b><span>BNF Games · simulador policial</span></div></div><a class="hbtn" href="./index.html" style="display:inline-flex;align-items:center;text-decoration:none">← Jogos</a></header>
+  <section class="cvh"><figure class="art cva">${art('rua',11)}</figure><div class="cvt"><div class="kick">Polícia Civil · 27 estados</div><h1>Distintivo</h1><p>Passe no concurso, assuma uma delegacia no interior e chegue ao comando da segurança pública. Cada inquérito tem prazo, cada operação tem risco e cada entrevista vira manchete.</p>
+  <div class="cvb">${cont?`<button class="sbtn" data-a="continue">Continuar carreira</button><div class="cvs">${sub}</div><button class="cvn" data-a="new">Começar nova carreira</button>`:`<button class="sbtn" data-a="new">Iniciar carreira</button>`}${best?`<div class="cvs">Melhor pontuação: <b>${best}</b></div>`:''}</div></div></section>
+  <section class="cvsec"><div class="kick" style="color:#9AA3B2">A carreira</div><ol class="cvl">${steps.map((x,i)=>`<li><span>${String(i+1).padStart(2,'0')}</span><b>${x[0]}</b><i>${x[1]}</i></li>`).join('')}</ol></section>
+  <section class="cvsec"><div class="kick" style="color:#9AA3B2">O trabalho</div><div class="cvg">${mods.map(m=>`<div class="cvc"><svg viewBox="0 0 24 24" aria-hidden="true">${m[2]}</svg><b>${m[0]}</b><span>${m[1]}</span></div>`).join('')}</div></section>
+  <p class="cvf">Taxas de crime aproximadas a partir do Anuário Brasileiro de Segurança Pública; os números semanais são simulados e não são estatística oficial. Pessoas, casos, grupos criminosos e cidades do interior são fictícios. Grátis e sem cadastro.</p></div>`;
 }
 function vSetup(){
   const u=UI.setup,U=u.uf?UF(u.uf):null;
@@ -1615,7 +1646,7 @@ function vFim(){
   <div class="chs"><button class="ch" data-a="new"><b>Nova carreira</b></button><button class="ch" data-a="cover"><b>Início</b></button></div></div></div></article>`;
 }
 function vCareer(){const G=S.g;if(UI.view==='rep'&&G.rep)return vReport();if(G.eval)return vEval();if(G.ev)return vEvent();if(UI.view==='op'&&G.lastOp)return vOpRes();if(UI.view==='col'&&G.col)return vCol();if(UI.view==='tv'&&G.tv)return vTV();return vDash()}
-function isDark(){if(!S||UI.screen!=='game')return false;if(S.phase==='fim')return true;if(S.phase!=='car')return false;const G=S.g;return (UI.view==='rep'&&!!G.rep)||!!G.eval||!!G.ev}
+function isDark(){if(UI.screen==='cover')return true;if(!S||UI.screen!=='game')return false;if(S.phase==='fim')return true;if(S.phase!=='car')return false;const G=S.g;return (UI.view==='rep'&&!!G.rep)||!!G.eval||!!G.ev}
 
 function render(){
   let h='';
