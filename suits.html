@@ -369,6 +369,8 @@ function migrate(s){
     if(!G.advRec)G.advRec={};if(!G.deck)G.deck=[];if(G.lastT===undefined)G.lastT=null;
     (G.cases||[]).forEach(c=>{
       if(!c.adv)c.adv='prado';
+      /* prazo já cumprido que a versão antiga esquecia de baixar (causava "prazo perdido" falso) */
+      if(c.prazo&&c.fase==='aguarda'&&['replica','saneamento','agravo','cumpr'].includes(c.prazo.tp)&&(c.wait||c.aud))c.prazo=null;
       if(!c.atq)c.atq={offer:null,rv:null,legacy:1};
       if(c.t==='acid'&&c.v&&!c.v.ped)c.v.ped='Sandra Moreira';
       if(c.rol===undefined)c.rol=null;
@@ -1074,7 +1076,7 @@ function endDay(){const G=S.g;
   if(D0(G.date)-D0(prev)>=3*864e5||wd(G.date)<wd(prev))weekly();
   G.h=hoursDay();
   if(G.ind.st>=95){bump('st',-40);G.date=nextWork(G.date);G.h=hoursDay();G.pop.push({k:'info',tit:'Você apagou',sub:'Estresse',txt:`<p>Na quarta xícara de café, a mão tremeu. Você acordou no sofá do escritório com a ${MENTOR.t} te cobrindo com o paletó dela.</p><p>"Vai pra casa. Dois dias. Prazo de processo a gente cumpre. Prazo do corpo, também." Você perdeu um dia útil inteiro.</p>`});}
-  casesOpen().forEach(c=>{
+  casesOpen().forEach(c=>{syncFase(c);
     if(c.wait&&c.wait.d<=G.date){const ev=c.wait.ev;c.wait=null;COURT[ev](c)}
     if(c.prazo&&c.prazo.ate<G.date)missPrazo(c);
     if(c.aud&&c.aud.d===G.date&&!c.aud.ok){c.fase=c.aud.tp;G.pop.push({k:'info',tit:`Hoje: ${c.aud.tp==='conc'?'audiência de conciliação':'audiência de instrução'}`,sub:c.num,txt:`<p>${esc(vara(c))}. Cliente: ${esc(c.cli.n)}. Do outro lado, ${advT(c)}.</p><p>Abra o processo para entrar na sala. Faltar tem consequência.</p>`,c:c.id});snd('alert')}
@@ -1299,7 +1301,12 @@ function submitForm(c){const F=formDef(c);if(!F)return;const ans=c.fa||{};if(F.g
   if(!spend(F.hrs))return;const items=[],ch=[];let tot=0;
   F.groups.forEach(gr=>{const o=gr.opts[ans[gr.id]];if(!o)return;tot+=o.ok;items.push({ok:o.ok>=1?1:o.ok>=.5?.5:0,l:gr.l,c:o.l,t:o.fb||(o.ok>=1?'Boa decisão.':''),a:o.a||[]});ch.push(...fx(o.fx));if(o.set)o.set(c);if(o.eff)o.eff(c)});
   const sc=tot/F.groups.length;ch.push(...fx(sc>=.9?[['jz',1],['cli',1]]:sc<.5?[['cli',-2]]:[]));
-  c.fb={tit:F.tit,items,ch,sc};c.fa={};snd(sc>=.8?'ok':'no');F.done(c,ans,sc);save();render()}
+  c.fb={tit:F.tit,items,ch,sc};c.fa={};snd(sc>=.8?'ok':'no');const f0=c.fase,P0=c.prazo;F.done(c,ans,sc);
+  /* ato praticado: baixa o prazo da fase que acabou de ser cumprida */
+  if(P0&&c.prazo===P0&&PZF[P0.tp]===f0)c.prazo=null;save();render()}
+const PZF={saneamento:'saneamento',contest:'contest',replica:'replica',emenda:'emenda',agravo:'agravo',recurso:'pos',cumpr:'cumpr'};
+/* garante que todo prazo aberto tenha a ação correspondente na tela */
+function syncFase(c){if(!c.done&&c.prazo&&c.fase==='aguarda'&&!c.ai&&PZF[c.prazo.tp]&&!(c.wait&&PZF[c.prazo.tp]!=='pos'))c.fase=PZF[c.prazo.tp]}
 
 /* ---------- atendimento ---------- */
 function ask(c,id){const T=TPL[c.t],q=T.atq.find(x=>x.id===id);if(!q||c.asked.includes(q.id)||c.asked.length>=4)return;if(!spend(.5))return;c.asked.push(q.id);if(q.rev)c.rev[q.rev]=1;if(q.f&&atqRv(c,q))c.rev[q.f]=1;if(q.fx)fx(q.fx);if(q.flag)c[q.flag]=1;save();render()}
@@ -1555,7 +1562,7 @@ function vAlg(c){const A=TPL[c.t].alg(c),R=c.algR;let h=`<div class="memo"><div 
     else h+=`<div class="say">${esc(R.qt)}</div><div class="alert ${R.q.s>=60?'ok':'er'}"><div><b>${R.q.fc?'Resposta contra os fatos do caso.':R.q.s>=80?'Resposta firme.':R.q.s>=60?'Respondeu, sem brilho.':'Resposta fraca.'}</b>${R.q.fc?esc(R.q.fc.msg)+leis(R.q.fc.a):R.q.bad.length?'Cuidado: "'+esc(R.q.bad[0])+'" joga contra o seu cliente.':R.q.s<60?'Faltou enfrentar o ponto que o juiz levantou.':'O juiz anota e acena com a cabeça.'}</div></div><div class="note">Nota final das alegações: <b>${Math.round(c.sc.alg*100)}/100</b>.</div><div style="height:8px"></div><button class="btn full" data-a="algEnd">Encerrar a audiência</button>`}
   return h+'</div></div>'}
 function waitInfo(c){const G=S.g;if(c.aud)return `Audiência marcada para <b>${fmtL(c.aud.d)}</b>${c.aud.d===G.date?' (hoje)':''}.`;if(c.wait){const n={despacho:'despacho inicial do juiz',tutela:'decisão sobre a tutela de urgência',agravoRes:'julgamento do agravo no '+TJ(),contestRe:'contestação da ré',saneam:'decisão de saneamento',sentenca:'sentença',embRes:'julgamento dos embargos',recRival:'decisão da parte contrária sobre recurso',acordao:'julgamento do recurso',pagto:'pagamento ou penhora'}[c.wait.ev];return `Aguardando: <b>${n}</b>. O cartório não avisa quando: a intimação chega pelo Diário.`}return 'Aguardando.'}
-function vCase(c){const G=S.g,T=TPL[c.t],P=partes(c);let h=`<button class="lnk sm" data-a="tab" data-v="processos">← Processos</button><div style="height:8px"></div>`;
+function vCase(c){syncFase(c);const G=S.g,T=TPL[c.t],P=partes(c);let h=`<button class="lnk sm" data-a="tab" data-v="processos">← Processos</button><div style="height:8px"></div>`;
   h+=`<div class="pn"><div class="li" style="border-bottom:1px solid var(--ln2)"><div class="av">${face(c.cli.n,c.cli.f)}</div><div class="t"><b>${esc(c.cli.n)}</b><span>${c.cli.idade} anos · ${esc(c.cli.prof)}</span><span class="mono xs">${c.num}</span></div><div style="width:90px;text-align:right"><div class="xs mu">satisfação</div>${bar(c.sat)}</div></div>
   <div class="kv"><div><label>Ação</label><b>${esc(T.nome)}</b></div><div><label>Você representa</label><b>${c.lado==='autor'?'o autor':'o réu'}</b></div><div><label>Rito</label><b>${c.fase==='atend'||c.fase==='estrat'&&c.lado==='autor'?'a definir':c.rito==='jec'?'Juizado Especial Cível':'Procedimento comum'}</b></div><div><label>Juízo</label><b>${c.fase==='atend'||c.fase==='estrat'||c.fase==='inicial'?'—':esc(vara(c))}</b></div><div><label>Partes</label><b style="white-space:normal;font-weight:500;font-size:12.5px">${esc(P.a)} × ${esc(P.r)}</b></div><div><label>Do outro lado</label><b>${advT(c)}</b></div><div><label>${c.t==='neg'?'Dívida contestada':c.t==='acid'?'Valor cobrado do cliente':'Custo do procedimento'}</label><b class="mono">${money(c.t==='neg'?c.v.div:c.t==='acid'?c.v.dmat+c.v.dmor:c.v.cir)}</b></div><div><label>Estilo do adversário</label><b style="white-space:normal;font-weight:500;font-size:12.5px">${esc(advOf(c).st)}</b></div></div></div>`;
   if(c.prazo)h+=`<div style="height:12px"></div><div class="alert ${prazoCls(c.prazo.ate)==='er'?'er':prazoCls(c.prazo.ate)==='wa'?'':'ok'}"><div><b>Prazo: ${esc(c.prazo.lbl)}. Vence ${fmtL(c.prazo.ate)} (${prazoTxt(c.prazo.ate)}).</b>${leis(c.prazo.a)}</div></div>`;else h+='<div style="height:12px"></div>';
