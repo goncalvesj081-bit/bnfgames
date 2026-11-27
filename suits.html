@@ -995,7 +995,7 @@ function spawnEv(){const G=S.g;const left=EVT.filter(e=>!G.evDone.includes(e.id)
 /* ---------- fim do dia ---------- */
 function endDay(){const G=S.g;
   casesOpen().forEach(c=>{if(c.aud&&c.aud.d<=G.date&&!c.aud.ok)missAud(c)});
-  const used=hoursDay()-G.h;bump('st',G.night?7:used>=7?2:used<=3?-4:-1);
+  const used=hoursDay()-G.h;bump('st',G.night?7:used>=7?3:used<=3?-2:0);
   const prev=G.date;G.date=nextWork(G.date);G.night=false;
   if(D0(G.date)-D0(prev)>=3*864e5||wd(G.date)<wd(prev))weekly();
   G.h=hoursDay();
