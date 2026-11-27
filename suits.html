@@ -959,7 +959,7 @@ const partes=c=>c.t==='neg'?{a:c.cli.n,r:c.v.emp}:c.t==='acid'?{a:c.v.aut,r:c.cl
 const vara=c=>c.rito==='jec'?`Juizado Especial Cível de ${CITY()}`:`${c.v.vara||RI(1,9)}ª Vara Cível de ${CITY()}`;
 const casesOpen=()=>S.g.cases.filter(c=>!c.done);
 const byId=id=>S.g.cases.find(c=>c.id===id);
-const needs=c=>!c.done&&(c.fb||ACT.includes(c.fase)||(c.aud&&c.aud.d===S.g.date&&!c.aud.ok));
+const needs=c=>!c.done&&(c.fb||c.ai||ACT.includes(c.fase)||(c.aud&&c.aud.d===S.g.date&&!c.aud.ok));
 function auto(c,t){c.autos.push({d:S.g.date,t})}
 function msg(from,txt,cid){S.g.msgs.unshift({d:S.g.date,from,txt,c:cid||null});S.g.msgs=S.g.msgs.slice(0,40)}
 function log(t){S.g.log.unshift({d:S.g.date,t});S.g.log=S.g.log.slice(0,80)}
@@ -1237,14 +1237,14 @@ function concInfo(c){const T=TPL[c.t],claim=T.val(c)||1000,s=strength(c);
   if(c.lado==='autor'){const fair=claim*s,offer=round100(claim*clamp(s,.25,.9)*(c.concR||(c.concR=R(.42,.62))));return {claim,fair,offer,counter:round100(claim*.85)}}
   const fair=claim*(1-s),offer=round100(claim*(c.concR||(c.concR=R(.5,.7))));return {claim,fair,offer,counter:round100(claim*.3)}}
 function concDo(c,v){const I=concInfo(c),G=S.g;if(!c.aud||c.aud.ok)return;G.h=Math.max(0,Math.round((G.h-3)*10)/10);
-  c.aud.ok=true;let items=[],ch=[];
+  c.aud=null;let items=[],ch=[];
   const good=c.lado==='autor'?I.offer>=.75*I.fair:I.offer<=1.25*I.fair;
   if(v==='aceita'){items.push({ok:good?1:.5,l:'Acordo',c:`Fechado em ${money(I.offer)}`,t:good?'Acordo bom: valor perto do que a causa vale, sem o risco e a demora do processo.':'Acordo abaixo do que a causa valia. Às vezes vale a paz, mas o cliente pode se arrepender.',a:['CPC-3','CPC-487']});
     auto(c,`Acordo homologado: ${money(I.offer)}.`);c.fb={tit:'Audiência de conciliação',items,ch};closeCase(c,'acordo',{amt:I.offer,good})}
   else if(v==='contra'){const p=c.lado==='autor'?clamp(strength(c)-.12,.1,.75):clamp(strength(c)-.05,.1,.8);if(chance(p)){items.push({ok:1,l:'Contraproposta',c:`Aceita: ${money(I.counter)}`,t:`${RIVAL.t} consulta o cliente por telefone, bufa, e aceita.`,a:['CPC-3']});auto(c,`Acordo homologado: ${money(I.counter)}.`);c.fb={tit:'Audiência de conciliação',items,ch};closeCase(c,'acordo',{amt:I.counter,good:true})}
     else{items.push({ok:.5,l:'Contraproposta',c:'Recusada',t:`"Sem chance, ${DOUT()}." Sem acordo, o processo segue.`});c.fb={tit:'Audiência de conciliação',items,ch};noDeal(c)}}
   else{items.push({ok:good?.5:1,l:'Proposta',c:'Recusada',t:good?'A proposta era razoável. Recusar é apostar na sentença.':'Recusar uma proposta ruim foi a decisão certa.'});c.fb={tit:'Audiência de conciliação',items,ch};noDeal(c)}
-  c.aud=null;save();render();top()}
+  save();render();top()}
 
 /* ---------- audiência de instrução ---------- */
 function aijSteps(c){return TPL[c.t].aij?TPL[c.t].aij(c):[]}
