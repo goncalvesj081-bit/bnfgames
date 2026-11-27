@@ -1064,7 +1064,7 @@ function computeSent(c){const T=TPL[c.t],s=strength(c),p=clamp((s-.3)*2.3/c.juiz
 }
 const winOf=c=>{const r=c.sent?c.sent.res:null;if(!r)return 0;return c.lado==='autor'?(r==='proc'?1:r==='parc'?.5:0):(r==='improc'?1:r==='parc'?.5:0)};
 function sentText(c){const T=TPL[c.t],st=c.sent,P=partes(c),J=c.juiz,jec=c.rito==='jec';const L=[];
-  L.push(`Vistos. Trata-se de ação ajuizada por ${P.a} em face de ${P.r}.${jec?' Dispensado o relatório.':' É o relatório. Decido.'}`);
+  L.push(`Vistos. Trata-se de ação ajuizada por ${P.a} em face de ${P.r.replace(/\.$/,'')}.${jec?' Dispensado o relatório.':' É o relatório. Decido.'}`);
   st.F.forEach(f=>{if(f.sg>0&&c.lado==='autor'||f.sg<0&&c.lado==='reu')L.push(c.lado==='autor'?'Os elementos dos autos favorecem a parte autora. '+f.t:'A defesa não conseguiu afastar a pretensão. '+f.t);else if(f.sg!==0)L.push(c.lado==='autor'?'Há elementos que militam contra a pretensão autoral. '+f.t:'A defesa trouxe elementos relevantes. '+f.t)});
   const lbl={proc:'PROCEDENTE',parc:'PARCIALMENTE PROCEDENTE',improc:'IMPROCEDENTE'}[st.res];
   const ds=T.dispo(c,{res:st.res,decl:c.t==='neg'&&st.res!=='improc',dm:st.dm,val:st.val});
