@@ -49,7 +49,7 @@ await loop(2500,()=>__suits.S.g.cases.some(c=>c.prazo&&c.prazo.tp==='saneamento'
 const before=await p.evaluate(()=>{const S=__suits.S;return {date:S.g.date,closed:S.g.stats.closed,cases:S.g.cases.map(c=>[c.id,c.t,c.fase,c.prazo&&c.prazo.tp,c.fee])}});console.log('OLD',JSON.stringify(before));
 p=await ctx.newPage();hook(p);await p.goto('file://'+require('path').resolve(__dirname,'../suits.html')+'#dev');await p.evaluate(()=>{__suits.act('continue');__suits.act('newsClose')});
 const mid=await p.evaluate(()=>{const S=__suits.S;return {sv:S.saveVersion,cases:S.g.cases.map(c=>[c.id,c.t,c.fase,c.adv,c.prazo&&c.prazo.tp,c.fee,c.jc])}});console.log('NEW',JSON.stringify(mid));
-await p.evaluate(()=>__suits.act('tab','prazos'));await p.screenshot({path:'prazos.png'});
+await p.evaluate(()=>__suits.act('tab','prazos'));await p.screenshot({path:require('path').join(require('os').tmpdir(),'suits-prazos.png')});
 await loop(2500,()=>__suits.S.g.stats.closed>=9);
 const fin=await p.evaluate(()=>{const S=__suits.S;return {date:S.g.date,stats:S.g.stats,advRec:S.g.advRec,cases:S.g.cases.map(c=>[c.t,c.adv,c.fase,c.how,c.win,c.fee,c.cli.n])}});console.log('FIN',JSON.stringify(fin));
 console.log(errs.slice(0,10).join('\n')||'no errors');await b.close()})().catch(e=>{console.error('FAIL',e.message);process.exit(1)});
