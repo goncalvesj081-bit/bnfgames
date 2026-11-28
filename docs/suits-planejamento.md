@@ -1,14 +1,24 @@
-# Suits — planejamento de novas áreas (v2 do plano)
+# Suits — planejamento de novas áreas (v3 do plano)
 
-> Para o Claude Code. Base: `bnfgames/suits.html` **v1.1.0** (Temporada 1 — A Beca,
-> com as correções do PR #18). Leia o arquivo inteiro antes de começar.
+> Para o Claude Code. Base: **v1.1.2** no `main` (PR #20). O código está separado
+> em `suits.html` + pasta `suits/`. **Leia primeiro o `CLAUDE.md` da raiz**, que tem
+> o mapa dos arquivos; abra só os arquivos que a tarefa toca.
 > A ordem importa: a **Etapa 0** é pré-requisito de todas as outras.
+> Visão de produto (clientes, eventos, carreira): `docs/suits-visao.md`.
 >
 > ⚠ = ponto não confirmado na fonte oficial. Confira antes de usar ou deixe de fora.
 
 ---
 
-## Onde estamos (retrato da v1.1.0)
+## Onde estamos (retrato da v1.1.2)
+
+**Histórico recente:**
+- 1.1.0 (PR #18): rol de testemunhas, advogados adversários, atendimento sorteado,
+  honorários sobre o proveito econômico.
+- 1.1.1 (PR #19): correções do relatório de testes (`docs/suits-relatorio-testes-1.1.0.md`),
+  com save v3. Feriados móveis, contrarrazões, acórdão, prazo de cumprimento,
+  tutela na negativação, alternativas embaralhadas, gabarito comentado.
+- 1.1.2 (PR #20): código separado em arquivos, `CLAUDE.md` e testes no repositório.
 
 **Funciona e deve ser preservado:**
 - Fatos escondidos no atendimento: `buildAtq` sorteia, por caso, qual pergunta
@@ -25,8 +35,12 @@
   outros.
 - Honorários: fixo + percentual sobre o **proveito econômico** (`proveito`,
   `feeOf`).
-- Save: `KEY='suits_v1'`, `saveVersion`, `migrate()` **aditivo** (só acrescenta
+- Save: `KEY='suits_v1'`, `SAVE_VERSION=3`, `migrate()` **aditivo** (só acrescenta
   campos com padrão) e `postLoad()` para acertos que precisam do jogo carregado.
+- Alternativas embaralhadas com semente estável (`sord`); o `data-v` guarda o
+  índice original.
+- Calendário com feriados nacionais fixos e móveis (Carnaval, Quinta e
+  Sexta-feira Santa, Corpus Christi) e recesso de 20/12 a 20/1.
 
 **Lições dos bugs da 1.0 (viram regra do motor):**
 1. **Todo ato praticado baixa o próprio prazo.** Hoje isso é o mapa `PZF`
@@ -41,12 +55,18 @@
    fato, a pergunta que o revela existiu; se a sentença afasta um pedido por uma
    súmula, a resposta ao juiz que contraria a súmula não pode ser "firme".
 
-**Dívidas técnicas que a Etapa 0 resolve** (contagem atual no código):
-- 22 checagens `c.t==='…'` (11 `neg`, 8 `acid`, 3 `saude`), 21 `rito==='…'` e
-  28 `lado==='…'`.
+**Dívidas técnicas que a Etapa 0 resolve** (contagem na v1.1.2, cresceu com as
+correções da 1.1.1):
+- `c.t==='…'`: 21 em `motor.js`, 5 em `telas.js` e 4 em `base.js`.
+- `rito==='…'`: 28 em `motor.js` e 2 em `telas.js`.
+- `lado==='…'`: 26 em `motor.js`, 9 em `telas.js` e 1 em `base.js`.
+- As listas específicas de cada caso (`VEHS`, `WREL`, `PROCS`, `ITENS`…) ficaram
+  em `dados/casos/_comum.js`. Elas devem ir para o arquivo do próprio caso.
 - Funções que só conhecem os 3 casos: `partes`, `vara`, `computeSent` (regras de
-  `neg`/`acid`/`saude` dentro dela), `recInfo`, `factCheck`, `COURT.contestRe`,
-  `formDef('replica')` e o cabeçalho de valor em `vCase`.
+  `neg`/`acid`/`saude` dentro dela), `recInfo`, `factCheck`, `COURT.despacho`
+  (tutela da negativação), `COURT.contestRe`, `formDef('replica')`, `proveito`,
+  `feeOf`, a checagem de urgência da cirurgia em `endDay`, os dilemas que
+  procuram casos abertos (`EVT.who`) e o cabeçalho de valor em `vCase`.
 - `FASE`, `ACT`, `PZF` e `COURT` assumem o processo civil.
 
 **Pendências que continuam valendo:**
@@ -56,9 +76,12 @@
   transcrito: conferência pendente" em todos os artigos. Ver "Conferência das
   leis" abaixo.
 - A 2ª fase da OAB só tem a área Civil.
-- O Montador só tem petição inicial e contestação. Réplica, recurso,
-  cumprimento e agravo são decisões em formulário.
-- O banco da OAB tem 60 questões (distribuídas em 7 disciplinas).
+- O Montador só tem petição inicial e contestação (a emenda reabre os blocos da
+  inicial). Réplica, recurso, contrarrazões, cumprimento e agravo são decisões em
+  formulário.
+- O banco da OAB tem 72 questões na 1ª fase e 12 na 2ª.
+- Só existem 3 modelos de caso. As variações internas ajudam, mas a repetição
+  ainda aparece depois de uns 6 casos. A Etapa 1 é a resposta.
 
 ---
 
@@ -70,8 +93,8 @@
    suba o HTML salvo da página). O Claude compara caractere por caractere e só
    então marca `ok:1`. Não tentar contornar o bloqueio do Planalto com
    user-agent falso: isso foi barrado pelo ambiente.
-3. **Script de checagem** (`tests/vade-refs.js`): lista todo `lei('…')` e todo
-   `a:['…']` usado no jogo e falha se algum não existir no `VADE`.
+3. **Script de checagem:** ✅ feito: `tests/vade-refs.js`. Hoje acusa 414
+   citações, todas no `VADE`, e 105 artigos ainda sem `ok:1`.
 4. **Regra da versão:** uma área nova só vai para o `main` com os artigos dela
    conferidos, ou com o aviso explícito no CHANGELOG.
 
@@ -117,9 +140,8 @@ const RITO = {
   de cálculo da intimação (`prazoBox`).
 - A caixa de cálculo e a agenda mostram "dias úteis" ou "dias corridos" ao lado
   de cada prazo.
-- Feriados: hoje só os nacionais fixos (`FER`). Carnaval e Corpus Christi não
-  contam. Decidir na 0.2 se entram (cálculo da Páscoa) ou se o jogo assume
-  isso com uma nota.
+- Feriados móveis: ✅ feito na 1.1.1 (`pascoa`, `movY`, `ferNome` em `base.js`).
+  Falta só a tabela de feriados por UF/tribunal, se quiser.
 
 ### 0.3 Templates declaram tudo
 
@@ -147,27 +169,45 @@ padrão do motor quando não existir. O cível atual vai inteiro para
 ### 0.5 Reputação por área e migração
 
 - `G.repA = {civel, trab, penal, prev}`. A Reputação geral continua no topo.
-- `migrate` (saveVersion 3): cria `repA` a partir do histórico. Para cada caso
+- `migrate` (saveVersion 4): cria `repA` a partir do histórico. Para cada caso
   encerrado, soma na área do template o que `closeCase` deu de reputação. Não
   zera nada.
 - Casos antigos sem `rito` válido no registro recebem `'comum'` ou `'jec'` (o
   que já tinham).
 
-### 0.6 Testes (entram no repositório)
+### 0.6 Testes
 
-Hoje os testes rodam fora do repositório. Commitar em `tests/`:
-- `tests/play.js`: robô em Playwright que joga uma carreira inteira (OAB e N
-  processos), com detecção de loop (mesmo estado por 3 ciclos → encerra o dia)
-  e captura de erros de página.
-- `tests/mig.js`: gera um save na versão anterior (`git show <tag>:suits.html`),
-  carrega na nova e joga até o fim.
+✅ Já estão no repositório (1.1.2):
+- `tests/jogar.js`: robô em Playwright que joga uma carreira inteira (OAB e N
+  processos), com detecção de loop e captura de erros de página.
+- `tests/migracao.js <ref-git>`: gera um save na versão `<ref>`, carrega na atual
+  e joga até o fim.
 - `tests/vade-refs.js`: toda referência de lei existe no `VADE`.
-- **Teste de regressão da 0:** sementes fixas (trocar `Math.random` por um RNG
-  com semente no modo `#dev`) para jogar os 3 casos nos dois desfechos e comparar
-  sentença, prazos e honorários com a v1.1.0.
+
+Falta para a Etapa 0:
+- **Teste de regressão com semente fixa:** trocar `Math.random` por um RNG com
+  semente no modo `#dev`, jogar os 3 casos nos dois desfechos e comparar
+  sentença, prazos e honorários com a v1.1.2.
+- **Robô mais esperto:** hoje ele escolhe a primeira opção, que depois do
+  embaralhamento é aleatória (perde muito e cai em indeferimento da inicial).
+  No modo `#dev`, expor a resposta certa para o robô também testar o caminho da
+  vitória.
 
 **Aceite:** zero `c.t==='…'` fora dos templates; zero `rito==='…'` fora de
-`RITO`; os testes passam; um save da 1.1 carrega e termina a carreira.
+`RITO`; os testes passam; um save da 1.1.2 carrega e termina a carreira.
+
+### 0.7 Primeiro ciclo jogável da visão (junto com a Etapa 0)
+
+O `docs/suits-visao.md` pede um ciclo completo antes de crescer. O motor já tem
+quase tudo; faltam três peças pequenas:
+1. **Aceitar ou recusar o caso** no fim do atendimento (hoje todo caso é aceito).
+   Recusar com orientação é a resposta certa para o caso prescrito da Etapa 1.
+2. **Ficha do cliente:** promover `c.sat` a `confianca` e acrescentar `paciencia`
+   e `expectativa` (esta já existe em parte: `c.expect` e `c.promise`). Os
+   recados (`msgs.wait`) já escalam o tom.
+3. **Consequência dias depois:** fila `G.ecos` com eventos agendados a partir do
+   resultado (indicação de novo cliente, reclamação, cliente que volta com outro
+   problema). Vai num arquivo novo, `suits/dados/ecos.js`.
 
 ---
 
@@ -366,7 +406,7 @@ padrão.
 
 ## Balanceamento (rever a cada versão com o robô de testes)
 
-Números da v1.1.0 em carreira simulada (o robô escolhe sempre a primeira opção):
+Números da v1.1.0 em carreira simulada (antes do embaralhamento):
 - 6 processos encerrados em cerca de 8 a 10 meses de jogo;
 - Clientes chegava a 100 em 8 meses na 1.0 (corrigido na 1.1 com o custo de 4x
   acima de 90). Medir de novo: a regra é que **nenhum indicador chegue a 100
@@ -374,7 +414,7 @@ Números da v1.1.0 em carreira simulada (o robô escolhe sempre a primeira opç�
 - o caixa só cresce (salário de associado maior que o custo de vida). Ajustar na
   Etapa 5.
 
-Com cada área nova, o robô de `tests/play.js` precisa saber jogar as peças e as
+Com cada área nova, o robô de `tests/jogar.js` precisa saber jogar as peças e as
 audiências dela. **Atualizar o robô faz parte do aceite.**
 
 ---
@@ -397,7 +437,7 @@ audiências dela. **Atualizar o robô faz parte do aceite.**
 
 | Versão | Etapa | Por que nessa ordem |
 | --- | --- | --- |
-| 1.2.0 | Motor de ritos + testes no repositório | Sem isso, cada área vira um monte de `if`, e sem teste a refatoração é às cegas |
+| 1.2.0 | Motor de ritos + primeiro ciclo da visão | Sem o motor, cada área vira um monte de `if`; o ciclo prova que é uma carreira, não um banco de questões |
 | 1.3.0 | Cível ampliado + peças novas no Montador | Valida o motor sem rito novo; as peças são reusadas pelas outras áreas |
 | 1.4.0 | Trabalhista | Rito próprio, mas parecido com o cível (dias úteis) |
 | 1.5.0 | Criminal (defesa) | Testa a contagem corrida, o recesso por caso e a lógica de partes (MP × réu) |
@@ -418,5 +458,5 @@ audiências dela. **Atualizar o robô faz parte do aceite.**
 - [ ] 15 questões novas da área no banco da OAB.
 - [ ] Todos os artigos novos no `VADE` e no `tests/vade-refs.js`, conferidos (`ok:1`)
       ou listados como pendentes no CHANGELOG.
-- [ ] `migrate` aditivo, testado com um save da versão anterior (`tests/mig.js`).
+- [ ] `migrate` aditivo, testado com um save da versão anterior (`tests/migracao.js`).
 - [ ] Os 3 casos da Temporada 1 continuam funcionando igual.
