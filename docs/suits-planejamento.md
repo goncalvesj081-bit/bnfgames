@@ -85,6 +85,40 @@ correções da 1.1.1):
 
 ---
 
+## Como este plano se junta à visão de produto
+
+O `docs/suits-visao.md` define **três pilares**: Advocacia (processos), Carreira
+(trajetória) e Gestão (escritório, equipe, dinheiro). Toda funcionalidade nova
+precisa fortalecer pelo menos um. Este plano cuida do pilar Advocacia (motor e
+áreas do Direito). A visão cuida dos outros dois. As duas trilhas andam juntas,
+na distribuição que a própria visão sugere:
+
+| Versão | Trilha técnica (este plano) | Trilha de experiência (visão) | Pilar |
+| --- | --- | --- | --- |
+| 1.2.0 | Motor de ritos | Primeiro ciclo jogável + histórico de carreira + motor de eventos | Advocacia, Carreira |
+| 1.3.0 | Cível ampliado | Clientes com personalidade e relacionamento | Advocacia, Carreira |
+| 1.4.0 | Trabalhista | Eventos de rotina e dilemas sem resposta perfeita | Carreira |
+| 1.5.0 | Criminal | Personagens recorrentes, rivalidade e casos especiais | Carreira |
+| 1.6.0 | Previdenciário | Rede de contatos e clientes que voltam | Carreira, Gestão |
+| 2.0.0 | Especialização e escritório | Níveis de carreira, escritório, equipe, Temporada 2 | Carreira, Gestão |
+
+**Princípios da visão que viram regra de código:**
+- **Decisão com consequência.** Toda escolha mexe em pelo menos um destes:
+  caso, cliente, reputação, dinheiro ou carreira. E aparece no histórico.
+- **Nem tudo é prova jurídica.** Eventos de comunicação, organização e
+  negociação valem tanto quanto peças.
+- **Nem todo dilema tem resposta certa.** Os eventos ganham opções com
+  *trade-off* (custo e ganho diferentes), e não só certo e errado: `ok` deixa de
+  ser obrigatório e o feedback mostra o que se ganhou e o que se perdeu.
+- **Complexidade gradual.** Indicadores e sistemas novos aparecem quando a
+  carreira chega neles. Ninguém vê "equipe" sendo associado júnior.
+- **Narrativa nasce da mecânica.** Personagens reagem ao que o jogador fez
+  (histórico), em vez de textos soltos.
+- **Sem punição inexplicável.** Evento aleatório não pune o que o jogador não
+  podia entender nem prevenir. Essa é a mesma lição do bug do rol.
+
+---
+
 ## Conferência das leis (tarefa contínua, bloqueia cada versão)
 
 1. Acrescentar ao `VADE` o campo **`ok:1`** por artigo conferido, e mostrar o
@@ -208,6 +242,19 @@ quase tudo; faltam três peças pequenas:
 3. **Consequência dias depois:** fila `G.ecos` com eventos agendados a partir do
    resultado (indicação de novo cliente, reclamação, cliente que volta com outro
    problema). Vai num arquivo novo, `suits/dados/ecos.js`.
+4. **Histórico de carreira** (`G.hist`): cada decisão relevante vira uma linha
+   (data, caso, decisão, consequência). Ele aparece numa aba "Carreira" e é a
+   matéria-prima dos ecos, das promoções e das falas dos personagens ("você me
+   explicou tudo daquela vez").
+5. **Motor de eventos genérico:** hoje `EVT` só tem dilemas éticos. Ele passa a
+   aceitar `categoria` (ética, rotina, cliente, colega, oportunidade),
+   `condicao(G)` (quando pode aparecer), `custo` (horas e dinheiro, visíveis antes
+   da escolha) e `eco` (consequência agendada). Os 8 dilemas atuais migram sem
+   mudar o texto.
+
+O ciclo da visão (seção 13) fica assim: mensagem → atendimento → aceitar ou
+recusar → processo → decisão ou acordo → reação do cliente → registro no
+histórico → eco dias depois.
 
 ---
 
@@ -228,7 +275,24 @@ embargos de declaração e cumprimento de sentença. O bloco novo **`vicio`**
 embargos de todas as áreas.
 
 **Pegadinha transversal nova:** a cobrança prescrita deve ser **recusada com
-orientação** no atendimento. Recusar caso é uma decisão que o jogo ainda não tem.
+orientação** no atendimento (a decisão de recusar chega na 0.7).
+
+### Clientes com personalidade (visão, seção 4)
+
+- Ficha do cliente: **confiança**, **paciência**, **expectativa**, **condição
+  financeira** e **perfil** (ansioso, desconfiado, prático, emotivo). Nem tudo
+  aparece como número: o perfil muda o tom dos recados e das falas.
+- A paciência controla a frequência e o tom dos recados (`msgs.wait` já escala)
+  e o risco de o cliente trocar de advogado.
+- A expectativa nasce do atendimento: prometer resultado sobe a expectativa e o
+  tombo depois (`c.promise` já existe).
+- **Resultado bem explicado segura o cliente mesmo na derrota.** Novo momento no
+  fim do processo: "explicar a decisão ao cliente", com escolhas de comunicação.
+- Satisfação alta gera **indicação** (eco); um cliente encerrado pode **voltar**
+  com outro problema (template novo com `cliente` reaproveitado).
+- Dilema da visão para esta versão: **cliente insatisfeito ameaça trocar de
+  advogado** (explicar, renegociar a comunicação, propor acordo ou encerrar a
+  relação de forma adequada, com o art. 112 do CPC já no Vade).
 
 ---
 
@@ -281,6 +345,24 @@ particular de `liquidacao`.
 
 **Ética nova:** o cliente pede para "aumentar um pouco" as horas extras na
 inicial (alterar a verdade dos fatos; CPC, art. 80, II, já no Vade).
+
+### Eventos de rotina e dilemas profissionais (visão, seções 3 e 8)
+
+Entram pelo motor de eventos da 0.7, em `suits/dados/eventos.js`. Alguns
+exemplos:
+- a Dra. Marta pede que você assuma um processo delicado (mais carga, mais
+  reputação se der certo);
+- um colega pede ajuda para preparar uma audiência (custa horas e rende
+  relacionamento);
+- um erro administrativo exige retrabalho (protocolo no processo errado);
+- fim de expediente: terminar a peça, estudar (Vade Mecum) ou ir para casa
+  (estresse);
+- proposta de outro escritório (salário maior × ficar com a Marta).
+
+Dilemas com *trade-off*, e não com resposta única, nas categorias da visão:
+comunicação de riscos, pressão por resultado, relação com colegas e organização
+de prazos. Os dilemas que envolvem ética ou lei continuam com a resposta
+juridicamente correta e o artigo.
 
 **Vade novo:** CLT (só os artigos usados) e Súmulas do TST.
 
@@ -353,6 +435,17 @@ padrão.
 
 **Fica para depois:** Tribunal do Júri, em etapa própria.
 
+### Personagens recorrentes e casos especiais (visão, seções 7 e 10)
+
+- **Promotor fixo** como rival da área penal, com o mesmo papel narrativo do Dr.
+  Prado. Os advogados de `ADV` passam a lembrar dos encontros anteriores
+  (histórico): "da última vez você me tirou a testemunha na contradita".
+- **Casos especiais** (raros, com regra própria): repercussão na cidade, alto
+  valor, conflito de interesses, caso em que o melhor resultado é o acordo, caso
+  que cruza áreas (o roubo com reconhecimento por foto + a ponte com o
+  Distintivo). Exigem mais de uma habilidade: peça, audiência, imprensa e
+  cliente. Deixam marca duradoura no histórico e na reputação.
+
 ---
 
 ## Etapa 4 — Previdenciário (v1.6.0)
@@ -377,9 +470,43 @@ padrão.
   e recurso inominado.
 - **Vade novo:** Lei 8.213, Lei 8.742 e Lei 10.259.
 
+### Rede de contatos e clientes que voltam (visão, seções 4 e 11)
+
+- **Contatos** (`G.rede`): pessoas conhecidas na carreira (ex-clientes, colegas,
+  assistentes sociais, peritos, servidores). Elas indicam clientes, abrem portas
+  e às vezes pedem favores (dilemas).
+- O previdenciário é a área natural para isso: no interior, um cliente bem
+  atendido traz a família e os vizinhos.
+
 ---
 
 ## Etapa 5 — Carreira: especialização e escritório (v2.0.0)
+
+**Níveis de carreira (visão, seção 5).** O jogo deixa de ter só "associado":
+
+| Nível | Posição | O que muda no jogo |
+| --- | --- | --- |
+| 1 | Bacharel | OAB (já existe) |
+| 2 | Advogado júnior | Casos passados pela Dra. Marta, com revisão dela (hoje é isso) |
+| 3 | Advogado pleno | Escolhe casos, atende sem supervisão, primeiros clientes próprios |
+| 4 | Advogado sênior | Casos complexos e especiais; orienta um estagiário |
+| 5 | Sócio | Participa do resultado do escritório e das decisões |
+| 6 | Dono de escritório | Capta clientes, contrata, paga as contas |
+
+A **promoção combina critérios**, nunca uma pontuação só: experiência (casos
+encerrados), qualidade técnica (nota das peças e audiências), reputação, ética,
+relação com clientes e prazos cumpridos. A Dra. Marta faz uma avaliação de
+desempenho periódica que lê o histórico e explica o que falta.
+
+**Temporadas (visão, seção 10):** a Temporada 1 (o começo) termina com a decisão
+sobre o futuro. A Temporada 2 (independência) é esta etapa. A Temporada 3
+(reconhecimento: casos grandes, concorrentes, tribunais superiores) e a 4
+(legado: formar gente, finais diferentes de carreira) ficam depois que o ciclo
+principal estiver sólido.
+
+**Gestão sem planilha:** aluguel, sistemas e equipe aparecem como decisões
+pontuais com consequência clara (contratar agora ou esperar, aceitar mais casos
+ou não), e não como tabela de custos.
 
 1. **2ª fase da OAB por área:** Civil, Trabalho ou Penal (a FGV oferece 7 áreas;
    o jogo começa com 3). A peça do exame vem da área escolhida e vira a primeira
@@ -428,8 +555,8 @@ audiências dela. **Atualizar o robô faz parte do aceite.**
 - **Modo "audiência real":** o jogador digita o relatório de uma audiência que
   assistiu e o jogo transforma em caso jogável (combina com os relatórios de
   audiência da faculdade).
-- **Feriados móveis** (Carnaval, Sexta-feira Santa, Corpus Christi) e
-  **feriados locais por comarca**.
+- **Feriados locais por comarca** (os móveis já entraram na 1.1.1).
+- **Áreas da visão ainda sem etapa:** Empresarial e Administrativo.
 
 ---
 
@@ -443,6 +570,19 @@ audiências dela. **Atualizar o robô faz parte do aceite.**
 | 1.5.0 | Criminal (defesa) | Testa a contagem corrida, o recesso por caso e a lógica de partes (MP × réu) |
 | 1.6.0 | Previdenciário | Reaproveita JEC/JEF |
 | 2.0.0 | Especialização e escritório | Junta tudo na carreira |
+
+## Aceite de cada funcionalidade de experiência (visão, seção 14)
+
+- [ ] Fortalece pelo menos um pilar (Advocacia, Carreira ou Gestão).
+- [ ] O jogador entende o que está acontecendo e por que decide.
+- [ ] Custo de tempo e dinheiro visível antes da escolha.
+- [ ] Consequência coerente e registrada no histórico.
+- [ ] Nenhuma punição aleatória sem explicação.
+- [ ] Não contradiz o estado do processo nem os fatos do caso.
+- [ ] Save antigo continua funcionando (`tests/migracao.js`).
+- [ ] Funciona no celular e no desktop.
+- [ ] Passa na pergunta-guia: *isso faz o jogador sentir que vive uma carreira na
+      advocacia, ou só acrescenta mais uma tela?*
 
 ## Aceite de cada área
 
