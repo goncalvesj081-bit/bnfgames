@@ -1,4 +1,4 @@
-# Suits — planejamento de novas áreas (v3 do plano)
+# Suits — planejamento de novas áreas (v3 do plano · modelo de referência)
 
 > Para o Claude Code. Base: **v1.1.2** no `main` (PR #20). O código está separado
 > em `suits.html` + pasta `suits/`. **Leia primeiro o `CLAUDE.md` da raiz**, que tem
@@ -116,6 +116,67 @@ na distribuição que a própria visão sugere:
   (histórico), em vez de textos soltos.
 - **Sem punição inexplicável.** Evento aleatório não pune o que o jogador não
   podia entender nem prevenir. Essa é a mesma lição do bug do rol.
+
+---
+
+## Cenário brasileiro atual (pesquisa de novembro de 2026)
+
+O que mudou na advocacia e no Judiciário e ainda não está no jogo, com o lugar
+de cada item no plano. Fontes ao final da seção. Tudo aqui também passa pela
+**conferência das leis**: os itens com ⚠ tinham informação conflitante ou
+secundária na pesquisa.
+
+### Tecnologia e rotina do advogado
+
+| Tema | Situação hoje | No jogo | Etapa |
+| --- | --- | --- | --- |
+| **IA generativa na advocacia** | Recomendação 001/2024 do CFOAB (diretrizes: revisão humana, sigilo, transparência com o cliente). Plano Nacional de IA na Advocacia (jun/2026). Em ago/2026, o CFOAB autorizou ações contra empresas de IA que praticam atos privativos. No Judiciário, Resolução CNJ 615/2025. | **Assistente de IA no escritório:** economiza horas na redação, mas a peça que não é revisada pode trazer jurisprudência inventada (sanção, juízo −, representação). Dilemas: colar dados do cliente numa IA pública (sigilo); avisar ou não o cliente; "robô-advogado" captando clientes. | 1.4 (dilemas) e 2.0 (ferramenta) |
+| **Domicílio Judicial Eletrônico** | Obrigatório para pessoas jurídicas citadas e intimadas (Res. CNJ 455/2022; obrigatoriedade em 2025). Datas de adesão e multa variam entre as fontes ⚠. | Quando o réu é empresa, a citação é eletrônica e o prazo começa pela confirmação no Domicílio. Pegadinha: empresa que não se cadastrou. | 1.2 (motor de ritos: citação por tipo de réu) |
+| **Feriado local no recurso** | Lei 14.939/2024: o tribunal manda corrigir a falta de prova de feriado local, em vez de declarar o recurso intempestivo (CPC, art. 1.003, §6º). STJ e STF divergem sobre a aplicação ⚠. | Feriados por comarca, e um evento "recurso no último dia, que era feriado municipal": o jogador precisa juntar a prova. | 1.2 (calendário) |
+| **Tempo real dos processos** | Justiça em Números 2025 (dados de 2024): em média 2 anos e 9 meses na fase de conhecimento e 5 anos e 3 meses na execução. Um em cada quatro processos tem gratuidade. | O jogo comprime o tempo (um caso leva de 3 a 6 meses). Documentar o fator de compressão no balanceamento e mostrar ao jogador, no fim do caso, quanto tempo levaria na vida real. | Balanceamento |
+
+### Direito material e processual que afeta os casos
+
+| Tema | Situação hoje | No jogo | Etapa |
+| --- | --- | --- | --- |
+| **Juros e correção (Lei 14.905/2024)** | Correção pelo IPCA e juros legais pela Selic menos o IPCA (CC, arts. 389 e 406), com piso zero. STF validou a aplicação da Selic. | O bloco **`liquidacao`** do Montador (Etapa 2) e o cumprimento de sentença usam essa regra. Pegadinha: aplicar 1% ao mês, a regra antiga. | 1.3 e 1.4 |
+| **Plano de saúde fora do rol da ANS** | STF, ADI 7265 (set/2025): a Lei 14.454/2022 é constitucional, mas a cobertura fora do rol exige **5 critérios cumulativos** e consulta obrigatória ao **NatJus** ⚠ (conferir a lista no acórdão). | Variação nova do caso do plano: procedimento **fora do rol**. A tutela fica mais difícil, e o jogador precisa reunir prescrição, evidência científica e parecer do NatJus. O caso atual, de doença preexistente, continua. | 1.3 |
+| **Superendividamento** | Lei 14.181/2021 (repactuação global de dívidas preservando o mínimo existencial). Decreto 11.150/2022, alterado pelo 11.567/2023, fixou o mínimo existencial em valor fixo, contestado nos tribunais e no STF (ADPFs 1005 e 1006) ⚠. | **Caso novo do cível**, muito comum: cliente com vários empréstimos e cartões. Audiência de repactuação com todos os credores. Ótimo para o pilar "nem tudo é sentença". | 1.3 |
+| **Desjudicialização de família** | Res. CNJ 571/2024: inventário e partilha em cartório mesmo com herdeiro menor ou incapaz. Divórcio em cartório com filhos menores só quando as questões dos filhos já foram resolvidas judicialmente. Advogado obrigatório no ato. | Nos casos de família, a primeira decisão é **cartório ou Judiciário**. Escolher o caminho certo poupa meses ao cliente e é o tipo de orientação que gera indicação. | 1.3 |
+| **Honorários de sucumbência** | STJ, Tema 1076: a equidade só vale para proveito econômico inestimável ou irrisório, ou para valor da causa muito baixo. Nas demais causas, de 10% a 20% (CPC, art. 85, §2º ⚠). | `feeOf` usa 10% fixo; passa a usar a faixa de 10% a 20% conforme o desempenho, e a equidade nas causas de valor baixo. | 1.2 |
+| **Pejotização (Tema 1389 do STF)** | Repercussão geral reconhecida em abr/2025; processos sobre o tema **suspensos no país todo** até o julgamento de mérito (competência, validade e ônus da prova). Sem julgamento final na pesquisa ⚠. | Caso trabalhista "PJ que era empregado": o processo fica **sobrestado**. Ensina a suspensão por repercussão geral e o que dizer ao cliente que espera. | 1.4 |
+| **Reconhecimento de pessoas** | STJ (HC 598.886 e seguintes): o art. 226 do CPP não é mera recomendação; reconhecimento fora do rito, inclusive por foto, é nulo. Res. CNJ 484/2022. Reforçado pelo STJ em 2026. | Já previsto na Etapa 3. Ganha base mais firme. | 1.5 |
+| **Juiz das garantias** | STF validou em 2023, com 12 meses prorrogáveis por mais 12 para implantar. Em 2025, cerca de 16 tribunais estaduais tinham implantado ⚠. | No criminal, o juiz do inquérito e o da ação podem ser diferentes conforme a comarca. Detalhe de realismo, não mecânica central. | 1.5 |
+| **Benefício por incapacidade** | Novo Atestmed (Portaria Conjunta MPS/INSS 13/2026): a análise documental passa a ser a via prioritária, com benefício de até 90 dias sem perícia presencial ⚠. A fila da perícia caiu em 2026. | No previdenciário, o primeiro passo do auxílio por incapacidade é o pedido documental no INSS. Só depois da negativa vem a ação. | 1.6 |
+| **Reforma do Código Civil** | PL 4/2025 em comissão no Senado (prazo até 22/12/2026), sem votação. Mais de 900 artigos alterados. | Nada muda agora. Mas o `VADE` precisa aceitar **vigência por data** (`vig:{de,ate}`), para o jogo poder trocar artigos quando uma lei mudar, sem quebrar saves. | 1.2 (estrutura do VADE) |
+
+### Mercado e carreira
+
+| Tema | Situação hoje | No jogo | Etapa |
+| --- | --- | --- | --- |
+| **Tamanho da advocacia** | Cerca de 1,5 milhão de advogados inscritos (Quadro da OAB, nov/2026). A OAB tem programas para a jovem advocacia. | O mercado é competitivo: o jogador recém-inscrito não tem clientes próprios, e por isso a carreira começa como associado. Na Temporada 2, a captação legítima (indicação, reputação, publicidade sóbria) é o que diferencia. | 2.0 |
+| **Advocacia dativa** | Convênios com as seccionais, como o da OAB-SP, reajustado em 2026, pagam honorários tabelados pelo Estado. | **Fonte de renda do autônomo iniciante:** inscrever-se na advocacia dativa traz casos (muitos criminais e de família), com honorários baixos e fixos. É uma decisão de carreira com trade-off. | 2.0 |
+| **Reforma tributária** | LC 214/2025: redução de 30% de IBS e CBS para profissões intelectuais regulamentadas, como a advocacia. 2026 é ano-teste e a CBS entra em 2027. Opção pelo Simples para 2027 em set/2026 ⚠. | Na gestão do escritório, uma decisão anual de **regime tributário** (Simples ou fora dele), com o custo visível. Sem planilha. | 2.0 |
+| **Exame de Ordem** | Formato mantido (80 questões com 50% para aprovar; peça + 4 questões). 47º EOU em 2026. Reaproveitamento da 1ª fase para quem reprova na 2ª. Taxa por volta de R$ 350 ⚠. | O jogo já segue o formato e o reaproveitamento. Atualizar a taxa de reprovação (hoje R$ 300) depois de conferir o edital. | 1.2 |
+
+**Fontes desta seção:**
+- IA: [Recomendação do CFOAB sobre IA](https://www.oab.org.br/noticia/62711/confira-versao-final-da-recomendacao-do-cfoab-sobre-o-uso-de-ia-na-pratica-juridica), [Plano Nacional de IA na Advocacia](https://www.oab.org.br/noticia/64289/cfoab-lanca-o-plano-nacional-para-orientar-uso-da-ia-e-ampliar-oportunidades-para-a-advocacia), [OAB contra empresas de IA que praticam atos privativos](https://www.oab.org.br/util/print/64465?print=Noticia), [CNJ: norma de IA no Judiciário](https://www.oab.org.br/noticia/62921/nova-norma-do-cnj-define-regras-para-ia-no-judiciario-com-participacao-da-oab)
+- Domicílio Judicial Eletrônico: [CNJ, cinco perguntas](https://www.cnj.jus.br/cinco-perguntas-para-entender-o-domicilio-judicial-eletronico/), [Migalhas](https://www.migalhas.com.br/depeso/431782/domicilio-judicial-eletronico-obrigatorio-a-pj-em-todos-os-tribunais)
+- Feriado local: [Lei 14.939/2024](https://legis.senado.leg.br/norma/39385229), [AASP sobre o STJ](https://www.aasp.org.br/?p=82954)
+- Tempo dos processos: [Justiça em Números 2025, sumário](https://www.cnj.jus.br/wp-content/uploads/2025/10/sumario-executivo-2025.pdf), [gratuidade](https://www.conjur.com.br/2025-set-25/um-em-cada-quatro-processos-tem-gratuidade-de-justica-no-brasil//?print=1)
+- Juros: [Lei 14.905/2024](https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/Lei/L14905.htm), [STF valida a Selic](https://www.conjur.com.br/2025-set-15/stf-valida-aplicacao-da-selic-para-correcao-de-dividas-civis//?print=1)
+- Rol da ANS: [STF fixa critérios](https://noticias.stf.jus.br/postsnoticias/stf-fixa-criterios-para-que-planos-de-saude-cubram-tratamentos-fora-da-lista-da-ans/), [acórdão da ADI 7265](https://legis.senado.leg.br/norma/41502636)
+- Superendividamento: [ConJur, mínimo existencial](https://www.conjur.com.br/2025-set-28/superendividamento-minimo-existencial-e-limite-de-repactuacao-de-divida//?print=1), [repactuação pode excluir juros](https://www.conjur.com.br/?p=884457)
+- Família: [Resolução CNJ 571/2024](https://atos.cnj.jus.br/atos/detalhar/5705), [IBDFAM](https://ibdfam.org.br/noticias/12170)
+- Honorários: [Tema 1076 do STJ](https://informativos.trilhante.com.br/temas-stj/tema-repetitivo-1076-stj)
+- Pejotização: [Agência Brasil](https://agenciabrasil.ebc.com.br/justica/noticia/2025-04/stf-suspende-todas-acoes-do-pais-sobre-pejotizacao-de-trabalhadores), [ConJur](https://www.conjur.com.br/?p=843263)
+- Reconhecimento de pessoas: [Resolução CNJ 484/2022](https://atos.cnj.jus.br/atos/detalhar/4883), [ConJur 2026](https://www.conjur.com.br/2026-abr-06/norma-do-cpp-sobre-reconhecimento-pessoal-nao-e-mera-recomendacao-reforca-stj//?print=1)
+- Juiz das garantias: [STF proclama o resultado](https://noticias.stf.jus.br/postsnoticias/juiz-das-garantias-stf-proclama-resultado-do-julgamento/), [estudo UnB](https://periodicos.unb.br/index.php/redunb/article/download/58028/44111/226621)
+- INSS: [Novo Atestmed](https://agenciagov.ebc.com.br/noticias/202603/novo-atestmed-acelera-a-decisao-de-analise-de-beneficios-por-incapacidade-temporaria), [fila da perícia](https://www.contabeis.com.br/noticias/77832/fila-da-pericia-do-inss-cai-59-em-2026/)
+- Código Civil: [Agência Senado](https://www12.senado.leg.br/noticias/materias/2026/01/20/reforma-do-codigo-civil-pode-avancar-no-senado-em-2026), [PL 4/2025](https://www25.senado.leg.br/web/atividade/materias/-/materia/166998)
+- Mercado: [Quadro de Advogados da OAB](https://www.oab.org.br/institucionalconselhofederal/quadroAdvogados), [advocacia dativa OAB-SP](https://www.oabsp.org.br/jornaldaadvocacia/26-03-02-1816-novo-convenio-da-advocacia-dativa-traz-reajustes-de-ate-antecipacao-de-honorarios-e-sistema-integrado-de-pagamento)
+- Tributário: [OAB-SP, simulador](https://www.oabsp.org.br/jornaldaadvocacia/26-10-29-1807-oab-sp-lanca-simulador-gratuito-para-calcular-imposto-da-reforma-tributaria), [OAB, impacto da reforma](https://www.oab.org.br/noticia/62445/luta-por-justica-fiscal-o-impacto-da-reforma-tributaria-na-advocacia)
+- Exame de Ordem: [cronograma do 47º e 48º EOU](https://www.oab.org.br/util/print/64207?print=Noticia)
 
 ---
 
